@@ -19,21 +19,21 @@ module audiobus
 		public cowbell:audiobus.instruments.CowBell;
 		
 		public dsp:AudioContext;
-		public masterGain:GainNode;			// MAIN volume 
+		public gain:GainNode;			// MAIN volume 
 
 		/*
 		public set volume( vol:number=1 ):void
 		{
-			this.masterGain.gain = vol;
+			this.gain.gain = vol;
 		}
 		
 		public get volume( ):number
 		{
-			return this.masterGain.gain;
+			return this.gain.gain;
 		}
 		*/
 		// starts here...
-		constructor( )
+		constructor( audioContext:AudioContext = null, outputTo:GainNode = null )
 		{
 			var available:boolean = this.initDSP( window );
 			if (!available)
@@ -63,17 +63,22 @@ module audiobus
 		private setup():void
 		{
 			// Setup Main OUTPUT LEVEL
-			this.masterGain = this.dsp.createGain();
+			this.gain = this.dsp.createGain();
 		
 			// Create Instruments
-			this.bassdrum = new audiobus.instruments.BassDrum( this.dsp, this.masterGain );
-			this.conga = new audiobus.instruments.Conga( this.dsp, this.masterGain );
-			this.snare = new audiobus.instruments.Snare( this.dsp, this.masterGain );
-			this.hihat = new audiobus.instruments.HiHat( this.dsp, this.masterGain );
-			this.cowbell = new audiobus.instruments.CowBell( this.dsp, this.masterGain );
+			this.bassdrum = new audiobus.instruments.BassDrum( this.dsp, this.gain );
+			this.conga = new audiobus.instruments.Conga( this.dsp, this.gain );
+			this.snare = new audiobus.instruments.Snare( this.dsp, this.gain );
+			this.hihat = new audiobus.instruments.HiHat( this.dsp, this.gain );
+			this.cowbell = new audiobus.instruments.CowBell( this.dsp, this.gain );
+			
+			// If you want to connect this DrumMachine machine to 
+			// another DrumMachine machine or to the Spectrum Analyser
+			// this is the place to intercept it!
+			
 			
 			// 	Route SIGNALS - MIX AND OUTPUT
-			this.masterGain.connect( this.dsp.destination );
+			this.gain.connect( this.dsp.destination );
 			
 			// Fix FF
 			//for legacy browsers
@@ -85,22 +90,67 @@ module audiobus
 		{
 			switch (id)
 			{
+			
+				default:
+				case 0:
+					this.bassdrum.start(2050, 0.005, 0.01, 0.7);
+					break;			
 				case 1:
-					this.snare.start();
-					break;
+					this.bassdrum.start(4050, 0.007, 0.01, 0.6);
+					
+					break;			
 				case 2:
-					this.hihat.start();
-					break;
+					this.bassdrum.start(8050, 0.008, 0.03, 0.5);
+					
+					break;			
 				case 3:
-					this.conga.start();
-					break;
-				case 4:
-					this.cowbell.start();
+					this.bassdrum.start(12050, 0.005, 0.01, 0.4);
+					
 					break;
 					
-				case 0:
-				default:
-					this.bassdrum.start();
+				case 4:
+					this.snare.start( 2050, 0.005, 0.01, 0.1);
+					break;			
+				case 5:
+					this.snare.start( 2050, 0.006, 0.02, 0.1);
+					break;			
+				case 6:
+					this.snare.start( 2050, 0.007, 0.03, 0.1);
+					break;			
+					
+				case 7:
+					this.snare.start( 2050, 0.008, 0.04, 0.1);
+					break;			
+				case 8:
+					this.conga.start( 1200, 0.160);
+					break;			
+				case 9:
+					this.conga.start( 2200, 0.260);
+					
+					break;			
+				case 10:
+					this.conga.start( 3200, 0.360);
+					
+					break;			
+				case 11:
+					this.conga.start( 4200, 0.460);
+					
+					break;			
+				case 12:
+					this.cowbell.start( 0.025, 0.05, 0.4);
+					break;			
+				case 13:
+					this.cowbell.start( 0.020, 0.04, 0.3);
+					break;			
+				case 14:
+					this.cowbell.start( 0.015, 0.03, 0.2);
+					break;			
+				case 15:
+					this.cowbell.start( 0.010, 0.02, 0.3);
+					break;			
+				case 16:
+					this.cowbell.start( 0.005, 0.01, 0.2);
+					break;
 			}
 		}
 	}

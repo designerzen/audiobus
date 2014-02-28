@@ -1,4 +1,6 @@
 ///<reference path="audiobus/DrumMachine.ts" />
+///<reference path="audiobus/inputs/Microphone.ts" />
+///<reference path="audiobus/visualisation/SpectrumAnalyzer.ts" />
 class Main 
 {
 	
@@ -17,6 +19,15 @@ class Main
 		this.drums.trigger(2);
 		this.drums.trigger(3);
 		this.drums.trigger(4);
+		
+		// var mic = new audiobus.inputs.Microphone( this.drums.dsp, this.drums.gain );
+		// mic.getMic();
+		
+		var viz = new audiobus.visualisation.SpectrumAnalyzer( this.drums.dsp, this.drums.gain );
+		
+		// now hook into our analyser for updates
+		
+		
 		// Attach key event
 		document.onkeydown = (event) => {
             this.keyListener(event);

@@ -16,17 +16,17 @@ module audiobus.instruments
 			this.osc2.connect( this.gain );
 		}
 		
-		public start():void
+		public start(  f:number=1200, offsetA:number=0.160 ):void
 		{
 			var t:number = this.context.currentTime;
 			
-			this.osc2.frequency.setValueAtTime(1200, t);
+			this.osc2.frequency.setValueAtTime(f, t);
 			this.osc2.frequency.linearRampToValueAtTime(800, t + 0.005);
 			
 			this.gain.gain.cancelScheduledValues( t );
 			this.gain.gain.setValueAtTime(0.5, t);
 			this.gain.gain.exponentialRampToValueAtTime(0.5, 	t + 0.010);
-			this.gain.gain.linearRampToValueAtTime(0.0,  t + 0.160);
+			this.gain.gain.linearRampToValueAtTime(0.0,  t + offsetA);
 			
 			this.osc2.start(0);	
 		}
