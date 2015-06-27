@@ -30,7 +30,9 @@ module audiobus.instruments
 			this.osc1.frequency.setValueAtTime( l, t );
 			this.osc1.frequency.exponentialRampToValueAtTime( 80, t + offsetA );
 
-			this.osc1.start(0);
+			if ( !this.hasInitialised )this.osc1.start(0);
+			
+			super.start();
 		}
 	}
 	

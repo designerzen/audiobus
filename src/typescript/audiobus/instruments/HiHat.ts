@@ -86,13 +86,17 @@ module audiobus.instruments
 			this.gain.gain.linearRampToValueAtTime(0.0,  t + 0.300);
 			
 			//noise.start(0);		
+			if ( !this.hasInitialised )
+			{
+				this.osc5.start(0);
+				this.osc6.start(0);
+				this.osc7.start(0);
+				this.osc8.start(0);
+				this.osc9.start(0);
+				this.oscA.start(0);
+			}
 			
-			this.osc5.start(0);
-			this.osc6.start(0);
-			this.osc7.start(0);
-			this.osc8.start(0);
-			this.osc9.start(0);
-			this.oscA.start(0);
+			super.start();
 		}
 		
 	}

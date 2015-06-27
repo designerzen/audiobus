@@ -28,7 +28,8 @@ module audiobus.instruments
 			this.gain.gain.exponentialRampToValueAtTime(0.5, 	t + 0.010);
 			this.gain.gain.linearRampToValueAtTime(0.0,  t + offsetA);
 			
-			this.osc2.start(0);	
+			if ( !this.hasInitialised ) this.osc2.start(0);	
+			super.start();
 		}
 	}
 	

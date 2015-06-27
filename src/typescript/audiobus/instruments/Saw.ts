@@ -10,9 +10,15 @@ module audiobus.instruments
 		constructor( audioContext:AudioContext, outputTo:GainNode )
 		{
 			super( audioContext, outputTo );
+			this.create();
+		}
+		
+		// Synthesize!
+		private create():void
+		{
 			// Synthesize!
-			this.osc = audioContext.createOscillator();
-			this.osc.type = 1; // sine wave
+			this.osc = this.context.createOscillator();
+			this.osc.type = 1; // Saw wave
 			this.osc.connect( this.gain );
 		}
 		
@@ -30,8 +36,9 @@ module audiobus.instruments
 			//this.gain.gain.setValueAtTime(0.5, t);
 			//this.gain.gain.exponentialRampToValueAtTime(0.5, 	t + 0.010);
 			//this.gain.gain.linearRampToValueAtTime(0.0,  t + 0.160);
-			
-			this.osc.start(0);	
+		
+			if ( !this.hasInitialised )this.osc.start(t);	
+			super.start();
 		}
 		
 	}

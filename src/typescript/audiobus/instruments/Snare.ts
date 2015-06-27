@@ -29,17 +29,19 @@ module audiobus.instruments
 		}
 		
 		// trigger!
-		public start( l:number=2050, offsetA:number=0.025, offsetB:number=0.050, offsetC:number=0.3):void
+		public start( l:number=2050, attack:number=0.025, offsetB:number=0.050, offsetC:number=0.3):void
 		{
 			var t:number = this.context.currentTime;
 			
 			this.gain.gain.cancelScheduledValues( t );
 			this.gain.gain.setValueAtTime(1, t);
-			this.gain.gain.linearRampToValueAtTime(1,  t + offsetA);
-			this.gain.gain.exponentialRampToValueAtTime(0.2, 	t + offsetB);
-			this.gain.gain.linearRampToValueAtTime(0.0,  t + offsetC);
+			this.gain.gain.linearRampToValueAtTime(1, t + attack);
+			this.gain.gain.exponentialRampToValueAtTime(0.2, t + offsetB);
+			this.gain.gain.linearRampToValueAtTime(0.0, t + offsetC);
 				
-			this.noise.start(0);
+			if ( !this.hasInitialised )this.noise.start(0);
+			
+			super.start();
 		}
 		
 	}

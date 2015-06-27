@@ -11,8 +11,13 @@ module audiobus.instruments
 		constructor( audioContext:AudioContext, outputTo:GainNode )
 		{
 			super( audioContext, outputTo );
+			this.create();
+		}
+		
+		private create():void
+		{
 			// Synthesize!
-			this.osc = audioContext.createOscillator();
+			this.osc = this.context.createOscillator();
 			this.osc.type = 0; // sine wave
 			this.osc.connect( this.gain );
 		}
@@ -26,13 +31,39 @@ module audiobus.instruments
 			//this.osc.frequency.setValueAtTime(1200, t);
 			//this.osc.frequency.linearRampToValueAtTime(800, t + 0.005);
 			
-			this.gain.gain.value = .5;
 			//this.gain.gain.cancelScheduledValues( t );
-			//this.gain.gain.setValueAtTime(0.5, t);
-			//this.gain.gain.exponentialRampToValueAtTime(0.5, 	t + 0.010);
-			//this.gain.gain.linearRampToValueAtTime(0.0,  t + 0.160);
+			this.gain.gain.cancelScheduledValues( t );
+				
+			if ( this.isPlaying )
+			{
+				// this note is already playing so don't tweak it.
+				this.gain.gain.value = .5;
+			}else{
+				// freshly playing so ADSR it
+				//this.gain.gain.value = .5;
+				//this.gain.gain.setValueAtTime(0.0001, t);
+    			// An exception will be thrown if this value is less than or equal to 0,
+				// or if the value at the time of the previous event is less than or equal to 0.
+				//this.gain.gain.exponentialRampToValueAtTime( 0.5, t + 0.001 );
+				//this.gain.gain.value = .5;
+					
+				//this.gain.gain.setValueAtTime(0.0000000000001, t);	
+				this.gain.gain.exponentialRampToValueAtTime( 0.5, t + this.durationFadeIn );
+				
+				console.log( 'trying to start '+this.isPlaying+ ' state:' + this.osc.playbackState );
+			}
 			
-			this.osc.start(0);	
+			//console.log( 'hasInitialised '+this.hasInitialised+ ' state:' + this.osc.playbackState );
+			if ( !this.hasInitialised ) this.osc.start(t);	
+			super.start();
+		}
+		
+		public stop():void
+		{
+			if ( !this.hasInitialised ) return;
+			console.log( 'stop playing? '+this.isPlaying + ' state:' + this.osc.playbackState );
+			//this.osc.stop( 0 );
+			super.stop();
 		}
 		
 	}

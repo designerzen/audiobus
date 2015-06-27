@@ -14,8 +14,7 @@ module audiobus.inputs
     {
 		public context:AudioContext;
 		public gain:GainNode;
-			// this will need to be removed once getUserMedia is more accepted
-		
+			
 		// create
 		constructor( audioContext:AudioContext, outputTo:GainNode )
 		{
@@ -23,6 +22,7 @@ module audiobus.inputs
 			this.gain = audioContext.createGain();
 			this.gain.connect( outputTo );
 		}
+		// this will need to be removed once getUserMedia is more accepted
 		private getUserMedia(options: { video?: boolean; audio?: boolean; }, 
 				success: (stream: any) => void, 
 				error?: (error: string) => void)
