@@ -1,4 +1,4 @@
-///<reference path="../definitions/waa.d.ts" />
+/// <reference path="../Dependencies.ts"/>
 ///<reference path="Instrument.ts" />
 ///<reference path="../ISoundControl.ts" />
 module audiobus.instruments
@@ -7,55 +7,100 @@ module audiobus.instruments
     export class Theremin extends Instrument implements ISoundControl
     {
 		private osc:OscillatorNode;
-		
+		private oscFilter:OscillatorNode;
+
+		public volume:GainNode;
+		public oscVolume:GainNode;
+		public finalVolume:GainNode;
+		public scuzzVolume:GainNode;
+		public feedbackGain:GainNode;
+
+		public filter:BiquadFilterNode;
+		public delay:DelayNode;
+		public analyser:AnalyserNode;
+
+		public compressor:DynamicsCompressorNode;
+
 		// create
 		constructor( audioContext:AudioContext, outputTo:GainNode )
 		{
 			super( audioContext, outputTo );
 			this.create();
 		}
-		
+
 		private create():void
 		{
 			// Synthesize!
 			this.osc = this.context.createOscillator();
-			this.osc.type = 0; // sine wave
-			this.osc.connect( this.gain );
-			
-			this.gain = audioContext.createGain();
-			h.volume = a.createGain ? a.createGain() : a.createGainNode(), 
-			h.oscVolume = a.createGain ? a.createGain() : a.createGainNode(), 
-			h.finalVolume = a.createGain ? a.createGain() : a.createGainNode(), 
-			h.scuzzVolume = a.createGain ? a.createGain() : a.createGainNode(),
-			h.filter = a.createBiquadFilter(),
-			h.delay = a.createDelay ? a.createDelay() : a.createDelayNode(),
-			h.feedbackGain = a.createGain ? a.createGain() : a.createGainNode(),
-			h.compressor = a.createDynamicsCompressor(), 
-			
-			
+			this.osc.type = OscillatorTypes.SINE; // sine wave
+			this.osc.frequency.value = 400,
+			//this.osc.connect( this.gain );
+
+			this.volume = this.context.createGain();
+			this.oscVolume = this.context.createGain();
+			this.finalVolume = this.context.createGain();
+			this.scuzzVolume = this.context.createGain();
+			this.feedbackGain = this.context.createGain();
+
+			this.filter = this.context.createBiquadFilter();
+			this.delay = this.context.createDelay();
+
+			this.compressor = this.context.createDynamicsCompressor();
+
+
+			this.filter.type = "lowpass";
+			this.feedbackGain.gain.value = 0.5;
+			this.delay.delayTime.value = 0.5;
+			this.scuzzVolume.gain.value = 0.5;
+			this.volume.gain.value =0.5;
+			this.oscVolume.gain.value = 0;
+			this.finalVolume.gain.value = 1;
+
+
+			this.oscFilter = this.context.createOscillator();
+			this.oscFilter.connect(this.oscVolume);
+
+			this.osc.connect(this.scuzzVolume);
+			this.scuzzVolume.connect( this.oscFilter );
+
+			this.oscVolume.connect(this.filter);
+			this.filter.connect(this.compressor);
+			this.filter.connect(this.delay);
+			this.delay.connect(this.feedbackGain);
+			this.delay.connect(this.compressor);
+			this.feedbackGain.connect(this.delay);
+			this.compressor.connect(this.volume);
+			this.volume.connect(this.finalVolume);
+			this.finalVolume.connect(this.analyser);
+
+			this.analyser.connect(this.context.destination);
+			this.analyser.smoothingTimeConstant = 0.85;
+
+			this.osc.start(0);
+			this.oscFilter.start(0);
 		}
-		
-		public setFilterFrequency(b):void
+
+		public setFilterFrequency(b:number):number
 		{
-			var c = 40,
-				e = a.sampleRate / 2,
-				f = Math.log(e / c) / Math.LN2,
-				g = Math.pow(2, f * (2 / d.clientHeight * (d.clientHeight - b) - 1));
-			h.filter.frequency.value = e * g
+			var c:number = 40,
+				e:number = this.context.sampleRate / 2,
+				f:number = Math.log(e / c) / Math.LN2,
+				g:number = Math.pow(2, f * (2 / b) );
+			return e * g;
 		}
-		
+
 		public start( frequency:number ):void
 		{
 			//console.log("Sine commencing at f:"+frequency );
 			var t:number = this.context.currentTime;
-			
+
 			this.osc.frequency.value = frequency;
 			//this.osc.frequency.setValueAtTime(1200, t);
 			//this.osc.frequency.linearRampToValueAtTime(800, t + 0.005);
-			
+
 			//this.gain.gain.cancelScheduledValues( t );
 			this.gain.gain.cancelScheduledValues( t );
-				
+
 			if ( this.isPlaying )
 			{
 				// this note is already playing so don't tweak it.
@@ -68,30 +113,30 @@ module audiobus.instruments
 				// or if the value at the time of the previous event is less than or equal to 0.
 				//this.gain.gain.exponentialRampToValueAtTime( 0.5, t + 0.001 );
 				//this.gain.gain.value = .5;
-					
-				//this.gain.gain.setValueAtTime(0.0000000000001, t);	
+
+				//this.gain.gain.setValueAtTime(0.0000000000001, t);
 				this.gain.gain.exponentialRampToValueAtTime( 0.5, t + this.durationFadeIn );
-				
-				console.log( 'trying to start '+this.isPlaying+ ' state:' + this.osc.playbackState );
+
+				console.log( 'trying to start '+this.isPlaying );
 			}
-			
+
 			//console.log( 'hasInitialised '+this.hasInitialised+ ' state:' + this.osc.playbackState );
-			if ( !this.hasInitialised ) this.osc.start(t);	
+			if ( !this.hasInitialised ){ this.osc.start(t);}
 			super.start();
 		}
-		
+
 		public stop():void
 		{
-			if ( !this.hasInitialised ) return;
-			console.log( 'stop playing? '+this.isPlaying + ' state:' + this.osc.playbackState );
+			if ( !this.hasInitialised ) {return;}
+			console.log( 'stop playing? '+this.isPlaying );
 			//this.osc.stop( 0 );
 			super.stop();
 		}
-		
-	}
-	
-}
 
+	}
+
+}
+/*
 var a, b, c, d, e, f, g, h = {},
 	i = !1,
 	j = !1,
@@ -115,35 +160,35 @@ return 580 > o ? (l = 1.3, m = 1.3) : 700 > o ? (l = 1.2, m += 1, n +=
 		f ? a = new f : alert(
 				"Boo hiss! Sorry but this will not work in your browser. Please upgrade to the latest Chrome or Safari and have another try."
 			), c.getElementById("waveform")
-			.addEventListener("change", theremin.setWaveform, !1), 
+			.addEventListener("change", theremin.setWaveform, !1),
 			c.getElementById("delay")
-			.addEventListener("input", theremin.sliderChange, !1), 
+			.addEventListener("input", theremin.sliderChange, !1),
 			c.getElementById("feedback")
-			.addEventListener("input", theremin.sliderChange, !1), 
+			.addEventListener("input", theremin.sliderChange, !1),
 			c.getElementById("scuzzVolume")
-			.addEventListener("input", theremin.sliderChange, !1), 
+			.addEventListener("input", theremin.sliderChange, !1),
 			c.getElementById("mainVolume")
-			.addEventListener("input", theremin.sliderChange, !1), 
-			d = c.querySelector(".surface"), 
-			e = c.querySelector(".finger"), 
-			
-			h.volume = a.createGain ? a.createGain() : a.createGainNode(), 
-			h.oscVolume = a.createGain ? a.createGain() : a.createGainNode(), 
-			h.finalVolume = a.createGain ? a.createGain() : a.createGainNode(), 
+			.addEventListener("input", theremin.sliderChange, !1),
+			d = c.querySelector(".surface"),
+			e = c.querySelector(".finger"),
+
+			h.volume = a.createGain ? a.createGain() : a.createGainNode(),
+			h.oscVolume = a.createGain ? a.createGain() : a.createGainNode(),
+			h.finalVolume = a.createGain ? a.createGain() : a.createGainNode(),
 			h.scuzzVolume = a.createGain ? a.createGain() : a.createGainNode(),
 			h.filter = a.createBiquadFilter(),
 			h.delay = a.createDelay ? a.createDelay() : a.createDelayNode(),
 			h.feedbackGain = a.createGain ? a.createGain() : a.createGainNode(),
-			h.compressor = a.createDynamicsCompressor(), 
-			
+			h.compressor = a.createDynamicsCompressor(),
+
 			b = a.createAnalyser(),
-			b.smoothingTimeConstant = .85, 
+			b.smoothingTimeConstant = .85,
 			theremin.updateOutputs(),
-			theremin.animateSpectrum(), 
-			
+			theremin.animateSpectrum(),
+
 			d.addEventListener("mousedown",
-				theremin.play, !1), 
-				
+				theremin.play, !1),
+
 			d.addEventListener("touchstart", theremin.play, !
 				1), c.querySelector(".surface")
 			.addEventListener("touchmove", function(a)
@@ -154,38 +199,38 @@ return 580 > o ? (l = 1.3, m = 1.3) : 700 > o ? (l = 1.2, m += 1, n +=
 	routeSounds: function()
 	{
 		var c = document;
-		theremin.setWaveform(c.getElementById("waveform")), 
-		h.filter.type = "lowpass", 
-		h.feedbackGain.gain.value = c.getElementById("feedback").value, 
-		h.delay.delayTime.value = c.getElementById("delay").value, 
-		h.scuzzVolume.gain.value = c.getElementById("scuzzVolume").value, 
-		h.volume.gain.value = .6, 
-		h.oscVolume.gain.value = 0, 
-		h.finalVolume.gain.value = c.getElementById("mainVolume").value, 
-		
-		g = a.createOscillator(), 
-		g.frequency.value = 400, 
-		g.type = "sine", 
-		g.connect(h.scuzzVolume), 
+		theremin.setWaveform(c.getElementById("waveform")),
+		h.filter.type = "lowpass",
+		h.feedbackGain.gain.value = c.getElementById("feedback").value,
+		h.delay.delayTime.value = c.getElementById("delay").value,
+		h.scuzzVolume.gain.value = c.getElementById("scuzzVolume").value,
+		h.volume.gain.value = .6,
+		h.oscVolume.gain.value = 0,
+		h.finalVolume.gain.value = c.getElementById("mainVolume").value,
+
+		g = a.createOscillator(),
+		g.frequency.value = 400,
+		g.type = "sine",
+		g.connect(h.scuzzVolume),
 		h.scuzzVolume.connect(f.detune),
-		
-		f = a.createOscillator(), 
-		f.connect(h.oscVolume), 
-		
-		h.oscVolume.connect(h.filter), 
-		h.filter.connect(h.compressor), 
-		h.filter.connect(h.delay), 
+
+		f = a.createOscillator(),
+		f.connect(h.oscVolume),
+
+		h.oscVolume.connect(h.filter),
+		h.filter.connect(h.compressor),
+		h.filter.connect(h.delay),
 		h.delay.connect(h.feedbackGain),
-		h.delay.connect(h.compressor), 
+		h.delay.connect(h.compressor),
 		h.feedbackGain.connect(h.delay),
-		h.compressor.connect(h.volume), 
+		h.compressor.connect(h.volume),
 		h.volume.connect(h.finalVolume),
-		h.finalVolume.connect(b), 
-		
-		b.connect(a.destination), 
-		
-		g.start || (g.start = g.noteOn), 
-		g.start(0), 
+		h.finalVolume.connect(b),
+
+		b.connect(a.destination),
+
+		g.start || (g.start = g.noteOn),
+		g.start(0),
 		f.start || (f.start = f.noteOn),
 		f.start(0)
 	},
@@ -283,4 +328,4 @@ return 580 > o ? (l = 1.3, m = 1.3) : 700 > o ? (l = 1.2, m += 1, n +=
 				a), c = Math.round(i / n), e = 0; c > e; e += 1) d = a[e], g.fillRect(
 			n * e * 1.6, j, n, -d * m)
 	}
-}
+}*/

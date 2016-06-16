@@ -1,80 +1,82 @@
-//<reference path="../../../definitions/waa.d.ts" />
-///<reference path="Visualiser.ts" />
+/// <reference path="../../Dependencies.ts" />
+/// <reference path="Visualiser.ts" />
 module audiobus.visualisation
 {
 	export class Plasma extends Visualiser
     {
-		private var palette:Vector.<int>;
-		private var sineTable:Vector.<int>;
-		private var pos1:int;
-		private var pos2:int;
-		
+		private palette:Array<number>;
+		private sineTable:Array<number>;
+
+		private pos1:number;
+		private pos2:number;
+
 		// create
-		constructor( audioContext:AudioContext )
+		constructor()
 		{
+			super();
 			this.createTable();
-			super( audioContext );
 		}
-		
+
 		private createTable():void
 		{
-			var i:int, r:int, g:int, b:int, rad:number;
+			var i:number, r:number, g:number, b:number, rad:number;
 
-			palette = new Vector.<int>(256, true);
-			sineTable = new Vector.<int>(512, true);
+			this.palette = new Array(); // 256
+			this.sineTable = new Array(); // 512
 
 			for (i = 0; i < 512; ++i)
 			{
 				rad = i * 0.703125 * 0.0174532;
-				sineTable[i] = Math.sin(rad) * 1024;
+				this.sineTable[i] = Math.sin(rad) * 1024;
 			}
 
-			for (i = 0; i < 64; ++i) 
+			for (i = 0; i < 64; ++i)
 			{
 				r = i << 2;
 				g = 255 - ((i << 2) + 1);
 				b = 0;
-				palette[i] = r << 16 | g << 8 | b;
+				this.palette[i] = r << 16 | g << 8 | b;
 
 				r = 255;
 				g = (i << 2) + 1;
-				palette[i + 64] = r << 16 | g << 8 | b;
+				this.palette[i + 64] = r << 16 | g << 8 | b;
 
 				r = 255 - ((i << 2) + 1);
 				g = r;
 				b = 0;
-				palette[i + 128] = r << 16 | g << 8 | b;
+				this.palette[i + 128] = r << 16 | g << 8 | b;
 
 				r = 0;
 				g = (i << 2) + 1;
 				b = 0;
-				palette[i + 192] = r << 16 | g << 8 | b;
+				this.palette[i + 192] = r << 16 | g << 8 | b;
 			}
 		}
-		
+
 		public update( frequencyData:Uint8Array )
 		{
-			this.canvas;
-			var i:int, j:int, p:int, tp1:int, tp2:int, tp3:int, tp4:int;
+			//this.canvas;
+			var i:number, j:number, p:number, tp1:number, tp2:number, tp3:number, tp4:number;
 
-			tp3 = pos2;
+			tp3 = this.pos2;
 			//canvas.lock();
 
-			for (i = 0; i < 360; ++i) 
+			for (i = 0; i < 360; ++i)
 			{
-				tp1 = pos1 + 5;
+				tp1 = this.pos1 + 5;
 				tp2 = 3;
 				tp3 &= 511;
 				tp4 &= 511;
 
-				for (j = 0; j < 480; ++j) 
+				for (j = 0; j < 480; ++j)
 				{
 					tp1 &= 511;
 					tp2 &= 511;
 
-					p = sineTable[tp1] + sineTable[tp2] + sineTable[tp3] + sineTable[tp4];
+					p = this.sineTable[tp1] + this.sineTable[tp2] + this.sineTable[tp3] + this.sineTable[tp4];
 					p = (128 + (p >> 4)) & 255;
-					canvas.setPixel(j, i, palette[p]);
+
+					//this.context.setPixel( j, i, this.palette[p] );
 
 					tp1 += 5;
 					tp2 += 3;
@@ -86,9 +88,9 @@ module audiobus.visualisation
 
 			//canvas.unlock();
 
-			pos1 += 9;
-			pos2 += 8;		
+			this.pos1 += 9;
+			this.pos2 += 8;
 		}
 	}
-	
+
 }
