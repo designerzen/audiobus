@@ -1,8 +1,9 @@
 /// <reference path="../../Dependencies.ts" />
 /// <reference path="Visualiser.ts" />
-module audiobus.visualisation
+/// <reference path="IVisualiser.ts" />
+module audiobus.visualisation.visualisers
 {
-	export class Plasma extends Visualiser
+	export class Plasma extends Visualiser implements IVisualiser
     {
 		private palette:Array<number>;
 		private sineTable:Array<number>;
@@ -53,7 +54,7 @@ module audiobus.visualisation
 			}
 		}
 
-		public update( frequencyData:Uint8Array )
+		public update( spectrum:Uint8Array, time:number ):void
 		{
 			//this.canvas;
 			var i:number, j:number, p:number, tp1:number, tp2:number, tp3:number, tp4:number;
@@ -90,6 +91,8 @@ module audiobus.visualisation
 
 			this.pos1 += 9;
 			this.pos2 += 8;
+
+			super.update( spectrum, time );
 		}
 	}
 

@@ -1,5 +1,3 @@
-/// <reference path="../Dependencies.ts"/>
-
 // interface IPlugs
 module audiobus.instruments
 {
@@ -7,7 +5,6 @@ module audiobus.instruments
     {
 		public context:AudioContext;
 		public gain:GainNode;
-        
 		public isPlaying:boolean = false;
 		public hasInitialised:boolean = false;
 
@@ -32,7 +29,7 @@ module audiobus.instruments
 		constructor( audioContext:AudioContext, outputTo:GainNode )
 		{
 			this.context = audioContext;
-			this.gain = this.context.createGain();
+			this.gain = audioContext.createGain();
 			this.gain.connect( outputTo );
 		}
 
@@ -45,9 +42,14 @@ module audiobus.instruments
 			console.log( 'start ' +this.isPlaying  );
 		}
 
+        public note( frequency:number ):boolean
+        {
+            return this.isPlaying;
+        }
+
 		public stop():void
 		{
-			if ( !this.hasInitialised || !this.isPlaying ) { return; };
+			if ( !this.hasInitialised || !this.isPlaying ) return;
 
 			//this.gain.gain.value = 0;
 			//
@@ -58,6 +60,7 @@ module audiobus.instruments
 			console.log( 'stop vol:', this.gain );
 			//if (this.gain.gain.value > 0 ) console.error('could not stop'+this);
 			this.isPlaying = false;
+
 		}
 
 		public fadeIn( time:number=0.1 ):void

@@ -3,11 +3,15 @@ module audiobus.visualisation
 {
     export class SpectrumAnalyzer
     {
-		public context:AudioContext;
+		private context:AudioContext;
 		public gain:GainNode;
 		public analyser:AnalyserNode;
-		private sampleRate:number;
 		public frequencyData:Uint8Array;
+
+        private running:boolean = false;
+        private sampleRate:number;
+
+        public onanalysis:Function = function(){};
 
 		constructor( audioContext:AudioContext, outputTo:GainNode )
 		{
@@ -28,13 +32,39 @@ module audiobus.visualisation
 
 			//connect to source
 			this.gain.connect( this.analyser );
+
+            // Store
+            this.analyser.getByteFrequencyData( this.frequencyData );
 		}
 
-		private update() {
-			//constantly getting feedback from data
-			this.analyser.getByteFrequencyData( this.frequencyData );
+        public start():void
+        {
+            this.running = true;
+            this.update();
+        }
+
+        public stop():void
+        {
+            this.running = false;
+        }
+
+		private update():void
+        {
 			// Schedule the next update
-			requestAnimationFrame( this.update );
+			if (this.running)
+            {
+                //constantly getting feedback from data
+    			this.analyser.getByteFrequencyData( this.frequencyData );
+                // send out this data
+                // this.frequencyData
+    			if (this.onanalysis)
+                {
+                    this.onanalysis( this.frequencyData );
+                }
+                // go round another tine!
+                requestAnimationFrame( () => this.update() );
+                ///console.log("analyser::updated", this.update);
+            }
 		}
 
 	}
