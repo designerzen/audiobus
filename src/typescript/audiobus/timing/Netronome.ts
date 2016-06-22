@@ -1,8 +1,10 @@
-/// <reference path="Dependencies.ts" />
-module audiobus
+/// <reference path="../Dependencies.ts" />
+module audiobus.timing
 {
 	export class Netronome
     {
+		public now:Function = () => window.performance && window.performance.now ? window.performance.now() : Date.now();
+
 		// Start *all* metronomes from the same point in time
 		static EPOCH:number = new Date( 2012, 12, 21, 6, 6, 6 ).getTime();
 
@@ -11,11 +13,9 @@ module audiobus
 
 		private playing:boolean = false;
 		public percentage:number = 0;
-		//private callOnBeat:Function;
-		private callOnBeat:(scope:any,time : number)=>any;
-		private callOnProgress:( scope:any,percent : number)=>any;
 
-		private callbackScope;
+		public ontick:Function;
+		public onprogress:Function;
 
 		// INTERALS =======================================================
 
@@ -26,14 +26,12 @@ module audiobus
 
 			var seconds:number = 60 / beatsPerMinute ;
 
-
 			this.period = seconds * 1000;
 
 			this.lastBarTimeStamp = this.determineStartTime();
 
-			var elapsed:number =  Date.now() - this.lastBarTimeStamp;	// fetch last bar timestamp and minus from NOW
+			var elapsed:number =  this.now() - this.lastBarTimeStamp;	// fetch last bar timestamp and minus from NOW
 			this.percentage = elapsed / this.period;
-
 
 			return beatsPerMinute;
 		}
@@ -43,28 +41,12 @@ module audiobus
 			return ( 60 / ( this.period * 0.001 ) ) >> 0;
 		}
 
-
-		constructor( onBeatCallback:(scope:any, time : number)=>any, onProgressCallback:(scope:any, percent : number)=>any, scope:any )
-		{
-			// Assign the method implementation here.
-			this.callOnBeat = onBeatCallback;
-			this.callOnProgress = onProgressCallback;
-			/*
-			this.callOnBeat = () => {
-				onBeatCallback.apply(this, arguments);
-			}
-
-			this.callOnProgress = () => {
-				onProgressCallback.apply(this, arguments);
-			}
-			*/
-			this.callbackScope = scope;
-		}
+		constructor(){}
 
 		////////////////////////////////////////////////////////////////////////
 		// Begin & End the Netronome timer
 		////////////////////////////////////////////////////////////////////////
-		public start( bpm:number=90):void
+		public start( bpm:number=90 ):void
 		{
 			this.playing = true;
 			this.setBpm( bpm );
@@ -84,7 +66,7 @@ module audiobus
 		private determineStartTime():number
 		{
 			// so we have a timestamp that shows the time now
-			var now:number = Date.now();						// correct :)
+			var now:number = this.now() >> 0;								// correct :)
 			var timeSinceEpoch:number = now - Netronome.EPOCH;			// correct :)
 			var elapsed:number = timeSinceEpoch % this.period;
 			var remaining:number = this.period - elapsed;
@@ -101,7 +83,6 @@ module audiobus
 			return lastTick;
 		}
 
-
 		////////////////////////////////////////////////////////////////////////
 		//
 		////////////////////////////////////////////////////////////////////////
@@ -117,45 +98,40 @@ module audiobus
 		private onTimer():void
 		{
 			// discover how much time has elapsed since our last timestamp...
-			var time:number = Date.now();
+			var time:number = this.now();
 			var elapsed:number = time - this.lastBarTimeStamp;	// fetch last bar timestamp and minus from NOW
 			var progress:number = elapsed / this.period;
 			var barOccurred:boolean = elapsed >= this.period;
 
-			// pass on a progress event!
-			// this contains the percentage that the bar has elapsed
-			//dispatchEvent( new MetronomeEvent( MetronomeEvent.PROGRESS, progress ) );
-
 			// check to see if the bar had elapsed && beatsCompletedBeforeBar
-			if ( barOccurred )
+			if ( this.ontick && barOccurred )
 			{
 				// update the last timestamp to about now or before...
 				this.incrementCuePoints( time );
 				this.percentage = 0;
 
-
 				// callback! make sure that the scope is consistent
 				//this.callOnBeat.apply( time );
-				this.callOnBeat( this.callbackScope, time );
+				this.ontick( this, time );
 
 				// call this method immediately again without delay!
 				// this should catch any quickly added cue points at low beats
 				this.onTimer();
 			}
 
-			if ( progress > this.percentage )
+			// pass on a progress event!
+			// this contains the percentage that the bar has elapsed
+			if ( this.onprogress && progress > this.percentage )
 			{
 				this.percentage = progress;
-				this.callOnProgress( this.callbackScope,  this.percentage );
+				this.onprogress( this,  this.percentage );
+				//console.log("Progress "+this.percentage );
 			}
 
-			//console.log("Progress "+this.percentage );
-
+			// loop
 			if ( this.playing ) {
 				requestAnimationFrame( () => this.onTimer() );
 			}
 		}
-
-
 	}
 }

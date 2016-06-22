@@ -9,7 +9,7 @@ module audiobus.instruments
 		private osc:OscillatorNode;
 		private oscFilter:OscillatorNode;
 
-		public volume:GainNode;
+		public initialVolume:GainNode;
 		public oscVolume:GainNode;
 		public finalVolume:GainNode;
 		public scuzzVolume:GainNode;
@@ -36,7 +36,7 @@ module audiobus.instruments
 			this.osc.frequency.value = 400,
 			//this.osc.connect( this.gain );
 
-			this.volume = this.context.createGain();
+			this.initialVolume = this.context.createGain();
 			this.oscVolume = this.context.createGain();
 			this.finalVolume = this.context.createGain();
 			this.scuzzVolume = this.context.createGain();
@@ -47,15 +47,13 @@ module audiobus.instruments
 
 			this.compressor = this.context.createDynamicsCompressor();
 
-
 			this.filter.type = "lowpass";
 			this.feedbackGain.gain.value = 0.5;
 			this.delay.delayTime.value = 0.5;
 			this.scuzzVolume.gain.value = 0.5;
-			this.volume.gain.value =0.5;
+			this.initialVolume.gain.value =0.5;
 			this.oscVolume.gain.value = 0;
 			this.finalVolume.gain.value = 1;
-
 
 			this.oscFilter = this.context.createOscillator();
 			this.oscFilter.connect(this.oscVolume);
@@ -69,15 +67,12 @@ module audiobus.instruments
 			this.delay.connect(this.feedbackGain);
 			this.delay.connect(this.compressor);
 			this.feedbackGain.connect(this.delay);
-			this.compressor.connect(this.volume);
-			this.volume.connect(this.finalVolume);
-			this.finalVolume.connect(this.analyser);
+			this.compressor.connect(this.initialVolume);
+			this.initialVolume.connect(this.finalVolume);
+			//this.finalVolume.connect(this.analyser);
 
-			this.analyser.connect(this.context.destination);
-			this.analyser.smoothingTimeConstant = 0.85;
-
-			this.osc.start(0);
-			this.oscFilter.start(0);
+			//this.analyser.connect(this.context.destination);
+			//this.analyser.smoothingTimeConstant = 0.85;
 		}
 
 		public setFilterFrequency(b:number):number
@@ -89,7 +84,7 @@ module audiobus.instruments
 			return e * g;
 		}
 
-		public start( frequency:number ):void
+		public start( frequency:number ):boolean
 		{
 			//console.log("Sine commencing at f:"+frequency );
 			var t:number = this.context.currentTime;
@@ -98,41 +93,16 @@ module audiobus.instruments
 			//this.osc.frequency.setValueAtTime(1200, t);
 			//this.osc.frequency.linearRampToValueAtTime(800, t + 0.005);
 
-			//this.gain.gain.cancelScheduledValues( t );
-			this.gain.gain.cancelScheduledValues( t );
-
-			if ( this.isPlaying )
-			{
-				// this note is already playing so don't tweak it.
-				this.gain.gain.value = .5;
-			}else{
-				// freshly playing so ADSR it
-				//this.gain.gain.value = .5;
-				//this.gain.gain.setValueAtTime(0.0001, t);
-    			// An exception will be thrown if this value is less than or equal to 0,
-				// or if the value at the time of the previous event is less than or equal to 0.
-				//this.gain.gain.exponentialRampToValueAtTime( 0.5, t + 0.001 );
-				//this.gain.gain.value = .5;
-
-				//this.gain.gain.setValueAtTime(0.0000000000001, t);
-				this.gain.gain.exponentialRampToValueAtTime( 0.5, t + this.durationFadeIn );
-
-				console.log( 'trying to start '+this.isPlaying );
-			}
-
 			//console.log( 'hasInitialised '+this.hasInitialised+ ' state:' + this.osc.playbackState );
-			if ( !this.hasInitialised ){ this.osc.start(t);}
-			super.start();
+			if ( super.start() )
+			{
+				this.osc.start(t);
+				this.oscFilter.start(t);
+				return true;
+			}else{
+				return false
+			}
 		}
-
-		public stop():void
-		{
-			if ( !this.hasInitialised ) {return;}
-			console.log( 'stop playing? '+this.isPlaying );
-			//this.osc.stop( 0 );
-			super.stop();
-		}
-
 	}
 
 }
