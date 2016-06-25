@@ -1,5 +1,5 @@
 /// <reference path="../../Dependencies.ts"/>
-/// <reference path="../Instrument.ts" />
+/// <reference path="Drum.ts" />
 /*//////////////////////////////////////////////////////////////////////////////
 
 MIT Licence
@@ -14,7 +14,7 @@ Methods     -
 //////////////////////////////////////////////////////////////////////////////*/
 module audiobus.instruments.beats
 {
-    export class CowBell extends Instrument
+    export class CowBell extends Drum
     {
 		private oscB:OscillatorNode;
 		private oscC:OscillatorNode;
@@ -22,10 +22,10 @@ module audiobus.instruments.beats
 		// create
 		constructor( audioContext:AudioContext, outputTo:GainNode )
 		{
-			super( audioContext, outputTo );
+			super( audioContext );
 
 			// Synthesize!
-			//	GENERATE COWBELL
+			//GENERATE COWBELL
 			this.oscB = audioContext.createOscillator();
 			this.oscB.type = OscillatorTypes.SQUARE; // square wave
 			this.oscB.frequency.value = 900;
@@ -34,13 +34,23 @@ module audiobus.instruments.beats
 			this.oscC.type = OscillatorTypes.SQUARE; // square wave
 			this.oscC.frequency.value = 1400;
 
-
+            // we send null to connect as we are handling the
+            // source connections manually here
 			this.oscB.connect( this.gain );
 			this.oscC.connect( this.gain );
+
+            // Shape the output waveform
+            this.envelope.attackTime = 0.025;
+            this.envelope.decayTime = 0.05;
+            this.envelope.releaseTime = 0.4;
+            this.envelope.sustainVolume = 0.2;
+
+            this.connect( outputTo, null );
 		}
 
 		public start(offsetA:number=0.025, offsetB:number=0.05, offsetC:number=0.4):boolean
 		{
+            /*
 			var t:number = this.context.currentTime;
 
 			this.gain.gain.cancelScheduledValues( t );
@@ -48,7 +58,9 @@ module audiobus.instruments.beats
 			this.gain.gain.linearRampToValueAtTime( 1,  t + offsetA );
 			this.gain.gain.exponentialRampToValueAtTime( 0.2, t + offsetB );
 			this.gain.gain.linearRampToValueAtTime( 0.0,  t + offsetC );
+*/
 
+            var position:number = this.envelope.start();
             if ( super.start() )
             {
                 this.oscB.start(0);

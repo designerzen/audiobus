@@ -4,6 +4,7 @@
 ///<reference path="io/Microphone.ts" />
 
 ///<reference path="Conductor.ts" />
+///<reference path="envelopes/Envelope.ts"/>
 
 ///<reference path="instruments/DrumMachine.ts" />
 

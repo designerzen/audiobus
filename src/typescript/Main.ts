@@ -6,9 +6,10 @@ class Main
 	private bass:audiobus.instruments.basics.Oscillator;
 	private netronome:audiobus.timing.Netronome;
 
-	private midiInput:audiobus.io.Midi;
-	private midiOutput:audiobus.io.Midi;
+	private midiDevice:audiobus.io.Midi;
 	private midiFile:audiobus.io.MidiFile;
+
+	private harmongraph:audiobus.visualisation.visualisers.Harmongraph;
 
 	static run():void
 	{
@@ -20,7 +21,7 @@ class Main
 	{
 		var context:AudioContext = audiobus.Conductor.create(window);
 		var volume:GainNode = context.createGain();
-		volume.connect( context.destination );
+		//volume.connect( context.destination );
 
 		// MIDI File : Load in data
 		this.midiFile = new audiobus.io.MidiFile();
@@ -38,7 +39,8 @@ class Main
 		//this.drums.trigger(4);
 
 		//this.bass = new audiobus.instruments.basics.SawToothWave( context, volume );
-		this.bass = new audiobus.instruments.basics.SquareWave( context, volume );
+		//this.bass = new audiobus.instruments.basics.SquareWave( context, volume );
+		this.bass = new audiobus.instruments.basics.SineWave( context, volume );
 
 
 		// Timing :
@@ -49,22 +51,28 @@ class Main
         };
 		// this.netronome.start( 90 );
 
+		/**/
 		// Visualisations :
 		// -----------------------------------------------
-		var analyser:audiobus.visualisation.SpectrumAnalyzer = new audiobus.visualisation.SpectrumAnalyzer( context, volume );
+		var analyser:audiobus.visualisation.SpectrumAnalyzer = new audiobus.visualisation.SpectrumAnalyzer( context, volume, audiobus.visualisation.SpectrumAnalyzer.TYPE_TIME_DOMAIN );
 
-		var visualiser = new audiobus.visualisation.visualisers.Harmongraph();
-		visualiser.createCanvas( 512, 512 );
+		this.harmongraph = new audiobus.visualisation.visualisers.Harmongraph();
+		this.harmongraph.createCanvas( 512, 512 );
+		//this.harmongraph.appendSlave( new audiobus.visualisation.visualisers.Plasma() );
+		//this.harmongraph.prependSlave( new audiobus.visualisation.visualisers.Plasma() );
+		this.harmongraph.setAsMaster();
 		// now hook into our analyser for updates
+
+		console.log( this.harmongraph.toString() );
 
 		var counter:number = 1;
 		analyser.onanalysis = (spectrum:Uint8Array) => {
 			// and send the updates to the visualiser
-			visualiser.zRatio = 1+(counter++/128)%128;
-			visualiser.xPhase += 0.02;//
-			visualiser.yPhase += 0.01;//
-			visualiser.zPhase += 0.01;
-			visualiser.update( spectrum, window.performance.now() );
+			this.harmongraph.zRatio = 1+(counter++/1208)%1200;
+			//this.harmongraph.xPhase += 0.0003;//
+			//this.harmongraph.yPhase += 0.0002;//
+			this.harmongraph.zPhase += 0.0001;
+			this.harmongraph.update( spectrum, window.performance.now() );
 			//console.log( "analyser::", spectrum );
         };
 		analyser.start();
@@ -73,8 +81,11 @@ class Main
 		// Interactions :
 		// -----------------------------------------------
 		// Attach key event
-		document.onkeydown = (event) => {
+		document.onkeydown = (event:KeyboardEvent) => {
             this.onKeyDown(event);
+        };
+		document.onkeyup = (event:KeyboardEvent) => {
+            this.onKeyUp(event);
         };
 
 		// Watch for page scrolling :
@@ -83,51 +94,59 @@ class Main
         };
 
 		// Watch for mouse events :
-		document.onmousedown  = (event) => {
+		document.onmousedown = (event:MouseEvent) => {
             this.onMouse(event);
         };
 
-		document.onmouseup  = (event) => {
+		document.onmouseup = (event:MouseEvent) => {
             this.onMouse(event);
         };
+		document.onmousemove = (event:MouseEvent) => {
+            this.onMouse(event);
+        };
+
+		//document.onmousewheel = (event:MouseEvent) => {
+        //    this.onMouseWheel(event);
+        //};
 
 		if (window.DeviceOrientationEvent !== undefined)
 		{
 	        window.addEventListener("devicemotion", (event)=>this.onDeviceMotion(event ), true);
 	    }
 
-
+		if (window.cordova)
+		{
+			// we are in Cordova world...
+			// meaning we are in a phone or tablet
+		}
 
 
 		// MIDI :
 		// Watch for MIDI input :
-		//this.midiInput = new audiobus.io.Midi();
-		this.midiInput = new audiobus.io.devices.TB3();
+		//this.midiDevice = new audiobus.io.Midi();
+		this.midiDevice = new audiobus.io.devices.TB3();
 
 		// start watching for midi input...
-		this.midiInput.onmidimessage = (event) => {
+		this.midiDevice.onmidimessage = (event) => {
 			this.onMIDIMessage(event);
 		};
 
-		this.midiInput.connect();
-
-		//this.midiOutput = new audiobus.io.Midi();
-		//this.midiOutput;
-
+		this.midiDevice.connect();
 
 		// Microphone Input :
 		// var mic = new audiobus.inputs.Microphone( this.drums.dsp, this.drums.gain );
 		// mic.getMic();
 
-
 		// Now let's route this all to a midi output
-
-		// Create MIDI output :
-		// this.midiOutput = new audiobus.io.Midi();
 
 		// and load in our MIDI file if requested...
 	}
-	
+
+	private sendMIDI( )
+	{
+		// this.midiDevice.send( );
+	}
+
 	// Midi file has loaded or failed to load!
 	private onMidiFile( e )
 	{
@@ -146,7 +165,6 @@ class Main
 
 			case audiobus.io.MidiMessage.ACTION_NOTE_ON:
 				console.log( e.toString() );
-
 				this.bass.start( audiobus.io.Midi.frequencyFromNote( e.note ) );
 				break;
 
@@ -165,7 +183,7 @@ class Main
 
 		var progressX:number = left / (doc.scrollWidth - window.innerWidth);
 		var progressY:number = top / (doc.scrollHeight - window.innerHeight);
-		console.log('Progress : ', progressX, progressY);
+		//console.log('Progress : ', progressX, progressY);
 		this.bass.note( progressY * 700 );
 	}
 
@@ -191,15 +209,27 @@ class Main
 	}
 
 	// EVENT : Some kind of mouse interaction
-	private onMouse(e)
+	private onMouseWheel(e:MouseEvent)
 	{
-		console.error(e);
+		// this.bass.note( e. );
+	}
+
+	private onMouse(e:MouseEvent)
+	{
 		var type:string = e.type;
+
 		switch(type)
 		{
 			// down
 			case "mousedown":
 				this.bass.start();
+				break;
+
+			case "mousemove":
+			//	console.error(e);
+				this.harmongraph.xPhase = 10 * e.clientX / window.innerWidth;
+				this.harmongraph.yPhase = 8 * e.clientY / window.innerHeight;
+
 				break;
 
 			// up
@@ -208,36 +238,44 @@ class Main
 		}
 	}
 
-	// EVENT : A User has pressed a key
-	private onKeyDown(e)
+	private onKeyDown(e:KeyboardEvent)
 	{
-		if (!e)	{ e = window.event; };
+		//if (!e)	{ e = window.event; };
 		switch( e.keyCode )
 		{
 			//keyCode 37 is left arrow
 			case 37:
-				this.drums.trigger(1*4);
+				this.drums.trigger(3);
 				break;
 
 			case 38:
-			//keyCode 38 is down arrow
-				this.drums.trigger(2*4);
+			//keyCode 38 is up arrow
+				this.drums.trigger(6);
 				break;
 
 			case 39:
 			//keyCode 39 is right arrow
-				this.drums.trigger(3*4);
+				this.drums.trigger(9);
 				break;
 
 			case 40:
-			//keyCode 40 is up arrow
-				this.drums.trigger(4*4);
+			//keyCode 40 is down arrow
+				this.drums.trigger(12);
 				break;
+
+			default:
+				this.bass.start( e.keyCode * 100 );
 		}
 	}
 
-	private sendMIDI( )
+	// EVENT : A User has pressed a key
+	private onKeyUp(e:KeyboardEvent)
 	{
-		// this.midiOutput.send( );
+		//if (!e)	{ e = window.event; };
+		switch( e.keyCode )
+		{
+
+		}
 	}
+
 }

@@ -21,108 +21,68 @@ module audiobus.visualisation.visualisers
         public decay:number 			= 2/10000;
 
         // Appearance
-        public opacity:number 		    = 0;
-        public red:number 				= 0;
-        public green:number 			= 255;	// 255
-        public blue:number 				= 0;
+        public opacity:number 		    = 255;
+        public red:number 				= 128;
+        public green:number 			= 128;	// 255
+        public blue:number 				= 128;
         //var _thickness 		= 0.5;
 
         public sectionLength:number 	= 20;
         public deg2rad:number 		    = Math.PI/180;		// Factor to convert degs to radians
 
-        private bitmapData:ImageData;
 
 		// create
 		constructor()
         {
-            super();
-        }
-
-        private drawPixel( x:number, y:number, r:number, g:number, b:number, alpha:number ):void
-    	{
-    		x = x >> 0;
-    		y = y >> 0;
-    		var i:number = (x + y * this.bitmapData.width) * 4;
-    		//console.log( "drawPixel x:"+x+" y:"+y+" i:"+i );
-    		this.bitmapData.data[i+0] = r;
-    		this.bitmapData.data[i+1] = g;
-    		this.bitmapData.data[i+2] = b;
-    		this.bitmapData.data[i+3] = alpha;
-    	}
-
-        public setCanvas(canvas:HTMLCanvasElement)
-        {
-            super.setCanvas(canvas);
-            this.bitmapData	= this.context.getImageData(0, 0, this.width, this.height);
+            super('Harmongraph');
         }
 
         public update( spectrum:Uint8Array, time:number):void
     	{
     		// clear screen in preProcess() :)
-    		var x:number, y:number, ox:number, oy:number;
+    		var x:number, y:number;
     		var a:number = this.amplitude;
     		var s:number = 0;
-    		var xp:number = this.xPhase;
-    		var yp:number = this.yPhase;
-    		var zp:number = this.zPhase;
+			var alpha:number = this.opacity;
 
     		// Clear Screen();
-    		// Store the current transformation matrix
+    		// Clear the current transformation matrix
     		this.bitmapData = this.context.createImageData(this.bitmapData);
+
+			// reuse
+			//this.bitmapData = this.context.getImageData(0,0,this.width, this.height);
+			//var data = this.bitmapData.data.length;
 
 			// limit 1024
 			var limit:number = 1024;
-    		for (var t = 0; t < 5120; t++)
+			var quantity:number = limit*4;
+    		for (var t = 0; t < quantity; ++t)
     		{
-    			this.opacity = 1;//( t*0.2 )>>0;
+    			//this.opacity = 1;//( t*0.2 )>>0;
 
-    			//var level:number = (spectrum[ t%limit ] );//*0.5;
-    			var level:number = (spectrum[ t%256 ] + 1);//*0.5;
+    			var level:number = 1+(spectrum[ t%limit ]/255 );//*0.5;
+				// if (level > 0) console.log('level:'+level);
+    			//var level:number = (spectrum[ t%256 ] + 1);//*0.5;
     			//var level:number = (spectrum[ this.opacity ] + 1);//*0.5;
-    			var sector :number = 2;//(spectrum[ t%256 ] + 1);//*0.5; level *
+    			var sector :number = 1;//(spectrum[ t%256 ] + 1);//*0.5; level *
 				//console.log("Harmongraph "+spectrum.length, level);
 
-    			x = level * a * Math.sin(this.xRatio * t * this.deg2rad + xp) + a * Math.sin(this.zRatio * t * this.deg2rad + zp );
-    			y = level * a * Math.sin(this.yRatio * t * this.deg2rad + yp);
+    			x = level * a * Math.sin(this.xRatio * t * this.deg2rad + this.xPhase) + a * Math.sin(this.zRatio * t * this.deg2rad + this.zPhase );
+    			y = level * a * Math.sin(this.yRatio * t * this.deg2rad + this.yPhase);
     			// z = ;
     			a *= (1 - this.decay);
 
-    			this.drawPixel( this.centreX + sector*x, this.centreY + sector* y, this.red, this.green, this.blue , this.opacity);
-
-    			/*
-    			if (s == 0)
-    			{
-    				// Create new line section
-
-
-    				if (t == 0)
-    				{
-    					//_context.moveTo(x, y);
-    					drawPixel( x, y, this.red, this.green, this.blue , this.opacity);
-    				} else {
-    					//_context.moveTo(ox, oy);
-    					//_context.lineTo(x, y);
-    					//drawPixel( ox, oy, this.red, this.green, this.blue , this.opacity);
-    					drawPixel( x, y, this.red, this.green, this.blue , this.opacity);
-    				}
-    				//plot.addChild(l);
-    			} else {
-    				// Append to line section
-    				//_context.lineTo(x, y);
-    				drawPixel( x, y, this.red, this.green, this.blue , this.opacity);
-    			}
-    			ox = x;
-    			oy = y;
-    			*/
+    			this.drawPixel( this.centreX + sector*x, this.centreY + sector* y, this.red, this.green, this.blue , alpha);
 
     			s++;
 
     			//console.log( "Harmon Graph "+s );
     			if (s == this.sectionLength) s = 0;
     		}
-
+//console.log(spectrum);
     		// draw shapes to canvas!
     		this.context.putImageData(this.bitmapData,0,0);
+			//console.log( "Harmon Graph ", this.bitmapData );
             super.update( spectrum, time );
     	}
 

@@ -1,5 +1,5 @@
 /// <reference path="../../Dependencies.ts"/>
-/// <reference path="../Instrument.ts" />
+/// <reference path="Drum.ts" />
 /*//////////////////////////////////////////////////////////////////////////////
 
 MIT Licence
@@ -14,37 +14,58 @@ Methods     -
 //////////////////////////////////////////////////////////////////////////////*/
 module audiobus.instruments.beats
 {
-    export class BassDrum extends Instrument
+    export class BassDrum extends Drum
     {
-		private osc1:OscillatorNode;
+		private bass:OscillatorNode;
+        public envelope:audiobus.envelopes.Envelope;
 
 		// create
 		constructor( audioContext:AudioContext, outputTo:GainNode )
 		{
-			super( audioContext, outputTo );
-			// Synthesize!
-			this.osc1 = audioContext.createOscillator();
-			this.osc1.type = OscillatorTypes.SINE; // sine wave
-			this.osc1.connect( this.gain );
+			super( audioContext );
+
+            // Synthesize!
+			this.bass = audioContext.createOscillator();
+			this.bass.type = OscillatorTypes.SINE; // sine wave
+            this.bass.connect(this.gain);
+            // Shape the output waveform
+            this.envelope.attackTime = 0.01;
+            this.envelope.decayTime = 0.1;
+            this.envelope.holdTime = 0;
+            this.envelope.hold = false;
+            this.envelope.releaseTime = 0.7;
+            this.envelope.sustainVolume = 0.95;
+
+            // Connect these bits and pieces together
+            this.connect( outputTo, this.bass );
 		}
 
 		// trigger!
 		public start( l:number=2050, offsetA:number=0.005, offsetB:number=0.01, offsetC:number=0.7):boolean
 		{
-			var t:number = this.context.currentTime;
+            var t:number = this.context.currentTime;
 
-			this.gain.gain.cancelScheduledValues( t );
+            /*
+            this.envelope.attackTime = 0.01;
+            this.envelope.decayTime = 0.1;
+            this.envelope.holdTime = 0;
+            this.envelope.hold = false;
+            this.envelope.releaseTime = 0.7;
+            this.envelope.sustainVolume = 0.95;
 
-			this.gain.gain.setValueAtTime( 1, t );
-			this.gain.gain.linearRampToValueAtTime( 1, 	t + offsetB );
-			this.gain.gain.linearRampToValueAtTime( 0.0,  t + offsetC );
+			this.envelope.gain.setValueAtTime( 1, t );
+			this.envelope.gain.linearRampToValueAtTime( 1, 	t + offsetB );
+			this.envelope.gain.linearRampToValueAtTime( 0.0,  t + offsetC );
+*/
+            var position:number = this.envelope.start();
 
-			this.osc1.frequency.setValueAtTime( l, t );
-			this.osc1.frequency.exponentialRampToValueAtTime( 80, t + offsetA );
+			this.bass.frequency.setValueAtTime( l, t );
+			this.bass.frequency.exponentialRampToValueAtTime( 80, t + offsetA );
 
 			if ( super.start() )
             {
-                this.osc1.start(0);
+                // always start it from 0 as sine waves otherwise will click
+                this.bass.start(0);
                 return true;
             }else{
                 return false;

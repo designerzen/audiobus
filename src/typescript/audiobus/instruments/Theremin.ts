@@ -33,7 +33,7 @@ module audiobus.instruments
 			// Synthesize!
 			this.osc = this.context.createOscillator();
 			this.osc.type = OscillatorTypes.SINE; // sine wave
-			this.osc.frequency.value = 400,
+			this.osc.frequency.value = 400;
 			//this.osc.connect( this.gain );
 
 			this.initialVolume = this.context.createGain();
@@ -72,7 +72,7 @@ module audiobus.instruments
 			//this.finalVolume.connect(this.analyser);
 
 			//this.analyser.connect(this.context.destination);
-			//this.analyser.smoothingTimeConstant = 0.85;
+			
 		}
 
 		public setFilterFrequency(b:number):number

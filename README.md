@@ -7,3 +7,8 @@ Typescript
 Javscript
 Arduino
 Actionscript
+
+
+
+// Installing TypeScript Definitions
+tsd install cordova/ -rs

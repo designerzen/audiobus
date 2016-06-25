@@ -1,5 +1,5 @@
 /// <reference path="../../Dependencies.ts"/>
-/// <reference path="../Instrument.ts" />
+/// <reference path="Drum.ts" />
 /*//////////////////////////////////////////////////////////////////////////////
 
 MIT Licence
@@ -14,7 +14,7 @@ Methods     -
 //////////////////////////////////////////////////////////////////////////////*/
 module audiobus.instruments.beats
 {
-    export class HiHat extends Instrument
+    export class HiHat extends Drum
     {
 		private osc5:OscillatorNode;
 		private osc6:OscillatorNode;
@@ -23,13 +23,13 @@ module audiobus.instruments.beats
 		private osc9:OscillatorNode;
 		private oscA:OscillatorNode;
 
-		public f1:BiquadFilterNode;
-		public f2:BiquadFilterNode;
+		public biQuadFilterA:BiquadFilterNode;
+		public biQuadFilterB:BiquadFilterNode;
 
 		// create
 		constructor( audioContext:AudioContext, outputTo:GainNode )
 		{
-			super( audioContext, outputTo );
+			super( audioContext );
 
 			// Synthesize!
 
@@ -58,23 +58,25 @@ module audiobus.instruments.beats
 			this.oscA.type = OscillatorTypes.SQUARE; // square wave
 			this.oscA.frequency.value = 2800;
 
-			this.f1 = audioContext.createBiquadFilter();
-			//this.f1.type = OscillatorTypes.SQUARE; // HP filter
-			this.f1.frequency.value = 10000;
+			this.biQuadFilterA = audioContext.createBiquadFilter();
+			//this.biQuadFilterA.type = OscillatorTypes.SQUARE; // HP filter
+			this.biQuadFilterA.frequency.value = 10000;
 
-			this.f2 = audioContext.createBiquadFilter();
-			//this.f2.type = OscillatorTypes.SQUARE; // HP filter
-			this.f2.frequency.value = 10000;
+			this.biQuadFilterB = audioContext.createBiquadFilter();
+			//this.biQuadFilterB.type = OscillatorTypes.SQUARE; // HP filter
+			this.biQuadFilterB.frequency.value = 10000;
 
-			this.osc5.connect(this.f1);
-			this.osc6.connect(this.f1);
-			this.osc7.connect(this.f1);
-			this.osc8.connect(this.f1);
-			this.osc9.connect(this.f1);
-			this.oscA.connect(this.f1);
+			this.osc5.connect(this.biQuadFilterA);
+			this.osc6.connect(this.biQuadFilterA);
+			this.osc7.connect(this.biQuadFilterA);
+			this.osc8.connect(this.biQuadFilterA);
+			this.osc9.connect(this.biQuadFilterA);
+			this.oscA.connect(this.biQuadFilterA);
 
-			this.f1.connect(this.f2);
-			this.f2.connect( this.gain );
+			this.biQuadFilterA.connect(this.biQuadFilterB);
+			this.biQuadFilterB.connect( this.gain );
+
+            this.connect( outputTo, this.biQuadFilterB );
 		}
 
 		// TRIGGERS
@@ -86,20 +88,23 @@ module audiobus.instruments.beats
 			//this.noiseGain.gain.setValueAtTime(0.2, t);
 			//this.noiseGain.gain.linearRampToValueAtTime(0,  t + 0.025);
 
-			this.f1.frequency.setValueAtTime(20, t);
-			this.f1.frequency.linearRampToValueAtTime(16000, 	t + 0.050);
-			this.f2.frequency.setValueAtTime(20, t);
-			this.f2.frequency.linearRampToValueAtTime(16000, 	t + 0.050);
+			this.biQuadFilterA.frequency.setValueAtTime(20, t);
+			this.biQuadFilterA.frequency.linearRampToValueAtTime(16000, 	t + 0.050);
+			this.biQuadFilterB.frequency.setValueAtTime(20, t);
+			this.biQuadFilterB.frequency.linearRampToValueAtTime(16000, 	t + 0.050);
 
+            /*
 			this.gain.gain.cancelScheduledValues( t );
 			this.gain.gain.setValueAtTime(0.4, t);
 			this.gain.gain.linearRampToValueAtTime(0.4,  t + 0.025);
 			this.gain.gain.exponentialRampToValueAtTime(0.1, 	t + 0.050);
 			this.gain.gain.linearRampToValueAtTime(0.0,  t + 0.300);
+*/
 
-			//noise.start(0);
+            var position:number = this.envelope.start();
             if ( super.start() )
             {
+                //noise.start(0);
                 this.osc5.start(0);
 				this.osc6.start(0);
 				this.osc7.start(0);
