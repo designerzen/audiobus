@@ -1,0 +1,3 @@
+interface IMixerItem {
+    volume:number;
+}
