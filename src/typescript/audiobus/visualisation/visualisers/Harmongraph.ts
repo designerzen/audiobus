@@ -22,9 +22,9 @@ module audiobus.visualisation.visualisers
 
         // Appearance
         public opacity:number 		    = 255;
-        public red:number 				= 128;
-        public green:number 			= 128;	// 255
-        public blue:number 				= 128;
+        public red:number 				= 55;
+        public green:number 			= 55;	// 255
+        public blue:number 				= 55;
         //var _thickness 		= 0.5;
 
         public sectionLength:number 	= 20;
@@ -55,7 +55,7 @@ module audiobus.visualisation.visualisers
 
 			// limit 1024
 			var limit:number = 1024;
-			var quantity:number = limit*4;
+			var quantity:number = limit*8;
     		for (var t = 0; t < quantity; ++t)
     		{
     			//this.opacity = 1;//( t*0.2 )>>0;
@@ -77,7 +77,10 @@ module audiobus.visualisation.visualisers
     			s++;
 
     			//console.log( "Harmon Graph "+s );
-    			if (s == this.sectionLength) s = 0;
+    			if (s === this.sectionLength)
+				{
+					s = 0;
+				}
     		}
 //console.log(spectrum);
     		// draw shapes to canvas!

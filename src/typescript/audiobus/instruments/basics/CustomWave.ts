@@ -17,12 +17,13 @@ module audiobus.instruments.basics
 {
     export class CustomWave extends Instrument implements ISoundControl
     {
-        private customShape
+        private customShape:WaveShaperNode;
 
-		constructor( audioContext:AudioContext, outputTo:GainNode )
+		constructor( audioContext:AudioContext, outputTo:AudioNode )
 		{
-			super( audioContext, outputTo );
+			super( audioContext );
             this.create();
+            this.connect( outputTo, this.customShape );
 		}
 
         private makeDistortionCurve(amount:number=50):Float32Array
@@ -45,15 +46,18 @@ module audiobus.instruments.basics
 		{
             this.customShape = this.context.createWaveShaper();
             this.customShape.curve = this.makeDistortionCurve(400);
-            this.customShape.connect( this.gain );
 		}
 
         public start( frequency:number=-1 ):boolean
 		{
-			if ( frequency > -1 ) this.customShape.frequency.value = frequency;
+			if ( frequency > -1 )
+            {
+                //this.customShape.frequency.value = frequency;
+            }
+
 			if  ( super.start() )
             {
-                this.customShape.start( this.context.currentTime );
+                //this.customShape.start( this.context.currentTime );
                 return true;
             }else{
                 return false;
@@ -62,7 +66,7 @@ module audiobus.instruments.basics
 
         public note( frequency:number ):boolean
         {
-            this.customShape.frequency.value = frequency;
+            //this.customShape.frequency.value = frequency;
             return this.isPlaying;
         }
 	}

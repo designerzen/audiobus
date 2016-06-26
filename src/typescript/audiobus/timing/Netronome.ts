@@ -1,21 +1,11 @@
 /// <reference path="../Dependencies.ts" />
+/// <reference path="Timer.ts" />
 module audiobus.timing
 {
-	export class Netronome
+	export class Netronome extends Timer
     {
-		public now:Function = () => window.performance && window.performance.now ? window.performance.now() : Date.now();
-
 		// Start *all* metronomes from the same point in time
 		static EPOCH:number = new Date( 2012, 12, 21, 6, 6, 6 ).getTime();
-
-		private period:number = 6000;
-		private lastBarTimeStamp:number;
-
-		private playing:boolean = false;
-		public percentage:number = 0;
-
-		public ontick:Function;
-		public onprogress:Function;
 
 		// INTERALS =======================================================
 
@@ -41,22 +31,25 @@ module audiobus.timing
 			return ( 60 / ( this.period * 0.001 ) ) >> 0;
 		}
 
-		constructor(){}
+		constructor()
+		{
+			super();
+		}
 
 		////////////////////////////////////////////////////////////////////////
 		// Begin & End the Netronome timer
 		////////////////////////////////////////////////////////////////////////
 		public start( bpm:number=90 ):void
 		{
-			this.playing = true;
 			this.setBpm( bpm );
 			// begin!
-			requestAnimationFrame( () =>  this.onTimer() );
+			super.start();
 		}
 
 		public stop():void
 		{
 			this.playing = false;
+			super.stop();
 		}
 
 		////////////////////////////////////////////////////////////////////////
@@ -95,7 +88,7 @@ module audiobus.timing
 		////////////////////////////////////////////////////////////////////////
 		// Check the time to see if a beat has occurred
 		////////////////////////////////////////////////////////////////////////
-		private onTimer():void
+		public onTimer():void
 		{
 			// discover how much time has elapsed since our last timestamp...
 			var time:number = this.now();
@@ -129,9 +122,7 @@ module audiobus.timing
 			}
 
 			// loop
-			if ( this.playing ) {
-				requestAnimationFrame( () => this.onTimer() );
-			}
+			super.onTimer();
 		}
 	}
 }

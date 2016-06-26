@@ -135,7 +135,7 @@ module audiobus.io
             for (var input = inputValues.next(); input && !input.done; input = inputValues.next())
             {
                 var values:WebMidi.MIDIInput = input.value;
-                if (values.name == name)
+                if (values.name === name)
                 {
                     return values;
                 }
@@ -235,7 +235,7 @@ module audiobus.io
             for (var output = outputValues.next(); output && !output.done; output = outputValues.next())
             {
                 var values:WebMidi.MIDIOutput = output.value;
-                if (values.name == name)
+                if (values.name === name)
                 {
                     return values;
                 }

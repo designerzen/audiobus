@@ -2,8 +2,12 @@
 /// <reference path="audiobus/Conductor.ts" />
 class Main
 {
+	// Instruments
 	private drums:audiobus.instruments.DrumMachine;
 	private bass:audiobus.instruments.basics.Oscillator;
+
+	// Timing
+	private metronome:audiobus.timing.Metronome;
 	private netronome:audiobus.timing.Netronome;
 
 	private midiDevice:audiobus.io.Midi;
@@ -19,9 +23,10 @@ class Main
 	// Begin here
 	constructor(  )
 	{
-		var context:AudioContext = audiobus.Conductor.create(window);
+		var context:AudioContext = audiobus.Engine.create(window);
 		var volume:GainNode = context.createGain();
-		//volume.connect( context.destination );
+		//var destination = context.destination;
+		volume.connect( context.destination );
 
 		// MIDI File : Load in data
 		this.midiFile = new audiobus.io.MidiFile();
@@ -40,13 +45,24 @@ class Main
 
 		//this.bass = new audiobus.instruments.basics.SawToothWave( context, volume );
 		//this.bass = new audiobus.instruments.basics.SquareWave( context, volume );
+		//this.bass = new audiobus.instruments.basics.TriangleWave( context, volume );
 		this.bass = new audiobus.instruments.basics.SineWave( context, volume );
+		//this.bass.volume = 1;
 
+		var square = new audiobus.instruments.basics.SquareWave( context, volume );
 
 		// Timing :
 		// -----------------------------------------------
 		this.netronome = new audiobus.timing.Netronome();
 		this.netronome.ontick = (time) => {
+            console.log("tick "+time);
+			//square.start( (Math.random()*440)+440 );
+			//this.drums.trigger(1);
+        };
+		//this.netronome.start( 90 );
+
+		this.metronome = new audiobus.timing.Metronome();
+		this.metronome.ontick = (time) => {
             console.log("tick "+time);
         };
 		// this.netronome.start( 90 );
@@ -63,7 +79,7 @@ class Main
 		this.harmongraph.setAsMaster();
 		// now hook into our analyser for updates
 
-		console.log( this.harmongraph.toString() );
+		// console.log( this.harmongraph.toString() );
 
 		var counter:number = 1;
 		analyser.onanalysis = (spectrum:Uint8Array) => {
@@ -93,6 +109,7 @@ class Main
             this.onPageScroll(event);
         };
 
+
 		// Watch for mouse events :
 		document.onmousedown = (event:MouseEvent) => {
             this.onMouse(event);
@@ -112,7 +129,9 @@ class Main
 		if (window.DeviceOrientationEvent !== undefined)
 		{
 	        window.addEventListener("devicemotion", (event)=>this.onDeviceMotion(event ), true);
-	    }
+			window.addEventListener("deviceorientation", (event)=>this.onDeviceOrientation(event ), true);
+		}
+
 
 		if (window.cordova)
 		{
@@ -147,12 +166,16 @@ class Main
 		// this.midiDevice.send( );
 	}
 
+	// EVENTS ======= Stuff Happening! ==========
+
+	// EVENT :
 	// Midi file has loaded or failed to load!
 	private onMidiFile( e )
 	{
 		console.error(e);
 	}
 
+	// EVENT :
 	// a Midi message has been received
 	private onMIDIMessage( e:audiobus.io.MidiMessage )
 	{
@@ -184,9 +207,21 @@ class Main
 		var progressX:number = left / (doc.scrollWidth - window.innerWidth);
 		var progressY:number = top / (doc.scrollHeight - window.innerHeight);
 		//console.log('Progress : ', progressX, progressY);
-		this.bass.note( progressY * 700 );
+		this.bass.note( 110 + progressY *440 );
 	}
 
+	// EVENT :
+	// The physical orientation of the device,
+	// expressed as a series of rotations from a local coordinate frame
+	private onDeviceOrientation(event)
+	{
+
+	}
+
+	// EVENT :
+	// the acceleration of the device, expressed in Cartesian coordinates
+	// in a coordinate frame defined in the device.
+	// It also supplies the rotation rate of the device about a local coordinate frame.
 	private onDeviceMotion(event)
 	{
 		// gamma is the left-to-right tilt in degrees, where right is positive
@@ -196,7 +231,7 @@ class Main
 	    var tiltFB = event.beta;
 
 	    // alpha is the compass direction the device is facing in degrees
-	    var dir = event.alpha
+	    var dir = event.alpha;
 
 		// Accelerometer
 		var aX = event.accelerationIncludingGravity.x*1;
@@ -208,12 +243,17 @@ class Main
 		// yPosition = Math.atan2(aX, aZ);
 	}
 
-	// EVENT : Some kind of mouse interaction
+	// EVENT : Wheel of the mouse has triggered
+	// You may want to disable page scrolling as
+	// the mouse wheel will also trigger the window scroll position!
 	private onMouseWheel(e:MouseEvent)
 	{
 		// this.bass.note( e. );
+		// If you want to disable window scrolling...
+		//e.preventDefault();
 	}
 
+	// EVENT : Some kind of mouse interaction
 	private onMouse(e:MouseEvent)
 	{
 		var type:string = e.type;
@@ -227,9 +267,11 @@ class Main
 
 			case "mousemove":
 			//	console.error(e);
-				this.harmongraph.xPhase = 10 * e.clientX / window.innerWidth;
-				this.harmongraph.yPhase = 8 * e.clientY / window.innerHeight;
-
+				if (this.harmongraph)
+				{
+					this.harmongraph.xPhase = 10 * e.clientX / window.innerWidth;
+					this.harmongraph.yPhase = 8 * e.clientY / window.innerHeight;
+				}
 				break;
 
 			// up
@@ -264,7 +306,7 @@ class Main
 				break;
 
 			default:
-				this.bass.start( e.keyCode * 100 );
+				this.bass.start( e.keyCode * 3 );
 		}
 	}
 
@@ -274,7 +316,8 @@ class Main
 		//if (!e)	{ e = window.event; };
 		switch( e.keyCode )
 		{
-
+			default:
+				this.bass.stop( );
 		}
 	}
 

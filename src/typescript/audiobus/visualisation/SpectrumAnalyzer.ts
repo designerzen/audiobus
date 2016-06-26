@@ -40,7 +40,7 @@ module audiobus.visualisation
 			//this.gain.connect( this.analyser );
 
             // Store initial data
-            if (this.type == SpectrumAnalyzer.TYPE_FREQUENCY)
+            if (this.type === SpectrumAnalyzer.TYPE_FREQUENCY)
             {
                 this.analyser.getByteFrequencyData( this.frequencyData );
             }else{
@@ -65,7 +65,7 @@ module audiobus.visualisation
 			if (this.running)
             {
                 //constantly getting feedback from data
-                if (this.type == SpectrumAnalyzer.TYPE_FREQUENCY)
+                if (this.type === SpectrumAnalyzer.TYPE_FREQUENCY)
                 {
                     this.analyser.getByteFrequencyData( this.frequencyData );
                 }else{

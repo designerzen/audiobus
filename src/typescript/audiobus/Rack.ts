@@ -22,9 +22,5 @@ module audiobus
             this.context = context;
         }
 
-        public createFilter()
-        {
-            
-        }
     }
 }

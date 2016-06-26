@@ -1,9 +1,21 @@
+interface Window {
+  DeviceOrientationEvent: any;
+}
+
 ///<reference path="../typings/tsd.d.ts" />
 
 ///<reference path="io/Midi.ts" />
 ///<reference path="io/Microphone.ts" />
 
 ///<reference path="Conductor.ts" />
+///<reference path="Engine.ts" />
+
+///<reference path="Rack.ts" />
+///<reference path="IRackItem.ts" />
+
+///<reference path="Mixer.ts" />
+///<reference path="IMixerItem.ts" />
+
 ///<reference path="envelopes/Envelope.ts"/>
 
 ///<reference path="instruments/DrumMachine.ts" />

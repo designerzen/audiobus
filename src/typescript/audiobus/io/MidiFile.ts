@@ -62,12 +62,12 @@ module audiobus.io
                         //console.log( ff );
                         //midi.currentData = data;
                         //midi.loadMidiFile(onsuccess, onprogress, onerror);
-                        if (completeCallback) completeCallback( ff );
+                        if (completeCallback) { completeCallback( ff ); }
                     } else {
                         onerror && onerror('Unable to load MIDI file');
                     }
                 }
-            }
+            };
             fetch.send();
         }
 

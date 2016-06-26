@@ -14,20 +14,19 @@ Methods     -
 //////////////////////////////////////////////////////////////////////////////*/
 module audiobus.instruments.beats
 {
-    export class BassDrum extends Drum
+    export class BassDrum extends Drum implements ISoundControl
     {
 		private bass:OscillatorNode;
-        public envelope:audiobus.envelopes.Envelope;
 
 		// create
-		constructor( audioContext:AudioContext, outputTo:GainNode )
+		constructor( audioContext:AudioContext, outputTo:AudioNode )
 		{
 			super( audioContext );
 
             // Synthesize!
 			this.bass = audioContext.createOscillator();
 			this.bass.type = OscillatorTypes.SINE; // sine wave
-            this.bass.connect(this.gain);
+
             // Shape the output waveform
             this.envelope.attackTime = 0.01;
             this.envelope.decayTime = 0.1;
@@ -41,23 +40,15 @@ module audiobus.instruments.beats
 		}
 
 		// trigger!
-		public start( l:number=2050, offsetA:number=0.005, offsetB:number=0.01, offsetC:number=0.7):boolean
+		public start( l:number=2050, offsetA:number=0.005 ):boolean
 		{
             var t:number = this.context.currentTime;
 
             /*
-            this.envelope.attackTime = 0.01;
-            this.envelope.decayTime = 0.1;
-            this.envelope.holdTime = 0;
-            this.envelope.hold = false;
-            this.envelope.releaseTime = 0.7;
-            this.envelope.sustainVolume = 0.95;
-
 			this.envelope.gain.setValueAtTime( 1, t );
 			this.envelope.gain.linearRampToValueAtTime( 1, 	t + offsetB );
 			this.envelope.gain.linearRampToValueAtTime( 0.0,  t + offsetC );
-*/
-            var position:number = this.envelope.start();
+            */
 
 			this.bass.frequency.setValueAtTime( l, t );
 			this.bass.frequency.exponentialRampToValueAtTime( 80, t + offsetA );

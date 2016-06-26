@@ -64,15 +64,17 @@ module audiobus.instruments
 			this.oscVolume.connect(this.filter);
 			this.filter.connect(this.compressor);
 			this.filter.connect(this.delay);
+
 			this.delay.connect(this.feedbackGain);
 			this.delay.connect(this.compressor);
+
 			this.feedbackGain.connect(this.delay);
 			this.compressor.connect(this.initialVolume);
 			this.initialVolume.connect(this.finalVolume);
 			//this.finalVolume.connect(this.analyser);
 
 			//this.analyser.connect(this.context.destination);
-			
+
 		}
 
 		public setFilterFrequency(b:number):number
@@ -100,7 +102,7 @@ module audiobus.instruments
 				this.oscFilter.start(t);
 				return true;
 			}else{
-				return false
+				return false;
 			}
 		}
 	}

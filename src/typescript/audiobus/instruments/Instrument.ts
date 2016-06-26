@@ -1,7 +1,8 @@
 // interface IPlugs
 module audiobus.instruments
 {
-    export class Instrument
+    // IRackItem
+    export class Instrument implements IMixerItem
     {
 		public context:AudioContext;
 		public gain:GainNode;
@@ -10,14 +11,9 @@ module audiobus.instruments
 		public hasInitialised:boolean = false;    // are oscillators swinging?
 		public needsUpdate:boolean = false;       // does it need an external update?
 
+        private amplitude:number = 0.5;             // overall output volume
         // DADSHR
-        public delay:number = 0;        // pregnant pause - inspired by the Prophet`08
-        public attack:number = 0.2;       // how aggressive the intro fade is
-        public amplitude:number = 0.5;  // overall output volume
-        public decay:number = 1;        // how much to let off after the intro before...
-        public sustain:number = 0.4;    // how loud is the afternote
-        public hold:number = 1;         // how long to hold the note for
-        public release:number = 1.2;      // how long does the fade out last
+        public envelope:audiobus.envelopes.Envelope;
 
 		public SILENCE:number = 0.00000001;//Number.MIN_VALUE*100000000000;
 
@@ -40,17 +36,23 @@ module audiobus.instruments
 			this.context = audioContext;
 			this.gain = audioContext.createGain();
             this.gain.gain.value = this.amplitude;
+            this.envelope = new audiobus.envelopes.Envelope( audioContext );
 
-            if (outputTo || source) this.connect( outputTo, source );
-
+            if (outputTo || source)
+            {
+                this.connect( outputTo, source );
+            }
             // TODO: add itself to the conductor so that we can call
             // all instruments together with one call
 		}
 
-        public connect( outputTo:AudioNode, source:AudioNode):void
+        public connect( outputTo:AudioNode, source:AudioNode=null):void
         {
-            if (outputTo){ this.gain.connect( outputTo ); };
-            //if (source){};
+            if (source)
+            {
+                source.connect( this.gain );
+            }
+            this.envelope.connect( outputTo , this.gain );
         }
 
         // Handles : Delay -> Attack -> Decay -> Sustain -> Release
@@ -64,9 +66,10 @@ module audiobus.instruments
 
             // it might already be fading in, but as we only fade from
             // one volume to another, it would just fade 1 -> 1
-            this.fadeIn( this.attack, this.decay, this.sustain, this.delay );
+            var position:number = this.envelope.start();
+
             this.isPlaying = true;
-            console.log( "start via attack "+this.attack, this );
+            //console.log( "start : "+position, this);
 
 			//console.log( 'start ' +this.isPlaying  );
             return initialising;
@@ -78,28 +81,25 @@ module audiobus.instruments
         }
 
         // Handles : Hold -> Release
-		public stop( fade:boolean=true ):boolean
+		public stop():boolean
 		{
             // already playing or not initialised - nothing to stop
-			if ( !this.hasInitialised || !this.isPlaying ) return false;
+			if ( !this.hasInitialised || !this.isPlaying )
+            {
+                return false;
+            }
+
+            this.envelope.stop();
 
             // An exception will be thrown if this value is less than or equal to 0,
 			// or if the value at the time of the previous event is less than or equal to 0.
-			if (fade)
-            {
-                this.fadeOut( this.release );
-            } else{
-                this.gain.gain.cancelScheduledValues( this.context.currentTime );
-                //this.gain.gain.value = 0;
-                this.gain.gain.setValueAtTime( 0, this.context.currentTime );
-            }
-
 			this.isPlaying = false;
-            console.log( "stopping via "+(fade?"fade":"cut"), this);
+            console.log( "stopping", this);
 
             return true;
 		}
 
+        /*
         // Handles : Delay -> Attack -> Decay -> Sustain -> Hold
 		public fadeIn( duration:number=0.1, decay:number=0.1, sustain:number=0.1, delay:number=0 ):void
 		{
@@ -149,10 +149,6 @@ module audiobus.instruments
             this.gain.gain.setValueAtTime( 0, delay + t + duration );
 		}
 
-		public onFaded(  ):void
-		{
-			//alert("fade complete "+this.gain.gain);
-		}
-
+        */
 	}
 }

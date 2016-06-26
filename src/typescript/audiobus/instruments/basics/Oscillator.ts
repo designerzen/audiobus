@@ -17,35 +17,49 @@ module audiobus.instruments.basics
 {
     export class Oscillator extends Instrument implements ISoundControl
     {
-		public osc:OscillatorNode;
+		private oscillator:OscillatorNode;
 
 		// create
-		constructor( audioContext:AudioContext, outputTo:GainNode, type:string=OscillatorTypes.SINE )
+		constructor( audioContext:AudioContext, outputTo:AudioNode, type:string=OscillatorTypes.SINE )
 		{
-			super( audioContext, outputTo );
+			super( audioContext );
 			this.create( type );
+            this.connect( outputTo, this.oscillator );
 		}
 
-		private create( type:string=OscillatorTypes.SINE ):void
+		private create( type:string ):void
 		{
 			// Synthesize!
-			this.osc = this.context.createOscillator();
-			this.osc.type = type; // sine wave
-			this.osc.connect( this.gain );
-            this.osc.frequency.value = 440;
+			this.oscillator = this.context.createOscillator();
+			this.oscillator.type = type; // sine wave
+            this.oscillator.frequency.value = 440;
+
+            this.envelope.attackTime = 0.5;
+            this.envelope.decayTime = 0.2;
+            this.envelope.sustainVolume = 0.9;
+            this.envelope.holdTime = -1;
+            this.envelope.hold = true;
+            this.envelope.releaseTime = 0.7;
 		}
 
 		public start( frequency:number=-1 ):boolean
 		{
-			//console.log("Sine commencing at f:"+frequency );
-            if ( frequency > -1 ) this.osc.frequency.value = frequency;
+			//
+            if ( frequency > -1 )
+            {
+                this.oscillator.frequency.value = frequency;
+            }else{
+
+            }
 
             // if this is initialising... we need to begin the oscillator!
             if  ( super.start() )
             {
-                this.osc.start( this.context.currentTime );
+                // this.context.currentTime
+                this.oscillator.start( 0 );
                 return true;
             }else{
+                //this.oscillator.
                 return false;
             }
 		}
@@ -58,10 +72,12 @@ module audiobus.instruments.basics
 
         public note( frequency:number ):boolean
         {
-            this.osc.frequency.value = frequency;
-            //this.osc.frequency.setValueAtTime(1200, t);
-			//this.osc.frequency.linearRampToValueAtTime(800, t + 0.005);
 
+            var time:number = this.context.currentTime + 0.005;
+            //this.oscillator.frequency.cancelScheduledValues();
+            this.oscillator.frequency.value = frequency;
+            //this.oscillator.frequency.setValueAtTime(frequency, time);
+			//this.oscillator.frequency.linearRampToValueAtTime( frequency, time );
             return this.isPlaying;
         }
 

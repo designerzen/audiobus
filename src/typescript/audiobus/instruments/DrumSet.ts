@@ -26,6 +26,9 @@ module audiobus.instruments
 		{
 			super(audioContext,outputTo);
             this.setup();
+            // 	Route SIGNALS - MIX AND OUTPUT
+			//this.gain.connect( this.context.destination );
+			this.connect( outputTo, this.gain );
 		}
 
 		private setup():void
@@ -42,8 +45,7 @@ module audiobus.instruments
 			// this is the place to intercept it!
 
 
-			// 	Route SIGNALS - MIX AND OUTPUT
-			this.gain.connect( this.context.destination );
+
 		}
 
 		public trigger( id:number=0 ):void
@@ -52,23 +54,23 @@ module audiobus.instruments
 			{
 				default:
 				case 0:
-					this.bassdrum.start(2050, 0.005, 0.01, 0.7);
+					this.bassdrum.start(2050, 0.005);
 					break;
 				case 1:
-					this.bassdrum.start(4050, 0.007, 0.01, 0.6);
+					this.bassdrum.start(4050, 0.0076);
 
 					break;
 				case 2:
-					this.bassdrum.start(8050, 0.008, 0.03, 0.5);
+					this.bassdrum.start(8050, 0.008);
 
 					break;
 				case 3:
-					this.bassdrum.start(12050, 0.005, 0.01, 0.4);
+					this.bassdrum.start(12050, 0.005);
 
 					break;
 
 				case 4:
-					this.snare.start( 2050, 0.005, 0.01, 0.1);
+					this.snare.start( 2050, 0.005);
 					break;
 				case 5:
 					this.snare.start( 2050, 0.006, 0.02, 0.1);

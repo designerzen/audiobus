@@ -27,7 +27,7 @@ module audiobus.instruments.beats
 		public biQuadFilterB:BiquadFilterNode;
 
 		// create
-		constructor( audioContext:AudioContext, outputTo:GainNode )
+		constructor( audioContext:AudioContext, outputTo:AudioNode )
 		{
 			super( audioContext );
 
@@ -76,6 +76,13 @@ module audiobus.instruments.beats
 			this.biQuadFilterA.connect(this.biQuadFilterB);
 			this.biQuadFilterB.connect( this.gain );
 
+            this.envelope.amplitude = 0.8;
+            this.envelope.attackTime = 0.025;
+            this.envelope.decayTime = 0.05;
+            this.envelope.releaseTime = 0.3;
+            this.envelope.sustainVolume = 0.2;
+            this.envelope.decayType = audiobus.envelopes.Envelope.CURVE_TYPE_EXPONENTIAL;
+
             this.connect( outputTo, this.biQuadFilterB );
 		}
 
@@ -93,15 +100,6 @@ module audiobus.instruments.beats
 			this.biQuadFilterB.frequency.setValueAtTime(20, t);
 			this.biQuadFilterB.frequency.linearRampToValueAtTime(16000, 	t + 0.050);
 
-            /*
-			this.gain.gain.cancelScheduledValues( t );
-			this.gain.gain.setValueAtTime(0.4, t);
-			this.gain.gain.linearRampToValueAtTime(0.4,  t + 0.025);
-			this.gain.gain.exponentialRampToValueAtTime(0.1, 	t + 0.050);
-			this.gain.gain.linearRampToValueAtTime(0.0,  t + 0.300);
-*/
-
-            var position:number = this.envelope.start();
             if ( super.start() )
             {
                 //noise.start(0);

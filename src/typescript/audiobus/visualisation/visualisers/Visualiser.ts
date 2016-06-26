@@ -133,7 +133,7 @@ module audiobus.visualisation.visualisers
 				vis = vis.next;
 				vis.master = false;
 				vis.setCanvas( this.canvas );
-				tail = vis
+				tail = vis;
 			}
 
 			this.master = true;
@@ -207,7 +207,10 @@ module audiobus.visualisation.visualisers
 		public update( spectrum:Uint8Array, time:number ):void
 		{
 			// call the next one on the list!
-			if (this.next) this.next.update( spectrum, time );
+			if (this.next)
+			{
+				this.next.update( spectrum, time );
+			}
 		}
 	}
 

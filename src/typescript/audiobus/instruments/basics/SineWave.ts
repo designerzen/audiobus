@@ -17,7 +17,7 @@ module audiobus.instruments.basics
 {
     export class SineWave extends Oscillator implements ISoundControl
     {
-		constructor( audioContext:AudioContext, outputTo:GainNode )
+		constructor( audioContext:AudioContext, outputTo:AudioNode )
 		{
 			super( audioContext, outputTo, OscillatorTypes.SINE );
 		}

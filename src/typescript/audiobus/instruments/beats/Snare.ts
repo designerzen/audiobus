@@ -20,10 +20,8 @@ module audiobus.instruments.beats
 		private noiseBuffer:AudioBuffer;
 		private noiseData:Float32Array;
 
-        public envelope:audiobus.envelopes.Envelope;
-
 		// create
-		constructor( audioContext:AudioContext, outputTo:GainNode )
+		constructor( audioContext:AudioContext, outputTo:AudioNode )
 		{
 			super( audioContext );
 
@@ -60,7 +58,6 @@ module audiobus.instruments.beats
 			this.gain.gain.exponentialRampToValueAtTime(0.2, t + offsetB);
 			this.gain.gain.linearRampToValueAtTime(0.0, t + offsetC);
             */
-            var position:number = this.envelope.start();
             if  ( super.start() )
             {
                 // as you always want the snare to sound the same

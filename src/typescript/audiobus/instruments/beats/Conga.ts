@@ -19,7 +19,7 @@ module audiobus.instruments.beats
 		private osc:OscillatorNode;
 
 		// create
-		constructor( audioContext:AudioContext, outputTo:GainNode )
+		constructor( audioContext:AudioContext, outputTo:AudioNode )
 		{
 			super( audioContext );
 			// Synthesize!
@@ -32,6 +32,7 @@ module audiobus.instruments.beats
             this.envelope.decayTime = 0.05;
             this.envelope.releaseTime = 0.160;
             this.envelope.sustainVolume = 0.5;
+            this.envelope.decayType = audiobus.envelopes.Envelope.CURVE_TYPE_EXPONENTIAL;
 
             this.connect( outputTo, this.osc );
 		}
@@ -49,7 +50,6 @@ module audiobus.instruments.beats
 			this.gain.gain.exponentialRampToValueAtTime(0.5, 	t + 0.010);
 			this.gain.gain.linearRampToValueAtTime(0.0,  t + offsetA);
             */
-            var position:number = this.envelope.start();
             if ( super.start() )
             {
                 this.osc.start(0);

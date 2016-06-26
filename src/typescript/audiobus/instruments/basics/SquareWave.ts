@@ -17,7 +17,7 @@ module audiobus.instruments.basics
 {
     export class SquareWave extends Oscillator implements ISoundControl
     {
-		constructor( audioContext:AudioContext, outputTo:GainNode )
+		constructor( audioContext:AudioContext, outputTo:AudioNode )
 		{
 			super( audioContext, outputTo, OscillatorTypes.SQUARE );
 		}
