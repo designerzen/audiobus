@@ -98,13 +98,71 @@ module examples
 			document.onmousemove = (event:MouseEvent) => {
 				this.onMouse(event);
 			};
+			document.onmousedown = (event:MouseEvent) => {
+	            this.onMouse(event);
+	        };
+
+			document.ontouchmove = (event:TouchEvent) => {
+	            this.onMouse(event);
+	        };
+
+			document.onmouseup = (event:MouseEvent) => {
+	            this.onMouse(event);
+	        };
+			document.ontouchstart = (event:TouchEvent) => {
+	            this.onMouse(event);
+	        };
+
+			document.ontouchend = (event:TouchEvent) => {
+	            this.onMouse(event);
+	        };
 		}
 		// EVENT : Some kind of mouse interaction
-		private onMouse(e:MouseEvent)
+		private onMouse(e:Event)
 		{
 			var type:string = e.type;
 			switch(type)
 			{
+				case "touchstart":
+				case "mousedown":
+					//var randomBeat:number = Math.round(Math.random() * 100 );
+					//this.drums.trigger(randomBeat);
+
+					// so we want it so that when played in landscape mode, yoou
+					//
+					var y:number = e.clientY;
+					 var fingers:number = 3 * y / (window.innerHeight);
+					 var finger:number = Math.round( fingers );
+					 console.log(e,fingers,finger,y,window.innerHeight);
+					 switch(finger)
+				 	{
+						case 0:
+							this.drums.bassdrum.start( 750 + Math.random() * 100,Math.random() * 100 );
+							this.harmongraph.zRatio = Math.random() * 30;
+							break;
+						case 1:
+							this.drums.conga.start( 1200 + Math.random() * 100 );
+							this.harmongraph.zRatio = Math.random() * 800;
+							break;
+						case 2:
+							this.drums.snare.start( 2050 + Math.random() * 100 );
+							this.harmongraph.zRatio = Math.random() * 1100;
+							break;
+						case 3:
+							this.drums.tom.start( Math.random() * 10 + 55, Math.random() * 20 + 55 );
+							this.harmongraph.zRatio = Math.random() * 1800;
+							break;
+					}
+
+					break;
+
+				case "touchend":
+				case "mouseup":
+				//	console.error(e);
+
+					break;
+
+				case "touchmove":
 				case "mousemove":
 					if (this.harmongraph)
 					{
