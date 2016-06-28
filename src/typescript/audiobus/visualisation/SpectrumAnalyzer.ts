@@ -3,50 +3,131 @@ module audiobus.visualisation
 {
     export class SpectrumAnalyzer
     {
-		private context:AudioContext;
-		public gain:GainNode;
-		public analyser:AnalyserNode;
-		public frequencyData:Uint8Array;
+        public now:Function = () => window.performance && window.performance.now ? window.performance.now() : Date.now();
+
+        private audioContext:AudioContext;
+        public analyser:AnalyserNode;
+        public frequencyData:Uint8Array;
+
+        private visualContext:CanvasRenderingContext2D;
+        public canvas:HTMLCanvasElement;
 
         private running:boolean = false;
         private sampleRate:number;
         private type:string;
 
+        public head:audiobus.visualisation.visualisers.Visualiser;
+        public tail:audiobus.visualisation.visualisers.Visualiser;
+
         public onanalysis:Function = function(){};
 
-        public static TYPE_FREQUENCY:string = "input";
-        public static TYPE_TIME_DOMAIN:string = "input";
+        public static TYPE_FREQUENCY:string = "frequency";
+        public static TYPE_TIME_DOMAIN:string = "fft";
 
-		constructor( audioContext:AudioContext, outputTo:GainNode, type:string=SpectrumAnalyzer.TYPE_FREQUENCY)
+		constructor( audioContext:AudioContext, type:string=SpectrumAnalyzer.TYPE_FREQUENCY, fftSize:number=1024 )
 		{
             this.type = type;
-			this.context = audioContext;
+			this.audioContext = audioContext;
 			this.analyser = audioContext.createAnalyser();
-            //this.analyser.smoothingTimeConstant = 0.85;
+            this.analyser.smoothingTimeConstant = 0.85;
+
 			this.sampleRate = audioContext.sampleRate;
 
-			// must be a power of two
-			this.analyser.fftSize = 2048;
-			//pipe to speakers
-			//this.analyser.connect(audioContext.destination);
-
-			//create an empty array with 1024 items
-			this.frequencyData = new Uint8Array(1024);
-
-			//this.gain = audioContext.createGain();
-			//this.gain.connect( outputTo );
-
-			//connect to source
-			//this.gain.connect( this.analyser );
-
             // Store initial data
-            if (this.type === SpectrumAnalyzer.TYPE_FREQUENCY)
-            {
-                this.analyser.getByteFrequencyData( this.frequencyData );
-            }else{
-                this.analyser.getByteTimeDomainData( this.frequencyData );
-            }
+            this.setFidelity( fftSize );
 		}
+
+        public setFidelity( fftSize:number ):void
+        {
+            switch (this.type)
+            {
+                case SpectrumAnalyzer.TYPE_FREQUENCY:
+                    this.analyser.fftSize = fftSize;   // must be a power of two
+                    this.frequencyData = new Uint8Array(this.analyser.frequencyBinCount);
+                    this.analyser.getByteFrequencyData( this.frequencyData );
+                    break;
+
+                case SpectrumAnalyzer.TYPE_TIME_DOMAIN:
+                    this.analyser.fftSize = fftSize;    // must be a power of two
+                    this.frequencyData = new Uint8Array(this.analyser.frequencyBinCount);
+                    this.analyser.getByteTimeDomainData( this.frequencyData );
+                    break;
+
+            }
+        }
+
+        public connect( outputTo:AudioNode, source:AudioNode ):void
+        {
+            source.connect( this.analyser );
+            this.analyser.connect( outputTo );
+        }
+
+        // As these effects can be chained together,
+        // There should only be one canvas object per desired html element
+        // This is passed and shared in all of the other visualisers
+        public createCanvas( width:number=256, height:number=256, id:string='audiobus-visualiser' ):HTMLCanvasElement
+        {
+            this.canvas = document.createElement("canvas");
+            this.canvas.width = width;
+            this.canvas.height = height;
+            this.canvas.id = id;
+
+            document.body.appendChild( this.canvas );
+
+            this.setCanvas( this.canvas );
+            return this.canvas;
+        }
+
+        // You can use the chain's siblings to pass this
+        public setCanvas(canvas:HTMLCanvasElement):void
+        {
+            this.canvas = canvas;
+            this.visualContext = this.canvas.getContext("2d");
+        }
+
+        // resizes canvas!
+        public setSize():void
+        {
+
+        }
+
+        // Add a visualiser as a slave effect that draws over this one!
+        public append( slave:audiobus.visualisation.visualisers.Visualiser ):void
+        {
+            // check to see if there is a tail...
+            if (!this.tail)
+            {
+                this.tail = this.head = slave;
+                slave.setCanvas( this.canvas );
+                return;
+            }
+
+            // find the tail and add to it
+            this.tail.next = slave;
+            slave.previous = this.tail;
+            this.tail = slave;
+
+            slave.setCanvas( this.canvas );
+            console.error( slave );
+        }
+
+        public prepend( slave:audiobus.visualisation.visualisers.Visualiser ):void
+        {
+            if (!this.head)
+            {
+                this.tail = this.head = slave;
+                slave.setCanvas( this.canvas );
+                return;
+            }
+
+            // find the tail and add to it
+            // find the tail and add to it
+            this.head.previous = slave;
+            slave.next = this.head;
+            this.head = slave;
+            slave.setCanvas( this.canvas );
+            console.error( 'prependSlave', slave );
+        }
 
         public start():void
         {
@@ -71,6 +152,22 @@ module audiobus.visualisation
                 }else{
                     this.analyser.getByteTimeDomainData( this.frequencyData );
                 }
+
+                // call all registered visualisers
+                var vis:audiobus.visualisation.visualisers.Visualiser = this.head;
+                if (vis)
+                {
+                    // clear if neccessary
+                    this.visualContext.fillStyle = 'rgb(0, 0, 0)';
+                    this.visualContext.fillRect(0, 0, vis.width, vis.height);
+
+                    while (vis)
+                    {
+                        vis.update( this.frequencyData, this.now(), this.analyser.frequencyBinCount );
+                        vis = vis.next;
+                    }
+                }
+
                 // send out this data
                 // this.frequencyData
     			if (this.onanalysis)

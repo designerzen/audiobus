@@ -36,32 +36,6 @@ module audiobus.visualisation.visualisers
 			this.name = title;
 		}
 
-		// As these effects can be chained together,
-		// There should only be one canvas object per desired html element
-		// This is passed and shared in all of the other visualisers
-		public createCanvas( width:number=256, height:number=256 ):void
-		{
-			this.canvas = document.createElement("canvas");
-			this.canvas.width = width;
-			this.canvas.height = height;
-
-			document.body.appendChild( this.canvas );
-
-			this.setCanvas( this.canvas );
-		}
-
-		// You can use the chain's siblings to pass this
-		public setCanvas(canvas:HTMLCanvasElement):void
-		{
-			this.canvas = canvas;
-			this.context = this.canvas.getContext("2d");
-			this.width = this.canvas.width;
-			this.height = this.canvas.height;
-			this.centreX = this.width / 2;
-			this.centreY = this.height / 2;
-			this.bitmapData	= this.context.getImageData(0, 0, this.width, this.height);
-		}
-
 		public toString():string
 		{
 			var vis:Visualiser = this;
@@ -109,6 +83,32 @@ module audiobus.visualisation.visualisers
 				// already an orphan ;(
 			}
 			return this;
+		}
+
+		// As these effects can be chained together,
+		// There should only be one canvas object per desired html element
+		// This is passed and shared in all of the other visualisers
+		public createCanvas( width:number=256, height:number=256 ):void
+		{
+			this.canvas = document.createElement("canvas");
+			this.canvas.width = width;
+			this.canvas.height = height;
+
+			document.body.appendChild( this.canvas );
+
+			this.setCanvas( this.canvas );
+		}
+
+		// You can use the chain's siblings to pass this
+		public setCanvas(canvas:HTMLCanvasElement):void
+		{
+			this.canvas = canvas;
+			this.context = this.canvas.getContext("2d");
+			this.width = this.canvas.width;
+			this.height = this.canvas.height;
+			this.centreX = this.width / 2;
+			this.centreY = this.height / 2;
+			this.bitmapData	= this.context.getImageData(0, 0, this.width, this.height);
 		}
 
 		// This loops through all visualisers and
@@ -204,12 +204,12 @@ module audiobus.visualisation.visualisers
 		// This will render the visualiser...
 		// Pass in frequency data from the Spectrum Analyser
 		// It will call all subsequent effects in the chain
-		public update( spectrum:Uint8Array, time:number ):void
+		public update( spectrum:Uint8Array, time:number, bufferLength:number ):void
 		{
 			// call the next one on the list!
 			if (this.next)
 			{
-				this.next.update( spectrum, time );
+				this.next.update( spectrum, time, bufferLength );
 			}
 		}
 	}

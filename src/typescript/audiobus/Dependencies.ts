@@ -42,3 +42,5 @@ interface Window {
 
 // Visualisations
 ///<reference path="visualisation/SpectrumAnalyzer.ts" />
+///<reference path="visualisation/colour/colour.ts" />
+///<reference path="visualisation/colour/rainbows.ts" />

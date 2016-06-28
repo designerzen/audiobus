@@ -73,7 +73,7 @@ module audiobus.visualisation.visualisers
 			}
 		}
 
-		public update( spectrum:Uint8Array, time:number ):void
+		public update( spectrum:Uint8Array, time:number, bufferLength:number ):void
 		{
 			//this.canvas;
 			var i:number, j:number, p:number, tp1:number, tp2:number, tp3:number, tp4:number;
@@ -120,7 +120,7 @@ module audiobus.visualisation.visualisers
 
 			this.context.putImageData(this.bitmapData,0,0);
 
-			super.update( spectrum, time );
+			super.update( spectrum, time, bufferLength );
 		}
 	}
 

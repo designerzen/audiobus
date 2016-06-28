@@ -1,0 +1,15 @@
+out/
+obj/
+.sync
+.idea/workspace.xml
+.DS_Store
+src/assets/*
+!src/assets/fonts
+!src/assets/batchcommands
+!src/assets/css
+!src/assets/play.fxg
+!src/assets/playpause.fxg
+!src/assets/images
+/bin/assets/teamsheets
+*-unused*
+*_unused*

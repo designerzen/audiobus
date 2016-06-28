@@ -30,7 +30,7 @@ module audiobus.io
     		return result;
     	}
 
-    	/* read a big-endian 32-bit integer */
+    	// read a big-endian 32-bit integer
     	public readInt32():number
         {
     		var result = (
@@ -42,7 +42,7 @@ module audiobus.io
     		return result;
     	}
 
-    	/* read a big-endian 16-bit integer */
+    	// Read a big-endian 16-bit integer
     	public readInt16():number
         {
     		var result = (
@@ -52,7 +52,7 @@ module audiobus.io
     		return result;
     	}
 
-    	/* read an 8-bit integer */
+    	// read an 8-bit integer
     	public readInt8(signed:boolean):number
         {
     		var result = this.str.charCodeAt(this.position);
@@ -73,14 +73,16 @@ module audiobus.io
     	public readVarInt():number
         {
     		var result = 0;
-    		while (true) {
+    		while (true)
+            {
     			var b:number = this.readInt8(false);
-    			if (b & 0x80) {
+    			if (b & 0x80)
+                {
     				result += (b & 0x7f);
     				result <<= 7;
     			} else {
-    				/* b is the last byte */
-    				return result + b;
+
+    				return result + b; // b is the last byte
     			}
     		}
         }

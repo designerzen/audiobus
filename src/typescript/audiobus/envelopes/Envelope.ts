@@ -87,6 +87,12 @@ module audiobus.envelopes
 
 		public SILENCE:number = 0.00000001;//Number.MIN_VALUE*100000000000;
 
+        // Returns the entire length in seconds of this envelope
+        public get duration():number
+        {
+            return this.delayTime + this.attackTime + this.decayTime + this.releaseTime + (this.holdTime < 0 ? 0 : this.holdTime);
+        }
+
         constructor( audioContext:AudioContext, outputTo:AudioNode=null, source:AudioNode=null )
         {
             // this contains our envelope
@@ -115,15 +121,15 @@ module audiobus.envelopes
             }
         }
 
-        private fade( curveType:string, volume:number, time:number, duration:number=0 ):number
+        private fade( curveType:string, volume:number, time:number, length:number=0 ):number
         {
-            if ( duration <= 0 )
+            if ( length <= 0 )
             {
                 // we may as well cut rather than fade...
                 this.envelope.gain.setValueAtTime( volume, time );
                 return time;
             }
-            var position:number = time + duration;
+            var position:number = time + length;
             var offset:number;
             switch (curveType)
             {
@@ -146,6 +152,7 @@ module audiobus.envelopes
                 default:
                     this.envelope.gain.linearRampToValueAtTime( volume, position );
             }
+            //this.envelope.gain.setValueAtTime( volume, position );
             return position;
         }
 
@@ -153,6 +160,7 @@ module audiobus.envelopes
         {
             var time:number = startPosition > -1 ? startPosition : this.context.currentTime;
             var position:number = this.delayTime + time;
+            var vol:number = this.gain * this.amplitude;
 
             // clear any future events we may have set up
             if (clearExisting)
@@ -161,16 +169,16 @@ module audiobus.envelopes
             }
             //console.error(this);
             // first set the initial volume at now as 1...
-            // this.envelope.gain.setValueAtTime( 1, position );
+            this.envelope.gain.setValueAtTime( 0, position );
 
             // Attack to full amplitude
-            position = this.fade( this.attackType, this.gain * this.amplitude, position, this.attackTime );
+            position = this.fade( this.attackType, vol, position, this.attackTime );
 
             // Decay to Sustain
             position = this.fade( this.decayType, this.gain *this.sustainVolume, position, this.decayTime );
 
             // Sustain & Hold
-            this.envelope.gain.setValueAtTime(this.gain *this.sustainVolume, position);
+            //this.envelope.gain.setValueAtTime(this.gain *this.sustainVolume, position);
 
             // == HOLDING ==
             // now if holding is occurring, let's hold for that specified
@@ -186,7 +194,7 @@ module audiobus.envelopes
                 position += this.holdTime;
                 // now fade out...
                 return this.stop( position, false );
-
+                //return this.stop( position, true );
             }
         }
 

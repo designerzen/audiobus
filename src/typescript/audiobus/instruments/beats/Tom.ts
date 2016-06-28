@@ -4,17 +4,17 @@
 
 MIT Licence
 
-Bass Drum
+Tom Drum
 ==============
 Abstract    - Basic Percussion Element
 Description -
-Use         - trigge
+Use         - trigger
 Methods     -
 
 //////////////////////////////////////////////////////////////////////////////*/
 module audiobus.instruments.beats
 {
-    export class BassDrum extends Drum implements ISoundControl
+    export class Tom extends Drum implements ISoundControl
     {
 		private bass:OscillatorNode;
 
@@ -32,7 +32,7 @@ module audiobus.instruments.beats
             compressor.threshold.value = -50;
             compressor.knee.value = 40;
             compressor.ratio.value = 12;
-            compressor.reduction.value = -20;
+            compressor.reduction.value = -2;
             compressor.attack.value = 0;
             compressor.release.value = 0.25;
 
@@ -45,12 +45,12 @@ module audiobus.instruments.beats
             compressor.connect(biquadFilter);
 
             // Shape the output waveform
-            this.envelope.gain = 8;
-            this.envelope.attackTime = 0.002;
-            this.envelope.decayTime = 0.05;
+            this.envelope.gain = 4;
+            this.envelope.attackTime = 0.1;
+            this.envelope.decayTime = 0.2;
             this.envelope.holdTime = 0;
             this.envelope.hold = false;
-            this.envelope.releaseTime = 0.3;
+            this.envelope.releaseTime = 0.9;
             this.envelope.sustainVolume = 0.8;
 
             // Connect these bits and pieces together
@@ -58,12 +58,17 @@ module audiobus.instruments.beats
         };
 
 		// trigger!
-		public start( startFrequency:number=750, endFrequency:number=80, length:number=0.005 ):boolean
+		public start( startFrequency:number=65, endFrequency:number=55 ):boolean
 		{
             var t:number = this.context.currentTime;
+            var d:number = this.envelope.duration - this.envelope.attackTime;
 
-			this.bass.frequency.setValueAtTime( startFrequency, t );
-			this.bass.frequency.exponentialRampToValueAtTime( endFrequency, t + length );
+            this.bass.frequency.setValueAtTime( 0, t );
+            this.bass.frequency.exponentialRampToValueAtTime( startFrequency, t + this.envelope.attackTime);
+            this.bass.frequency.setValueAtTime( startFrequency, t + this.envelope.attackTime );
+
+			this.bass.frequency.linearRampToValueAtTime( endFrequency, t + d);
+            this.bass.frequency.setValueAtTime( endFrequency, t + d );
 
 			if ( super.start() )
             {

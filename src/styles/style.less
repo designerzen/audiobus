@@ -1,0 +1,36 @@
+@import url(reset);
+@import url(colours);
+
+html,body{
+	width:100%;
+	height:100%;
+	display:block;
+	margin:0;
+	padding:0;
+}
+
+body{
+	min-height:100%;
+	color:@grey;
+	color:@translucent;
+	background-color:black;
+}
+body.fixed{
+	max-height:100%;
+	overflow:hidden;
+}
+#visualiser{
+    position:fixed;
+    top:0;
+    left:0;
+	z-index: -1;
+}
+
+#visualiserjumbo{
+    position:absolute;
+    top:0;
+    left:0;
+	width:100%;
+	height:100%;
+	z-index: -1;
+}
