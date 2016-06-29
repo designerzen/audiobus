@@ -23,6 +23,7 @@ module audiobus.io
             this.str = str;
         }
 
+        // Data management
     	public read(length:number):string
         {
     		var result:string = this.str.substr(this.position, length);
@@ -53,10 +54,13 @@ module audiobus.io
     	}
 
     	// read an 8-bit integer
-    	public readInt8(signed:boolean):number
+    	public readInt8(signed:boolean=false):number
         {
     		var result = this.str.charCodeAt(this.position);
-    		if (signed && result > 127) result -= 256;
+    		if (signed && result > 127)
+            {
+                result -= 256;
+            }
     		this.position += 1;
     		return result;
     	}
@@ -72,7 +76,7 @@ module audiobus.io
     	*/
     	public readVarInt():number
         {
-    		var result = 0;
+    		var result:number = 0;
     		while (true)
             {
     			var b:number = this.readInt8(false);

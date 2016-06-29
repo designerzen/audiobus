@@ -49,16 +49,22 @@ module audiobus.io
                 {
                     if (fetch.status === 200)
                     {
-                        var t = fetch.responseText || '';
+                        var t:string = fetch.responseText || '';
                         var ff = [];
-                        var mx = t.length;
+                        var mx:number = t.length;
                         var scc = String.fromCharCode;
                         for (var z = 0; z < mx; z++)
                         {
                             ff[z] = scc(t.charCodeAt(z) & 255);
                         }
                         ///
-                        var data = ff.join('');
+                        var data:string = ff.join('');
+
+
+                        var stream = new audiobus.io.MidiStream( data );
+                        var decoder = new audiobus.io.MidiDecoder( stream );
+
+
                         //console.log( ff );
                         //midi.currentData = data;
                         //midi.loadMidiFile(onsuccess, onprogress, onerror);

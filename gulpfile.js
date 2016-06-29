@@ -32,9 +32,11 @@ gulp.task('midi', function(){
 // Compile our styles
 gulp.task('examples-styles', function () {
     return gulp.src('src/styles/style.less')
+    .pipe(sourcemaps.init())
     .pipe(less({
       paths:[ 'src/styles/' ]
     }))
+    .pipe(sourcemaps.write(EXAMPLES+'assets/style/'))
     .pipe( gulp.dest(EXAMPLES+'assets/style/' ));
 });
 gulp.task('examples-code',['dist'], function () {

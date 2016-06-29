@@ -1,26 +1,6 @@
 /// <reference path="../Dependencies.ts" />
 module audiobus.io
 {
-	/*
-	interface Navigator {
-			getUserMedia(
-				options: { video?: boolean; audio?: boolean; },
-				success: (stream: any) => void,
-				error?: (error: string) => void
-				) : void;
-		}
-		// this will need to be removed once getUserMedia is more accepted
-		private getUserMedia(options: { video?: boolean; audio?: boolean; },
-				success: (stream: any) => void,
-				error?: (error: string) => void)
-		{
-			var n = <any>navigator;
-			n.getUserMedia  = n.getUserMedia || n.webkitGetUserMedia || n.mozGetUserMedia || n.msGetUserMedia;
-			return  n.getUserMedia({video: true, audio:true}, success, error);
-		}
-
-	*/
-
 	export class Microphone
     {
 		public context:AudioContext;
