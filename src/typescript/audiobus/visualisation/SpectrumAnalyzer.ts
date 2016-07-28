@@ -56,9 +56,9 @@ module audiobus.visualisation
             }
         }
 
-        public connect( outputTo:AudioNode, source:AudioNode ):void
+        public connect( outputTo:AudioNode, source:AudioNode=null ):void
         {
-            source.connect( this.analyser );
+            if (source) source.connect( this.analyser );
             this.analyser.connect( outputTo );
         }
 
@@ -67,14 +67,20 @@ module audiobus.visualisation
         // This is passed and shared in all of the other visualisers
         public createCanvas( width:number=256, height:number=256, id:string='audiobus-visualiser' ):HTMLCanvasElement
         {
-            this.canvas = document.createElement("canvas");
+            if ( !this.checkCanvasExists(id) )
+            {
+                this.canvas = document.createElement("canvas");
+                this.canvas.id = id;
+                this.canvas.className = "audiobus-visualisation";
+                document.body.appendChild( this.canvas );
+            }else{
+                this.canvas = document.getElementById( id ) as HTMLCanvasElement;
+            }
+
             this.canvas.width = width;
             this.canvas.height = height;
-            this.canvas.id = id;
 
-            document.body.appendChild( this.canvas );
-
-            this.setCanvas( this.canvas );
+            this.visualContext = this.canvas.getContext("2d");
             return this.canvas;
         }
 
@@ -85,13 +91,26 @@ module audiobus.visualisation
             this.visualContext = this.canvas.getContext("2d");
         }
 
-        // resizes canvas!
-        public setSize():void
+        public checkCanvasExists( id:string ):boolean
         {
+            var element:HTMLElement = document.getElementById( id );
+            return element != null;
+        }
 
+        // resizes canvas!
+        public setSize(width:number=256, height:number=256):void
+        {
+            this.canvas.width = width;
+            this.canvas.height = height;
         }
 
         // Add a visualiser as a slave effect that draws over this one!
+        public solo( slave:audiobus.visualisation.visualisers.Visualiser ):void
+        {
+            this.tail = this.head = slave;
+            slave.setCanvas( this.canvas );
+        }
+
         public append( slave:audiobus.visualisation.visualisers.Visualiser ):void
         {
             // check to see if there is a tail...

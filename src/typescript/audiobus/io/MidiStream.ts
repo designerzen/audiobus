@@ -5,11 +5,12 @@ MIT Licence
 
 Midi File
 ==============
-Abstract    - Load and decode a .midi file from a server
-Description - Buffers a .midi file into memory, parse the commands
-Use         - Load( file.midi, onComplete ) and wait for the callback
+Abstract    - A string based byte nibbler and convertor
+Description - Feed it a data file then request bytes as needed
+Use         - 
 Methods     -
 Forked from - https://github.com/gasman/jasmid/blob/master/stream.js#L2
+
 //////////////////////////////////////////////////////////////////////////////*/
 module audiobus.io
 {

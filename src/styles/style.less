@@ -34,34 +34,14 @@ body.fixed{
 	height:100%;
 	z-index: -1;
 }
-
-#drumkit{
+.overlay{
 	position:absolute;
+    top:0;
+    left:0;
 	width:100%;
 	height:100%;
-	top:0;
-	left:0;
-	z-index:0;
-	opacity:0.5;
-	margin:0;
-	padding:0;
+	z-index: 999;
 }
+// Example 001 - drumkit
+@import url(drumkit);
 
-.drum{
-	width:100%;
-	display: block;
-	height:25%;
-}
-
-#kick{
-	background-color: @orange;
-}
-#snare{
-	background-color: @brown;
-}
-#conga{
-	background-color: @green;
-}
-#hihat{
-	background-color: @blue;
-}

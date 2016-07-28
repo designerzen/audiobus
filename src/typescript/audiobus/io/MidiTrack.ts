@@ -5,7 +5,7 @@ MIT Licence
 
 Midi Track
 ==============
-Abstract    - Load and decode a .midi file from a server
+Abstract    - A Midi Track Model - no logic - just data
 Description - Buffers a .midi file into memory, parse the commands
 Use         - Load( file.midi, onComplete ) and wait for the callback
 Methods     -
@@ -20,10 +20,22 @@ module audiobus.io
         public ticksPerBeat:number;
     }
 
-
-    export class MidiFileEvent
+    export class MidiCommand
     {
+        // Commands!
+        public static TYPE_CHANNEL:string = 'channel';
+        public static TYPE_META:string = 'meta';
+        
+        public static COMMAND_NOTE_OFF:string = 'noteOff';
+        public static COMMAND_NOTE_ON:string = 'noteOn';
+        public static COMMAND_NOTE_AFTER_TOUCH:string = 'noteAftertouch';
+        public static COMMAND_CONTROLLER:string = 'controller';
+        public static COMMAND_PROGRAM_CHANGE:string = 'programChange';
+        public static COMMAND_CHANNEL_AFTEER_TOUCH:string = 'channelAftertouch';
+        public static COMMAND_PITCH_BEND:string = 'pitchBend';
+
         public deltaTime:number;
+        public frameRate:number;
         public channel:number;
 
         public type:string;
@@ -52,24 +64,57 @@ module audiobus.io
 
         public controllerType:number;
         public programNumber:number;
+        public sequenceNumber:number;
     }
 
     export class MidiTrack
     {
         public header:MidiHeader;
-        public tracks:Array<MidiFileEvent>;
+        public tracks:Array<MidiCommand>;
+
+        public trackName:string = "";
+        public meta:string = "";
+        public copyrightNotice:string = "";
+        public lyrics:string = "";
 
         constructor( header:MidiHeader )
         {
-
+            this.header = header;
         }
 
-
-        public decode( stream:MidiStream )
+        // A way of adding an event and multiple events to track
+        public addEvent( index:number, event:MidiCommand )
         {
-            var header = this.decodeHeader( stream );
-            var tracks = this.decodeTracks( stream );
-        }
+            // check to see if there is an pocket already open
+            // open a new pocket
+            if (event.type === "meta")
+            {
+                switch( event.subtype )
+                {
+                    case "text":
+                    case "trackName":
+                    case "copyrightNotice":
+                    case "lyrics":
+                        this[event.subtype] += event.text;
+                        break;
 
+                    default:
+                        // add
+                }
+            }else{
+                switch( event.subtype )
+                {
+                    case MidiCommand.COMMAND_NOTE_ON:
+                    case MidiCommand.COMMAND_NOTE_OFF:
+                    case MidiCommand.COMMAND_CONTROLLER:
+                    case MidiCommand.COMMAND_PITCH_BEND:
+                    case MidiCommand.COMMAND_PROGRAM_CHANGE:
+                    case MidiCommand.COMMAND_CHANNEL_AFTEER_TOUCH:
+                    default:
+                        // add
+                }
+            }
+
+        }
     }
 }

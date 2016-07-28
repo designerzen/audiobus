@@ -1,4 +1,4 @@
-/// <reference path="../audiobus.d.ts" />
+/// <reference path="../audiobus/Dependencies.ts"/>
 module examples
 {
 	export class ExampleDrumKeyboard
@@ -52,8 +52,8 @@ module examples
 			var analyser:audiobus.visualisation.SpectrumAnalyzer = new audiobus.visualisation.SpectrumAnalyzer( context, audiobus.visualisation.SpectrumAnalyzer.TYPE_TIME_DOMAIN );
 			//var analyser:audiobus.visualisation.SpectrumAnalyzer = new audiobus.visualisation.SpectrumAnalyzer( context, audiobus.visualisation.SpectrumAnalyzer.TYPE_FREQUENCY );
 			var canvas = analyser.createCanvas( window.innerWidth / 2,  window.innerHeight / 2, 'visualiserjumbo' );
-			//var rainbow:Array<audiobus.visualisation.colour.Colour> = audiobus.visualisation.colour.Rainbows.colour();
-			var rainbow:Array<audiobus.visualisation.colour.Colour> = audiobus.visualisation.colour.Rainbows.colour(0.3,0.3,0.3, 0,2,4, 230,25);
+			var rainbow:Array<audiobus.visualisation.colour.Colour> = audiobus.visualisation.colour.Rainbows.colour();
+			//var rainbow:Array<audiobus.visualisation.colour.Colour> = audiobus.visualisation.colour.Rainbows.colour(0.3,0.3,0.3, 0,2,4, 230,25);
 			//console.error(rainbow);
 			this.harmongraph = new audiobus.visualisation.visualisers.Harmongraph();
 			this.harmongraph.red = 0;
@@ -102,40 +102,43 @@ module examples
 	            this.onMouse(event);
 	        };
 
-			document.ontouchmove = (event:TouchEvent) => {
-	            this.onMouse(event);
-	        };
 
 			document.onmouseup = (event:MouseEvent) => {
 	            this.onMouse(event);
 	        };
 			document.ontouchstart = (event:TouchEvent) => {
-	            this.onMouse(event);
+	            this.onTouch(event);
 	        };
+			document.ontouchmove = (event:TouchEvent) => {
+				this.onTouch(event);
+			};
 
 			document.ontouchend = (event:TouchEvent) => {
-	            this.onMouse(event);
+	            this.onTouch(event);
 	        };
 		}
 		// EVENT : Some kind of mouse interaction
-		private onMouse(e:Event)
+		private onTouch(e:TouchEvent)
 		{
 			var type:string = e.type;
+			var touches:TouchList = e.touches;
 			switch(type)
 			{
 				case "touchstart":
-				case "mousedown":
 					//var randomBeat:number = Math.round(Math.random() * 100 );
 					//this.drums.trigger(randomBeat);
 
 					// so we want it so that when played in landscape mode, yoou
 					//
-					var y:number = e.clientY;
-					 var fingers:number = 3 * y / (window.innerHeight);
-					 var finger:number = Math.round( fingers );
+					var touch:Touch = touches.item[0];
+					var y:number = touch.clientY;
+					var fingers:number = 3 * y / (window.innerHeight);
+					var finger:number = Math.round( fingers );
+
 					 console.log(e,fingers,finger,y,window.innerHeight);
+
 					 switch(finger)
-				 	{
+					{
 						case 0:
 							this.drums.bassdrum.start( 750 + Math.random() * 100,Math.random() * 100 );
 							this.harmongraph.zRatio = Math.random() * 30;
@@ -157,12 +160,59 @@ module examples
 					break;
 
 				case "touchend":
-				case "mouseup":
-				//	console.error(e);
 
 					break;
 
 				case "touchmove":
+
+					break;
+
+			}
+		}
+		private onMouse(e:MouseEvent)
+		{
+			var type:string = e.type;
+			switch(type)
+			{
+				case "mousedown":
+					//var randomBeat:number = Math.round(Math.random() * 100 );
+					//this.drums.trigger(randomBeat);
+
+					// so we want it so that when played in landscape mode, yoou
+					var buttonHeight = window.innerHeight * 0.25;
+					var y:number = e.clientY ||  e.offsetY;
+					var precentageY = y / window.innerHeight;
+					var fingers:number = 3 * precentageY;	// we want a number between 0 and 3
+					var finger:number = 1+Math.floor( fingers );
+
+					 console.log(e,fingers,finger,precentageY);
+
+					 switch(finger)
+				 	{
+						case 1:
+							this.drums.bassdrum.start( 750 + Math.random() * 100,Math.random() * 100 );
+							this.harmongraph.zRatio = Math.random() * 30;
+							break;
+						case 2:
+							this.drums.conga.start( 1200 + Math.random() * 100 );
+							this.harmongraph.zRatio = Math.random() * 800;
+							break;
+						case 3:
+							this.drums.snare.start( 2050 + Math.random() * 100 );
+							this.harmongraph.zRatio = Math.random() * 1100;
+							break;
+						case 4:
+							this.drums.tom.start( Math.random() * 10 + 55, Math.random() * 20 + 55 );
+							this.harmongraph.zRatio = Math.random() * 1800;
+							break;
+					}
+
+					break;
+
+				case "mouseup":
+				//	console.error(e);
+					break;
+
 				case "mousemove":
 					if (this.harmongraph)
 					{

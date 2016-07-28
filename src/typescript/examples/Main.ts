@@ -1,4 +1,4 @@
-/// <reference path="../audiobus.d.ts" />
+/// <reference path="../audiobus/Dependencies.ts"/>
 module examples
 {
 	export class Main
@@ -27,7 +27,7 @@ module examples
 
 			// MIDI File : Load in data
 			this.midiFile = new audiobus.io.MidiFile();
-			this.midiFile.load( "assets/midi/chopin-polishdance.mid", (event)=>this.onMidiFile(event) );
+			this.midiFile.load( "assets/midi/chopin-polishdance.mid", (midiTrack:audiobus.io.MidiTrack)=>this.onMidiFile(midiTrack) );
 
 
 			// Instruments :
@@ -178,9 +178,9 @@ module examples
 
 		// EVENT :
 		// Midi file has loaded or failed to load!
-		private onMidiFile( e )
+		private onMidiFile( midiTrack:audiobus.io.MidiTrack )
 		{
-			console.error(e);
+			console.error(midiTrack);
 		}
 
 		// EVENT :

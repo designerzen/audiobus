@@ -81,7 +81,7 @@ module audiobus.visualisation.visualisers
 			//this.bitmapData = this.context.getImageData(0,0,this.width, this.height);
 			// Clear Screen();
     		// Clear the current transformation matrix
-    		this.bitmapData = this.context.createImageData(this.bitmapData);
+    		//this.bitmapData = this.context.createImageData(this.bitmapData);
 
 			tp3 = this.pos2;
 			//canvas.lock();
@@ -118,7 +118,19 @@ module audiobus.visualisation.visualisers
 			this.pos1 += 9;
 			this.pos2 += 8;
 
-			this.context.putImageData(this.bitmapData,0,0);
+			// now copy this into all the places that need it...
+
+			var columnX:number = 0;
+			while ( columnX < this.width )
+			{
+				var rowY:number = 0;
+				while ( rowY < this.height )
+				{
+					this.context.putImageData(this.bitmapData,columnX,rowY);
+					rowY += 360;
+				}
+				columnX += 480;
+			}
 
 			super.update( spectrum, time, bufferLength );
 		}

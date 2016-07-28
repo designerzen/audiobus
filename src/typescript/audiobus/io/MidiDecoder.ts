@@ -24,22 +24,30 @@ module audiobus.io
     {
         private lastEventTypeByte:number;
 
-        constructor(stream:MidiStream)
+        constructor()
         {
-            this.decode( stream );
         }
 
-        public decode( stream:MidiStream )
+        private readChunk(stream:MidiStream):MidiChunk
         {
-            var header = this.decodeHeader( stream );
+            var chunk:MidiChunk = new MidiChunk();
+    		chunk.id = stream.read(4);    // Each midi event message is 4 bytes big...
+    		chunk.length = stream.readInt32();
+            chunk.data = stream.read(chunk.length);
+    		return chunk;
+        }
+
+        public decode( stream:MidiStream ):MidiTrack
+        {
+            var header:MidiHeader = this.decodeHeader( stream );
             var track:MidiTrack = new MidiTrack( header );
-            this.decodeTracks( track, stream );
+            return this.decodeTracks( track, stream );
         }
 
-        public decodeHeader( stream:MidiStream ):MidiHeader
+        private decodeHeader( stream:MidiStream ):MidiHeader
         {
             var headerChunk:MidiChunk = this.readChunk(stream);
-            if (headerChunk.id != 'MThd' || headerChunk.length != 6)
+            if (headerChunk.id !== 'MThd' || headerChunk.length !== 6)
             {
                 throw "Bad .mid file - header not found";
             }
@@ -49,59 +57,55 @@ module audiobus.io
             var trackCount = headerStream.readInt16();
             var timeDivision = headerStream.readInt16();
 
+                // console.error(stream, headerChunk, headerStream, formatType, trackCount, timeDivision);
+
             if (timeDivision & 0x8000)
             {
-                throw "Expressing time division in SMTPE frames is not supported yet"
+                throw "Expressing time division in SMTPE frames is not supported yet";
             }
 
             var header:MidiHeader = new MidiHeader();
             header.formatType = formatType;
             header.trackCount = trackCount;
             header.ticksPerBeat = timeDivision;
-
+            // console.log(header);
             return header;
         }
 
-        public decodeTracks( track:MidiTrack, stream:MidiStream ):void
+        private decodeTracks( track:MidiTrack, stream:MidiStream ):MidiTrack
         {
-            var tracks:Array<MidiFileEvent> = new Array();
+            var tracks:Array<MidiCommand> = new Array();
             var quantity:number = track.header.trackCount;
             for (var i = 0; i < quantity; i++)
             {
-                tracks[i] = [];
+                //tracks[i] = [];
                 var trackChunk = this.readChunk(stream);
-                if (trackChunk.id != 'MTrk')
+                if (trackChunk.id !== 'MTrk')
                 {
                     throw "Unexpected chunk - expected MTrk, got "+ trackChunk.id;
                 }
                 var trackStream:MidiStream = new MidiStream(trackChunk.data);
                 while (!trackStream.eof())
                 {
-                    var event:MidiFileEvent = this.readEvent(trackStream);
-                    tracks[i].push(event);
-                    //console.log(event);
+                    var event:MidiCommand = this.readEvent(trackStream);
+                    //tracks[i].push(event);
+                    track.addEvent(i,event);
+                    console.log(event);
                 }
             }
+            return track;
         }
 
-        private readChunk(stream:MidiStream):MidiChunk
-        {
-            var chunk:MidiChunk = new MidiChunk();
-    		chunk.id = stream.read(4);    // Each midi event message is 4 bytes big...
-    		chunk.length = stream.readInt32();
-            chunk.data = stream.read(length);
-    		return chunk;
-        }
 
-        private readEvent(stream:MidiStream):MidiFileEvent
+        private readEvent(stream:MidiStream):MidiCommand
         {
-    		var event:MidiFileEvent = new MidiFileEvent();
+    		var event:MidiCommand = new MidiCommand();
             var time:number = stream.readVarInt();
     		var eventTypeByte:number = stream.readInt8();
 
             event.deltaTime = time;
 
-    		if ((eventTypeByte & 0xf0) == 0xf0)
+    		if ((eventTypeByte & 0xf0) === 0xf0)
             {
                 return this.decodeSystemEvent( stream, event, eventTypeByte);
 
@@ -111,22 +115,22 @@ module audiobus.io
     		}
     	}
 
-        private decodeSystemEvent( stream:MidiStream, event:MidiFileEvent, eventTypeByte:number ):MidiFileEvent
+        private decodeSystemEvent( stream:MidiStream, event:MidiCommand, eventTypeByte:number ):MidiCommand
         {
             // system / meta event
-            if (eventTypeByte == 0xff)
+            if (eventTypeByte === 0xff)
             {
-                /* meta event */
-                event.type = 'meta';
-                var subtypeByte = stream.readInt8();
-                var length = stream.readVarInt();
+                // meta event
+                event.type =  MidiCommand.TYPE_META;
+                var subtypeByte:number = stream.readInt8();
+                var length:number = stream.readVarInt();
 
                 switch(subtypeByte)
                 {
                     case 0x00:
                         event.subtype = 'sequenceNumber';
-                        if (length != 2) { throw "Expected length for sequenceNumber event is 2, got " + length;}
-                        event.number = stream.readInt16();
+                        if (length !== 2) { throw "Expected length for sequenceNumber event is 2, got " + length;}
+                        event.sequenceNumber = stream.readInt16();
                         return event;
 
                     case 0x01:
@@ -166,33 +170,35 @@ module audiobus.io
 
                     case 0x20:
                         event.subtype = 'midiChannelPrefix';
-                        if (length != 1){ throw "Expected length for midiChannelPrefix event is 1, got " + length;}
+                        if (length !== 1){ throw "Expected length for midiChannelPrefix event is 1, got " + length;}
                         event.channel = stream.readInt8();
                         return event;
 
                     case 0x2f:
                         event.subtype = 'endOfTrack';
-                        if (length != 0) { throw "Expected length for endOfTrack event is 0, got " + length;}
+                        if (length !== 0) { throw "Expected length for endOfTrack event is 0, got " + length;}
                         return event;
 
                     case 0x51:
                         event.subtype = 'setTempo';
-                        if (length != 3) { throw "Expected length for setTempo event is 3, got " + length;}
+                        if (length !== 3) { throw "Expected length for setTempo event is 3, got " + length;}
                         event.microsecondsPerBeat = (
                             (stream.readInt8() << 16)
                             + (stream.readInt8() << 8)
                             + stream.readInt8()
-                        )
+                        );
                         return event;
 
                     case 0x54:
                         event.subtype = 'smpteOffset';
-                        if (length != 5) { throw "Expected length for smpteOffset event is 5, got " + length;}
+                        if (length !== 5) { throw "Expected length for smpteOffset event is 5, got " + length;}
                         var hourByte:number = stream.readInt8();
 
+                        // magic
                         event.frameRate = {
                             0x00: 24, 0x20: 25, 0x40: 29, 0x60: 30
                         }[hourByte & 0x60];
+                        console.error( event.frameRate );
 
                         event.hour = hourByte & 0x1f;
                         event.min = stream.readInt8();
@@ -203,7 +209,7 @@ module audiobus.io
 
                     case 0x58:
                         event.subtype = 'timeSignature';
-                        if (length != 4){ throw "Expected length for timeSignature event is 4, got " + length;}
+                        if (length !== 4){ throw "Expected length for timeSignature event is 4, got " + length;}
                         event.numerator = stream.readInt8();
                         event.denominator = Math.pow(2, stream.readInt8());
                         event.metronome = stream.readInt8();
@@ -212,7 +218,7 @@ module audiobus.io
 
                     case 0x59:
                         event.subtype = 'keySignature';
-                        if (length != 2){ throw "Expected length for keySignature event is 2, got " + length;}
+                        if (length !== 2){ throw "Expected length for keySignature event is 2, got " + length;}
                         event.key = stream.readInt8(true);
                         event.scale = stream.readInt8();
                         return event;
@@ -224,19 +230,19 @@ module audiobus.io
 
                     default:
                         // console.log("Unrecognised meta event subtype: " + subtypeByte);
-                        event.subtype = 'unknown'
+                        event.subtype = 'unknown';
                         event.data = stream.read(length);
                         return event;
                 }
 
-            } else if (eventTypeByte == 0xf0) {
+            } else if (eventTypeByte === 0xf0) {
 
                 event.type = 'sysEx';
                 var length = stream.readVarInt();
                 event.data = stream.read(length);
                 return event;
 
-            } else if (eventTypeByte == 0xf7) {
+            } else if (eventTypeByte === 0xf7) {
 
                 event.type = 'dividedSysEx';
                 var length = stream.readVarInt();
@@ -249,11 +255,11 @@ module audiobus.io
             }
         }
 
-        private decodeChannelEvent(stream:MidiStream, event:MidiFileEvent, eventTypeByte:number ):MidiFileEvent
+        private decodeChannelEvent(stream:MidiStream, event:MidiCommand, eventTypeByte:number ):MidiCommand
         {
             var param1:number;
 
-            if ((eventTypeByte & 0x80) == 0)
+            if ((eventTypeByte & 0x80) === 0)
             {
                 /* running status - reuse lastEventTypeByte as the event type.
                     eventTypeByte is actually the first parameter
@@ -267,12 +273,12 @@ module audiobus.io
 
             var eventType = eventTypeByte >> 4;
             event.channel = eventTypeByte & 0x0f;
-            event.type = 'channel';
+            event.type = MidiCommand.TYPE_CHANNEL;
 
             switch (eventType)
             {
                 case 0x08:
-                    event.subtype = 'noteOff';
+                    event.subtype = MidiCommand.COMMAND_NOTE_OFF;//'noteOff';
                     event.noteNumber = param1;
                     event.velocity = stream.readInt8();
                     return event;
@@ -280,43 +286,43 @@ module audiobus.io
                 case 0x09:
                     event.noteNumber = param1;
                     event.velocity = stream.readInt8();
-                    if (event.velocity == 0)
+                    if (event.velocity === 0)
                     {
-                        event.subtype = 'noteOff';
+                        event.subtype =  MidiCommand.COMMAND_NOTE_OFF;
                     } else {
-                        event.subtype = 'noteOn';
+                        event.subtype = MidiCommand.COMMAND_NOTE_ON;//'noteOn';
                     }
                     return event;
 
                 case 0x0a:
-                    event.subtype = 'noteAftertouch';
+                    event.subtype = MidiCommand.COMMAND_NOTE_AFTER_TOUCH;//'noteAftertouch';
                     event.noteNumber = param1;
                     event.amount = stream.readInt8();
                     return event;
 
                 case 0x0b:
-                    event.subtype = 'controller';
+                    event.subtype = MidiCommand.COMMAND_CONTROLLER;//'controller';
                     event.controllerType = param1;
                     event.value = stream.readInt8();
                     return event;
 
                 case 0x0c:
-                    event.subtype = 'programChange';
+                    event.subtype = MidiCommand.COMMAND_PROGRAM_CHANGE;//'programChange';
                     event.programNumber = param1;
                     return event;
 
                 case 0x0d:
-                    event.subtype = 'channelAftertouch';
+                    event.subtype = MidiCommand.COMMAND_CHANNEL_AFTEER_TOUCH;//'channelAftertouch';
                     event.amount = param1;
                     return event;
 
                 case 0x0e:
-                    event.subtype = 'pitchBend';
+                    event.subtype = MidiCommand.COMMAND_PITCH_BEND;//'pitchBend';
                     event.value = param1 + (stream.readInt8() << 7);
                     return event;
 
                 default:
-                    throw "Unrecognised MIDI event type: " + eventType
+                    throw "Unrecognised MIDI event type: " + eventType;
                     /*
                     console.log("Unrecognised MIDI event type: " + eventType);
                     stream.readInt8();

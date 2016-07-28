@@ -14,6 +14,7 @@
     "filesGlob": [
         "./src/typescript/audiobus/**/*.ts",
         "./src/typescript/typings/*.ts",
+        "./src/typescript/examples/**/*.ts",
         "!./node_modules/**/*.ts"
     ],
     "files": [
@@ -42,6 +43,7 @@
         "./src/typescript/audiobus/instruments/OscillatorTypes.ts",
         "./src/typescript/audiobus/instruments/Synthesizer.ts",
         "./src/typescript/audiobus/instruments/Theremin.ts",
+        "./src/typescript/audiobus/instruments/Violin.ts",
         "./src/typescript/audiobus/io/devices/TB3.ts",
         "./src/typescript/audiobus/io/Microphone.ts",
         "./src/typescript/audiobus/io/Midi.ts",
@@ -61,6 +63,7 @@
         "./src/typescript/audiobus/timing/TimeUtilities.ts",
         "./src/typescript/audiobus/visualisation/colour/Colour.ts",
         "./src/typescript/audiobus/visualisation/colour/Rainbows.ts",
+        "./src/typescript/audiobus/visualisation/ExampleVisualiser.ts",
         "./src/typescript/audiobus/visualisation/SpectrumAnalyzer.ts",
         "./src/typescript/audiobus/visualisation/visualisers/Bars.ts",
         "./src/typescript/audiobus/visualisation/visualisers/Harmongraph.ts",
@@ -68,7 +71,11 @@
         "./src/typescript/audiobus/visualisation/visualisers/Plasma.ts",
         "./src/typescript/audiobus/visualisation/visualisers/Scope.ts",
         "./src/typescript/audiobus/visualisation/visualisers/Visualiser.ts",
-        "./src/typescript/typings/tsd.d.ts"
+        "./src/typescript/typings/tsd.d.ts",
+        "./src/typescript/examples/Example.ts",
+        "./src/typescript/examples/ExampleDrumKeyboard.ts",
+        "./src/typescript/examples/ExampleFingerSynth.ts",
+        "./src/typescript/examples/Main.ts"
     ],
     "formatCodeOptions": {
         "indentSize": 2,
