@@ -114,7 +114,7 @@ module examples
 		////////////////////////////////////////////////////////////////////////
 		public onTouch(e:TouchEvent):void
 		{
-			//console.log("onTouch",e);
+			console.log("onTouch",e);
 			if (!this.hasTouch)
 			{
 				this.hasTouch = true;

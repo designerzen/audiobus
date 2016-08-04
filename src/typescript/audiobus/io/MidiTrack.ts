@@ -1,4 +1,5 @@
 /// <reference path="../Dependencies.ts"/>
+/// <reference path="./MidiCommand.ts"/>
 /*//////////////////////////////////////////////////////////////////////////////
 
 MIT Licence
@@ -6,10 +7,9 @@ MIT Licence
 Midi Track
 ==============
 Abstract    - A Midi Track Model - no logic - just data
-Description - Buffers a .midi file into memory, parse the commands
-Use         - Load( file.midi, onComplete ) and wait for the callback
+Description - Sequences of MidiCommands
+Use         - Add MidiCommands
 Methods     -
-Forked from - https://github.com/gasman/jasmid/blob/master/stream.js#L2
 //////////////////////////////////////////////////////////////////////////////*/
 module audiobus.io
 {
@@ -18,53 +18,6 @@ module audiobus.io
         public formatType:number;
         public trackCount:number;
         public ticksPerBeat:number;
-    }
-
-    export class MidiCommand
-    {
-        // Commands!
-        public static TYPE_CHANNEL:string = 'channel';
-        public static TYPE_META:string = 'meta';
-        
-        public static COMMAND_NOTE_OFF:string = 'noteOff';
-        public static COMMAND_NOTE_ON:string = 'noteOn';
-        public static COMMAND_NOTE_AFTER_TOUCH:string = 'noteAftertouch';
-        public static COMMAND_CONTROLLER:string = 'controller';
-        public static COMMAND_PROGRAM_CHANGE:string = 'programChange';
-        public static COMMAND_CHANNEL_AFTEER_TOUCH:string = 'channelAftertouch';
-        public static COMMAND_PITCH_BEND:string = 'pitchBend';
-
-        public deltaTime:number;
-        public frameRate:number;
-        public channel:number;
-
-        public type:string;
-        public subtype:string;
-        public text:string;
-        public data:string;
-
-        public hour:number;
-        public min:number;
-        public sec:number;
-        public frame:number;
-        public subframe:number;
-        public microsecondsPerBeat:number;
-
-        public key:number;
-        public scale:number;
-        public numerator:number;
-        public denominator:number;
-        public metronome:number;
-        public thirtyseconds:number;
-
-        public amount:number;
-        public noteNumber:number;
-        public velocity:number;
-        public value:number;
-
-        public controllerType:number;
-        public programNumber:number;
-        public sequenceNumber:number;
     }
 
     export class MidiTrack
@@ -77,9 +30,9 @@ module audiobus.io
         public copyrightNotice:string = "";
         public lyrics:string = "";
 
-        constructor( header:MidiHeader )
+        constructor( header:MidiHeader=null )
         {
-            this.header = header;
+            if (header) this.header = header;
         }
 
         // A way of adding an event and multiple events to track
@@ -87,7 +40,7 @@ module audiobus.io
         {
             // check to see if there is an pocket already open
             // open a new pocket
-            if (event.type === "meta")
+            if (event.type === MidiCommand.TYPE_META)
             {
                 switch( event.subtype )
                 {
@@ -100,6 +53,7 @@ module audiobus.io
 
                     default:
                         // add
+                        this.meta += event.text;
                 }
             }else{
                 switch( event.subtype )
@@ -109,9 +63,11 @@ module audiobus.io
                     case MidiCommand.COMMAND_CONTROLLER:
                     case MidiCommand.COMMAND_PITCH_BEND:
                     case MidiCommand.COMMAND_PROGRAM_CHANGE:
-                    case MidiCommand.COMMAND_CHANNEL_AFTEER_TOUCH:
+                    case MidiCommand.COMMAND_CHANNEL_AFTER_TOUCH:
                     default:
                         // add
+                        event.deltaTime;
+                        this.tracks.push(event);
                 }
             }
 

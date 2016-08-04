@@ -4,7 +4,7 @@ interface Window {
 
 ///<reference path="../typings/tsd.d.ts" />
 
-///<reference path="io/Midi.ts" />
+///<reference path="io/MidiHardware.ts" />
 ///<reference path="io/Microphone.ts" />
 
 ///<reference path="Conductor.ts" />

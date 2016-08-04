@@ -66,7 +66,9 @@ module examples
 			}
 
             var type:string = e.type;
-			var fingers:TouchList = e.touches;
+
+
+			var fingers:TouchList = e.changedTouches;
 
 			// loop through fingers here...
 			for ( var f:number=0, l=fingers.length; f<l; ++f)

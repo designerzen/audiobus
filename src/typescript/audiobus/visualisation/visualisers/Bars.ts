@@ -28,7 +28,7 @@ module audiobus.visualisation.visualisers
 			if (!this.rainbow)
 			{
 				//this.rainbow = audiobus.visualisation.colour.Rainbows.colour( 0.3, 0.3, 0.3,0, 2, 4, (bufferLength/2)>>0,1+(bufferLength/2)>>0, bufferLength );
-				this.rainbow = audiobus.visualisation.colour.Rainbows.colour( 0.3, 0.3, 0.3,0, 2, 4, 127,128, 255 );
+				this.rainbow = audiobus.visualisation.colour.Rainbows.colour();
 			}
             var barWidth:number = (this.width / bufferLength);// * 2.5;
             var barHeight:number;
@@ -41,7 +41,7 @@ module audiobus.visualisation.visualisers
 				var block:number = (percent * 255)>>0;
 				colour = this.rainbow[block];
                 barHeight = spectrum[i];
-				console.log( colour.toString() );
+				//console.log( colour.toString() );
 
                 this.context.fillStyle = colour.toRGBA(barHeight+100);//'rgb(' + (barHeight+100) + ',50,50)';
                 //this.context.fillStyle = colour.toRGB();//'rgb(' + (barHeight+100) + ',50,50)';

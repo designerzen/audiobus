@@ -7,7 +7,7 @@ Midi File
 ==============
 Abstract    - A string based byte nibbler and convertor
 Description - Feed it a data file then request bytes as needed
-Use         - 
+Use         -
 Methods     -
 Forked from - https://github.com/gasman/jasmid/blob/master/stream.js#L2
 
@@ -71,10 +71,9 @@ module audiobus.io
     		return this.position >= this.str.length;
     	}
 
-    	/* read a MIDI-style variable-length integer
-    		(big-endian value in groups of 7 bits,
-    		with top bit set to signify that another byte follows)
-    	*/
+    	// read a MIDI-style variable-length integer
+    	//	(big-endian value in groups of 7 bits,
+    	//	with top bit set to signify that another byte follows)
     	public readVarInt():number
         {
     		var result:number = 0;
@@ -91,5 +90,6 @@ module audiobus.io
     			}
     		}
         }
+        
     }
 }

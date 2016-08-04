@@ -1,7 +1,7 @@
 /// <reference path="../Dependencies.ts"/>
 module audiobus.io
 {
-    export class Midi
+    export class MidiHardware
     {
         public inputID:string = undefined;
         public outputID:string = undefined;
@@ -13,13 +13,13 @@ module audiobus.io
         public connectedInput:WebMidi.MIDIInput;
         public connectedOutput:WebMidi.MIDIOutput;
 
-        public onmidiconnected:Function = function(message:MidiMessage){};
-        public onmididisconnected:Function = function(message:MidiMessage){};
-        public onmidimessage:Function = function(message:MidiMessage){};
+        public onmidiconnected:Function = function(message:MidiCommand){};
+        public onmididisconnected:Function = function(message:MidiCommand){};
+        public onmidimessage:Function = function(message:MidiCommand){};
 
         public midiAccess:WebMidi.MIDIAccess;
 
-        private messagePool:Array<MidiMessage>;
+        private messagePool:Array<MidiCommand>;
 
         public static PORT_TYPE_INPUT:string = "input";
         public static PORT_TYPE_OUTPUT:string = "output";
@@ -63,11 +63,6 @@ module audiobus.io
         }
 
         // INPUT --------------------------------------------------------------
-        private createMessage( data: Uint8Array ):MidiMessage
-        {
-            // look to see if there ae any in our pool...
-            return new audiobus.io.MidiMessage( data );
-        }
 
         private connectInput( deviceName:string ):WebMidi.MIDIInput
         {
@@ -176,7 +171,7 @@ module audiobus.io
 
             switch(type)
             {
-                case Midi.PORT_DEVICE_STATE_CONNECTED:
+                case MidiHardware.PORT_DEVICE_STATE_CONNECTED:
                     console.log("name", name, "port", port, "state", state);
                     if ( !this.connectedInput && this.available && !this.availableIn )
                     {
@@ -185,7 +180,7 @@ module audiobus.io
                     }
                     break;
 
-                case Midi.PORT_DEVICE_STATE_DISCONNECTED:
+                case MidiHardware.PORT_DEVICE_STATE_DISCONNECTED:
                     console.log("name", name, "port", port, "state", state);
                     if (name === this.inputID)
                     {
@@ -208,11 +203,10 @@ module audiobus.io
         }
 
 
-
         // EVENT : A MIDI message has been received from the Input
         private onMIDIMessage( event:WebMidi.MIDIMessageEvent )
         {
-            var message:MidiMessage = this.createMessage(event.data);
+            var message:MidiCommand = MidiCommandFactory.create( event.data);
             this.onmidimessage.call(this, message);     // now dispatch this event...
             //console.log('data', data, 'cmd', cmd, 'channel', channel);
         }
@@ -249,41 +243,46 @@ module audiobus.io
             var outputValues = outputs.values();
         }
 
+        // use a midi event to send to the hardware
+        public send( command:MidiCommand )
+        {
+            this.connectedOutput.send( command.data, command.deltaTime * 1000);
+        }
         /*
         // MIDI send
         public send(data, delay)
         { // set channel volume
-    		output.send(data, delay * 1000);
+    		this.connectedOutput.send(data, delay * 1000);
     	}
 
     	public setController(channel, type, value, delay)
         {
-    		output.send([channel, type, value], delay * 1000);
+    		this.connectedOutput.send([channel, type, value], delay * 1000);
     	}
 
     	public setVolume(channel, volume, delay)
         { // set channel volume
-    		output.send([0xB0 + channel, 0x07, volume], delay * 1000);
+    		this.connectedOutput.send([0xB0 + channel, 0x07, volume], delay * 1000);
     	}
 
     	public programChange(channel, program, delay)
         { // change patch (instrument)
-    		output.send([0xC0 + channel, program], delay * 1000);
+    		this.connectedOutput.send([0xC0 + channel, program], delay * 1000);
     	}
 
     	public pitchBend(channel, program, delay)
         { // pitch bend
-    		output.send([0xE0 + channel, program], delay * 1000);
+    		this.connectedOutput.send([0xE0 + channel, program], delay * 1000);
     	}
 
     	public noteOn(channel, note, velocity, delay)
         {
-    		output.send([0x90 + channel, note, velocity], delay * 1000);
+    		this.connectedOutput.send([0x90 + channel, note, velocity], delay * 1000);
     	}
 
     	public noteOff(channel, note, delay)
         {
-    		output.send([0x80 + channel, note, 0], delay * 1000);
+    		this.connectedOutput.send([0x80 + channel, note, 0], delay * 1000);
     	}
 
     	public chordOn(channel, chord, velocity, delay)
@@ -291,7 +290,7 @@ module audiobus.io
     		for (var n = 0; n < chord.length; n ++)
             {
     			var note = chord[n];
-    			output.send([0x90 + channel, note, velocity], delay * 1000);
+    			this.connectedOutput.send([0x90 + channel, note, velocity], delay * 1000);
     		}
     	}
 
@@ -300,74 +299,32 @@ module audiobus.io
     		for (var n = 0; n < chord.length; n ++)
             {
     			var note = chord[n];
-    			output.send([0x80 + channel, note, 0], delay * 1000);
+    			this.connectedOutput.send([0x80 + channel, note, 0], delay * 1000);
     		}
     	}
 
     	public stopAllNotes()
         {
-    		output.cancel();
+    		this.connectedOutput.cancel();
     		for (var channel = 0; channel < 16; channel ++)
             {
-    			output.send([0xB0 + channel, 0x7B, 0]);
+    			this.connectedOutput.send([0xB0 + channel, 0x7B, 0]);
     		}
         }
         */
     }
 
-    export class MidiMessage
+
+    // create MidiCommands
+    export class MidiCommandFactory
     {
-        public data: Uint8Array;
-
-        public cmd:number = -1;
-        public channel:number = -1;
-        public type:number;
-        public note:number = -1;
-        public velocity:number = -1;
-
-        public action:string = 'na';
-
-        public static ACTION_NOTE_ON:string = "noteOn";
-        public static ACTION_NOTE_OFF:string = "noteOff";
-        public static ACTION_AFTERTOUCH:string = "aftertouch";
-        public static ACTION_CONTROL_CHANGE:string = "controlChange";
-        public static ACTION_PITCH_BEND:string = "pitchbend";
-        public static ACTION_SYSTEM_MESSAGE:string = "systemMessage";
-        public static ACTION_CHANNEL_PRESSURE:string = "channelPressure";
-        public static ACTION_PATCH_CHANGE:string = "patchChange";
-
-        public static ACTIONS:Array<string> = [
-            MidiMessage.ACTION_NOTE_OFF,
-            MidiMessage.ACTION_NOTE_ON,
-            MidiMessage.ACTION_AFTERTOUCH,
-            MidiMessage.ACTION_CONTROL_CHANGE,
-            MidiMessage.ACTION_PATCH_CHANGE,
-            MidiMessage.ACTION_CHANNEL_PRESSURE,
-            MidiMessage.ACTION_PITCH_BEND,
-            MidiMessage.ACTION_SYSTEM_MESSAGE
-        ];
-        // with pressure and tilt off
-        // note off: 128, cmd: 8
-        // note on: 144, cmd: 9
-        // pressure / tilt on
-        // pressure: 176, cmd 11:
-        // bend: 224, cmd: 14
-
-        constructor( eventData: Uint8Array=undefined )
+        constructor()
         {
-            if (eventData)
-            {
-                this.reset(eventData);
-            }
-        }
-        public toString():string
-        {
-            var ouput:string = 'MIDI:Input::'+this.action;
-            return ouput + ' [Channel '+this.channel+'] Type:'+this.type+' Note:'+this.note.toString(16)+ ' Velocity:'+this.velocity.toString(16) ;
+
         }
 
         // Takes a midi command and converts it into something useful
-        private convertCommand( command:number ):string
+        public static convertChannelMessage( command:number ):string
         {
             /*
             command-nibble 	command-name 	data-bytes 	data-meaning
@@ -383,7 +340,7 @@ module audiobus.io
 
             System Messages :
             F 	system-message 	     0       or variable 	none or sysex
-            	start of system exclusive message 	variable
+                start of system exclusive message 	variable
             0xF1 	MIDI Time Code Quarter Frame (Sys Common)
             0xF2 	Song Position Pointer (Sys Common)
             0xF3 	Song Select (Sys Common)
@@ -403,49 +360,63 @@ module audiobus.io
             // check to see if we have a system message...
             if (item > 6)
             {
-                return MidiMessage.ACTION_SYSTEM_MESSAGE;
+                return MidiCommand.COMMAND_SYSTEM_MESSAGE;
             }
-            return MidiMessage.ACTIONS[item];
+            return MidiCommand.COMMANDS[item];
         }
 
-        // clear all data
-        public reset( eventData: Uint8Array ):void
+        // set
+        public static create( eventData: Uint8Array ):MidiCommand
         {
             // each eventData is an array of 8-digit binary byte
             // usually represented as a hexadecimal integer 00-FF
             // or a number betweeo 0-255
+            var command:MidiCommand = new MidiCommand();
             var commandByte:number = eventData[0];
+            var type = commandByte & 0xf0; // channel agnostic message type. Thanks, Phil Burk.
 
-            this.data = eventData;
+            // store original data
+            command.raw = eventData;
+
             // 0.  If zero, then the byte is a data byte, and if one, then the byte is a command byte
             // 1. Command byte
-            this.cmd = commandByte >> 4;
-            this.channel = commandByte & 0xf;
-            this.type = commandByte & 0xf0; // channel agnostic message type. Thanks, Phil Burk.
+            //command.cmd = commandByte >> 4;
 
-            this.note = eventData[1] || 0;
-            this.velocity = eventData[2] || 0;
+            command.channel = commandByte & 0xf;
 
-            this.action = this.convertCommand(this.cmd);
+            command.noteNumber = eventData[1] || 0;
+            command.velocity = eventData[2] || 0;
+
+            command.type = MidiCommandFactory.convertChannelMessage( commandByte >> 4 );
             //console.log( this.toString() );
 
-            switch (this.type) {
+            //console.error( this.cmd.toString(16),this.channel.toString(16),this.type.toString(16),this.note.toString(16),this.velocity.toString(16) );
+            switch (type)
+            {
                 case 240: //
-                     //
-                     break;
+                    //
+                    //command.type = MidiCommand.COMMAND_CONTROLLER;
+                    break;
+
                 case 176: //
-                     //
-                     break;
-                case 144: // noteOn message
-                     //noteOn(note, velocity);
-                      //console.error( this.cmd.toString(16),this.channel.toString(16),this.type.toString(16),this.note.toString(16),this.velocity.toString(16) );
-                     break;
-                case 128: // noteOff message
-                    //noteOff(note, velocity);
+                    //
+                    break;
+
+                case 144:
+                    // noteOn message
+                    command.type = MidiCommand.COMMAND_NOTE_ON;
+                    break;
+
+                case 128:
+                    // noteOff message
+                    command.type = MidiCommand.COMMAND_NOTE_OFF;
                     break;
             }
+            return command;
         }
+
     }
+
 }
 
 /*

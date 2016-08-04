@@ -1,4 +1,6 @@
 /// <reference path="../Dependencies.ts"/>
+/// <reference path="./MidiCommand.ts"/>
+/// <reference path="./MidiTrack.ts"/>
 /*//////////////////////////////////////////////////////////////////////////////
 
 MIT Licence
@@ -10,6 +12,29 @@ Description - Buffers a .midi file into memory, parse the commands
 Use         - Load( file.midi, onComplete ) and wait for the callback
 Methods     -
 Forked from - https://github.com/gasman/jasmid/blob/master/stream.js#L2
+References  - http://www.indiana.edu/~emusic/etext/MIDI/chapter3_MIDI3.shtml
+
+Channel Voice
+    Control the instrument's 16 voices (timbres, patches), plays notes, sends
+    controller data, etc.
+
+Channel Mode
+    Define instrument's response to Voice messages, sent over instrument's
+    'basic' channel
+
+System Common
+    Messages intended to all networked instruments and devices
+
+System Real-Time
+    Intended for all networked instruments and devices. Contain only status
+    bytes and is used for syncronization of all devices. essentially a timing
+    clock
+
+System Exclusive
+    Originally used for manufacturer-specific codes, such as editor/librarians,
+    has been expanded to include MIDI Time Code, MIDI Sample Dump Standard and
+    MIDI Machine Control
+
 //////////////////////////////////////////////////////////////////////////////*/
 module audiobus.io
 {
@@ -97,7 +122,7 @@ module audiobus.io
         }
 
 
-        private readEvent(stream:MidiStream):MidiCommand
+        public readEvent(stream:MidiStream):MidiCommand
         {
     		var event:MidiCommand = new MidiCommand();
             var time:number = stream.readVarInt();
@@ -237,14 +262,14 @@ module audiobus.io
 
             } else if (eventTypeByte === 0xf0) {
 
-                event.type = 'sysEx';
+                event.type = MidiCommand.TYPE_SYSTEM_EXCLUSIVE;
                 var length = stream.readVarInt();
                 event.data = stream.read(length);
                 return event;
 
             } else if (eventTypeByte === 0xf7) {
 
-                event.type = 'dividedSysEx';
+                event.type = MidiCommand.TYPE_DIVIDED_SYSTEM_EXCLUSIVE;
                 var length = stream.readVarInt();
                 event.data = stream.read(length);
                 return event;
@@ -255,6 +280,9 @@ module audiobus.io
             }
         }
 
+        // Channel Voice
+        // Control the instrument's 16 voices (timbres, patches),
+        // plays notes, sends controller data, etc.
         private decodeChannelEvent(stream:MidiStream, event:MidiCommand, eventTypeByte:number ):MidiCommand
         {
             var param1:number;
@@ -312,7 +340,7 @@ module audiobus.io
                     return event;
 
                 case 0x0d:
-                    event.subtype = MidiCommand.COMMAND_CHANNEL_AFTEER_TOUCH;//'channelAftertouch';
+                    event.subtype = MidiCommand.COMMAND_CHANNEL_AFTER_TOUCH;//'channelAftertouch';
                     event.amount = param1;
                     return event;
 
