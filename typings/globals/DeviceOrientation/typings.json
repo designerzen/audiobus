@@ -1,0 +1,8 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/73110d92bdab2367e326f297bef3574285cba329/ng-cordova/deviceOrientation.d.ts",
+    "raw": "github:DefinitelyTyped/DefinitelyTyped/ng-cordova/deviceOrientation.d.ts#73110d92bdab2367e326f297bef3574285cba329",
+    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/73110d92bdab2367e326f297bef3574285cba329/ng-cordova/deviceOrientation.d.ts"
+  }
+}

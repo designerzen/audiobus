@@ -1,19 +1,21 @@
 {
     "version": "1.8.0",
     "compilerOptions": {
-        "target": "es5",
-        "module": "commonjs",
+        "allowUnusedLabels": false,
         "declaration": false,
+        "module": "commonjs",
         "noImplicitAny": false,
-        "removeComments": true,
+        "noImplicitReturns": true,
         "noLib": false,
         "preserveConstEnums": true,
-        "suppressImplicitAnyIndexErrors": true
+        "removeComments": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "target": "es5"
     },
     "compileOnSave": false,
     "filesGlob": [
         "./src/typescript/audiobus/**/*.ts",
-        "./src/typescript/typings/*.ts",
+        "./typings/*.ts",
         "./src/typescript/examples/**/*.ts",
         "!./node_modules/**/*.ts"
     ],
@@ -44,6 +46,7 @@
         "./src/typescript/audiobus/instruments/Synthesizer.ts",
         "./src/typescript/audiobus/instruments/Theremin.ts",
         "./src/typescript/audiobus/instruments/Violin.ts",
+        "./src/typescript/audiobus/io/devices/KMix.ts",
         "./src/typescript/audiobus/io/devices/TB3.ts",
         "./src/typescript/audiobus/io/Microphone.ts",
         "./src/typescript/audiobus/io/MidiCommand.ts",
@@ -72,7 +75,7 @@
         "./src/typescript/audiobus/visualisation/visualisers/Plasma.ts",
         "./src/typescript/audiobus/visualisation/visualisers/Scope.ts",
         "./src/typescript/audiobus/visualisation/visualisers/Visualiser.ts",
-        "./src/typescript/typings/tsd.d.ts",
+        "./typings/index.d.ts",
         "./src/typescript/examples/Example.ts",
         "./src/typescript/examples/ExampleDrumKeyboard.ts",
         "./src/typescript/examples/ExampleFingerSynth.ts",

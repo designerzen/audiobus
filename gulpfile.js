@@ -70,7 +70,7 @@ destination.distribute  = folders.distribute;
 // EXAMPLES ====================================================================
 
 
-
+// Copy example midi files from the source folder to the destination midi folder
 gulp.task('examples-midi', function(){
     return gulp.src(source.midi)
     .pipe(gulp.dest(destination.midi));
@@ -118,13 +118,19 @@ gulp.task('examples', ['examples-code','examples-markup', 'examples-midi','examp
 
 
 // TYPESCRIPT ========================
+
+// Ensure that the code is good and proper
 gulp.task('lint', function () {
-    var tsProject = ts.createProject( 'tsconfig.json', {} );
-    return tsProject.src( source.typescript )
-        .pipe( tslint(tsProject) )
-        .pipe( tslint.report('prose', {
-            emitError: false
-        }));
+    return gulp.src( source.typescript )
+        .pipe( tslint({
+            formatter: "verbose"
+            //formatter: "prose"
+        }) )
+        .pipe( tslint.report( {
+            emitError: false,
+            summarizeFailureOutput: true,
+            reportLimit: 20
+        } ));
 });
 
 gulp.task('polyfills', function(){

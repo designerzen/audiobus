@@ -58,7 +58,7 @@ module audiobus.visualisation
 
         public connect( outputTo:AudioNode, source:AudioNode=null ):void
         {
-            if (source) source.connect( this.analyser );
+            if (source) {source.connect( this.analyser );}
             this.analyser.connect( outputTo );
         }
 

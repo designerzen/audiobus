@@ -32,7 +32,7 @@ module audiobus.io
 
         constructor( header:MidiHeader=null )
         {
-            if (header) this.header = header;
+            if (header) {this.header = header;}
         }
 
         // A way of adding an event and multiple events to track

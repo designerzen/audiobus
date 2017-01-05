@@ -3,7 +3,7 @@
 
 module audiobus.io.devices
 {
-    export class TB3 extends MidiHardware
+    export class KMix extends MidiHardware
     {
         // Input port : [ type:'input' id: '3' manufacturer: 'Microsoft Corporation' name: '3- TB-3' version: '6.1']
         public static PORT_TYPE_INPUT:string = "3- TB-3";

@@ -1,11 +1,16 @@
-audiobus
+audio.bus
 ========
 
-Cross Platform Audio Playback and Synthesis
+Cross Platform Audio Playback and Synthesis using modern web features.
+Currently supports Chrome / Firefox / Edge / Safari / Opera / Vivaldi
 
-Typescript / Javscript
-Actionscript
+Typescript / Javascript
+Actionscript (depreceated)
 
+
+Usage
+===
+See WIKI
 
 
 Examples
@@ -15,11 +20,6 @@ Each experiment was created in an evening at Drake Music Lab
 29/06/2016 > DMLAB001 : A Single Hand - 4 part Drum Kit
 
 
-Contributers & Contributions:
-===
-
-AudioContext Polyfill - Copyright (c) 2013 - 2014 Shinnosuke Watanabe
-https://github.com/shinnn/AudioContext-Polyfill
 
 
 
@@ -36,3 +36,13 @@ Help
 ===
 // Installing TypeScript Definitions
 tsd install cordova/ -rs
+
+
+
+
+
+Contributers & Contributions:
+===
+
+AudioContext Polyfill - Copyright (c) 2013 - 2014 Shinnosuke Watanabe
+https://github.com/shinnn/AudioContext-Polyfill

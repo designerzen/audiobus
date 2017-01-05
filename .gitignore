@@ -3,6 +3,7 @@ obj/
 .sync
 .idea/workspace.xml
 .DS_Store
+node_modules
 src/assets/*
 !src/assets/fonts
 !src/assets/batchcommands
