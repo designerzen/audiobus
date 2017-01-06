@@ -2,7 +2,7 @@
   "author": "designerzen",
   "name": "AudioBUS",
   "description": "A Web based Audio Synthesizer",
-  "version": "2.0.1",
+  "version": "2.0.3",
   "homepage": "http://designerzen.com/",
   "license": "MIT",
   "keywords": [
@@ -14,13 +14,16 @@
     "url": "https://github.com/designerzen"
   },
   "devDependencies": {
+    "autoprefixer": "^6.6.1",
     "browser-sync": "^2.18.5",
-    "controlkit": "^0.1.9",
+    "cssnano": "^3.10.0",
     "gh-pages": "^0.12.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
     "gulp-debug": "^3.0.0",
+    "gulp-if": "^2.0.2",
     "gulp-less": "^3.3.0",
+    "gulp-postcss": "^6.2.0",
     "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^1.9.1",
     "gulp-tslint": "^7.0.1",
@@ -29,5 +32,7 @@
     "tslint": "^4.2.0",
     "typescript": "^2.1.4"
   },
-  "dependencies": {}
+  "dependencies": {
+    "controlkit": "^0.1.9"
+  }
 }

@@ -75,6 +75,7 @@
         "./src/typescript/audiobus/visualisation/visualisers/Plasma.ts",
         "./src/typescript/audiobus/visualisation/visualisers/Scope.ts",
         "./src/typescript/audiobus/visualisation/visualisers/Visualiser.ts",
+        "./typings/audiobus.d.ts",
         "./typings/index.d.ts",
         "./src/typescript/examples/Example.ts",
         "./src/typescript/examples/ExampleDrumKeyboard.ts",

@@ -32,10 +32,12 @@ run > npm install
 run > gulp
 
 
+
+
 Help
 ===
-// Installing TypeScript Definitions
-tsd install cordova/ -rs
+
+
 
 
 

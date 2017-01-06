@@ -12,9 +12,10 @@ module audiobus.io.devices
         {
             super();
         }
+
         public connect():boolean
         {
-            return super.connect( TB3.PORT_TYPE_INPUT );
+            return super.connect( KMix.PORT_TYPE_INPUT );
         }
     }
 }

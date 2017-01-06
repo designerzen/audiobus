@@ -1,11 +1,11 @@
 {
   "name": "AudioBUS",
   "globalDependencies": {
-    "waa": "github:DefinitelyTyped/DefinitelyTyped/webaudioapi/waa.d.ts#f481e77dfca5a146db1b4f5f20f15929b30c8729",
-    "webmidi": "github:DefinitelyTyped/DefinitelyTyped/webmidi/webmidi.d.ts#e609b55a48c77ee8fd5cf01e6a1caf2cefbd09e5",
-    "MediaStream": "github:DefinitelyTyped/DefinitelyTyped/webrtc/MediaStream.d.ts#1315d46f8066eec8c197914da88e98629ebc2254",
-    "es6-promise": "github:DefinitelyTyped/DefinitelyTyped/es6-promise/es6-promise.d.ts#1315d46f8066eec8c197914da88e98629ebc2254",
-    "es6-collections": "github:DefinitelyTyped/DefinitelyTyped/es6-collections/es6-collections.d.ts#1315d46f8066eec8c197914da88e98629ebc2254",
+    "waa": "github:DefinitelyTyped/DefinitelyTyped/webaudioapi/waa.d.ts",
+    "webmidi": "github:DefinitelyTyped/DefinitelyTyped/webmidi/webmidi.d.ts",
+    "MediaStream": "github:DefinitelyTyped/DefinitelyTyped/webrtc/MediaStream.d.ts",
+    "es6-promise": "github:DefinitelyTyped/DefinitelyTyped/es6-promise/es6-promise.d.ts",
+    "es6-collections": "github:DefinitelyTyped/DefinitelyTyped/es6-collections/es6-collections.d.ts",
     "cordova": "github:DefinitelyTyped/DefinitelyTyped/cordova/cordova.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
     "BatteryStatus": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/BatteryStatus.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
     "Device": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/Device.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
@@ -26,7 +26,6 @@
     "InAppBrowser": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/InAppBrowser.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
     "Keyboard": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/Keyboard.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
     "WebSQL": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/WebSQL.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "Camera": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/Camera.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "deviceOrientation": "github:DefinitelyTyped/DefinitelyTyped/ng-cordova/deviceOrientation.d.ts#73110d92bdab2367e326f297bef3574285cba329"
-  }
+    "Camera": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/Camera.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c"
+    }
 }

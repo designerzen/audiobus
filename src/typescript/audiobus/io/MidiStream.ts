@@ -3,13 +3,13 @@
 
 MIT Licence
 
-Midi File
+Midi Stream
 ==============
 Abstract    - A string based byte nibbler and convertor
 Description - Feed it a data file then request bytes as needed
 Use         -
 Methods     -
-Forked from - https://github.com/gasman/jasmid/blob/master/stream.js#L2
+Forked from - 
 
 //////////////////////////////////////////////////////////////////////////////*/
 module audiobus.io
@@ -90,6 +90,6 @@ module audiobus.io
     			}
     		}
         }
-        
+
     }
 }

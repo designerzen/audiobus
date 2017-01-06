@@ -1,4 +1,4 @@
-@import url(reset);
+@import url(partials/reset);
 @import url(colours);
 
 html,body{
@@ -15,33 +15,25 @@ body{
 	color:@translucent;
 	background-color:black;
 }
+
 body.fixed{
 	max-height:100%;
 	overflow:hidden;
 }
-#visualiser{
-    position:fixed;
-    top:0;
-    left:0;
-	z-index: -1;
-}
 
-#visualiserjumbo{
-    position:absolute;
-    top:0;
-    left:0;
-	width:100%;
-	height:100%;
-	z-index: -1;
-}
 .overlay{
 	position:absolute;
-    top:0;
-    left:0;
+	top:0;
+	left:0;
 	width:100%;
 	height:100%;
-	z-index: 999;
+	max-width:100%;
+	max-height:100%;
+	z-index: 909;
 }
-// Example 001 - drumkit
-@import url(drumkit);
 
+// Example 001 - drumkit
+// @import url(drumkit);
+
+
+@import url(visualiser);

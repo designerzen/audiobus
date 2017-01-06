@@ -17,7 +17,10 @@ module audiobus.io
     {
         public track:MidiTrack;
 
-        constructor(){}
+        constructor()
+        {
+
+        }
 
         // file can either be a file name as a string
         // or it can be a base64 encoded midi file
@@ -72,7 +75,7 @@ module audiobus.io
                     {
                         var data:string = this.convertResponse( fetch.responseText || '' );
                         var stream:MidiStream = new audiobus.io.MidiStream( data );
-                        var decoder:MidiDecoder = new audiobus.io.MidiDecoder(  );
+                        var decoder:MidiDecoder = new audiobus.io.MidiDecoder();
                         this.track = decoder.decode(stream);
 
                         if (completeCallback) { completeCallback( this.track ); }

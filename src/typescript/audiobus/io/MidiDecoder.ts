@@ -53,13 +53,14 @@ module audiobus.io
         {
         }
 
+        // Take a 4 byte chunk out of the data set
         private readChunk(stream:MidiStream):MidiChunk
         {
             var chunk:MidiChunk = new MidiChunk();
-    		chunk.id = stream.read(4);    // Each midi event message is 4 bytes big...
-    		chunk.length = stream.readInt32();
+            chunk.id = stream.read(4);    // Each midi event message is 4 bytes big...
+            chunk.length = stream.readInt32();
             chunk.data = stream.read(chunk.length);
-    		return chunk;
+            return chunk;
         }
 
         public decode( stream:MidiStream ):MidiTrack

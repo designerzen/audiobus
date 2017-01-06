@@ -1,4 +1,5 @@
 /// <reference path="../audiobus/Dependencies.ts"/>
+
 module examples
 {
 	export class Main
@@ -11,7 +12,7 @@ module examples
 		private metronome:audiobus.timing.Metronome;
 		private netronome:audiobus.timing.Netronome;
 
-		private midiDevice:audiobus.io.Midi;
+		private midiDevice:audiobus.io.MidiHardware;
 		private midiFile:audiobus.io.MidiFile;
 
 		private harmongraph:audiobus.visualisation.visualisers.Harmongraph;
@@ -185,21 +186,21 @@ module examples
 
 		// EVENT :
 		// a Midi message has been received
-		private onMIDIMessage( e:audiobus.io.MidiMessage )
+		private onMIDIMessage( e:audiobus.io.MidiCommand )
 		{
 			// now assign some instruments for the different channels...
 			switch(e.action)
 			{
-				case audiobus.io.MidiMessage.ACTION_NOTE_OFF:
+				case audiobus.io.MidiCommand.ACTION_NOTE_OFF:
 					this.bass.stop();
 					break;
 
-				case audiobus.io.MidiMessage.ACTION_NOTE_ON:
+				case audiobus.io.MidiCommand.ACTION_NOTE_ON:
 					console.log( e.toString() );
 					this.bass.start( audiobus.io.Midi.frequencyFromNote( e.note ) );
 					break;
 
-				case audiobus.io.MidiMessage.ACTION_PITCH_BEND:
+				case audiobus.io.MidiCommand.ACTION_PITCH_BEND:
 					this.bass.note( audiobus.io.Midi.frequencyFromNote( e.note ) );
 					break;
 			}

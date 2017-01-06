@@ -2,7 +2,7 @@ interface Window {
   DeviceOrientationEvent: any;
 }
 
-///<reference path="../typings/tsd.d.ts" />
+///<reference path="../../typings/tsd.d.ts" />
 
 ///<reference path="io/MidiHardware.ts" />
 ///<reference path="io/Microphone.ts" />
@@ -38,9 +38,18 @@ interface Window {
 ///<reference path="instruments/basics/Oscillator.ts" />
 
 // Timings
-///<reference path="timing/Netronome.ts" />
+///<reference path="timing/Metronome.ts" />
+///<reference path="timing/Metronome.ts" />
+///<reference path="timing/Sequencer.ts" />
+///<reference path="timing/Timer.ts" />
 
 // Visualisations
 ///<reference path="visualisation/SpectrumAnalyzer.ts" />
-///<reference path="visualisation/colour/colour.ts" />
-///<reference path="visualisation/colour/rainbows.ts" />
+///<reference path="visualisation/colour/Colour.ts" />
+///<reference path="visualisation/colour/Rainbows.ts" />
+
+///<reference path="visualisation/visualisers/Bars.ts" />
+///<reference path="visualisation/visualisers/Harmongraph.ts" />
+///<reference path="visualisation/visualisers/Plasma.ts" />
+///<reference path="visualisation/visualisers/Scope.ts" />
+///<reference path="visualisation/visualisers/Visualiser.ts" />

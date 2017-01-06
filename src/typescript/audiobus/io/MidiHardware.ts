@@ -246,7 +246,7 @@ module audiobus.io
         // use a midi event to send to the hardware
         public send( command:MidiCommand )
         {
-            this.connectedOutput.send( command.data, command.deltaTime * 1000);
+            this.connectedOutput.send( [ Number(command.data) ], command.deltaTime * 1000);
         }
         /*
         // MIDI send

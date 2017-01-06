@@ -1,6 +1,5 @@
 /*
 
-
 FOR USING IN OTHER PROJECTS ====================================================
 
     release/
@@ -26,102 +25,124 @@ FOR TESTING ====================================================================
 */
 
 // Load in tasks and modifiers
-var gulp = require('gulp');
-var ts = require('gulp-typescript');
-var tslint = require('gulp-tslint');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var rename = require('gulp-rename');
-var less = require('gulp-less');
-var sourcemaps = require('gulp-sourcemaps');
+var
+  config      = require('./config'),
+  gulp        = require('gulp'),
+  gulpif      = require('gulp-if'),
+  ts          = require('gulp-typescript'),
+  concat      = require('gulp-concat'),
+  uglify      = require('gulp-uglify'),
+  rename      = require('gulp-rename'),
+  sourcemap   = require('gulp-sourcemaps');
 
-var OUTPUT_FILE_NAME_LIBRARY            = "audiobus.js";
-var OUTPUT_FILE_NAME_LIBRARY_MINIFIED   = "audiobus.min.js";
-var OUTPUT_FILE_NAME_POLYFILLS          = "polyfills.js";
 
-var SOURCE_CODE_TYPESCRIPT  = ['src/typescript/audiobus/*.ts','src/typescript/typings/*.ts','src/typescript/examples/*.ts'];
-
-// Where do these folders live?
-var folders             = {};
-folders.source          = 'src/';
-folders.build           = 'build';
-folders.release         = 'release';
-folders.distribute      = 'dist';
-folders.examples        = folders.build+'/examples/';
-
-// Where are the files from in the beginning?
-var source              = {};
-source.polyfills        = folders.source+'javascript/polyfillers/**/**.js';
-source.markup           = folders.source+'markup/**/**.+(md|html|htm)';
-source.midi             = folders.source+'midi/**/**.+(mid|midi)';
-source.style            = folders.source+'styles/style.less';
-source.typescript       = [folders.source+'typescript/audiobus/**/**.ts',folders.source+'typescript/typings/**/**.ts'];
-
-// Where do the files ends up in the end?
-var destination         = {};
-destination.examples    = folders.examples;
-destination.midi        = folders.examples+'assets/midi';
-destination.style       = folders.examples+'assets/style/';
-destination.scripts     = folders.examples+'assets/scripts/';
-destination.build       = folders.build;
-destination.release     = folders.release;
-destination.distribute  = folders.distribute;
+// Settings
+var debug = true;
+var sourcemaps = true;
 
 // EXAMPLES ====================================================================
 
-
-// Copy example midi files from the source folder to the destination midi folder
-gulp.task('examples-midi', function(){
-    return gulp.src(source.midi)
-    .pipe(gulp.dest(destination.midi));
-})
-
-// Compile our styles
-gulp.task('examples-styles', function () {
-    return gulp.src( source.style )
-    .pipe(sourcemaps.init())
-    .pipe(less({
-      paths:[ 'src/styles/' ]
-    }))
-    .pipe( sourcemaps.write(destination.style) )
-    .pipe( gulp.dest(destination.style) );
+////////////////////////////////////////////////////////////////////////////////
+// Verbose logging just to ensure that everything fits accordingly
+////////////////////////////////////////////////////////////////////////////////
+gulp.task('test', function(){
+    console.log("Testing Configuration...");
+    console.log(config);
+    // check paths exist...
 });
 
+////////////////////////////////////////////////////////////////////////////////
+// Copy example midi files from the source folder to the destination midi folder
+////////////////////////////////////////////////////////////////////////////////
+gulp.task('examples-midi', function(){
+    return gulp.src( config.source.midi )
+      .pipe(gulp.dest( config.destination.midi ));
+})
+
+////////////////////////////////////////////////////////////////////////////////
+// Compile our styles.
+// There are two sets of styles, one set is always loaded in
+// the other set are only loaded per project
+////////////////////////////////////////////////////////////////////////////////
+gulp.task('examples-styles', function () {
+
+    var postcss       = require('gulp-postcss');
+    var less          = require('gulp-less');
+    var autoprefixer  = require('autoprefixer');
+    var cssnano       = require('cssnano');
+
+    var processors = [
+        autoprefixer( {browsers: ['last 1 version']} ),
+        cssnano(),
+    ];
+
+    return gulp.src( config.source.style )
+      .pipe( gulpif( sourcemaps, sourcemap.init() ) )
+      .pipe( less().on('error', function(err){
+        // catch errors without breaking watch streams
+        console.log(err);
+        this.emit('end');
+      }) )
+      .pipe( postcss(processors) )
+      .pipe( gulpif( sourcemaps, sourcemap.write( config.destination.style ) ) )
+      .pipe( gulp.dest( config.destination.style ) );
+});
+
+
+////////////////////////////////////////////////////////////////////////////////
 // This compiles down all code in the typescript/examples folder
+////////////////////////////////////////////////////////////////////////////////
 gulp.task('examples-code', function () {
     var tsResult = gulp.src([
-            'src/typescript/audiobus.d.ts',
-            "src/typescript/typings/**/**.ts",
-            'src/typescript/examples/**/**.ts'
-        ])
-       .pipe(sourcemaps.init()) // This means sourcemaps will be generated
-       .pipe(ts({
-           sortOutput: true,
-           noExternalResolve:true
-       }));
+          // definitions
+          './typings/audiobus.d.ts',
+          "./typings/index.d.ts",
+          // example source files
+          './src/typescript/examples/**/**.ts'
+      ])
+     .pipe( gulpif( sourcemaps, sourcemap.init() ))       // This means sourcemaps will be generated
+     .pipe( ts() );
 
     return tsResult.js
-                //.pipe(concat('output.js')) // You can use other plugins that also support gulp-sourcemaps
-                .pipe(sourcemaps.write()) // Now the sourcemaps are added to the .js file
-                .pipe(gulp.dest(destination.scripts));
+      //.pipe(concat('output.js')) // You can use other plugins that also support gulp-sourcemaps
+      // Now the sourcemaps are added to the .js file
+      .pipe( gulpif( sourcemaps,sourcemap.write() ))
+      .pipe( gulp.dest( config.destination.scripts ));
 });
 
+////////////////////////////////////////////////////////////////////////////////
+// Straight copy of markup html to
+////////////////////////////////////////////////////////////////////////////////
 gulp.task('examples-markup', function(){
-    return gulp.src(source.markup)
-    .pipe(gulp.dest(destination.examples));
-})
+    return gulp.src( config.source.markup )
+      .pipe(gulp.dest( config.destination.examples ));
+});
 
+////////////////////////////////////////////////////////////////////////////////
+// Do all of the example files together
+////////////////////////////////////////////////////////////////////////////////
 gulp.task('examples', ['examples-code','examples-markup', 'examples-midi','examples-styles'], function(cb){
     cb();
-})
+});
 
 
+// static files simple copy to destination
+// .htaccess
+// https://github.com/h5bp/server-configs-apache/blob/master/dist/.htaccess
+gulp.task('static', function(){
+    return gulp.src( config.source.static )
+      .pipe(gulp.dest( config.destination.build ));
+});
 
 // TYPESCRIPT ========================
 
+////////////////////////////////////////////////////////////////////////////////
+// TASK : LINT
 // Ensure that the code is good and proper
+////////////////////////////////////////////////////////////////////////////////
 gulp.task('lint', function () {
-    return gulp.src( source.typescript )
+    var tslint = require('gulp-tslint');
+    return gulp.src( config.source.typescript )
         .pipe( tslint({
             formatter: "verbose"
             //formatter: "prose"
@@ -133,79 +154,82 @@ gulp.task('lint', function () {
         } ));
 });
 
+////////////////////////////////////////////////////////////////////////////////
+//
+////////////////////////////////////////////////////////////////////////////////
 gulp.task('polyfills', function(){
     // Now add polyfilla
-    return gulp.src( source.polyfills )
+    return gulp.src( config.source.polyfills )
         .pipe( uglify() )
-        .pipe( concat(OUTPUT_FILE_NAME_POLYFILLS) )
-        .pipe( gulp.dest(destination.build) )
-        .pipe( gulp.dest(destination.release) )
+        .pipe( concat( config.names.polyfills + '.js' ) )
+        .pipe( gulp.dest( config.destination.build ) )
+        .pipe( gulp.dest( config.destination.release ) );
         //.pipe( gulp.dest(destination.distribute) );
 });
 
+////////////////////////////////////////////////////////////////////////////////
+// save typed definitions locally...
+////////////////////////////////////////////////////////////////////////////////
+gulp.task('compile-definition', function () {
+    var tsProject = ts.createProject( 'tsconfig.json', {
+        declaration : true,
+        declarationFiles : true
+    });
 
-
-
-
-// This creates all of our files :)
-gulp.task('build', ['lint','polyfills','compile-folder'],function (cb) {
-    cb();
+    var tsResult = gulp.src( config.source.typescript ).pipe( tsProject() );
+    return  tsResult.dts.pipe( gulp.dest( config.typings ) );
 });
 
 
+////////////////////////////////////////////////////////////////////////////////
+//
+////////////////////////////////////////////////////////////////////////////////
 gulp.task('compile-file', function () {
+
+    // if this lives outside of this closure then you can incrementally compile :)
     var tsProject = ts.createProject( 'tsconfig.json', {
-        sortOutput: true,
-        outFile:OUTPUT_FILE_NAME_LIBRARY,
-        declarationFiles :true,
-        allowJs :true,
-        removeComments :true
+        outFile: config.names.library + '.js',
+        //declarationFiles : true,
+        allowJs : true,
+        removeComments : !debug
     });
 
-    var tsResult = tsProject.src(['src/typescript/typings/**/**.ts','src/typescript/audiobus/**/**.ts'])
-        .pipe( sourcemaps.init() ) // This means sourcemaps will be generated
-        .pipe( ts(tsProject) );
+    var tsResult = tsProject.src(['./typings/**/**.ts','./src/typescript/audiobus/**/**.ts'])
+        .pipe( gulpif( sourcemaps,sourcemap.init() ) ) // This means sourcemaps will be generated
+        .pipe( tsProject() );
 
     // save .d.ts file definitions
-    //tsResult.dts.pipe(gulp.dest('src/typescript/'));
-    tsResult.dts.pipe(gulp.dest(destination.build));
-    //tsResult.dts.pipe(gulp.dest(destination.release));
+    //tsResult.dts.pipe(gulp.dest(config.typings ));
 
-    //console.log( tsResult.dts );
 
     // save big file
     return tsResult.js
         //.pipe( concat("audiobus.js")) // You can use other plugins that also support gulp-sourcemaps
-        .pipe( sourcemaps.write('.') ) // Now the sourcemaps are added to the .js file
-        .pipe( gulp.dest(destination.build));
+        .pipe( gulpif( sourcemaps,sourcemap.write('.')) ) // Now the sourcemaps are added to the .js file
+        .pipe( gulp.dest(config.destination.build));
         //.pipe( gulp.dest(destination.distribute));
 });
 
 // RELEASE =====================================================================
 gulp.task('compile-release', function () {
     var tsProject = ts.createProject( 'tsconfig.json', {
-        sortOutput: true,
-        outFile:OUTPUT_FILE_NAME_LIBRARY,
-        declarationFiles :true,
-        allowJs :true,
-        removeComments :true
+        outFile : config.names.library + '.js',
+        declarationFiles : true,
+        allowJs : true,
+        removeComments : true
     });
 
-    var tsResult = tsProject.src(source.typescript).pipe( ts(tsProject) );
+    var tsResult = tsProject.src( config.source.typescript ).pipe( ts(tsProject) );
     // save big file
-    return tsResult.js.pipe( gulp.dest(destination.release));
+    return tsResult.js.pipe( gulp.dest( config.destination.release ));
 });
 
 // Compresss all of the javascript files and uglify
 gulp.task('minify', ['compile-release'], function(){
-    return gulp.src( destination.release+'/'+OUTPUT_FILE_NAME_LIBRARY)
+    return gulp.src( config.destination.release+'/'+config.names.library + '.js')
         .pipe( uglify() )
-        .pipe( rename(OUTPUT_FILE_NAME_LIBRARY_MINIFIED) )
-        .pipe( gulp.dest(destination.release) );
-});
-// This creates all of our files :)
-gulp.task('release', ['lint','polyfills','minify'],function (cb) {
-    cb();
+        .pipe( rename(config.names.library + 'min.js') )
+        .pipe( gulp.dest( config.destination.release ) );
 });
 
 
@@ -214,32 +238,30 @@ gulp.task('release', ['lint','polyfills','minify'],function (cb) {
 // This creates a folder of individual libs - not one long javascript
 gulp.task('compile-folder', function () {
     var tsProject = ts.createProject( 'tsconfig.json', {} );
-    var tsResult = tsProject.src(source.typescript)
-        .pipe( sourcemaps.init() ) // This means sourcemaps will be generated
+    var tsResult = tsProject.src( config.source.typescript )
+        .pipe( gulpif( sourcemaps,sourcemap.init() ) ) // This means sourcemaps will be generated
         .pipe( ts(tsProject) );
 
     return tsResult.js
         //.pipe( concat("audiobus.js")) // You can use other plugins that also support gulp-sourcemaps
-        .pipe( sourcemaps.write(destination.build) ) // Now the sourcemaps are added to the .js file
-        .pipe( gulp.dest(destination.build) );
+        .pipe( gulpif( sourcemaps,sourcemap.write( config.destination.build )) ) // Now the sourcemaps are added to the .js file
+        .pipe( gulp.dest( config.destination.build ) );
 });
 
 
-// FOLDER_RELEASE =====================================================================
-
-// 1. Compiles AudioBus to individual files
-// 2. Copies minified audiobus.js
-// 3. Copies License and Readme
-// 4. Copies examples folder
 
 
-
+////////////////////////////////////////////////////////////////////////////////
+// TASK : Serve
 // Create a local server and open it in our browser
+////////////////////////////////////////////////////////////////////////////////
 gulp.task('serve', ['lint','compile-file'], function () {
-    var browserSync = require('browser-sync').create();
-    gulp.watch([source.typescript], ['compile-file']);
-    gulp.watch([source.style], ['examples-styles']);
+
+    gulp.watch([config.source.typescript], ['compile-file']);
+    gulp.watch([config.source.style], ['examples-styles']);
     gulp.watch(['src/typescript/examples/**/**.ts'], ['examples-code']);
+
+    var browserSync = require('browser-sync').create();
     browserSync.init({
         server: {
 			// Serve up our build folder
@@ -264,5 +286,27 @@ gulp.task('serve', ['lint','compile-file'], function () {
 	});
 });
 
-// 'lint',
-gulp.task('default', ['build','examples','serve'] );
+
+// FOLDER_RELEASE ==============================================================
+
+// 1. Compiles AudioBus to individual files
+// 2. Copies minified audiobus.js
+// 3. Copies License and Readme
+// 4. Copies examples folder
+
+var callback = function (cb) { cb(); };
+
+////////////////////////////////////////////////////////////////////////////////
+// This creates all of our files for use during development :)
+////////////////////////////////////////////////////////////////////////////////
+gulp.task('build', ['lint','polyfills','compile-folder'], callback );
+
+////////////////////////////////////////////////////////////////////////////////
+// This creates all of our files for use in production :)
+////////////////////////////////////////////////////////////////////////////////
+gulp.task('release', ['lint','polyfills','minify'], callback );
+
+////////////////////////////////////////////////////////////////////////////////
+// DEFAULT TASK : Do the following sequence of events
+////////////////////////////////////////////////////////////////////////////////
+gulp.task('default', ['build','examples','serve'], callback );
