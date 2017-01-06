@@ -1,9 +1,12 @@
 {
     "version": "1.8.0",
     "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
         "allowUnusedLabels": false,
         "declaration": false,
+        "jsx": "preserve",
         "module": "commonjs",
+        "moduleResolution": "node",
         "noImplicitAny": false,
         "noImplicitReturns": true,
         "noLib": false,
