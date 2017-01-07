@@ -2,30 +2,6 @@
   "name": "AudioBUS",
   "globalDependencies": {
     "waa": "github:DefinitelyTyped/DefinitelyTyped/webaudioapi/waa.d.ts",
-    "webmidi": "github:DefinitelyTyped/DefinitelyTyped/webmidi/webmidi.d.ts",
-    "MediaStream": "github:DefinitelyTyped/DefinitelyTyped/webrtc/MediaStream.d.ts",
-    "es6-promise": "github:DefinitelyTyped/DefinitelyTyped/es6-promise/es6-promise.d.ts",
-    "es6-collections": "github:DefinitelyTyped/DefinitelyTyped/es6-collections/es6-collections.d.ts",
-    "cordova": "github:DefinitelyTyped/DefinitelyTyped/cordova/cordova.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "BatteryStatus": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/BatteryStatus.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "Device": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/Device.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "DeviceOrientation": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/DeviceOrientation.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "FileSystem": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/FileSystem.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "Media": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/Media.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "FileTransfer": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/FileTransfer.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "NetworkInformation": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/NetworkInformation.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "MediaCapture": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/MediaCapture.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "Dialogs": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/Dialogs.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "DeviceMotion": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/DeviceMotion.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "Push": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/Push.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "Splashscreen": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/Splashscreen.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "Contacts": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/Contacts.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "Globalization": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/Globalization.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "StatusBar": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/StatusBar.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "Vibration": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/Vibration.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "InAppBrowser": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/InAppBrowser.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "Keyboard": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/Keyboard.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "WebSQL": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/WebSQL.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c",
-    "Camera": "github:DefinitelyTyped/DefinitelyTyped/cordova/plugins/Camera.d.ts#a186b551aa4ce681a9a7d7c86c8a23c620c54d8c"
-    }
+    "webmidi": "registry:dt/webmidi#0.0.0+20160726191732"
+  }
 }
