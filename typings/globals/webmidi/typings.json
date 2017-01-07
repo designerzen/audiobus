@@ -1,8 +1,8 @@
 {
   "resolution": "main",
   "tree": {
-    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/e609b55a48c77ee8fd5cf01e6a1caf2cefbd09e5/webmidi/webmidi.d.ts",
-    "raw": "github:DefinitelyTyped/DefinitelyTyped/webmidi/webmidi.d.ts#e609b55a48c77ee8fd5cf01e6a1caf2cefbd09e5",
-    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/e609b55a48c77ee8fd5cf01e6a1caf2cefbd09e5/webmidi/webmidi.d.ts"
+    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/11d624e6569acdfea32fad59b175423e502789fc/webmidi/index.d.ts",
+    "raw": "registry:dt/webmidi#0.0.0+20160726191732",
+    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/11d624e6569acdfea32fad59b175423e502789fc/webmidi/index.d.ts"
   }
 }

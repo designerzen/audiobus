@@ -32,6 +32,11 @@ run > npm install
 run > gulp
 
 
+Thanks to
+===
+https://github.com/typings/typings
+
+
 
 
 Help

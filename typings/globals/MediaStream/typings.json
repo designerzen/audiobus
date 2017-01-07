@@ -1,8 +1,0 @@
-{
-  "resolution": "main",
-  "tree": {
-    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/1315d46f8066eec8c197914da88e98629ebc2254/webrtc/MediaStream.d.ts",
-    "raw": "github:DefinitelyTyped/DefinitelyTyped/webrtc/MediaStream.d.ts#1315d46f8066eec8c197914da88e98629ebc2254",
-    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/1315d46f8066eec8c197914da88e98629ebc2254/webrtc/MediaStream.d.ts"
-  }
-}
