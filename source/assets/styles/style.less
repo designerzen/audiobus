@@ -1,0 +1,39 @@
+@import url(partials/reset);
+@import url(colours);
+
+html,body{
+	width:100%;
+	height:100%;
+	display:block;
+	margin:0;
+	padding:0;
+}
+
+body{
+	min-height:100%;
+	color:@grey;
+	color:@translucent;
+	background-color:black;
+}
+
+body.fixed{
+	max-height:100%;
+	overflow:hidden;
+}
+
+.overlay{
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	max-width:100%;
+	max-height:100%;
+	z-index: 909;
+}
+
+// Example 001 - drumkit
+// @import url(drumkit);
+
+
+@import url(visualiser);

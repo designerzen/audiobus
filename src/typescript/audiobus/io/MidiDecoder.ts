@@ -7,8 +7,8 @@ MIT Licence
 
 Midi File
 ==============
-Abstract    - Load and decode a .midi file from a server
-Description - Buffers a .midi file into memory, parse the commands
+Abstract    - decode a .midi file from an object in memory
+Description - Buffers a .midi file into memory, parses the commands
 Use         - Load( file.midi, onComplete ) and wait for the callback
 Methods     -
 Forked from - https://github.com/gasman/jasmid/blob/master/stream.js#L2
@@ -47,6 +47,9 @@ module audiobus.io
 
     export class MidiDecoder
     {
+        // some systems leave the last byte out
+        // to preserve memory but here we can
+        // re-add it if we want to :)
         private lastEventTypeByte:number;
 
         constructor()

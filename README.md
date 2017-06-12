@@ -1,11 +1,21 @@
-audio.bus
+# audio.bus version 3 #
 ========
 
 Cross Platform Audio Playback and Synthesis using modern web features.
-Currently supports Chrome / Firefox / Edge / Safari / Opera / Vivaldi
 
-Typescript / Javascript
-Actionscript (depreceated)
+Typescript (compiles into JavaScript)
+Actionscript (depreciated)
+
+
+## Features ##
+Sequencing
+Full MIDI implementation
+Synthesised drum kit using oscillators and noise
+Bass sounds
+
+
+Currently supports and tested on :
+Chrome / Firefox / Edge / Safari / Opera / Vivaldi
 
 
 Usage
@@ -19,8 +29,27 @@ Each experiment was created in an evening at Drake Music Lab
 
 29/06/2016 > DMLAB001 : A Single Hand - 4 part Drum Kit
 
+### Files & Foldes ###
+.git/
+build/
+config/
+docs/
+examples/
+node_modules/
+source/
+source/assets/
+source/code/
+.editorconfig
+.gitignore
+LICENSE
+package.json
+README.md
 
 
+
+
+### Build ###
+config/settings/
 
 
 Installation
