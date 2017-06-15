@@ -1,4 +1,5 @@
 import Rules from './webpack.rules';
+import Settings from '../settings';
 
 // Libs
 import webpack from 'webpack';
@@ -35,7 +36,8 @@ import AppCachePlugin from 'appcache-webpack-plugin';
 // generates html from our templates :)
 const html = new HtmlWebpackPlugin({
   title: 'audioBus',
-  //template:''
+  template:Settings.files.template,
+  inject: 'body',
   hash: true,
     minify: {
     removeComments: true,
@@ -69,8 +71,8 @@ const appCache = new AppCachePlugin({
 });
 
 
-  // speed up builds
-  const forkTsChecker = new ForkTsCheckerWebpackPlugin();
+// speed up builds
+const forkTsChecker = new ForkTsCheckerWebpackPlugin();
 
 // PLUGINS -----------------------------------------------------------------
 const plugins = [

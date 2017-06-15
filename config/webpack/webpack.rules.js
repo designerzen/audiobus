@@ -61,7 +61,7 @@ const ruleFonts = {
 // Extract Text Plugin
 // https://github.com/webpack-contrib/extract-text-webpack-plugin
 const extractStyles = new ExtractTextPlugin({
-  filename: path.resolve(destination.style, '[name].css'),
+  filename: path.join(destination.style, '[name].css'),
   disable: false,
   allChunks: true,
   ignoreOrder:false
@@ -117,6 +117,77 @@ const ruleLESSExtracted = {
   })
 };
 
+// Markup...
+
+// Extract Text Plugin
+// https://github.com/webpack-contrib/extract-text-webpack-plugin
+const extractHTML = new ExtractTextPlugin({
+  filename: path.resolve(destination.root, '[name].[ext]'),
+  disable: false,
+  allChunks: true,
+  ignoreOrder:false
+});
+
+const ruleHTML = {
+  test: /\.(html)$/,
+  use:[
+    {
+      loader: 'file-loader?name='+destination.root
+    },
+    {
+      loader: 'html-loader',
+      options: {
+        minimize: true,
+        removeComments: false,
+        collapseWhitespace: false
+      }
+    }
+
+  ]
+};
+const rulePug = {
+  test: /\.(pug|jade)$/,
+  use:[
+    // {
+    //   loader: 'file-loader?name='+destination.root
+    // },
+    // {
+    //   loader: 'html-loader',
+    //   options: {
+    //     minimize: true,
+    //     removeComments: false,
+    //     collapseWhitespace: false
+    //   }
+    // },
+    {
+      loader: 'pug-loader'
+    }
+  ]
+
+};
+const rulePugExtracted = {
+  test: /\.(pug|jade)$/,
+  use: extractHTML.extract({
+      fallback: 'file-loader',
+
+      use: [
+        {
+          loader: 'html-loader',
+          options: {
+            minimize: true,
+            removeComments: false,
+            collapseWhitespace: false
+          }
+        },
+
+        {
+          loader: 'pug-loader'
+        }
+      ]
+
+  })
+
+};
 // Images...
 const ruleImages = {
   test: /\.(png|svg|jpeg|jpg|gif|webp)$/,
@@ -138,10 +209,14 @@ const ruleMidi = {
 module.exports = {
   typescript:ruleTypeScript,
   javascript:ruleJavaScript,
+  html:ruleHTML,
+  htmlPlugin:extractHTML,
+  //pug:rulePugExtracted,
+  pug:rulePug,
   fonts:ruleFonts,
   styles:ruleStyles,
-  //less:ruleLESSExtracted,
-  less:ruleLESS,
+  less:ruleLESSExtracted,
+  //less:ruleLESS,
   stylePlugin:extractStyles,
   images:ruleImages,
   videos:ruleVideos,

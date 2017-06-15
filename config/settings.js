@@ -22,6 +22,7 @@ const folders             = {};
   folders.fonts           = path.resolve(folders.assets, 'fonts');
   folders.images          = path.resolve(folders.assets, 'images');
   folders.styles          = path.resolve(folders.assets, 'styles');
+  folders.markup          = path.resolve(folders.source, 'markup');
   folders.typings         = path.resolve(folders.root, 'typings');
   folders.build           = path.resolve(folders.root, 'build');
   folders.release         = path.resolve(folders.root, 'release');
@@ -33,10 +34,10 @@ const folders             = {};
 // Where are the files from in the beginning?
 const source              = {};
   source.polyfills        = path.resolve(folders.code, 'javascript/polyfillers/**/**.js');
-  source.markup           = path.resolve(folders.source, 'markup/**/**.+(md|html|htm)');
+  source.markup           = path.resolve(folders.markup, '**/**.+(md|html|htm|pug|jade)');
   source.midi             = path.resolve(folders.assets, 'midi/**/**.+(mid|midi)');
   source.static           = path.resolve(folders.source, 'static');
-  source.style            = path.resolve(folders.source, 'styles/style.less');
+  source.style            = path.resolve(folders.styles, 'style.less');
   source.typescript       = [
     path.join(folders.typescript,'audiobus/**/**.ts'),
     path.join(folders.typings ,'**/**.ts')
@@ -48,6 +49,7 @@ const files = {};
   files.index = path.resolve(folders.code,'index.js');
   files.webpackConfig = path.resolve(folders.config,'webpack','webpack.config.js');
   files.tsConfig = path.resolve(folders.config,'typescript','tsconfig.json');
+  files.template = path.resolve(folders.markup, 'template.pug');
 
 
 // Where do the files ends up in the end?

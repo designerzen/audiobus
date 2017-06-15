@@ -33,6 +33,8 @@ const destination = Settings.destinations.build;
 const rules = [
   Rules.typescript,
   Rules.javascript,
+  Rules.html,
+  Rules.pug,
   Rules.fonts,
   Rules.images,
   //Rules.styles,
@@ -48,7 +50,8 @@ const plugins = [
   Plugins.html,
   //Plugins.resourceHint,
   //Plugins.styles,
-  //Plugins.stylePlugin,
+  Rules.stylePlugin,
+  //Rules.extractHTML
 ];
 
 // WEBPACK -----------------------------------------------------------------
