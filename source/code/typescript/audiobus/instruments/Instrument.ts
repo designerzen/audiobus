@@ -1,102 +1,116 @@
 // interface IPlugs
-module audiobus.instruments
-{
-    // IRackItem
-    export class Instrument implements IMixerItem
-    {
-		public context:AudioContext;
-		public gain:GainNode;
 
+import Envelope from '../envelopes/Envelope';
+import AudioComponent from '../AudioComponent';
+
+export default class Instrument extends AudioComponent
+{
 		public isPlaying:boolean = false;         // currently started
 		public hasInitialised:boolean = false;    // are oscillators swinging?
 		public needsUpdate:boolean = false;       // does it need an external update?
 
-        private amplitude:number = 0.5;             // overall output volume
-        // DADSHR
-        public envelope:audiobus.envelopes.Envelope;
+		public SILENCE:number = 0.00000001;				//Number.MIN_VALUE*100000000000;
+		public envelope:Envelope;									// all instruments have an envelope to control sound shape
 
-		public SILENCE:number = 0.00000001;//Number.MIN_VALUE*100000000000;
-
-		public set volume( vol:number )
+		public get isSource():boolean
 		{
-            var t:number = this.context.currentTime;
-			this.gain.gain.cancelScheduledValues( t );
-			this.gain.gain.value = vol;
-			this.amplitude = vol;
-		}
-
-		public get volume( ):number
-		{
-			return this.gain.gain.value;
+			return this.gainNode.numberOfInputs === 0;
 		}
 
 		// create
-		constructor( audioContext:AudioContext, outputTo:GainNode=null, source:AudioNode=null )
+		constructor( audioContext:AudioContext=undefined )
 		{
-			this.context = audioContext;
-			this.gain = audioContext.createGain();
-            this.gain.gain.value = this.amplitude;
-            this.envelope = new audiobus.envelopes.Envelope( audioContext );
+      super(audioContext);
+      this.envelope = new Envelope( audioContext );
 
-            if (outputTo || source)
-            {
-                this.connect( outputTo, source );
-            }
-            // TODO: add itself to the conductor so that we can call
-            // all instruments together with one call
+      // if (outputTo || source)
+      // {
+      //     this.connect( outputTo, source );
+      // }
+      // TODO: add itself to the conductor so that we can call
+      // all instruments together with one call
 		}
 
-        public connect( outputTo:AudioNode, source:AudioNode=null):void
-        {
-            if (source)
-            {
-                source.connect( this.gain );
-            }
-            this.envelope.connect( outputTo , this.gain );
-        }
+    public connect( outputTo:AudioNode, source:AudioNode=null):void
+    {
+      if (source)
+      {
+        source.connect( this.gainNode );
+      }
+      this.envelope.connect( outputTo , this.gainNode );
+    }
 
-        // Handles : Delay -> Attack -> Decay -> Sustain -> Release
+    ////////////////////////////////////////////////////////////////////////////
+    // Handles : Delay -> Attack -> Decay -> Sustain -> Release
+    ////////////////////////////////////////////////////////////////////////////
 		public start( ...args: any[] ):boolean
 		{
-            var initialising:boolean = !this.hasInitialised;
+      const initialising:boolean = !this.hasInitialised;
 			if (initialising)
-            {
-                this.hasInitialised = true;
-            }
+      {
+        this.hasInitialised = true;
+      }
 
-            // it might already be fading in, but as we only fade from
-            // one volume to another, it would just fade 1 -> 1
-            var position:number = this.envelope.start();
+      // it might already be fading in, but as we only fade from
+      // one volume to another, it would just fade 1 -> 1
+      const position:number = this.envelope.start();
 
-            this.isPlaying = true;
-            //console.log( "start : "+position, this);
+      this.isPlaying = true;
+      //console.log( "start : "+position, this);
 
 			//console.log( 'start ' +this.isPlaying  );
-            return initialising;
+      return initialising;
 		}
 
-        public note( frequency:number ):boolean
-        {
-            return this.isPlaying;
-        }
+    public note( frequency:number ):boolean
+    {
+      return this.isPlaying;
+    }
 
-        // Handles : Hold -> Release
+    ////////////////////////////////////////////////////////////////////////////
+    // Handles : Hold -> Release
+    ////////////////////////////////////////////////////////////////////////////
 		public stop():boolean
 		{
-            // already playing or not initialised - nothing to stop
+      // already playing or not initialised - nothing to stop
 			if ( !this.hasInitialised || !this.isPlaying )
-            {
-                return false;
-            }
+      {
+        return false;
+      }
 
-            this.envelope.stop();
+      this.envelope.stop();
 
-            // An exception will be thrown if this value is less than or equal to 0,
+      // An exception will be thrown if this value is less than or equal to 0,
 			// or if the value at the time of the previous event is less than or equal to 0.
 			this.isPlaying = false;
-            console.log( "stopping", this);
+      console.log( "stopping", this);
 
-            return true;
+      return true;
+		}
+
+		public pitchBend( program:number, delay:number=0)
+	  {
+			// pitch bend
+		}
+
+		public noteOn( note:number, velocity:number=1, delay:number=0)
+	  {
+
+		}
+
+		public noteOff( note:number, delay:number=0)
+	   {
+
+		}
+
+		public chordOn( chord:number=1, velocity:number=1, delay:number=0)
+		{
+
+		}
+
+		public chordOff( chord:number=1, delay:number=0)
+		{
+
 		}
 
         /*
@@ -150,5 +164,5 @@ module audiobus.instruments
 		}
 
         */
-	}
+
 }
