@@ -1,8 +1,0 @@
-{
-  "resolution": "main",
-  "tree": {
-    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/f481e77dfca5a146db1b4f5f20f15929b30c8729/webaudioapi/waa.d.ts",
-    "raw": "github:DefinitelyTyped/DefinitelyTyped/webaudioapi/waa.d.ts#f481e77dfca5a146db1b4f5f20f15929b30c8729",
-    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/f481e77dfca5a146db1b4f5f20f15929b30c8729/webaudioapi/waa.d.ts"
-  }
-}

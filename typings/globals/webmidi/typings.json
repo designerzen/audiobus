@@ -1,8 +1,0 @@
-{
-  "resolution": "main",
-  "tree": {
-    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/11d624e6569acdfea32fad59b175423e502789fc/webmidi/index.d.ts",
-    "raw": "registry:dt/webmidi#0.0.0+20160726191732",
-    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/11d624e6569acdfea32fad59b175423e502789fc/webmidi/index.d.ts"
-  }
-}

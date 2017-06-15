@@ -1,7 +1,0 @@
-{
-  "name": "AudioBUS",
-  "globalDependencies": {
-    "waa": "github:DefinitelyTyped/DefinitelyTyped/webaudioapi/waa.d.ts",
-    "webmidi": "registry:dt/webmidi#0.0.0+20160726191732"
-  }
-}
