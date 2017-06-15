@@ -1,40 +1,61 @@
-/// <reference path="../Dependencies.ts" />
-module audiobus.io
+import AudioComponent from '../AudioComponent';
+
+export default class Microphone extends AudioComponent
 {
-	export class Microphone
-    {
-		public context:AudioContext;
-		public gain:GainNode;
+	public source:MediaStream;
+	public stream:MediaStreamAudioSourceNode;
 
-		// create
-		constructor( audioContext:AudioContext, outputTo:GainNode )
-		{
-			this.context = audioContext;
-			this.gain = audioContext.createGain();
-			this.gain.connect( outputTo );
-		}
+	public state:string = "Disconnected";
 
-		public getMic()
-		{
+	constructor( audioContext:AudioContext=undefined )
+	{
+		super(audioContext);
+	}
+
+	public getMic():Promise<MediaStreamAudioSourceNode>
+	{
+		return new Promise<MediaStreamAudioSourceNode>((resolve, reject) => {
+
 			//get mic in
 			navigator.getUserMedia(
-				{audio:true},
-				this.onMicAvailable,
-				this.onMicUnAvailable
+				{
+					audio:true
+				},
+				// MediaStreamAudioSourceNode
+				(streamSource:MediaStream)=>{
+
+					// Success
+					this.onMicAvailable(streamSource);
+					resolve(this.stream);
+
+				},
+				// MediaStreamError
+				(error)=>{
+
+					// Failure
+					this.onMicUnAvailable(error);
+					reject(error);
+
+				}
+
 			);
-		}
+		});
 
-		// success callback when requesting audio input stream
-		private onMicAvailable(stream):void
-		{
-			// Create an AudioNode from the stream.
-			var mediaStreamSource:MediaStreamAudioSourceNode = this.context.createMediaStreamSource( stream );
-			this.gain.connect(mediaStreamSource);
-		}
+	}
 
-		private onMicUnAvailable( error ):void
-		{
-			console.log("The following error occured: " + error);
-		}
+	// success callback when requesting audio input stream
+	private onMicAvailable(streamSource:MediaStream):void
+	{
+		// Create an AudioNode from the stream.
+		this.source = streamSource;
+		this.state = "connected";
+		this.stream = this.context.createMediaStreamSource( streamSource );
+		this.gainNode.connect(this.stream);
+	}
+
+	private onMicUnAvailable( error:MediaStreamError ):void
+	{
+		console.log("The following error occured: " + error);
+		this.state = "disconnected";
 	}
 }
