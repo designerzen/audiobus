@@ -56,9 +56,9 @@ export default class MidiCommandFactory
       // each eventData is an array of 8-digit binary byte
       // usually represented as a hexadecimal integer 00-FF
       // or a number betweeo 0-255
-      var command:MidiCommand = new MidiCommand();
-      var commandByte:number = eventData[0];
-      var type = commandByte & 0xf0; // channel agnostic message type. Thanks, Phil Burk.
+      const command:MidiCommand = new MidiCommand();
+      const commandByte:number = eventData[0];
+      const type = commandByte & 0xf0; // channel agnostic message type. Thanks, Phil Burk.
 
       // store original data
       command.raw = eventData;

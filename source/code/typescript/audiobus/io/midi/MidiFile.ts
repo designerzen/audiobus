@@ -1,6 +1,6 @@
 import MidiTrack from './MidiTrack';
 import MidiStream from './MidiStream';
-import MidiDecoder from './MidiDecoder';
+import MidiFileDecoder from './MidiFileDecoder';
 
 /*//////////////////////////////////////////////////////////////////////////////
 
@@ -10,6 +10,10 @@ Abstract    - Load a .midi file from a local server or string
 Description - Buffers a .midi file into memory, parses the commands
 Use         - Load( file.midi, onComplete ) and wait for the callback
 Methods     -
+References -
+  http://cs.fit.edu/~ryan/cse4051/projects/midi/midi.html
+
+  https://www.cs.cmu.edu/~music/cmsip/readings/Standard-MIDI-file-format-updated.pdf
 
 //////////////////////////////////////////////////////////////////////////////*/
 export default class MidiFile
@@ -38,7 +42,7 @@ export default class MidiFile
   {
       const data = window.atob(file.split(',')[1]);
       const stream:MidiStream = new MidiStream( data );
-      const decoder:MidiDecoder = new MidiDecoder();
+      const decoder:MidiFileDecoder = new MidiFileDecoder();
       const track = decoder.decode(stream);
 
       return new Promise<MidiTrack>((resolve, reject) => {
@@ -69,7 +73,7 @@ export default class MidiFile
             {
               const data:string = this.convertResponse( fetch.responseText || '' );
               const stream:MidiStream = new MidiStream( data );
-              const decoder:MidiDecoder = new MidiDecoder();
+              const decoder:MidiFileDecoder = new MidiFileDecoder();
               const track = decoder.decode(stream);
 
               resolve(track);

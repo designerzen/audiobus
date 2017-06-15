@@ -3,12 +3,14 @@
 Midi Command
 ==============
 Abstract    - A Midi Command Model - no logic - just data
-Description - convert a midi chunk to midicommand then pass around
-Use         - Load( file.midi, onComplete ) and wait for the callback
+Description - convert a midi chunk to a midicommand then pass around to stuff
+Use         -
 Methods     -
 
 //////////////////////////////////////////////////////////////////////////////*/
-export default class MidiCommand
+import ICommand from '../../ICommand';
+
+export default class MidiCommand implements ICommand
 {
   // Types!
   public static TYPE_CHANNEL:string                   = 'channel';
@@ -29,6 +31,7 @@ export default class MidiCommand
   public static COMMAND_PITCH_BEND:string             = 'pitchBend';
   public static COMMAND_SYSTEM_MESSAGE:string         = 'systemMessage';
 
+  // The order of the Midi Codes so that you can map them easier
   public static COMMANDS:Array<string> = [
       MidiCommand.COMMAND_NOTE_OFF,
       MidiCommand.COMMAND_NOTE_ON,
@@ -40,12 +43,12 @@ export default class MidiCommand
       MidiCommand.COMMAND_SYSTEM_MESSAGE
   ];
 
-  // Settings
+  // Settings?
   public raw:Uint8Array;
 
   public deltaTime:number;
   public frameRate:number;
-  public channel:number;
+  public channel:number = -1; // all channels
 
   public type:string;
   public subtype:string;
@@ -67,8 +70,8 @@ export default class MidiCommand
   public thirtyseconds:number;
 
   public amount:number;
-  public noteNumber:number;
-  public velocity:number;
+  public noteNumber:number = -1;  // no note (probably system message)
+  public velocity:number = -1;    // not a note
   public value:number;
 
   public controllerType:number;
@@ -77,7 +80,12 @@ export default class MidiCommand
 
   public toString():string
   {
-    var ouput:string = 'MIDI:Input::'+this.subtype;
-    return ouput + ' [Channel '+this.channel+'] Type:'+this.type+' Note:'+this.noteNumber.toString(16)+ ' Velocity:'+this.velocity.toString(16) ;
+    var ouput:string = '[MidiCommand > '+this.subtype+']';
+    if (this.type === MidiCommand.TYPE_META)
+    {
+      return ouput + ':' + this.deltaTime + ' [Meta] Type:'+this.type ;
+    }else{
+      return ouput + ':' + this.deltaTime + ' [Channel '+this.channel+'] Type:'+this.type+' Note:'+this.noteNumber.toString(16)+ ' Velocity:'+this.velocity.toString(16) ;
+    }
   }
 }

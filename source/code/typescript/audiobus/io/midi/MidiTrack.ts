@@ -12,20 +12,80 @@ Methods     -
 
 import MidiCommand from './MidiCommand';
 import MidiHeader from './MidiHeader';
+import ICommand from '../../ICommand';
+import ITrack from '../../ITrack';
 
-export default class MidiTrack
+export default class MidiTrack implements ITrack
 {
     public header:MidiHeader;
-    public tracks:Array<MidiCommand>;
 
+    public tracks:Array<ICommand>;
+    public positions:object = {};
+
+    public fileName:string = "";
     public trackName:string = "";
     public meta:string = "";
     public copyrightNotice:string = "";
     public lyrics:string = "";
+    public bpm:number = 120;  // default from MIDI spec
+    public timeSignature:Array<number> = [4,4];  // default from MIDI spec
 
-    constructor( header:MidiHeader=null )
+    get tempo():number
     {
-        if (header) {this.header = header;}
+      // this is a factor of a number of things including header info
+      return this.header ? this.header.ticksPerBeat : -1;
+    }
+
+    constructor( header:MidiHeader=undefined )
+    {
+      if (header)
+      {
+        this.header = header;
+      }
+      this.tracks = [];
+    }
+
+    private addMetaEvent(event:MidiCommand)
+    {
+      if (!event.text)
+      {
+        return;
+      }
+
+
+      switch( event.subtype )
+      {
+          case "trackName":
+            if (this.trackName.length > 1)
+            {
+              //ableton adds some weird stuff to the track
+              this.trackName = event.text.replace(/\u0000/g, '')
+            }else{
+              // append...
+              this.trackName += event.text;
+            }
+            // also add it to filename if it looks like a file name...
+            break;
+
+          case "text":
+          case "copyrightNotice":
+          case "lyrics":
+              if (event.text)
+              {
+                this[event.subtype] += event.text;
+              }
+              break;
+
+          default:
+              // add
+              this.meta += event.text;
+      }
+    }
+
+    //
+    public getCommandAtPosition( position:number ):Array<MidiCommand>
+    {
+      return this.positions[position];
     }
 
     // A way of adding an event and multiple events to track
@@ -35,19 +95,8 @@ export default class MidiTrack
         // open a new pocket
         if (event.type === MidiCommand.TYPE_META)
         {
-            switch( event.subtype )
-            {
-                case "text":
-                case "trackName":
-                case "copyrightNotice":
-                case "lyrics":
-                    this[event.subtype] += event.text;
-                    break;
-
-                default:
-                    // add
-                    this.meta += event.text;
-            }
+          this.addMetaEvent(event);
+          // add !this.fileName && !event.length && track.name
         }else{
             switch( event.subtype )
             {
@@ -59,10 +108,17 @@ export default class MidiTrack
                 case MidiCommand.COMMAND_CHANNEL_AFTER_TOUCH:
                 default:
                     // add
-                    event.deltaTime;
+                    //event.deltaTime;
+                    //console.log(event.deltaTime);
+                    if (!this.positions[event.deltaTime])
+                    {
+                      this.positions[event.deltaTime] = [event];
+                    }else{
+                      this.positions[event.deltaTime].push(event);
+                    }
                     this.tracks.push(event);
             }
         }
-
+        //console.log(this.positions);
     }
 }
