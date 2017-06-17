@@ -26,6 +26,7 @@ CONFIG :
 import Settings from '../settings';
 import Rules from './webpack.rules';
 import Plugins from './webpack.plugins';
+import Entry from './webpack.entry';
 
 const destination = Settings.destinations.build;
 
@@ -50,6 +51,7 @@ const plugins = [
   Plugins.html,
   //Plugins.resourceHint,
   //Plugins.styles,
+  Plugins.chunksCommon,
   Rules.stylePlugin,
   //Rules.extractHTML
 ];
@@ -87,7 +89,7 @@ const config = {
   context: Settings.folders.root, // to automatically find tsconfig.json
 
   // entry point(s)...
-  entry: Settings.files.index,
+  entry: Entry,
 
   // where to compile to
   output: {

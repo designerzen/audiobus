@@ -74,6 +74,14 @@ const appCache = new AppCachePlugin({
 // speed up builds
 const forkTsChecker = new ForkTsCheckerWebpackPlugin();
 
+// CommonChunksPlugin will now extract all the common modules from main bundles
+const chunksCommon = 
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'common',
+       //But since there are no more common modules between them we end up with just the runtime code included in the manifest file
+       filename: 'common.js'
+  });
+
 // PLUGINS -----------------------------------------------------------------
 const plugins = [
 
@@ -132,12 +140,6 @@ const plugins = [
     // minChunks: Infinity
   }),
 
-  // CommonChunksPlugin will now extract all the common modules from main bundles
-  new webpack.optimize.CommonsChunkPlugin({
-      name: 'manifest',
-       //But since there are no more common modules between them we end up with just the runtime code included in the manifest file
-       filename: 'manifest.js'
-  }),
 
 
   // This is the extract text plugin instance for styles..
@@ -151,4 +153,5 @@ module.exports = {
   resourceHint,
   styles:Rules.stylesPlugin,
   less:Rules.lessPlugin,
+  chunksCommon
 }
