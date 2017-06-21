@@ -1,6 +1,7 @@
 import Rules from './webpack.rules';
 import Settings from '../settings';
 
+import path from 'path';
 // Libs
 import webpack from 'webpack';
 import HappyPack from 'happypack';
@@ -13,12 +14,45 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 // https://github.com/jantimon/resource-hints-webpack-plugin
 import ResourceHintWebpackPlugin from 'resource-hints-webpack-plugin';
 
-//
-import ExtractTextPlugin from 'extract-text-webpack-plugin';
-
 // https://github.com/lettertwo/appcache-webpack-plugin
 // Offline usage for android and iOs
 import AppCachePlugin from 'appcache-webpack-plugin';
+
+// https://github.com/webpack-contrib/extract-text-webpack-plugin
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
+
+
+const destination = Settings.destinations.build;
+
+// Extract Text Plugin
+// https://github.com/webpack-contrib/extract-text-webpack-plugin
+const extractStyles = new ExtractTextPlugin({
+  // path.join(destination.style, '[name].css')
+  //filename: "[name].css",
+  filename:  (getPath) => {
+    //const name = path.join(Settings.folderNames.styles, '[name].css');  //name already has js ext :(
+    const name = destination.style;
+    return getPath(name).replace('js', 'css');
+  },
+  disable: false,
+  allChunks: true,
+  ignoreOrder:false
+});
+
+// Extract Text Plugin
+// https://github.com/webpack-contrib/extract-text-webpack-plugin
+const extractHTML = new ExtractTextPlugin({
+  // everything goes into root for now...
+  filename:  (getPath) => {
+    //console.log("extractHTML",arguments);
+    const name = path.join(Settings.folderNames.styles, '[name].html');  //name already has js ext :(
+    return getPath(name).replace('js', 'html');
+  },
+  //filename: '[name].html',
+  disable: false,
+  allChunks: true,
+  ignoreOrder:false
+});
 
 // title: The title to use for the generated HTML document.
 // filename: The file to write the HTML to. Defaults to index.html. You can specify a subdirectory here too (eg: assets/admin.html).
@@ -75,7 +109,7 @@ const appCache = new AppCachePlugin({
 const forkTsChecker = new ForkTsCheckerWebpackPlugin();
 
 // CommonChunksPlugin will now extract all the common modules from main bundles
-const chunksCommon = 
+const chunksCommon =
     new webpack.optimize.CommonsChunkPlugin({
       name: 'common',
        //But since there are no more common modules between them we end up with just the runtime code included in the manifest file
@@ -151,6 +185,8 @@ module.exports = {
   forkTsChecker,
   html,
   resourceHint,
+  extractStyles,
+  extractHTML,
   styles:Rules.stylesPlugin,
   less:Rules.lessPlugin,
   chunksCommon

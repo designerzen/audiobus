@@ -27,15 +27,18 @@ import Settings from '../settings';
 import Rules from './webpack.rules';
 import Plugins from './webpack.plugins';
 import Entry from './webpack.entry';
+import Output from './webpack.output';
 
-const destination = Settings.destinations.build;
+
+console.log( Output );
 
 // Add them together
 const rules = [
   Rules.typescript,
   Rules.javascript,
-  Rules.html,
+  Rules.htmlExtracted,
   Rules.pug,
+  //Rules.pugExtracted,
   Rules.fonts,
   Rules.images,
   //Rules.styles,
@@ -52,8 +55,8 @@ const plugins = [
   //Plugins.resourceHint,
   //Plugins.styles,
   Plugins.chunksCommon,
-  Rules.stylePlugin,
-  //Rules.extractHTML
+  Plugins.extractStyles,
+  Plugins.extractHTML
 ];
 
 // WEBPACK -----------------------------------------------------------------
@@ -91,66 +94,9 @@ const config = {
   // entry point(s)...
   entry: Entry,
 
-  // where to compile to
-  output: {
-      filename: '[name].js',
-      chunkFilename: '[chunkhash].js',
-      path: destination.root,
-
-      // library: "MyLibrary", // string,
-      // the name of the exported library
-      //
-      // libraryTarget: "umd", // universal module definition
-      //     libraryTarget: "umd2", // universal module definition
-      //     libraryTarget: "commonjs2", // exported with module.exports
-      //     libraryTarget: "commonjs-module", // exports with module.exports
-      //     libraryTarget: "commonjs", // exported as properties to exports
-      //     libraryTarget: "amd", // defined with AMD defined method
-      //     libraryTarget: "this", // property set on this
-      // DEFAULT :
-      //libraryTarget: "var", // variable defined in root scope
-      //     libraryTarget: "assign", // blind assignment
-      //     libraryTarget: "window", // property set to window object
-      //     libraryTarget: "global", // property set to global object
-      //     libraryTarget: "jsonp", // jsonp wrapper
-      // the type of the exported library
-      //
-      // Advanced output configuration ------------------------------------------
-      // show comments in bundles, just to beautify the output of this example.
-      // should not be used for production
-      // pathinfo: true, // boolean
-      // include useful path info about modules, exports, requests, etc. into the generated code
-      //
-      // chunkFilename: "[id].js",
-      // chunkFilename: "[chunkhash].js", // for long term caching
-      // the filename template for additional chunks
-      //
-      // jsonpFunction: "myWebpackJsonp", // string
-      // name of the JSONP function used to load chunks
-      //
-      // sourceMapFilename: "[file].map", // string
-      // sourceMapFilename: "sourcemaps/[file].map", // string
-      // the filename template of the source map location
-      //
-      // devtoolModuleFilenameTemplate: "webpack:///[resource-path]", // string
-      // the name template for modules in a devtool
-      //
-      // devtoolFallbackModuleFilenameTemplate: "webpack:///[resource-path]?[hash]", // string
-      // the name template for modules in a devtool (used for conflicts)
-      //
-      // umdNamedDefine: true, // boolean
-      // use a named AMD module in UMD library
-      //
-      // crossOriginLoading: "use-credentials", // enum
-      // crossOriginLoading: "anonymous",
-      // crossOriginLoading: false,
-      // specifies how cross origin request are issued by the runtime
-
-      // the url to the output directory resolved relative to the HTML page
-      // publicPath: "/assets/", // string
-      // publicPath: "http://cdn.example.com/[hash]/",
-      publicPath:'/'
-  },
+  // where to compile to...
+  // https://webpack.js.org/configuration/output/
+  output: Output,
 
   module: {
     // rules for including assets

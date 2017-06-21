@@ -1,8 +1,6 @@
 import path from 'path';
 import Settings from '../settings';
-
-// https://github.com/webpack-contrib/extract-text-webpack-plugin
-import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import Plugins from './webpack.plugins';
 
 const destination = Settings.destinations.build;
 const useSourceMaps = true;
@@ -58,14 +56,6 @@ const ruleFonts = {
 };
 
 
-// Extract Text Plugin
-// https://github.com/webpack-contrib/extract-text-webpack-plugin
-const extractStyles = new ExtractTextPlugin({
-  filename: path.join(destination.style, '[name].css'),
-  disable: false,
-  allChunks: true,
-  ignoreOrder:false
-});
 
 const ruleStyles = {
   test: /\.css$/,
@@ -77,19 +67,19 @@ const ruleStyles = {
   ]
 };
 //
-// const ruleStylesExtracted = {
-//   test: /\.css$/,
-//   exclude: [/node_modules/, /bower_components/, /\.spec\./ ],
-//   use: extractStyles.extract({
-//       fallback: 'style-loader',
-//       use: [
-//         //{ loader: 'raw-loader' },
-//         // TODO :SET MODULES TO TRUE
-//         { loader: 'css-loader', query: { modules: false, sourceMaps: useSourceMaps, importLoaders:2, localIdentName:'[name]__[local]___[hash:base64:5]' } },
-//         { loader: 'postcss-loader' }
-//       ]
-//   })
-// };
+const ruleStylesExtracted = {
+  test: /\.css$/,
+  exclude: [/node_modules/, /bower_components/, /\.spec\./ ],
+  use: Plugins.extractStyles.extract({
+      fallback: 'style-loader',
+      use: [
+        //{ loader: 'raw-loader' },
+        // TODO :SET MODULES TO TRUE
+        { loader: 'css-loader', query: { modules: false, sourceMaps: useSourceMaps, importLoaders:2, localIdentName:'[name]__[local]___[hash:base64:5]' } },
+        { loader: 'postcss-loader' }
+      ]
+  })
+};
 const ruleLESS = {
   test: /\.less$/,
   exclude: [/node_modules/, /bower_components/, /\.spec\./ ],
@@ -105,7 +95,7 @@ const ruleLESS = {
 const ruleLESSExtracted = {
   test: /\.less$/,
   exclude: [/node_modules/, /bower_components/, /\.spec\./ ],
-  use: extractStyles.extract({
+  use: Plugins.extractStyles.extract({
       fallback: 'style-loader',
       use: [
         //{ loader: 'raw-loader' },
@@ -119,14 +109,7 @@ const ruleLESSExtracted = {
 
 // Markup...
 
-// Extract Text Plugin
-// https://github.com/webpack-contrib/extract-text-webpack-plugin
-const extractHTML = new ExtractTextPlugin({
-  filename: path.resolve(destination.root, '[name].[ext]'),
-  disable: false,
-  allChunks: true,
-  ignoreOrder:false
-});
+
 
 const ruleHTML = {
   test: /\.(html)$/,
@@ -145,6 +128,28 @@ const ruleHTML = {
 
   ]
 };
+
+
+const ruleHTMLExtracted = {
+  test: /\.(html)$/,
+  use: Plugins.extractHTML.extract({
+      fallback: 'file-loader',
+
+      use: [
+        {
+          loader: 'html-loader',
+          options: {
+            minimize: true,
+            removeComments: false,
+            collapseWhitespace: false
+          }
+        }
+      ]
+
+  })
+
+};
+
 const rulePug = {
   test: /\.(pug|jade)$/,
   use:[
@@ -167,7 +172,7 @@ const rulePug = {
 };
 const rulePugExtracted = {
   test: /\.(pug|jade)$/,
-  use: extractHTML.extract({
+  use: Plugins.extractHTML.extract({
       fallback: 'file-loader',
 
       use: [
@@ -210,14 +215,14 @@ module.exports = {
   typescript:ruleTypeScript,
   javascript:ruleJavaScript,
   html:ruleHTML,
-  htmlPlugin:extractHTML,
-  //pug:rulePugExtracted,
+  htmlExtracted:ruleHTMLExtracted,
+  pugExtracted:rulePugExtracted,
   pug:rulePug,
   fonts:ruleFonts,
   styles:ruleStyles,
+  //styles:ruleStylesExtracted,
   less:ruleLESSExtracted,
   //less:ruleLESS,
-  stylePlugin:extractStyles,
   images:ruleImages,
   videos:ruleVideos,
   midi:ruleMidi
