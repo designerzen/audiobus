@@ -78,6 +78,10 @@ export default class MidiCommand implements ICommand
   public programNumber:number;
   public sequenceNumber:number;
 
+  // for tracks that are precompiled, this serves as a handy place to store
+  // the actual position in the track that the command occurs at
+  public timeCode:number;
+
   public toString():string
   {
     var ouput:string = '[MidiCommand > '+this.subtype+']';

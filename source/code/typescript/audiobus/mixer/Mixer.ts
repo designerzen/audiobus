@@ -1,32 +1,15 @@
 import Engine from '../Engine';
 import MixerChannel from './MixerChannel';
+import AudioComponent from '../AudioComponent';
 
-export default class Mixer
+export default class Mixer extends AudioComponent
 {
   // a place to store the channels...
   private channels:Array<MixerChannel>;
 
-	public get volume()
-	{
-		return 1;
-	}
-
-	public set volume( vol:Number )
-	{
-
-	}
-
   constructor( specifiedContext:AudioContext=undefined )
   {
-		// tries to fetch the global context if not provided...
-		const context:AudioContext = specifiedContext || Engine.fetch();
-		// now wire in our global volume...
-		const gain:GainNode = context.createGain();
-  }
-
-  public mute():boolean
-  {
-      return true;
+		super(specifiedContext);
   }
 
   public solo():boolean

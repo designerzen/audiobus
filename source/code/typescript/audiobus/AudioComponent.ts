@@ -12,17 +12,24 @@ export default class AudioComponent
 	protected context:AudioContext;
 
 	// these are shared...
-	public gainNode:GainNode;
 	public outputGainNode:GainNode;
-	public inputGainNode:GainNode;
+	public inputAudioNode:AudioNode;
 
   protected amplitude:number = 1;           // overall default output volume
 
+	protected muted:boolean = false;
+	protected mutedVolume:number = 0;
+
+	public get isSource():boolean
+	{
+		return this.outputGainNode.numberOfInputs === 0;
+	}
+	
   public set volume( vol:number )
   {
     const t:number = this.context.currentTime;
-    this.gainNode.gain.cancelScheduledValues( t );
-    this.gainNode.gain.value = vol;
+    this.outputGainNode.gain.cancelScheduledValues( t );
+    this.outputGainNode.gain.value = vol;
     this.amplitude = vol;
   }
 
@@ -33,20 +40,30 @@ export default class AudioComponent
 
   public get volume( ):number
   {
-    return this.gainNode.gain.value;
+		if (this.muted)
+		{
+			return this.amplitude;
+		}else{
+			return this.outputGainNode.gain.value;
+		}
   }
 
-	// Where is the output node connected to?
+	// Get the port where the data comes out from...
 	public get output():GainNode
 	{
 		return this.outputGainNode;
 	}
-
-	// Set where this device outputs to
-	public set output( outputTo:GainNode )
+	
+	public get intput():AudioNode
 	{
-		this.outputGainNode = outputTo;
-		this.gainNode.connect( outputTo );
+		return this.inputAudioNode;
+	}
+	
+	// // Set which port this device gets it's data from...
+	public set input( port:AudioNode )
+	{
+		this.inputAudioNode = port;
+		this.outputGainNode.connect( port );
 	}
 
   // if no context is specified we get the engine default...
@@ -55,8 +72,42 @@ export default class AudioComponent
     const resolvedContext = audioContext ? audioContext : Engine.fetch();
 		this.context = resolvedContext;
 
-		this.gainNode = resolvedContext.createGain();
-    this.gainNode.gain.value = this.amplitude;
+		this.outputGainNode = resolvedContext.createGain();
+    this.outputGainNode.gain.value = this.amplitude;
+
+		// ready to go!
+  	this.create();
 	}
 
+  public mute():void
+  {
+		if (this.muted)
+		{
+			return;
+		}
+		this.mutedVolume = this.volume;
+		this.muted = true;
+  }
+
+  public unmute():void
+  {
+		if (!this.muted)
+		{
+			return;
+		}
+		this.muted = false;
+		this.volume = this.mutedVolume;
+  }
+
+	public create():void
+	{
+		
+	}
+
+	// Free up memory...
+	public destroy():void
+	{
+		this.outputGainNode.disconnect();
+    this.outputGainNode = null;
+	}
 }

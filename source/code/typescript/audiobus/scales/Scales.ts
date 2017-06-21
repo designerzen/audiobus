@@ -25,6 +25,10 @@ export default class Scales
 	  "B"
 	];
 
+	public static SEMITONES = {
+		"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11
+	};
+
 	constructor(  )
   {
 		throw Error("Scales is a static class, ie. don't call new Scales()");
@@ -49,11 +53,17 @@ export default class Scales
 			) / Math.log(2)
 		);
 	}
-	
-	public static noteNameFromPitch(frequency):string
+
+	public static noteNameFromPitch(frequency:number):string
 	{
 		const noteNumber:number = Scales.noteFromPitch(frequency) % 12;
 		return Scales.NOTES[ noteNumber ];
+	}
+
+	public static randomNote():number
+	{
+		const frequency:number = Math.random() * 2400;
+		return Scales.noteFromPitch(frequency);
 	}
 
 	public static frequencyFromNote(note:number):number

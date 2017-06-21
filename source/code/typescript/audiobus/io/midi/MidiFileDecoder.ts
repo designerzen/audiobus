@@ -320,6 +320,7 @@ export default class MidiFileDecoder
         case MidiEventCodes.NOTE_ON:
           event.noteNumber = paramater1;
           event.velocity = stream.readInt8();
+          //console.error("NOTEE ON!!!", event);
           if (event.velocity === 0)
           {
             // some older hardware used to send noteOn with zero velocity

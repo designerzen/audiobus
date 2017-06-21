@@ -1,4 +1,5 @@
-[// [General MIDI Instrument Patch Map](https://www.midi.org/specifications/item/gm-level-1-sound-set)
+// [General MIDI Instrument Patch Map](https://www.midi.org/specifications/item/gm-level-1-sound-set)
+
 export const MidiInstrumentCodes = [
 	"acoustic grand piano",
 	"bright acoustic piano",
@@ -129,7 +130,6 @@ export const MidiInstrumentCodes = [
 	"applause",
 	"gunshot",
 ]
-
 
 export const InstrumentFamilyByID = [
 	"piano",

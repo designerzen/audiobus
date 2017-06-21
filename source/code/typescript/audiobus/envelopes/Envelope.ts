@@ -55,7 +55,7 @@ export default class Envelope
 
   // how much to let off after the intro before...
   // Requires a number in milliseconds
-  public decayTime:number         = 1;
+  public decayTime:number         = 1000;
 
   // how loud is the afternote
   // This is a percentage between 0 -> 1
@@ -89,34 +89,27 @@ export default class Envelope
       return this.delayTime + this.attackTime + this.decayTime + this.releaseTime + (this.holdTime < 0 ? 0 : this.holdTime);
   }
 
-  constructor( audioContext:AudioContext, outputTo:AudioNode=null, source:AudioNode=null )
+	// Get the port where the data comes out from...
+	public get output():GainNode
+	{
+		return this.envelope;
+	}
+	
+
+	// Get the port where the data comes out from...
+	public set input( port:AudioNode )
+	{
+		port.connect( this.envelope );
+	}
+	
+  constructor( audioContext:AudioContext )
   {
       // this contains our envelope
       this.context = audioContext;
       this.envelope = audioContext.createGain();
       this.envelope.gain.value = this.amplitude;
-      if (outputTo || source)
-      {
-          this.connect( outputTo, source );
-      }
   }
-
-  // Where do we take the source sound from, and where to route it to?
-  // Output to should preferably be a GAIN Node
-  public connect( outputTo:AudioNode, source:AudioNode ):void
-  {
-      // If we have an input from a different source
-      if (source)
-      {
-          source.connect( this.envelope );
-      }
-      // If we have somewhere to route these to...
-      if ( outputTo )
-      {
-          this.envelope.connect(outputTo);
-      }
-  }
-
+	
 	// would be cool if this could return a promise :)
   private fade( curveType:string, volume:number, time:number, length:number=0 ):number
   {

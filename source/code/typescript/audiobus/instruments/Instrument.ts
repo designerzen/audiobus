@@ -2,6 +2,7 @@
 
 import Envelope from '../envelopes/Envelope';
 import AudioComponent from '../AudioComponent';
+import ICommand from '../ICommand';
 
 export default class Instrument extends AudioComponent
 {
@@ -12,17 +13,37 @@ export default class Instrument extends AudioComponent
 		public SILENCE:number = 0.00000001;				//Number.MIN_VALUE*100000000000;
 		public envelope:Envelope;									// all instruments have an envelope to control sound shape
 
-		public get isSource():boolean
+	
+		// Get the port where the data comes out from...
+		// public set output(port:AudioNode)
+		// {
+		// 	//this.envelope.output.connect( port );
+		// 	port.connect( this.outputGainNode ); // outputGainNode
+		// }
+		
+		// // Set which port this device gets it's data from...
+		public set input( port:AudioNode )
 		{
-			return this.gainNode.numberOfInputs === 0;
+			this.inputAudioNode = port;
+			this.envelope.input = port;//.connect( port );
 		}
-
+			
 		// create
 		constructor( audioContext:AudioContext=undefined )
 		{
       super(audioContext);
-      this.envelope = new Envelope( audioContext );
+		}
 
+		public create():void
+		{
+			this.envelope = new Envelope( this.context );
+			// set the input of the audio component to the output from the envelope
+			//this.input = this.envelope.output;
+			this.envelope.output.connect( this.output ); // outputGainNode
+			//this.output = this.envelope.output; // outputGainNode
+			// from now on, connect all your instruments to the envelope input!
+			// this.envelope.input = sources;
+			
       // if (outputTo || source)
       // {
       //     this.connect( outputTo, source );
@@ -30,15 +51,15 @@ export default class Instrument extends AudioComponent
       // TODO: add itself to the conductor so that we can call
       // all instruments together with one call
 		}
-
-    public connect( outputTo:AudioNode, source:AudioNode=null):void
-    {
-      if (source)
-      {
-        source.connect( this.gainNode );
-      }
-      this.envelope.connect( outputTo , this.gainNode );
-    }
+		// 
+    // public connect( outputTo:AudioNode, source:AudioNode=null):void
+    // {
+    //   if (source)
+    //   {
+    //     source.connect( this.gainNode );
+    //   }
+    //   this.envelope.connect( outputTo , this.gainNode );
+    // }
 
     ////////////////////////////////////////////////////////////////////////////
     // Handles : Delay -> Attack -> Decay -> Sustain -> Release
@@ -51,9 +72,10 @@ export default class Instrument extends AudioComponent
         this.hasInitialised = true;
       }
 
+			const time:number = this.context.currentTime + 0.005;
       // it might already be fading in, but as we only fade from
       // one volume to another, it would just fade 1 -> 1
-      const position:number = this.envelope.start();
+      const position:number = this.envelope.start(time, true);
 
       this.isPlaying = true;
       //console.log( "start : "+position, this);
@@ -88,6 +110,12 @@ export default class Instrument extends AudioComponent
       return true;
 		}
 
+
+		public command( action:ICommand )
+		{
+			// do something with this data...
+		}
+		
 		public pitchBend( program:number, delay:number=0)
 	  {
 			// pitch bend

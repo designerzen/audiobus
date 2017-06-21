@@ -1,174 +1,486 @@
+import ICommand from '../../ICommand';
 import MidiCommand from './MidiCommand';
 import MidiCommandFactory from './MidiCommandFactory';
+import PromiseQueue from '../../timing/PromiseQueue';
 
 export default class MidiHardware
 {
-    public inputID:string = undefined;
-    public outputID:string = undefined;
+  public static PORT_TYPE_INPUT:string = "input";
+  public static PORT_TYPE_OUTPUT:string = "output";
 
+  public static STATE_DISCONNETED:string = "disconnected";
 
-    public static PORT_TYPE_INPUT:string = "input";
-    public static PORT_TYPE_OUTPUT:string = "output";
+  public static PORT_DEVICE_STATE_CONNECTED:string = "connected";
+  public static PORT_DEVICE_STATE_DISCONNECTED:string = "disconnected";
 
-    public static STATE_DISCONNETED:string = "disconnected";
+  public static PORT_CONNECTION_STATE_OPEN:string = "open" ;
+  public static PORT_CONNECTION_STATE_CLOSED:string = "closed";
+  public static PORT_CONNECTION_STATE_PENDING:string = "pending";
 
-    public static PORT_DEVICE_STATE_CONNECTED:string = "connected";
-    public static PORT_DEVICE_STATE_DISCONNECTED:string = "disconnected";
+  public state:string = MidiHardware.STATE_DISCONNETED;
+  
+  public connecting:boolean = false;
+  public connectionQueue:PromiseQueue;
 
-    public static PORT_CONNECTION_STATE_OPEN:string = "open" ;
-    public static PORT_CONNECTION_STATE_CLOSED:string = "closed";
-    public static PORT_CONNECTION_STATE_PENDING:string = "pending";
+  // you should piggyback these!
+  public onmidiconnected:Function = function(message:MidiCommand){};
+  public onmididisconnected:Function = function(message:MidiCommand){};
+  public onmidimessage:Function = function(message:MidiCommand){};
 
-    public state:string = MidiHardware.STATE_DISCONNETED;
+  public midiAccess:WebMidi.MIDIAccess;
 
-    public available:boolean = false;
-    public availableIn:boolean = false;
-    public availableOut:boolean = false;
+  private messagePool:Array<MidiCommand>;
 
-    public connectedInput:WebMidi.MIDIInput;
-    public connectedOutput:WebMidi.MIDIOutput;
+  public get available():boolean
+  {
+    return !!this.midiAccess;
+  }
 
-    public onmidiconnected:Function = function(message:MidiCommand){};
-    public onmididisconnected:Function = function(message:MidiCommand){};
-    public onmidimessage:Function = function(message:MidiCommand){};
+  constructor(  )
+  {
+    
+  }
 
-    public midiAccess:WebMidi.MIDIAccess;
+  public access():Promise<WebMidi.MIDIAccess>
+  {
+    const promise:Promise<WebMidi.MIDIAccess> = new Promise<WebMidi.MIDIAccess>( (resolve:{(access:WebMidi.MIDIAccess):void}, reject) => {
 
-    private messagePool:Array<MidiCommand>;
+      //console.error(this.midiAccess);
+      
+      if (this.midiAccess)
+      {
+        // we already have!
+        //console.error("cached",this.midiAccess);
+        resolve(this.midiAccess);
 
-    constructor(  )
-    {
+      }else if (this.connecting){
 
-    }
-
-    public static frequencyFromNote(note:number):number
-    {
-        return 440 * Math.pow(2, (note - 69) / 12);
-    }
-
-    public connect( requestedDevice:string=undefined ):Promise<Array<WebMidi.MIDIInput>>
-    {
-        if (requestedDevice)
-        {
-          console.log('looking for midi device '+requestedDevice );
-        }else{
-          console.log('looking for all midi devices' );
+        // check to see if we are waiting for a previous resolution...
+        //console.error("pending"); 
+        // add promise to the queue...
+        if (!this.connectionQueue)
+        { 
+          this.connectionQueue = new PromiseQueue();
         }
+        this.connectionQueue.add( resolve, reject );
+        
+      }else if (navigator.requestMIDIAccess){
 
-        return new Promise<Array<WebMidi.MIDIInput>>((resolve, reject) => {
+        // fetch it from navigator..
+        //console.error("fresh"); 
+        this.connecting = true;
+        // request MIDI access     
+        navigator.requestMIDIAccess({
+                      // set to true if you need to send sysex messages
+                      sysex: true
+                  }).then(
+        
+                    // Success!
+                    (access: WebMidi.MIDIAccess) => {
+                      this.midiAccess = access;
+                      this.connecting = false;
+                      resolve(access);
+                      // resolve all of our subsequent queues...
+                      this.connectionQueue && this.connectionQueue.resolve(access);
+                      this.connectionQueue = null;
+                    },
+        
+                    // Failure
+                    (event) => {
+                      const message:String = "No MIDI devices located";
+                      this.connecting = false;
+                      reject(message);
+                      // reject all of our subsequent queues...
+                      this.connectionQueue && this.connectionQueue.reject(message);
+                      this.connectionQueue = null;
+                   }
+                );
+        
+        } else {
+          
+          reject("No MIDI support in this browser");
+        }
+        
+      });
+      
+      return promise;
+  }
 
-          // request MIDI access
-          if (navigator.requestMIDIAccess)
+  // for chaining it returns itself :)
+  public establish():Promise<MidiHardware>
+  {
+    return new Promise<MidiHardware>((resolve, reject) => {
+      
+      // much cleaner...
+      this.access().then(
+        
+        (access: WebMidi.MIDIAccess) => {
+          // now watch for events...
+          console.log("MIDI ESTABLISHED ACES");
+
+          access.onstatechange = (event: WebMidi.MIDIConnectionEvent) => {
+            // do something on change?
+            console.log("MIDI STATE ",event);
+            const port = event.port;
+            
+          };
+          resolve(this);
+        
+        
+        },
+        
+        // Failure
+        (error:string) => {
+          console.error('midi hardwarre not found' );
+          reject(error);
+        }  
+      );
+
+    });
+
+  }
+
+  private checkDevice( values:{ id?:string, manufacturer?:string, name?:string, version?:string, type?:string}, requested:{ id?:string, manufacturer?:string, name?:string, version?:string}, type:string ):boolean
+  {
+    let matched:boolean = false;
+    // compare!
+    // id first...
+    if (values.type === MidiHardware.PORT_TYPE_INPUT)
+    {
+        return true;
+    }
+    if (values.id === requested.id)
+    {
+        return true;
+    }
+    if (values.name === requested.name)
+    {
+        return true;
+    }
+  }
+
+  public findInputDevice(requested:{ id?:string, manufacturer?:string, name?:string, version?:string}):WebMidi.MIDIInput
+  {
+    const devices:Array<WebMidi.MIDIInput> = [];
+    const inputs:WebMidi.MIDIInputMap = this.midiAccess.inputs;
+    const inputValues = inputs.values();
+    //console.log("MIDI findInputDevice from", inputs,inputValues);
+
+
+    let values:WebMidi.MIDIInput = requested.id ? inputs.get(requested.id) : undefined; 
+    console.error( "Using get id command("+requested.id+")",values );
+    if(values)
+    {
+      return values;
+    }
+    
+    for (let input = inputValues.next(); input && !input.done; input = inputValues.next())
+    {
+      values = input.value;
+      let matched:boolean = false;
+
+      
+      //console.log("MIDI findInputDevice..", input,values);
+      
+      // if (values.type !== MidiHardware.PORT_TYPE_INPUT)
+      // {
+      //   // this one is of the wrong type!
+      //   continue;
+      // }
+      if (values.id === requested.id)
+      {
+          matched = true;
+      }
+      if (values.name === requested.name)
+      {
+          matched = true;
+      }
+      
+      if (matched)
+      {
+        devices.push( values );
+      }
+    }
+    // if there are more than one, loop through and make more tests...
+    if (devices.length > 1)
+    {
+      // too many...
+      devices.forEach( (device)=>{
+        // manufacturer...
+        if (requested.manufacturer && device.manufacturer && device.manufacturer.toLowerCase() === requested.manufacturer.toLowerCase())
+        {
+            return device;
+        }
+      })
+
+    }else if (devices.length === 0){
+      // too few...
+      return null;
+    }else{
+      // just right!
+      return devices[0];
+    }
+  }
+
+  
+  public findOutputDevice(requested:{ id?:string, manufacturer?:string, name?:string, version?:string}):WebMidi.MIDIOutput
+  {
+    const devices:Array<WebMidi.MIDIOutput> = [];
+    const outputs:WebMidi.MIDIOutputMap = this.midiAccess.outputs;
+    const outputValues = outputs.values();
+  
+    for (let output = outputValues.next(); output && !output.done; output = outputValues.next())
+    {
+      const values:WebMidi.MIDIOutput = output.value;
+      let matched:boolean = false;
+      if (values.id && requested.id && values.id === requested.id)
+      {
+          matched = true;
+      }
+      if (values.name && requested.name && values.name === requested.name)
+      {
+          matched = true;
+      }
+      
+      if (matched)
+      {
+        devices.push( values );
+      }
+      //console.log(devices,values.name ,requested.name );
+      
+    }
+    // if there are more than one, loop through and make more tests...
+    if (devices.length > 1)
+    {
+      // too many...
+      devices.forEach( (device)=>{
+        // manufacturer...
+        if (requested.manufacturer && device.manufacturer && device.manufacturer.toLowerCase() === requested.manufacturer.toLowerCase())
+        {
+            return device;
+        }
+      })
+
+    }else if (devices.length === 0){
+      // too few...
+      return null;
+    }else{
+      // just right!
+      return devices[0];
+    }
+    
+  }
+  
+  // type:'input' id: 'input-0' manufacturer: 'Microsoft Corporation' name
+  public getInputDevice( device:{ id?:string, manufacturer?:string, name?:string, version?:string} ):Promise<WebMidi.MIDIInput>
+  {
+  
+    return new Promise<WebMidi.MIDIInput>((resolve, reject) => {
+      
+      // much cleaner...
+      this.access().then(
+        
+        (access: WebMidi.MIDIAccess) => {
+
+          let input:WebMidi.MIDIInput = this.findInputDevice( device );
+
+          // check to see if we have a device...
+          if (input)
           {
-              navigator.requestMIDIAccess({
-                  sysex: false
-              }).then(
-
-                // Success!
-                (event) => {
-
-                  this.onMIDISuccess(event);
-
-                  // Now connect to out input port if possible
-                  if (requestedDevice)
-                  {
-                      this.connectedInput = this.connectInput( requestedDevice );
-                      // we can check to see if this has succeeded or not
-                      if (this.connectedInput)
-                      {
-
-                        console.log('midi hardwarre located' );
-                        resolve( [this.connectedInput] );
-                      }else{
-                        console.error('midi hardwarre not found' );
-                        reject("No MIDI devices found with the name "+requestedDevice);
-                      }
-                  }else{
-                      // if we requested a specific device... let us search for it...
-                      const allInputs = this.getInputs();
-                      if (allInputs.length)
-                      {
-                        console.log('midi hardware :',allInputs );
-                        resolve( allInputs );
-                      }else{
-                        // gah, no devices...
-                        reject("No MIDI devices plugged in");
-                      }
-
-                  }
-
-                },
-
-                // Failure
-                (event) => {
-                  this.onMIDIFailure(event);
-                  console.error('midi hardwarre not found' );
-                  reject("No MIDI devices located");
-               }
-            );
-
-          } else {
-
-              this.onMIDIFailure(null);
-              console.error('midi in browser not supported' );
-              reject("No MIDI support in this browser");
-          }
-
-        });
-    }
-
-    // INPUT --------------------------------------------------------------
-
-    private connectInput( deviceName:string ):WebMidi.MIDIInput
-    {
-        // now check to see that we have an input with that id
-        var input:WebMidi.MIDIInput = this.getInput( deviceName );
-
-        // check to see if this device was located...
-        if (input)
-        {
-            // success, device located
-            input.onmidimessage = (event: WebMidi.MIDIMessageEvent)=>{
-                this.onMIDIMessage(event);
+            resolve(input);
+          }else{
+            // ah rats... there isn't a midi device with that name connected yet :(
+            // now let's wait on some status updates...
+            access.onstatechange = (event: WebMidi.MIDIConnectionEvent) => {
+              
+              console.log("MIDI State change..", event);
+              // check to see if the device is now available!
+              const port:WebMidi.MIDIPort = event.port;
+              const state:string = port.state;
+              const name:string = port.name;
+              const type:string = port.type;
+              
+              
+              resolve( input );
+              
             };
-            // ensure that there are more than zero devices...
-            this.availableIn = true;
+          }
+        
+        },
+        
+        // Failure
+        (error:string) => {
+          console.error('midi hardwarre not found' );
+          reject(error);
+        }  
+      );
 
-            return input;
-        }else{
-            // we got no MIDI device with that name
-            this.availableIn = false;
-        }
-        return null;
-    }
+    });
+  }
+  
+  // type:'input' id: 'input-0' manufacturer: 'Microsoft Corporation' name
+  public getOutputDevice( device:{ id?:string, manufacturer?:string, name?:string, version?:string} ):Promise<WebMidi.MIDIOutput>
+  {
+  
+    return new Promise<WebMidi.MIDIOutput>((resolve, reject) => {
+      // much cleaner...
+      this.access().then(
+        
+        (access: WebMidi.MIDIAccess) => {
+          let output:WebMidi.MIDIOutput = this.findOutputDevice( device );
+          
+          // check to see if we have a device...
+          if (output)
+          {
+            resolve(output);
+          }else{
+            // ah rats... there isn't a midi device with that name connected yet :(
+            // now let's wait on some status updates...
+            access.onstatechange = (event: WebMidi.MIDIConnectionEvent) => {
+              
+              console.log("MIDI State change..", event);
+              // check to see if the device is now available!
+              const port:WebMidi.MIDIPort = event.port;
+              const state:string = port.state;
+              const name:string = port.name;
+              const type:string = port.type;
+              
+              
+              resolve( output );
+              
+            };
+          }
+        
+        },
+        
+        // Failure
+        (error:string) => {
+          console.error('midi hardware not found' );
+          reject(error);
+        }  
+      );
 
-    // success
-    private onMIDISuccess( access: WebMidi.MIDIAccess ):void
-    {
-        this.messagePool = new Array();
-        this.available = true;
-        this.midiAccess = access;
+    });
+  }
+  // 
+  // public connect( requestedInputDevice:string=undefined, requestedOutputDevice:string=undefined, wait:boolean=true ):Promise<Array<WebMidi.MIDIInput>>
+  // {
+  //     if (requestedInputDevice)
+  //     {
+  //       console.log('looking for midi input device '+requestedInputDevice );
+  //     }else{
+  //       console.log('looking for all midi input devices' );
+  //     }
+  //     if (requestedOutputDevice)
+  //     {
+  //       console.log('looking for midi output device '+requestedOutputDevice );
+  //     }else{
+  //       console.log('looking for all midi output devices' );
+  //     }
+  // 
+  //     return new Promise<Array<WebMidi.MIDIInput>>((resolve, reject) => {
+  // 
+  //       // request MIDI access
+  //       if (navigator.requestMIDIAccess)
+  //       {
+  //           navigator.requestMIDIAccess({
+  //               sysex: false
+  //           }).then(
+  // 
+  //             // Success!
+  //             (access: WebMidi.MIDIAccess) => {
+  // 
+  //               this.onMIDISuccess( access );
+  //               
+  //               // if we requested a specific device... let us search for it...
+  //               if (requestedOutputDevice)
+  //               {
+  //                 // this.connectedOutput = this.getOutput( requestedInputDevice );
+  //                 // if (this.connectedOutput)
+  //                 // {
+  //                 // 
+  //                 // }
+  //               }
+  //               // Now connect to out input port if possible
+  //               if (requestedInputDevice)
+  //               {
+  //                   this.connectedInput = this.getInput( requestedInputDevice );
+  //                   
+  //                   // we can check to see if this has succeeded or not
+  //                   if (this.connectedInput)
+  //                   {
+  //                     // success, device located... monitor for inputs?
+  //                     this.connectedInput.onmidimessage = (event: WebMidi.MIDIMessageEvent)=>{
+  //                         this.onMIDIMessage(event);
+  //                     };
+  //                     
+  //                     console.log('midi input hardware located and connected to',this.connectedInput );
+  //                     resolve( [this.connectedInput] );
+  //                   }else{
+  //                     console.error('midi hardware not found' );
+  //                     //reject("No MIDI devices found with the name "+requestedInputDevice);
+  //                   }
+  //                   
+  //                   
+  //                   // listen for connect/disconnect message(s) and react differently
+  //                   // depending on whether we are still waiting for the device to become
+  //                   // available...
+  //                   if (!this.connectedInput && wait)
+  //                   {
+  //                     // now wait for the device to become available...
+  //                     this.midiAccess.onstatechange = (event: WebMidi.MIDIConnectionEvent) => {
+  //                       console.log("MIDI State change..", event);
+  //                       // check to see if the device is now available!
+  //                       const port:WebMidi.MIDIPort = event.port;
+  //                       const nowAvailable:boolean = this.checkConnectionStatus( port, requestedInputDevice );
+  //                       this.onStateChange (event);
+  // 
+  //                       if (nowAvailable)
+  //                       {
+  //                         resolve( [this.connectedInput] );
+  //                       }
+  //                     };
+  //                   }
+  //                   
+  //               }else{
+  //                 
+  //                 // as no specific device was specified, we instead return all
+  //                   const allInputs = this.getInputs();
+  //                   if (allInputs.length)
+  //                   {
+  //                     console.log('midi hardware :',allInputs );
+  //                     resolve( allInputs );
+  //                   }else{
+  //                     // gah, no devices...
+  //                     reject("No MIDI devices plugged in");
+  //                   }
+  // 
+  //               }
+  // 
+  //             },
+  // 
+  //             // Failure
+  //             (event) => {
+  //               this.onMIDIFailure(event);
+  //               console.error('midi hardwarre not found' );
+  //               reject("No MIDI devices located");
+  //            }
+  //         );
+  // 
+  //       } else {
+  // 
+  //           this.onMIDIFailure(null);
+  //           console.error('midi in browser not supported' );
+  //           reject("No MIDI support in this browser");
+  //       }
+  // 
+  //     });
+  //   }
 
-
-        // Now connect to our output port
-        this.getOutputs();
-
-        /*
-        // now do outputs!
-        var values = output.value;
-        console.log("Input port : [ type:'" + values.type + "' id: '" + values.id +
-            "' manufacturer: '" + values.manufacturer + "' name: '" + values.name +
-            "' version: '" + values.version + "']");
-        */
-
-        // listen for connect/disconnect message
-        this.midiAccess.onstatechange = (event: WebMidi.MIDIConnectionEvent) => {
-            this.onStateChange (event);
-        };
-    }
+    // INPUT -------------------------------------------------------------    
 
     // try and retrieve an existing input (or null)
-    private getInput(name:string):WebMidi.MIDIInput
+    public getInput(name:string):WebMidi.MIDIInput
     {
         const inputs:WebMidi.MIDIInputMap = this.midiAccess.inputs;
         const inputValues = inputs.values();
@@ -184,8 +496,7 @@ export default class MidiHardware
         return null;
     }
 
-
-    private getInputs():Array<WebMidi.MIDIInput>
+    public getInputs():Array<WebMidi.MIDIInput>
     {
         const inputs:WebMidi.MIDIInputMap = this.midiAccess.inputs;
         const inputValues = inputs.values();
@@ -212,7 +523,62 @@ export default class MidiHardware
         }
         return devices;
     }
+    // success
+    private onMIDISuccess( access: WebMidi.MIDIAccess ):void
+    {
+        this.messagePool = new Array();
+        this.midiAccess = access;
+    
+    
+        /*
+        // now do outputs!
+        var values = output.value;
+        console.log("Input port : [ type:'" + values.type + "' id: '" + values.id +
+            "' manufacturer: '" + values.manufacturer + "' name: '" + values.name +
+            "' version: '" + values.version + "']");
+        */
+    
+    }
 
+    // if we are waiting for a named device to become available...
+    private checkConnectionStatus(port: WebMidi.MIDIPort, requestedInputDevice:string=undefined ):boolean
+    {
+      const state:string = port.state;
+      const name:string = port.name;
+      const type:string = port.type;
+      switch(port.type)
+      {
+          case MidiHardware.PORT_DEVICE_STATE_CONNECTED:
+            console.log("MIDI STATUS CONNECT"+"Device connected!");
+            if ( this.available )
+            {
+                // re-attempt to connect
+                const input = this.getInput( requestedInputDevice );
+                if (input)
+                {
+                  return true;
+                }else{
+                  return false;
+                }
+            }
+            break;
+
+          case MidiHardware.PORT_DEVICE_STATE_DISCONNECTED:
+          
+              console.log("MIDI STATUS DISCONNECT"+"name", name, "port", port, "state", state);
+              if (name === requestedInputDevice)
+              {
+                  // we have disconnected device!
+                  return false;
+
+              }
+
+
+              break;
+      }
+      return true;
+    }
+    
     private onStateChange(event: WebMidi.MIDIConnectionEvent)
     {
         var port:WebMidi.MIDIPort = event.port,
@@ -220,31 +586,16 @@ export default class MidiHardware
             name:string = port.name,
             type:string = port.type;
 
+        console.log(event);
         switch(type)
         {
             case MidiHardware.PORT_DEVICE_STATE_CONNECTED:
                 console.log("name", name, "port", port, "state", state);
-                if ( !this.connectedInput && this.available && !this.availableIn )
-                {
-                    // re-attempt to connect
-                    this.connectedInput = this.connectInput( this.inputID );
-                }
+                
                 break;
 
             case MidiHardware.PORT_DEVICE_STATE_DISCONNECTED:
                 console.log("name", name, "port", port, "state", state);
-                if (name === this.inputID)
-                {
-                    // we have disconnected input!
-                    this.connectedInput = null;
-                    this.availableIn = false;
-
-                }else if (name === this.outputID){
-
-                    // we have disconnected output!
-                    this.connectedOutput = null;
-                    this.availableOut = false;
-                }
 
                 // close the port
                 port.close();
@@ -257,7 +608,7 @@ export default class MidiHardware
     // EVENT : A MIDI message has been received from the Input
     private onMIDIMessage( event:WebMidi.MIDIMessageEvent )
     {
-        var message:MidiCommand = MidiCommandFactory.create( event.data);
+        const message:MidiCommand = MidiCommandFactory.create( event.data);
         this.onmidimessage.call(this, message);     // now dispatch this event...
         //console.log('data', data, 'cmd', cmd, 'channel', channel);
     }
@@ -265,14 +616,13 @@ export default class MidiHardware
     // failure
     private onMIDIFailure(e:WebMidi.MIDIMessageEvent):void
     {
-        this.available = false;
         console.log("No access to MIDI devices or your browser doesn't support WebMIDI API. Please use WebMIDIAPIShim " + e);
     }
 
 
 
     // OUTPUT --------------------------------------------------------------
-    private getOutput(name:string):WebMidi.MIDIOutput
+    public getOutput(name:string):WebMidi.MIDIOutput
     {
         var outputs:WebMidi.MIDIOutputMap = this.midiAccess.outputs;
         var outputValues = outputs.values();
@@ -288,79 +638,39 @@ export default class MidiHardware
         return null;
     }
 
-    private getOutputs()
+    public getOutputs():Array<WebMidi.MIDIOutput>
     {
-        var outputs:WebMidi.MIDIOutputMap = this.midiAccess.outputs;
-        var outputValues = outputs.values();
+      const outputs:WebMidi.MIDIOutputMap = this.midiAccess.outputs;
+      const outputValues = outputs.values();
+      const devices:Array<WebMidi.MIDIOutput> = [];
+
+      console.log(outputs,outputValues);
+      // Things you can do with the MIDIAccess object:
+      //  var inputs = this.midiAccess.inputs; // inputs = MIDIInputMaps, you can retrieve the inputs with iterators
+      //  var outputs = this.midiAccess.outputs; // outputs = MIDIOutputMaps, you can retrieve the outputs with iterators
+
+      // loop through all inputs
+      for (let input = outputValues.next(); input && !input.done; input = outputValues.next())
+      {
+          const values:WebMidi.MIDIOutput = input.value;
+          console.log("Input port : [ type:'" + values.type + "' id: '" + values.id +
+              "' manufacturer: '" + values.manufacturer + "' name: '" + values.name +
+              "' version: '" + values.version + "']");
+
+          // listen for midi messages
+          // input.value.onmidimessage = (event: WebMidi.MIDIMessageEvent)=>{
+          //     this.onMIDIMessage(event);
+          // };
+          devices.push( values );
+      }
+      return devices;
     }
 
     // use a midi event to send to the hardware
-    public send( command:MidiCommand )
+    public send( output:WebMidi.MIDIOutput, command:ICommand )
     {
-        this.connectedOutput.send( [ Number(command.data) ], command.deltaTime * 1000);
+      // if we are still trying to connect then we defer this until the promise has resolved...
+      output.send( [ Number(command.data) ], command.deltaTime * 1000);
     }
-    /*
-    // MIDI send
-    public send(data, delay)
-    { // set channel volume
-		this.connectedOutput.send(data, delay * 1000);
-	}
 
-	public setController(channel, type, value, delay)
-    {
-		this.connectedOutput.send([channel, type, value], delay * 1000);
-	}
-
-	public setVolume(channel, volume, delay)
-    { // set channel volume
-		this.connectedOutput.send([0xB0 + channel, 0x07, volume], delay * 1000);
-	}
-
-	public programChange(channel, program, delay)
-    { // change patch (instrument)
-		this.connectedOutput.send([0xC0 + channel, program], delay * 1000);
-	}
-
-	public pitchBend(channel, program, delay)
-    { // pitch bend
-		this.connectedOutput.send([0xE0 + channel, program], delay * 1000);
-	}
-
-	public noteOn(channel, note, velocity, delay)
-    {
-		this.connectedOutput.send([0x90 + channel, note, velocity], delay * 1000);
-	}
-
-	public noteOff(channel, note, delay)
-    {
-		this.connectedOutput.send([0x80 + channel, note, 0], delay * 1000);
-	}
-
-	public chordOn(channel, chord, velocity, delay)
-    {
-		for (var n = 0; n < chord.length; n ++)
-        {
-			var note = chord[n];
-			this.connectedOutput.send([0x90 + channel, note, velocity], delay * 1000);
-		}
-	}
-
-	public chordOff(channel, chord, delay)
-    {
-		for (var n = 0; n < chord.length; n ++)
-        {
-			var note = chord[n];
-			this.connectedOutput.send([0x80 + channel, note, 0], delay * 1000);
-		}
-	}
-
-	public stopAllNotes()
-    {
-		this.connectedOutput.cancel();
-		for (var channel = 0; channel < 16; channel ++)
-        {
-			this.connectedOutput.send([0xB0 + channel, 0x7B, 0]);
-		}
-    }
-    */
 }

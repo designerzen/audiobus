@@ -1,3 +1,5 @@
+import Now from './now';
+
 export default class Timer
 {
   public now:Function = () => window.performance && window.performance.now ? window.performance.now() : Date.now();
@@ -15,6 +17,10 @@ export default class Timer
 	protected onProgress:{ (scope:Timer, startTime:number, time:number):void } = (scope:Timer, startTime:number, time:number) => {};
 
 	//protected onprogress:Function;
+  get timeStarted():number
+  {
+    return this.startTime;
+  }
 
 	get isPlaying():boolean
 	{

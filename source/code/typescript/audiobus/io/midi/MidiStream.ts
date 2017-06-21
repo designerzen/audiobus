@@ -16,9 +16,14 @@ export default class MidiStream
     private position:number = 0;
     private str:string;
 
+    public set data(str:string)
+    {
+      this.str = str;
+    }
+
     constructor(str:string)
     {
-        this.str = str;
+        this.data = str;
     }
 
     // Data management
@@ -56,9 +61,9 @@ export default class MidiStream
   {
 		var result = this.str.charCodeAt(this.position);
 		if (signed && result > 127)
-        {
-            result -= 256;
-        }
+    {
+        result -= 256;
+    }
 		this.position += 1;
 		return result;
 	}

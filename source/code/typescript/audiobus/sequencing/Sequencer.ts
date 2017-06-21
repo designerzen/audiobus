@@ -1,8 +1,13 @@
-import Timer from './Timer';
+import Timer from '../timing/Timer';
 import ICommand from '../ICommand';
+import ITrack from '../ITrack';
 
 export default class Sequencer
 {
+
+	// a collection of ITracks to play :)
+	protected tracks:Array<ITrack> = [];
+
 	// where are we up to in the sequence in ms?
 	protected position:number = 0;
 	protected lastTimeStamp:number = 0;
@@ -12,10 +17,17 @@ export default class Sequencer
 	protected length:number = -1;
 
 	// place to store our commands...
-	public tracks:Array<ICommand> = [];
+	public commands:Array<ICommand> = [];
 	public positions:object = {};
 
 	private timer:Timer= new Timer();
+
+	protected onEvents:{ (scope:Sequencer, event:ICommand, elapsed:number):void; } = (scope:Sequencer, event:ICommand, elapsed:number) => {};
+
+	public set onEvent( method:{ (scope:Sequencer, event:ICommand, elapsed:number):void; } )
+	{
+		this.onEvents = method;
+	}
 
 	constructor()
 	{
@@ -48,20 +60,38 @@ export default class Sequencer
 		this.checkCommandsAtPosition( time );
 	}
 
+	// midi is added using a running count...
+	private previousTime:number = 0;
+	
 	public add( command:ICommand )
 	{
 		// sets the cue
+		const position:number = this.previousTime + command.deltaTime + 400;
+		command.timeCode = position;
 		//this.commands.push( command );
 		// and stores an instance in the dictionary with the time key
 		//this.timings[command.] = command;
-		if (!this.positions[command.deltaTime])
+		if (!this.positions[position])
 		{
-			this.positions[command.deltaTime] = [command];
+			this.positions[position] = [command];
 		}else{
-			this.positions[command.deltaTime].push(command);
+			this.positions[position].push(command);
 		}
+		// if (!this.positions[command.deltaTime])
+		// {
+		// 	this.positions[command.deltaTime] = [command];
+		// }else{
+		// 	this.positions[command.deltaTime].push(command);
+		// }
 
-		this.tracks.push(command);
+		
+		// now as we add each command individually, we can dictate when their
+		// appropriate time point is going to be
+		//console.log("Command!", command, position );
+
+		this.commands.push(command);
+		
+		this.previousTime = position;
 	}
 
 	public addTracks( commands:Array<ICommand> )
@@ -118,7 +148,11 @@ export default class Sequencer
 		if (commands && commands.length )
 		{
 			console.log("Sequencing", elapsed, commands );
-			// now send
+			// now send out all of them!
+			commands.forEach( (command)=>{
+				this.onEvents( this, command, elapsed );
+			});
+			
 		}
 
 	}

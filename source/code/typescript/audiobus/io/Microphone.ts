@@ -12,7 +12,7 @@ export default class Microphone extends AudioComponent
 		super(audioContext);
 	}
 
-	public getMic():Promise<MediaStreamAudioSourceNode>
+	public fetch():Promise<MediaStreamAudioSourceNode>
 	{
 		return new Promise<MediaStreamAudioSourceNode>((resolve, reject) => {
 
@@ -25,8 +25,15 @@ export default class Microphone extends AudioComponent
 				(streamSource:MediaStream)=>{
 
 					// Success
-					this.onMicAvailable(streamSource);
-					resolve(this.stream);
+					const success:boolean = this.determineMicAvailability(streamSource);
+					if (success)
+					{
+						this.onMicAvailable();
+						resolve(this.stream);
+					}else{
+						this.onMicUnAvailable(null);
+						reject("User may have cancelled permissions...");
+					}
 
 				},
 				// MediaStreamError
@@ -44,13 +51,27 @@ export default class Microphone extends AudioComponent
 	}
 
 	// success callback when requesting audio input stream
-	private onMicAvailable(streamSource:MediaStream):void
+	private determineMicAvailability(streamSource:MediaStream):boolean
 	{
 		// Create an AudioNode from the stream.
 		this.source = streamSource;
+		
+		try{
+			this.stream = this.context.createMediaStreamSource( streamSource );
+			//this.input = this.stream;
+			this.outputGainNode.connect(this.stream);
+			
+		}catch(error){
+			this.state = "disconnected";
+			return false;
+		}
+		return true;
+	}
+	
+	// success callback when requesting audio input stream
+	private onMicAvailable():void
+	{
 		this.state = "connected";
-		this.stream = this.context.createMediaStreamSource( streamSource );
-		this.gainNode.connect(this.stream);
 	}
 
 	private onMicUnAvailable( error:MediaStreamError ):void
