@@ -46,6 +46,11 @@ export default class Engine
 
   public static context:AudioContext;
 
+  constructor()
+  {
+    throw Error("Engine should not be created with new()");
+  }
+  
   public static get channelCount():number
   {
     return Engine.context ? Engine.context.destination.channelCount : -1;
@@ -68,7 +73,7 @@ export default class Engine
   {
     return Engine.context ? Engine.context.destination : null;
   }
-  
+
   public static connect( source:AudioNode ):void
   {
     source.connect( Engine.output );
@@ -79,7 +84,7 @@ export default class Engine
 	  if (Engine.context)
 		{
 			return Engine.context;
-		};
+		}
 
 		try {
 
