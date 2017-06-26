@@ -54,15 +54,17 @@ export default class MidiFileDecoder
   // (ie. just its data bytes are sent) as long as the previous, transmitted message had the same Status
   private lastEventTypeByte:number;
 
-  constructor()
+  constructor( )
   {
 
   }
 
-  public decode( stream:MidiStream ):MidiTrack
+  public decode( stream:MidiStream,name?:string  ):MidiTrack
   {
+    // we can specify a name here for the output file
+    // but if midi header data exists, it will be overwritten...
     const header:MidiHeader = this.decodeHeader( stream );
-    const track:MidiTrack = new MidiTrack( header );
+    const track:MidiTrack = new MidiTrack( header, name );
     return this.decodeTracks( track, stream );
   }
 
@@ -202,9 +204,18 @@ export default class MidiFileDecoder
       return this.decodeSystemEvent( stream, event, eventTypeByte);
 
     } else {
-
+      const channelEvent = this.decodeChannelEvent( stream, event, eventTypeByte);
+      // check the command to see if it also impacts upon the track...
+      switch (channelEvent.subtype )
+      {
+        case MidiCommand.COMMAND_PROGRAM_CHANGE:
+          // Add instrument to Track...
+          // const instrument = "";
+          //track.instruments.push(instrument);
+          break;
+      }
       // Channel event
-      return this.decodeChannelEvent( stream, event, eventTypeByte);
+      return channelEvent;//track
     }
   }
 
@@ -329,6 +340,7 @@ export default class MidiFileDecoder
           } else {
             event.subtype = MidiCommand.COMMAND_NOTE_ON;//'noteOn';
           }
+          // TODO: General MIDI instrument...
           return event;
 
         case MidiEventCodes.NOTE_AFTER_TOUCH:
@@ -345,6 +357,7 @@ export default class MidiFileDecoder
 
         // Program Change or Patch Change
         case MidiEventCodes.PROGRAM_CHANGE:
+          // This changes
           event.subtype = MidiCommand.COMMAND_PROGRAM_CHANGE;
           event.programNumber = paramater1;
           return event;

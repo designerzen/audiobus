@@ -20,7 +20,7 @@ import MidiCommand from './MidiCommand';
 import MidiHardware from './MidiHardware';
 import MidiCommandFactory from './MidiCommandFactory';
 import {MidiCommandCodes,MidiChannelMessages} from './MidiCodes';
-import Now from '../../timing/now';
+import TimeNow from '../../timing/TimeNow';
 
 export default class MidiHardwareDevice
 {
@@ -187,7 +187,7 @@ export default class MidiHardwareDevice
     //const data:Array<number> = [];
     let delay:number = action.deltaTime;
 
-    console.error( "command", { subtype:action.subtype, delay, channel} );
+    //console.error( "command", { subtype:action.subtype, delay, channel} );
     switch( action.subtype )
     {
       case MidiCommand.COMMAND_NOTE_OFF:
@@ -239,13 +239,14 @@ export default class MidiHardwareDevice
 
   public send( data:Array<number>, delay:number=0, port?:WebMidi.MIDIOutput ):void
   {
-    const time:number = Now() + (delay*1000);
+    const time:number = TimeNow() + (delay*1000);
+    // omitting the timestamp means send immediately...
     if (port)
     {
-      console.error("Sending MIDI OUT : ", data, delay, port);
+      //console.error("Sending MIDI OUT : ", data, delay, port);
       port.send(data, time);
     }else{
-      console.error("Sending BULK MIDI OUT : ", data, delay, this.connectedOutputs );
+      //console.error("Sending BULK MIDI OUT : ", data, delay, this.connectedOutputs );
       this.connectedOutputs.forEach( (output:WebMidi.MIDIOutput)=>{
         //console.error("Sending MIDI OUT : ", data, delay, output);
         output.send(data, time);

@@ -1,6 +1,6 @@
 /*//////////////////////////////////////////////////////////////////////////////
 
-MIT Licence
+https://webaudio.github.io/web-midi-api/
 
 Midi Track
 ==============
@@ -19,8 +19,9 @@ export default class MidiTrack implements ITrack
 {
     public header:MidiHeader;
 
+    public instruments:Array<number>;
     public tracks:Array<ICommand>;
-    public positions:object = {};
+    public positions:object;
 
     public fileName:string = "";
     public trackName:string = "";
@@ -36,13 +37,18 @@ export default class MidiTrack implements ITrack
       return this.header ? this.header.ticksPerBeat : -1;
     }
 
-    constructor( header:MidiHeader=undefined )
+    constructor( header:MidiHeader=undefined, name?:string )
     {
       if (header)
       {
         this.header = header;
       }
       this.tracks = [];
+      this.instruments = [];
+      this.positions = {};
+      this.fileName = name;
+      // clean up name as fallback trackname too...
+      this.trackName = name;
     }
 
     private addMetaEvent(event:MidiCommand)

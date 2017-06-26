@@ -36,6 +36,7 @@ export default class MidiCommandFactory
           return event;
 
         // Program Change or Patch Change
+        // This means that the instrument has changed...
         case MidiEventCodes.PROGRAM_CHANGE:
 
           return event;
@@ -209,6 +210,7 @@ export default class MidiCommandFactory
       const command:MidiCommand = new MidiCommand();
       const commandByte:number = eventData[0];
       const type = commandByte & 0xf0; // channel agnostic message type. Thanks, Phil Burk.
+      const eventTypeByte:number = commandByte & 0xf0; // channel agnostic message type. Thanks, Phil Burk.
 
       // store original data
       command.raw = eventData;
@@ -216,14 +218,25 @@ export default class MidiCommandFactory
       // 0.  If zero, then the byte is a data byte, and if one, then the byte is a command byte
       // 1. Command byte
       //command.cmd = commandByte >> 4;
+      const isData:boolean = commandByte >> 4 === 0;
+
+      if ((eventTypeByte & MidiSystemCodes.SYSTEM_EXCLUSIVE) === MidiSystemCodes.SYSTEM_EXCLUSIVE)
+      {
+
+        // SYSTEM EVENT
+        //console.log("Command Factory > System event isData:"+isData);
+      }else{
+        // CHANNEL EVENT!
+        console.log("Command Factory > Channel event isData:"+isData);
+        command.type = MidiCommandFactory.convertChannelMessage( commandByte >> 4 );
+      }
 
       command.channel = commandByte & 0xf;
 
       command.noteNumber = eventData[1] || 0;
       command.velocity = eventData[2] || 0;
 
-      command.type = MidiCommandFactory.convertChannelMessage( commandByte >> 4 );
-      //console.log( this.toString() );
+        //console.log( this.toString() );
 
       //console.error( this.cmd.toString(16),this.channel.toString(16),this.type.toString(16),this.note.toString(16),this.velocity.toString(16) );
       // switch (type)

@@ -99,7 +99,7 @@ private decodeTB3( data:Uint8Array )
       default:
         //console.error("TB3 - onMidiMessage unknown source",event.data);
     }
-    console.log(alias + ':', 'cmd:0x'+event.data[0].toString(16), event.timeStamp,event.data );
+    //console.log(alias + ':', 'cmd:0x'+event.data[0].toString(16), event.timeStamp,event.data );
     super.onMidiMessage( alias, device, event );
   }
 

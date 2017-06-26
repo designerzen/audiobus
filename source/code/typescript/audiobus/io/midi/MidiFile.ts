@@ -74,7 +74,7 @@ export default class MidiFile
               const data:string = this.convertResponse( fetch.responseText || '' );
               const stream:MidiStream = new MidiStream( data );
               const decoder:MidiFileDecoder = new MidiFileDecoder();
-              const track = decoder.decode(stream);
+              const track = decoder.decode(stream,file);
 
               resolve(track);
 
