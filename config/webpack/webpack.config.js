@@ -38,7 +38,7 @@ const rules = [
   Rules.javascript,
   Rules.htmlExtracted,
   Rules.pug,
-  //Rules.pugExtracted,
+  Rules.pugExtracted,
   Rules.fonts,
   Rules.images,
   //Rules.styles,
@@ -48,10 +48,10 @@ const rules = [
 ];
 
 // Add them together
-const plugins = [
+let plugins = [
   //Plugins.appCache,
   //Plugins.forkTsChecker,
-  Plugins.html,
+  //Plugins.html,
   //Plugins.resourceHint,
   //Plugins.styles,
   Plugins.chunksCommon,
@@ -59,6 +59,13 @@ const plugins = [
   Plugins.extractHTML
 ];
 
+// merge both...
+plugins = plugins.concat( Plugins.markup );
+// plugins.push( Plugins.markup[0] );
+console.log(Plugins.markup[0] );
+// plugins.push( Plugins.markup[1] );
+console.log(Plugins.markup[1] );
+console.log('******************************');
 // WEBPACK -----------------------------------------------------------------
 const config = {
 
@@ -89,7 +96,8 @@ const config = {
   target:'web',
 
   // an absolute path, for resolving entry points and loaders from configuration
-  context: Settings.folders.root, // to automatically find tsconfig.json
+  //context: Settings.folders.root, // to automatically find tsconfig.json
+  context: Settings.folders.source, // to automatically resolve using relative paths
 
   // entry point(s)...
   entry: Entry,
@@ -111,7 +119,17 @@ const config = {
     // force extensions
     enforceExtension: false,
     // allow webpack to import files without suffixes
-    extensions: ['.ts', '.tsx', '.js', '.jsx']
+    extensions: ['.ts', '.tsx', '.js', '.jsx','less','mid'],
+    // https://decembersoft.com/posts/say-goodbye-to-relative-paths-in-typescript-imports/
+    alias: {
+      styles:Settings.folders.styles,
+      markup:Settings.folders.markup,
+      midi:Settings.folders.midi,
+      images:Settings.folders.images,
+      fonts:Settings.folders.fonts,
+      assets:Settings.folders.assets,
+      audiobus:Settings.folders.audiobus
+    }
   },
 
   // Statistics to display

@@ -1,5 +1,8 @@
 import Rules from './webpack.rules';
 import Settings from '../settings';
+import Entry from './webpack.entry';
+import FindFiles from '../../utilities/tools/FindFiles';
+import DetermineTemplate from '../../utilities/tools/DetermineTemplate';
 
 import path from 'path';
 // Libs
@@ -30,9 +33,12 @@ const extractStyles = new ExtractTextPlugin({
   // path.join(destination.style, '[name].css')
   //filename: "[name].css",
   filename:  (getPath) => {
+    //as we are using the [name] as the folder...
+    // we will have to assume the folder structure...
     //const name = path.join(Settings.folderNames.styles, '[name].css');  //name already has js ext :(
-    const name = destination.style;
-    return getPath(name).replace('js', 'css');
+    //const name = '[name].[ext]';//destination.style;
+    const name = destination.style;//destination.style;
+    return getPath(name);//.replace('[ext]', 'css');
   },
   disable: false,
   allChunks: true,
@@ -45,8 +51,8 @@ const extractHTML = new ExtractTextPlugin({
   // everything goes into root for now...
   filename:  (getPath) => {
     //console.log("extractHTML",arguments);
-    const name = path.join(Settings.folderNames.styles, '[name].html');  //name already has js ext :(
-    return getPath(name).replace('js', 'html');
+    const name = destination.markup;//path.join(Settings.folderNames.styles, '[name].html');  //name already has js ext :(
+    return getPath(name).replace('audiobus-', '');  // remove namespace...
   },
   //filename: '[name].html',
   disable: false,
@@ -70,8 +76,9 @@ const extractHTML = new ExtractTextPlugin({
 // generates html from our templates :)
 const html = new HtmlWebpackPlugin({
   title: 'audioBus',
-  template:Settings.files.template,
+  template:'!!pug-loader!'+Settings.files.template,
   inject: 'body',
+  // chunks:[]
   hash: true,
     minify: {
     removeComments: true,
@@ -86,6 +93,92 @@ const html = new HtmlWebpackPlugin({
     minifyURLs: true
   }
 });
+
+
+
+const modeUseUniqueFolders = true;
+const templateTypes = ["pug","html"];
+const fallback = path.resolve(  Settings.folders.templates, 'simple.pug' );
+const markup = [];
+
+// now convert our matches to entry points :)
+for (let key in Entry)
+{
+    // skip loop if the property is from prototype
+    if (!Entry.hasOwnProperty(key)) continue;
+    //
+    //
+    const entry = Entry[key];
+    const location = path.dirname(entry);
+    const name = path.basename(entry,'.js');
+    const file = modeUseUniqueFolders ? 'index.html' : name+'.html';//.replace('audiobus-','');
+    const folderName = key.replace('audiobus-','');
+    const isCore = folderName === Settings.folderNames.code;
+
+    const filename = !modeUseUniqueFolders || isCore ? file : path.join(folderName,file);
+
+    const title = isCore ? 'audioBus' : key + ' - audioBus';
+    // find potential templates in the folder...
+    const template = DetermineTemplate( entry, templateTypes, fallback );
+    const templateType = template.substring(template.lastIndexOf('.')+1, template.length);
+
+    const loaderType = templateType+"-loader";
+
+    //const template = Settings.files.template;
+    //const template = path.resolve(  Settings.folders.templates, 'template.pug' );
+    //const template = path.resolve(  Settings.folders.templates, 'simple.pug' );
+  //const chunks = ['common', 'audiobus-drumkit', key ]; // ,key 'audiobus-code',
+    //const chunks = isCore ? ['common','audiobus-code'] : ['common','audiobus-code','audiobus-drumkit']; // ,key
+    const chunks = ['common',key]; // ,keyD
+    const excludeChunks =[];// [key]; // ,keyD
+    console.log( "LOOK HERE", "chunks",chunks, folderName,"/", filename, template );
+    markup.push(
+      new HtmlWebpackPlugin({
+        title: title,
+        // force to use relevant loader here...
+        template:'!!'+loaderType+'!'+template,
+        inject: 'body',
+        chunks: chunks,
+        excludeChunks: excludeChunks,
+        filename: filename,
+        hash: true,
+          minify: {
+          removeComments: true,
+          collapseWhitespace: true,
+          removeRedundantAttributes: true,
+          useShortDoctype: true,
+          removeEmptyAttributes: true,
+          removeStyleLinkTypeAttributes: true,
+          keepClosingSlash: true,
+          minifyJS: true,
+          minifyCSS: true,
+          minifyURLs: true
+        }
+      })
+    );
+}
+const indexPage = new HtmlWebpackPlugin({
+  title: 'audioBus Index page',
+  template:'!!pug-loader!'+Settings.files.templateIndex,
+  filename:'list.html',
+  inject:false,
+  // chunks:[]
+  hash: true,
+  minify: {
+    removeComments: true,
+    collapseWhitespace: true,
+    removeRedundantAttributes: true,
+    useShortDoctype: true,
+    removeEmptyAttributes: true,
+    removeStyleLinkTypeAttributes: true,
+    keepClosingSlash: true,
+    minifyJS: true,
+    minifyCSS: true,
+    minifyURLs: true
+  }
+});
+
+markup.push( indexPage );
 
 // https://github.com/jantimon/resource-hints-webpack-plugin
 // https://www.w3.org/TR/resource-hints/
@@ -108,13 +201,16 @@ const appCache = new AppCachePlugin({
 // speed up builds
 const forkTsChecker = new ForkTsCheckerWebpackPlugin();
 
+
+
+
 // CommonChunksPlugin will now extract all the common modules from main bundles
 const chunksCommon =
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'common',
-       //But since there are no more common modules between them we end up with just the runtime code included in the manifest file
-       filename: 'common.js'
-  });
+  new webpack.optimize.CommonsChunkPlugin({
+    name: 'common',
+     //But since there are no more common modules between them we end up with just the runtime code included in the manifest file
+     filename: destination.scripts.replace('[name]','common')
+});
 
 // PLUGINS -----------------------------------------------------------------
 const plugins = [
@@ -184,6 +280,7 @@ module.exports = {
   appCache,
   forkTsChecker,
   html,
+  markup,
   resourceHint,
   extractStyles,
   extractHTML,

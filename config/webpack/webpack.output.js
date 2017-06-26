@@ -18,15 +18,21 @@ const output = {
    // Alternatively, specify output.hashDigestLength to configure the length globally.
    // Note this option is called filename but you are still allowed to something
    // like "js/[name]/bundle.js" to create a folder structure.
-   filename: 'scripts/[name].[hash:8].js',
+   //filename: path.join('assets','scripts','[name].[hash:8].js'),
+   filename: destination.scripts,
 
    //  chunkFilename: '[chunkhash].js',
+   chunkFilename: '[name].js?[chunkhash]',
+   // chunkFilename: "[id].js",
+   // chunkFilename: "[chunkhash].js", // for long term caching
+   // the filename template for additional chunks
 
   // The output directory as an absolute path.
   // eg. path: path.resolve(__dirname, 'dist/assets')
   // Note that [hash] in this parameter will be replaced with an hash of the compilation.
   // See the Caching guide for details.
-  path: path.resolve(destination.root),
+  path: path.resolve(destination.root, 'test'),
+  //path.resolve(destination.root),
 
   // library: "MyLibrary", // string,
   // the name of the exported library
@@ -51,10 +57,6 @@ const output = {
   // should not be used for production
   // pathinfo: true, // boolean
   // include useful path info about modules, exports, requests, etc. into the generated code
-  //
-  // chunkFilename: "[id].js",
-  // chunkFilename: "[chunkhash].js", // for long term caching
-  // the filename template for additional chunks
   //
   // jsonpFunction: "myWebpackJsonp", // string
   // name of the JSONP function used to load chunks

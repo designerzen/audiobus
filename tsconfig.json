@@ -29,5 +29,8 @@
         "dist",
         "release",
         "examples"
-    ]
+    ],
+    "paths": {
+      "audiobus/*": [ "source/code/typescript/audiobus/*" ]
+    }
 }

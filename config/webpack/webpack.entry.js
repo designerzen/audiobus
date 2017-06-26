@@ -1,6 +1,7 @@
 import Settings from '../settings';
 import FindFiles from '../../utilities/tools/FindFiles';
 import glob from 'glob';
+import path from 'path';
 
 // this "reads" files that it considers as entry points.
 // for the sake of easy management, it is just looking for index.ejs files
@@ -21,7 +22,7 @@ const startPath = Settings.folders.source;
 
 const entryPoints = {};
 
-const filter = ".js";
+const filter = "js";
 
 const matches = FindFiles( startPath, filter );
 
@@ -32,13 +33,15 @@ const matches = FindFiles( startPath, filter );
 // };
 // now convert our matches to entry points :)
 matches.forEach( (match)=>{
-  console.log("match",match);
-  const folderName = match.folder;
-  const appName = "audiobus-"+ match.name;
-  entryPoints[appName] = match.file;
+  const folderPath = match.folder;//path.dirName(match.folder);
+  const folderName = folderPath.substring( folderPath.lastIndexOf(path.sep)+1 );// folderPath.replace(/[\\\/][^\\\/]*$/, '');//.substring(folderPath.lastIndexOf("/")+1, -1);
+  const appName = match.name.substring( 0, match.name.lastIndexOf('.') );
+  const entryPoint = "audiobus-"+folderName;//+"-"+ appName;
+  //console.log("match",folderPath,folderName,appName, entryPoint);
+  entryPoints[entryPoint] = match.file;
 })
 
 // hard coded ones
-entryPoints.app  = Settings.files.index;
+//entryPoints.app  = Settings.files.index;
 
 module.exports = entryPoints;

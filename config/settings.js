@@ -39,9 +39,11 @@ const folders             = {};
   folders.source          = path.resolve(folders.root, 'source');
   folders.code            = path.resolve(folders.source, 'code');
   folders.typescript      = path.resolve(folders.code, 'typescript');
+  folders.audiobus        = path.resolve(folders.typescript, 'audiobus');
   folders.assets          = path.resolve(folders.source, 'assets');
   folders.fonts           = path.resolve(folders.assets, 'fonts');
   folders.images          = path.resolve(folders.assets, 'images');
+  folders.midi            = path.resolve(folders.assets, 'midi');
   folders.styles          = path.resolve(folders.assets, 'styles');
   folders.markup          = path.resolve(folders.source, 'markup');
 
@@ -73,6 +75,7 @@ const files = {};
   files.webpackConfig = path.resolve(folders.config,'webpack','webpack.config.js');
   files.tsConfig = path.resolve(folders.config,'typescript','tsconfig.json');
   files.template = path.resolve(folders.templates, 'template.pug');
+  files.templateIndex = path.resolve(folders.templates, 'index.pug');
 
 
 // Where do the files ends up in the end?
@@ -80,11 +83,12 @@ const destination = function( folder )
 {
   const output = {};
     output.root        = path.join(folder);
+    output.markup      = path.join(folder,"[name].html");
     output.assets      = path.join(folder,"assets");
     output.midi        = path.join(output.assets,"midi","[name].mid?[hash]-[name]");
     output.static      = path.join(folder);
-    output.scripts     = path.join(output.assets ,"scripts");
-    output.style       = path.join(output.assets, "style", "[name].[ext]" ); // ?[hash]-[name]
+    output.scripts     = path.join(output.assets ,"scripts","[name].js");
+    output.style       = path.join(output.assets, "style", "[name].css" ); // ?[hash]-[name]
     output.examples    = path.join(folder,'examples');
   return output;
 }

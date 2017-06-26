@@ -193,22 +193,38 @@ const rulePugExtracted = {
   })
 
 };
+
+
+/*
+
+    [ext] the extension of the resource
+    [name] the basename of the resource
+    [path] the path of the resource relative to the context query parameter or option.
+    [hash] the hash of the content, hex-encoded md5 by default
+    [<hashType>:hash:<digestType>:<length>] optionally you can configure
+        other hashTypes, i. e. sha1, md5, sha256, sha512
+        other digestTypes, i. e. hex, base26, base32, base36, base49, base52, base58, base62, base64
+        and length the length in chars
+    [N] the N-th match obtained from matching the current file name against the query param regExp
+
+*/
+
 // Images...
 const ruleImages = {
   test: /\.(png|svg|jpeg|jpg|gif|webp)$/,
   include: [ Settings.folders.images ],
   exclude: [ Settings.folders.fonts ],
   // [sha512:hash:base64:7].[ext]
-  loader: 'file-loader?name='+destination.images
+  loader: 'file-loader?name=[path][name].[ext]'//+destination.images
 };
 
 const ruleVideos = {
   test: /\.(mp4|webm)(\?.*)?$/,
-  loader: 'file-loader?name='+destination.videos
+  loader: 'file-loader?name=[path][name].[ext]'//+destination.videos
 };
 const ruleMidi = {
   test: /\.(midi|mid)$/,
-  loader: 'file-loader?name='+destination.midi
+  loader: 'file-loader?name=[path][name].[ext]'//+destination.midi
 };
 
 module.exports = {
