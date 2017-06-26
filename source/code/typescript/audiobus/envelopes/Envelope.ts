@@ -39,11 +39,12 @@ export default class Envelope
   XX---------------------------------------X
   Start                    |HOLD| Stop
   */
+	private inputPort:AudioNode;
 
   // A pregnant pause before the note begins - inspired by the Prophet`08
   // Affords for a slightly less robotic sounds with very subtle random delays
   // Requires a number in milliseconds
-  public delayTime:number         = 0;
+    public delayTime:number         = 0;
 
   // how aggressive the intro fade is
   // Requires a number in milliseconds
@@ -51,7 +52,8 @@ export default class Envelope
 
   // peak output volume
   // This is a percentage between 0 -> 1
-  public amplitude:number         = 1;
+	// NB. set in constructor
+  public amplitude:number;
 
   // how much to let off after the intro before...
   // Requires a number in milliseconds
@@ -75,6 +77,9 @@ export default class Envelope
   // A factor that can be sed to overdrive or refine the overall volume
   public gain:number              = 1;
 
+	// when did this envelope begin in audioContext time?
+	public startTime:number         =-1;
+
 
   // default types of curves...
   public attackType:string        = Envelope.CURVE_TYPE_LINEAR;
@@ -89,27 +94,58 @@ export default class Envelope
       return this.delayTime + this.attackTime + this.decayTime + this.releaseTime + (this.holdTime < 0 ? 0 : this.holdTime);
   }
 
+	public get endsAt():number
+	{
+		// if it hasn't started, we can't tell when it ends!
+		return this.startTime < 0 ? 0 : this.startTime + this.duration;
+	}
+
+  public get remaining():number
+  {
+		return this.endsAt - this.context.currentTime;
+  }
+
 	// Get the port where the data comes out from...
 	public get output():GainNode
 	{
 		return this.envelope;
 	}
-	
+
+	// Get the port where the data comes out from...
+	public get hasStarted():boolean
+	{
+		return this.startTime > -1;
+	}
+	public get hasFinished():boolean
+	{
+		return this.hasStarted ? this.startTime + this.duration > this.context.currentTime : false;
+	}
+
 
 	// Get the port where the data comes out from...
 	public set input( port:AudioNode )
 	{
-		port.connect( this.envelope );
+		if (port)
+		{
+			port.connect( this.envelope );
+
+		}else if (this.inputPort){
+
+			// disconnect existing...
+			this.inputPort.disconnect( this.envelope );
+		}
+
+		this.inputPort = port;
 	}
-	
-  constructor( audioContext:AudioContext )
+
+  constructor( audioContext:AudioContext, amplitude:number=1 )
   {
       // this contains our envelope
       this.context = audioContext;
       this.envelope = audioContext.createGain();
-      this.envelope.gain.value = this.amplitude;
+      this.envelope.gain.value = this.amplitude = amplitude;
   }
-	
+
 	// would be cool if this could return a promise :)
   private fade( curveType:string, volume:number, time:number, length:number=0 ):number
   {
@@ -155,6 +191,8 @@ export default class Envelope
       var position:number = this.delayTime + time;
       var vol:number = this.gain * this.amplitude;
 
+			this.startTime = time;
+
       // clear any future events we may have set up
       if (clearExisting)
       {
@@ -169,6 +207,8 @@ export default class Envelope
 
       // Decay to Sustain
       position = this.fade( this.decayType, this.gain *this.sustainVolume, position, this.decayTime );
+
+			//const introDuration:number = position - this.startTime;
 
       // Sustain & Hold
       //this.envelope.gain.setValueAtTime(this.gain *this.sustainVolume, position);
@@ -193,22 +233,28 @@ export default class Envelope
 
   public stop( startPosition:number=-1, clearExisting:boolean=true ):number
   {
-      var time:number = startPosition > -1 ? startPosition : this.context.currentTime;
-      var position:number = time;
+      const time:number = startPosition > -1 ? startPosition : this.context.currentTime;
+
 
       if (clearExisting)
       {
-          this.envelope.gain.cancelScheduledValues( position );
+          this.envelope.gain.cancelScheduledValues( time );
       }
 
       // Release
       // NB. An exception will be thrown if this value is less than or equal to 0,
       // or if the value at the time of the previous event is less than or equal to 0.
       // this.gain.gain.setValueAtTime(0.0000000000001, t);
-      position = this.fade( this.releaseType, this.SILENCE, position, this.releaseTime );
+      const position:number = this.fade( this.releaseType, this.SILENCE, time, this.releaseTime );
 
-      // Silence
+      // Silence once the fade had completed...
       this.envelope.gain.setValueAtTime( 0, position );
+
+			// for now...
+			setTimeout( ()=>{
+				console.log( "Envelope stopped" );
+			},this.releaseTime );
+
       return position;
   }
 }
