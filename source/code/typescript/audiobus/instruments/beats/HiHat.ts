@@ -1,5 +1,3 @@
-/// <reference path="../../Dependencies.ts"/>
-/// <reference path="Drum.ts" />
 /*//////////////////////////////////////////////////////////////////////////////
 
 MIT Licence
@@ -12,10 +10,11 @@ Use         - trigge
 Methods     -
 
 //////////////////////////////////////////////////////////////////////////////*/
-module audiobus.instruments.beats
+import Instrument from '../Instrument';
+import Envelope from '../../envelopes/Envelope';
+
+export default class HiHat extends Instrument
 {
-    export class HiHat extends Drum
-    {
 		private osc5:OscillatorNode;
 		private osc6:OscillatorNode;
 		private osc7:OscillatorNode;
@@ -27,7 +26,7 @@ module audiobus.instruments.beats
 		public biQuadFilterB:BiquadFilterNode;
 
 		// create
-		constructor( audioContext:AudioContext, outputTo:AudioNode )
+		constructor( audioContext?:AudioContext )
 		{
 			super( audioContext );
 
@@ -35,27 +34,27 @@ module audiobus.instruments.beats
 
 			//	GENERATE OSCILLATOR 5,6,7,8,9,A (square)
 			this.osc5 = audioContext.createOscillator();
-			this.osc5.type = OscillatorTypes.SQUARE; // square wave
+			this.osc5.type = "square";// OscillatorTypes.SQUARE; // square wave
 			this.osc5.frequency.value = 600;
 
 			this.osc6 = audioContext.createOscillator();
-			this.osc6.type = OscillatorTypes.SQUARE; // square wave
+			this.osc6.type = "square";//OscillatorTypes.SQUARE; // square wave
 			this.osc6.frequency.value = 900;
 
 			this.osc7 = audioContext.createOscillator();
-			this.osc7.type = OscillatorTypes.SQUARE; // square wave
+			this.osc7.type = "square";//OscillatorTypes.SQUARE; // square wave
 			this.osc7.frequency.value = 1300;
 
 			this.osc8 = audioContext.createOscillator();
-			this.osc8.type = OscillatorTypes.SQUARE; // square wave
+			this.osc8.type = "square";// OscillatorTypes.SQUARE; // square wave
 			this.osc8.frequency.value = 2000;
 
 			this.osc9 = audioContext.createOscillator();
-			this.osc9.type = OscillatorTypes.SQUARE; // square wave
+			this.osc9.type = "square";//OscillatorTypes.SQUARE; // square wave
 			this.osc9.frequency.value = 2300;
 
 			this.oscA = audioContext.createOscillator();
-			this.oscA.type = OscillatorTypes.SQUARE; // square wave
+			this.oscA.type = "square";//OscillatorTypes.SQUARE; // square wave
 			this.oscA.frequency.value = 2800;
 
 			this.biQuadFilterA = audioContext.createBiquadFilter();
@@ -73,23 +72,22 @@ module audiobus.instruments.beats
 			this.osc9.connect(this.biQuadFilterA);
 			this.oscA.connect(this.biQuadFilterA);
 
-			this.biQuadFilterA.connect(this.biQuadFilterB);
-			this.biQuadFilterB.connect( this.gain );
+			this.biQuadFilterA.connect( this.biQuadFilterB);
 
-            this.envelope.amplitude = 0.8;
-            this.envelope.attackTime = 0.025;
-            this.envelope.decayTime = 0.05;
-            this.envelope.releaseTime = 0.3;
-            this.envelope.sustainVolume = 0.2;
-            this.envelope.decayType = audiobus.envelopes.Envelope.CURVE_TYPE_EXPONENTIAL;
+      this.envelope.amplitude = 0.8;
+      this.envelope.attackTime = 0.025;
+      this.envelope.decayTime = 0.05;
+      this.envelope.releaseTime = 0.3;
+      this.envelope.sustainVolume = 0.2;
+      this.envelope.decayType = Envelope.CURVE_TYPE_EXPONENTIAL;
 
-            this.connect( outputTo, this.biQuadFilterB );
+      this.input = this.biQuadFilterB;
 		}
 
 		// TRIGGERS
 		public start():boolean
 		{
-			var t:number = this.context.currentTime;
+			const t:number = this.audioContext.currentTime;
 
 			// noise gain
 			//this.noiseGain.gain.setValueAtTime(0.2, t);
@@ -100,20 +98,19 @@ module audiobus.instruments.beats
 			this.biQuadFilterB.frequency.setValueAtTime(20, t);
 			this.biQuadFilterB.frequency.linearRampToValueAtTime(16000, 	t + 0.050);
 
-            if ( super.start() )
-            {
-                //noise.start(0);
-                this.osc5.start(0);
+      if ( super.start() )
+      {
+        //noise.start(0);
+        this.osc5.start(0);
 				this.osc6.start(0);
 				this.osc7.start(0);
 				this.osc8.start(0);
 				this.osc9.start(0);
 				this.oscA.start(0);
-                return true;
-            }else{
-                return false;
-            }
+          return true;
+      }else{
+          return false;
+      }
 		}
 
-	}
 }

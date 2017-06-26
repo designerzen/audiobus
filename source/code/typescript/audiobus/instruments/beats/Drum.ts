@@ -1,8 +1,4 @@
-/// <reference path="../../Dependencies.ts"/>
-/// <reference path="../Instrument.ts" />
 /*//////////////////////////////////////////////////////////////////////////////
-
-MIT Licence
 
 Bass Drum
 ==============
@@ -12,12 +8,12 @@ Use         - trigge
 Methods     -
 
 //////////////////////////////////////////////////////////////////////////////*/
-module audiobus.instruments.beats
+import Instrument from '../Instrument';
+
+export default class Drum extends Instrument
 {
-    export class Drum extends Instrument
-    {
 		// create
-		constructor( audioContext:AudioContext )
+		constructor( audioContext?:AudioContext )
 		{
 			super( audioContext );
 
@@ -29,4 +25,3 @@ module audiobus.instruments.beats
             this.envelope.sustainVolume = 0.95;
 		}
 	}
-}
