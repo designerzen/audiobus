@@ -1,4 +1,4 @@
-# audio.bus version 3 #
+# audio.bus version 3.0.0 #
 ========
 
 Cross Platform Audio Playback and Synthesis using modern web features.
@@ -63,7 +63,6 @@ run > gulp
 
 Thanks to
 ===
-https://github.com/typings/typings
 
 
 
@@ -74,7 +73,7 @@ Help
 
 
 
-
+https://sdkcarlos.github.io/sites/artyom.html
 
 
 Contributers & Contributions:
