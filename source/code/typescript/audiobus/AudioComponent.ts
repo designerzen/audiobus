@@ -20,11 +20,13 @@ export default class AudioComponent
 	protected muted:boolean = false;
 	protected mutedVolume:number = 0;
 
+	public name:string = "AudioComponent";
+
 	public get isSource():boolean
 	{
 		return this.outputGainNode.numberOfInputs === 0;
 	}
-	
+
   public set volume( vol:number )
   {
     const t:number = this.context.currentTime;
@@ -53,27 +55,34 @@ export default class AudioComponent
 	{
 		return this.outputGainNode;
 	}
-	
-	public get intput():AudioNode
+
+	public get input():AudioNode
 	{
 		return this.inputAudioNode;
 	}
-	
+
 	// // Set which port this device gets it's data from...
 	public set input( port:AudioNode )
 	{
 		this.inputAudioNode = port;
-		this.outputGainNode.connect( port );
+		if (port)
+		{
+			this.outputGainNode.connect( port );
+		}else{
+			this.outputGainNode.disconnect( port );
+		}
+
 	}
 
   // if no context is specified we get the engine default...
-	constructor( audioContext:AudioContext=undefined )
+	constructor( audioContext?:AudioContext )
 	{
     const resolvedContext = audioContext ? audioContext : Engine.fetch();
 		this.context = resolvedContext;
 
 		this.outputGainNode = resolvedContext.createGain();
     this.outputGainNode.gain.value = this.amplitude;
+
 
 		// ready to go!
   	this.create();
@@ -101,7 +110,7 @@ export default class AudioComponent
 
 	public create():void
 	{
-		
+
 	}
 
 	// Free up memory...
@@ -109,5 +118,9 @@ export default class AudioComponent
 	{
 		this.outputGainNode.disconnect();
     this.outputGainNode = null;
+	}
+	public toString():string
+	{
+		return "AudioComponent" + name+" input "+this.input+" output "+this.output;
 	}
 }

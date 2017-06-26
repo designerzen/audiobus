@@ -33,7 +33,6 @@ SOFTWARE.
 // flat: detune < 0,
 // sharp: detune >= 0
 
-import Engine from '../Engine';
 
 class PitchDetection
 {
@@ -129,6 +128,7 @@ class PitchDetection
 
 }
 
+import Engine from '../Engine';
 
 // create output class...
 export default class PitchDetect
@@ -136,14 +136,20 @@ export default class PitchDetect
   public static BUFFER_LENGTH = 1024;
 
   private stream:MediaStream;
-  private audioContext:AudioContext;
+  private context:AudioContext;
   private audioBuffer:Float32Array;
   private mediaStreamSource:MediaStreamAudioSourceNode;
   private analyser:AnalyserNode;
 
-  constructor()
+  public get audioContext( ):AudioContext
   {
+    return this.context;
+  }
 
+  constructor(audioContext?:AudioContext )
+	{
+    const resolvedContext = audioContext ? audioContext : Engine.fetch();
+		this.context = resolvedContext;
   }
 
   public connect(stream:MediaStream)
@@ -154,7 +160,7 @@ export default class PitchDetect
     // }
 
     this.stream = stream;
-    this.audioContext = Engine.fetch();
+    this.context = Engine.fetch();
     this.audioBuffer = new Float32Array(PitchDetect.BUFFER_LENGTH);
 
     this.enumerateStream();
