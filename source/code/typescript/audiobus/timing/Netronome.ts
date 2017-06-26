@@ -1,4 +1,5 @@
 import Timer from './Timer';
+import TimeNow from './TimeNow';
 
 export default class Netronome extends Timer
 {
@@ -21,7 +22,7 @@ export default class Netronome extends Timer
 
 			this.lastBarTimeStamp = this.determineStartTime();
 
-			const elapsed:number =  this.now() - this.lastBarTimeStamp;	// fetch last bar timestamp and minus from NOW
+			const elapsed:number =  TimeNow() - this.lastBarTimeStamp;	// fetch last bar timestamp and minus from NOW
 			this.percentage = elapsed / this.period;
 		}
 
@@ -58,18 +59,18 @@ export default class Netronome extends Timer
 		private determineStartTime():number
 		{
 			// so we have a timestamp that shows the time now
-			const now:number = this.now() >> 0;								// correct :)
-			const timeSinceEpoch:number = now - Netronome.EPOCH;			// correct :)
+			const timeNow:number = TimeNow() >> 0;								// correct :)
+			const timeSinceEpoch:number = timeNow - Netronome.EPOCH;			// correct :)
 			const elapsed:number = timeSinceEpoch % this.period;
 			const remaining:number = this.period - elapsed;
-			const lastTick:number =  ( now - elapsed );//  - period- period only for extra buffer room
+			const lastTick:number =  ( timeNow - elapsed );//  - period- period only for extra buffer room
 
-			//trace( 'CREATING EPOCH now:'+now+" then:"+EPOCH);
+			//trace( 'CREATING EPOCH timeNow:'+timeNow+" then:"+EPOCH);
 		//	trace( ''+Std.int(timeSinceEpoch / period)+" Bars have occurred at "+get_bpm()+ " BPM");
 		//	trace( ''+Std.int(elapsed)+" ms elapsed in this bar "+Std.int(elapsed*100/period)+'% Elapsed');
 		//	trace( 'lastTick : ' + lastTick + " at " + get_bpm()+ " BPM");
 			//trace( 'Remaining Time in Bar '+Std.int(remaining)+" ms "+Std.int(elapsed*100/period)+'% Elapsed');
-			//trace( 'Left Over at '+remaining+" period : "+period+' remaining : ' + remaining + ' timestamp : '+( now - remaining) );
+			//trace( 'Left Over at '+remaining+" period : "+period+' remaining : ' + remaining + ' timestamp : '+( timeNow - remaining) );
 
 			console.log( "lastTick : " + lastTick );
 			return lastTick;
@@ -78,7 +79,7 @@ export default class Netronome extends Timer
 		////////////////////////////////////////////////////////////////////////
 		//
 		////////////////////////////////////////////////////////////////////////
-		private incrementCuePoints( now:number = -1  ):void
+		private incrementCuePoints( timeNow:number = -1  ):void
 		{
 			// update the last timestamp to about now or before...
 			this.lastBarTimeStamp += this.period;

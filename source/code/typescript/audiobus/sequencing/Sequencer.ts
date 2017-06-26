@@ -6,6 +6,7 @@ export default class Sequencer
 {
 
 	// a collection of ITracks to play :)
+	// the sequence of these is also the order of playback...
 	protected tracks:Array<ITrack> = [];
 
 	// where are we up to in the sequence in ms?
@@ -28,17 +29,21 @@ export default class Sequencer
 	{
 		this.onEvents = method;
 	}
+	public get isPaused():boolean
+	{
+		return this.timer.isPaused;
+	}
 
 	constructor()
 	{
 
 		this.timer.ms = (scope:Timer, startTime:number, time:number)=>{
+			// while the sequencer is paused, the timer still updates here but the time code
+			// remains the same...
 
-			const elapsed:number = ( time - startTime) >> 0;  // stupid floating points...
 
-			this.onUpdate( elapsed );
+			this.onUpdate( startTime, time );
 
-			this.lastTimeStamp = elapsed;
 		}
 	}
 
@@ -52,6 +57,16 @@ export default class Sequencer
 		this.timer.stop();
 	}
 
+  public pause():void
+  {
+    this.timer.pause();
+  }
+
+  public resume():void
+  {
+
+		this.timer.resume();
+  }
 	public to( time:number )
 	{
 		// sets the playhead to this point in the sequence...
@@ -62,7 +77,9 @@ export default class Sequencer
 
 	// midi is added using a running count...
 	private previousTime:number = 0;
-	
+
+	//public getTimestamp
+
 	public add( command:ICommand )
 	{
 		// sets the cue
@@ -84,13 +101,13 @@ export default class Sequencer
 		// 	this.positions[command.deltaTime].push(command);
 		// }
 
-		
+
 		// now as we add each command individually, we can dictate when their
 		// appropriate time point is going to be
 		//console.log("Command!", command, position );
 
 		this.commands.push(command);
-		
+
 		this.previousTime = position;
 	}
 
@@ -103,8 +120,37 @@ export default class Sequencer
 			this.add( command );
 		}
 	}
+	//
+	// // you can specify the type of commands to retrieve...
+	// public getCommandsAtIndexByType( index:number, type:string ):Array<ICommand>
+	// {
+	//
+	// }
 
-	protected getCommandsBetween( startPosition:number, endPosition:number ):Array<ICommand>
+	// This method takes an index and returns commands with the same time code
+	// that match the command with the index. The quantity returned should
+	// be added to your external class' rolling index for the next interrogation
+	public getCommandsAtIndex( index:number ):Array<ICommand>
+	{
+		// 1. we fetch the code at the specified index...
+		let command:ICommand = this.commands[index];
+		// check to see if there are any commands that follow this command that
+		// share the same timings...
+		let position:number = command.timeCode;
+		return this.positions[position];
+
+		// TODO :
+		// fuzzy find for commands that are very close...
+		// for ( let i=index, l=index+10; i <l; ++i)
+		// {
+		// 	// this is the next command in the list...
+		// 	const subsequentCommand:ICommand = this.positions[i];
+		// 	//if (subsequentCommand.deltaTime === )
+		// }
+		//return commands;
+	}
+
+	public getCommandsBetween( startPosition:number, endPosition:number ):Array<ICommand>
 	{
 		//console.log("Sequencing:getCommandsBetween", startPosition, endPosition );
 		// loop through dictionary and find the keys!
@@ -112,7 +158,7 @@ export default class Sequencer
 		for ( let position=startPosition; position<endPosition; ++position )
 		{
 			// check dictionary...
-			let matches = this.positions[position];
+			let matches:Array<ICommand> = this.positions[position];
 			// if not null append!
 			if (matches && matches.length)
 			{
@@ -139,8 +185,21 @@ export default class Sequencer
 
 	}
 
-	protected onUpdate(elapsed:number)
+	protected onUpdate(startTime:number, time:number):void
 	{
+
+		const elapsed:number = ( time - startTime) >> 0;  // stupid floating points...
+
+		if (this.isPaused)
+		{
+			// update timestamp to something more recent...
+			// now save the last time stamp, ready for the next comparison...
+			this.lastTimeStamp = elapsed;
+			return;
+		}
+
+
+		// if we are paused, we need to re-adjust the last timestamp here...
 		const startPosition:number = this.lastTimeStamp;
 		const endPosition:number = elapsed;
 
@@ -152,8 +211,9 @@ export default class Sequencer
 			commands.forEach( (command)=>{
 				this.onEvents( this, command, elapsed );
 			});
-			
-		}
 
+		}
+		// now save the last time stamp, ready for the next comparison...
+		this.lastTimeStamp = elapsed;
 	}
 }

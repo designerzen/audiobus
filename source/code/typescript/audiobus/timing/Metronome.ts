@@ -1,4 +1,5 @@
 import Timer from './Timer';
+import TimeNow from './TimeNow';
 
 export default class Metronome extends Timer
 {
@@ -11,7 +12,7 @@ export default class Metronome extends Timer
 	private set bpm( beatsPerMinute:number )
 	{
 		const seconds:number = 60 / beatsPerMinute ;
-		const elapsed:number =  this.now() - this.lastBarTimeStamp;	// fetch last bar timestamp and minus from NOW
+		const elapsed:number =  TimeNow() - this.lastBarTimeStamp;	// fetch last bar timestamp and minus from NOW
 		this.period = seconds * 1000;
 		this.percentage = elapsed / this.period;
 	}

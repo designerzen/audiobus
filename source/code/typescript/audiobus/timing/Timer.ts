@@ -1,13 +1,12 @@
-import Now from './now';
+import TimeNow from './TimeNow';
 
 export default class Timer
 {
-  public now:Function = () => window.performance && window.performance.now ? window.performance.now() : Date.now();
-
   protected period:number = 6000;
 	protected lastBarTimeStamp:number = 0;
 
 	protected playing:boolean = false;
+	protected paused:boolean = false;
 
 	protected startTime:number = 0;
 	protected percentage:number = 0;
@@ -26,7 +25,10 @@ export default class Timer
 	{
 		return this.playing;
 	}
-
+  get isPaused():boolean
+  {
+    return this.paused;
+  }
 	set beat( trigger: { (scope:Timer, startTime:number, time:number):void; })
 	{
     this.onTick = trigger;
@@ -53,7 +55,7 @@ export default class Timer
 	public start( rate:number=90 ):void
 	{
 		this.playing = true;
-    this.startTime = this.now();
+    this.startTime = TimeNow();
 
     // trigger immediately!
     this.onTimer( this.startTime );
@@ -64,6 +66,16 @@ export default class Timer
 		this.playing = false;
 	}
 
+  public pause():void
+  {
+    this.paused = true;
+  }
+
+  public resume():void
+  {
+    this.paused = false;
+  }
+
 	////////////////////////////////////////////////////////////////////////
 	// Check the time to see if a beat has occurred
 	////////////////////////////////////////////////////////////////////////
@@ -73,9 +85,10 @@ export default class Timer
 		// loop
 		if ( this.playing )
 		{
-			const now:number = this.now();
+      // when the timer is paused, we want to ignore all 
+			const now:number = this.paused ? time : TimeNow();
 			// check to see if time has elapsed (at least as granular as we can see)
-			if (now > time)
+			if ( now > time)
 			{
 				this.onMillisecond && this.onMillisecond( this, this.startTime, now );
 			}
