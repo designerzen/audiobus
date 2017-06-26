@@ -31,7 +31,7 @@ const output = {
   // eg. path: path.resolve(__dirname, 'dist/assets')
   // Note that [hash] in this parameter will be replaced with an hash of the compilation.
   // See the Caching guide for details.
-  path: path.resolve(destination.root, 'test'),
+  path: path.resolve(destination.root, Settings.folderNames.build),
   //path.resolve(destination.root),
 
   // library: "MyLibrary", // string,

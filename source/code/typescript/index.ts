@@ -11,7 +11,7 @@ Welcome to audioBUS v3 :D
 import Engine from './audiobus/Engine';
 
 // Volume related stuff
-//import Mixer from './audiobus/mixer/Mixer';
+import Mixer from './audiobus/mixer/Mixer';
 
 // Hardware IO
 // MIDI stuff
@@ -36,10 +36,15 @@ import Netronome from './audiobus/timing/Netronome';
 import Sequencer from './audiobus/sequencing/Sequencer';
 import ICommand from './audiobus/ICommand';
 
+import NoteMatrix from './audiobus/NoteMatrix';
+import VoiceFactory from './audiobus/VoiceFactory';
+
 // Sythesis
 import Instrument from './audiobus/instruments/Instrument';
 import Oscillator from './audiobus/instruments/primitives/Oscillator';
 import OscillatorTypes from './audiobus/instruments/OscillatorTypes';
+import BassDrum from './audiobus/instruments/beats/BassDrum';
+
 import Scales from './audiobus/scales/Scales';
 import PitchDetect from './audiobus/analyse/PitchDetect';
 
@@ -57,23 +62,31 @@ if (!engine)
   throw Error("Browser does not support WebAudio. Try a newer browser.");
 }
 
+
 // If our app has more than one audio source, we are also going to need a mixer...
 
-//const mixer:Mixer = new Mixer();
+const mixer:Mixer = new Mixer( engine );
 //Engine.connect( mixer.output );
+
 
 
 
 // Make some sound! (engine here is optional but we provide it for future proofing)
 
 //const instrument:Instrument = new Instrument( engine );   // generic instrument (makes no sound!)
+//const oscillator:Oscillator = new Oscillator(engine);//OscillatorTypes.sine, engine ); //
+//const kick:BassDrum = new BassDrum(engine);
 
-const oscillator:Oscillator = new Oscillator(undefined);//OscillatorTypes.sine, engine ); //
-
-// connect directly to engine...
-Engine.connect( oscillator.output );
 // now connect it to our mixer...
 //mixer.input = oscillator.output;
+
+// connect directly to engine...
+//Engine.connect( kick.output );
+//Engine.connect( oscillator.output );
+// or pipe through the mixer...
+//mixer.connect( oscillator.output );
+//mixer.connect( kick.output );
+
 
 // make some noise!
 //const playing :boolean = oscillator.start( 440 );
@@ -83,6 +96,7 @@ Engine.connect( oscillator.output );
 
 // oscillator.command( command );
 // oscillator.noteOn( command );
+
 // oscillator.noteOff( command );
 
 
@@ -141,10 +155,126 @@ netronome.beat = ( scope:Timer, startTime:number, time:number ) => {
 // //metronome.start( 180 );
 
 
+// Some MIDI Hardware to play with...
+const tb303:TB3 = new TB3();
+tb303.onMidi = ( alias:string, device:WebMidi.MIDIInput, event:WebMidi.MIDIMessageEvent ) => {
+   //console.error("huzzah for a midi message has been received!", alias, device, event )
+   // convert this event into a command!
+   let command:MidiCommand = MidiCommandFactory.fromMidiEvent(event);
+   // you can test to see if it is a tempo or volume event...
+
+   // now play something!
+   if (command.noteNumber > 0)
+   {
+     console.error(device.name ,"midi message has been received!",  alias, command );
+   }
+};
+
+// as you can set up your device to be on whatever midi channel you want...
+// here we bind one to another!
+const channels:Array<number> = [0];
+const forceToChannel:number = 1; // my TB3 is expecting commands to channel 1
+const sequencer:Sequencer = new Sequencer();
+
+
+let sequencerIndex:number = 0;
+let notes:NoteMatrix = new NoteMatrix();
+
+
+let voiceFactory = new VoiceFactory();
+
+const playCommand = function( command:ICommand, channel?:number )
+{
+  tb303.command( command, channel );
+
+  // Get the port where the data comes out from...
+  let voice:Instrument = voiceFactory.fetchInstrument( Oscillator, Oscillator.NAME );
+  // //console.log( voice, {hasStarted:oscillator.hasStarted,	hasFinished:oscillator.hasFinished} );
+  //
+  //
+  // // connect if unconnected...
+  //Engine.connect( voice.output );
+  // mixer.connect( voice.output );
+
+  switch ( command.subtype )
+  {
+    case "noteOn":
+      const pitch:number = Scales.frequencyFromNoteNumber(command.noteNumber);
+      //kick.start( pitch-100, pitch );
+      //oscillator.start( pitch );
+      voice.start( pitch );
+      break;
+
+    case"noteOff":
+      //oscillator.stop();
+      //kick.stop();
+      voice.stop();
+      break;
+  }
+}
+
+//mergerNode = mixer.mux( oscillator.output, oscillator.output );
+//mergerNode.connect( this.audioContext.destination );
+
+
+const playNextCommand = function()
+{
+  let satisfied:boolean = false;  // only satisfied if a note on is available ;)
+  // This should go in a loop somewhere...
+  const nextCommands = sequencer.getCommandsAtIndex(sequencerIndex);
+  // check to see if we have commands...
+  if (nextCommands.length > 0)
+  {
+    // we have commands! execute them!
+    nextCommands.forEach( (command:ICommand) => {
+
+      // check their type to see if they are note on or note off etc...
+      console.log(sequencerIndex+". nextCommand", command.subtype );
+
+      switch ( command.subtype )
+      {
+        case "noteOn":
+          // you can check to see if the status has changed...
+          const wasPlayingBefore:boolean = notes.noteOn( command.noteNumber );
+          // loop
+          satisfied = true;
+          // if (!wasPlayingBefore)
+          // {
+          //   satisfied = true;
+              // spawn new instrument and start playing here...
+          // }
+          break;
+
+      case"noteOff":
+
+        const wasStoppedBefore:boolean = notes.noteOff( command.noteNumber );
+        // exit!
+        break;
+      }
+
+      playCommand( command, forceToChannel );
+
+    })
+    sequencerIndex += nextCommands.length;
+    //
+    // if we have a lot of note ons and note offs we should matrix them together...
+    //console.log(sequencerIndex+". nextCommands",nextCommands);
+    if (!satisfied)
+    {
+      // do it all again!
+      // at least until there are no more commands...
+      playNextCommand();
+    }
+  }
+  // now loop and find the corresponding note off...
+}
+
+
+
 //
 // Interface with MIDI or load a MIDI file
 const midiFile:MidiFile = new MidiFile();
-const midilocation:string = "assets/midi/funkytown.mid";
+const midilocation:string = "assets/midi/funktown.mid";
 
 
 //
@@ -177,14 +307,6 @@ midiFile.load( midilocation ).then(
        console.error("huzzah for a midi message has been received!", alias, device, event )
     };
 
-    const tb303:TB3 = new TB3();
-    tb303.onMidi = ( alias:string, device:WebMidi.MIDIInput, event:WebMidi.MIDIMessageEvent ) => {
-       //console.error("huzzah for a midi message has been received!", alias, device, event )
-       // convert this event into a command!
-       let command:MidiCommand = MidiCommandFactory.fromMidiEvent(event);
-       // now play something!
-       //console.error(device.name ,"midi message has been received!",  alias, command )
-    };
 
     //const midiDevice:MidiHardwareDevice = new MidiHardwareDevice();
     //
@@ -285,27 +407,22 @@ midiFile.load( midilocation ).then(
 
     // do something with the midi file like send it to the sequencer
 
-    // as you can set up your device to be on whatever midi channel you want...
-    // here we bind one to another!
-    const channels:Array<number> = [0];
-    const forceToChannel:number = 1; // my TB3 is expecting commands to channel 1
-    const sequencer:Sequencer = new Sequencer();
     // now convert this midiTrack into a sequence
     // sequencer.add();
     sequencer.addTracks( track.tracks );
-    sequencer.onEvent = (scope:Sequencer, event:ICommand, elapsed:number) => {
-      //console.log("audioBUS:MIDI>ms elapsed", event);
+    sequencer.onEvent = (scope:Sequencer, command:ICommand, elapsed:number) => {
+      //console.log("audioBUS:MIDI>ms elapsed", command);
 
-      //const pitch:number = Scales.frequencyFromNoteNumber(event.noteNumber);
+      //const pitch:number = Scales.frequencyFromNoteNumber(command.noteNumber);
       //oscillator.start( pitch );
 
       // now send this out to the midi device & channel(s) specified! :)
       channels.forEach( (channel:number)=>{
-        tb303.command( event, channel );
+        tb303.command( command, channel );
       });
-      // tb303.command( event, forceToChannel-1 );
+      // tb303.command( command, forceToChannel );
     };
-    sequencer.start();
+    //sequencer.start();
 
 
 
@@ -333,3 +450,20 @@ midiFile.load( midilocation ).then(
 //mixer.mute();
 //mixer.volume = 1;
 //mixer.solo();
+
+window.onkeydown = function(event){
+  //console.log("keydown",event);
+  playNextCommand();
+}
+
+window.onfocus = function() {
+  // pause timer...
+  console.error("Tab focussed");
+  sequencer.resume();
+}
+
+window.onblur = function() {
+  // resume timer
+  console.error("Tab lost focus");
+  sequencer.pause();
+}

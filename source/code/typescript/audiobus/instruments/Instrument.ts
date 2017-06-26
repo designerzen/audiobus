@@ -3,35 +3,68 @@
 import Envelope from '../envelopes/Envelope';
 import AudioComponent from '../AudioComponent';
 import ICommand from '../ICommand';
+import Conductor from '../Conductor';
 
 export default class Instrument extends AudioComponent
 {
-		public isPlaying:boolean = false;         // currently started
-		public hasInitialised:boolean = false;    // are oscillators swinging?
-		public needsUpdate:boolean = false;       // does it need an external update?
+		protected active:boolean = false;         		// currently making sound
+		protected playing:boolean = false;         		// currently started (not stopped)
+		protected hasInitialised:boolean = false;   	// are we ready to go?
+		public needsUpdate:boolean = false;       	// does it need an external update?
 
 		public SILENCE:number = 0.00000001;				//Number.MIN_VALUE*100000000000;
 		public envelope:Envelope;									// all instruments have an envelope to control sound shape
 
-	
+		public get isPlaying():boolean
+		{
+			return this.playing;
+		}
+
+		// Get the port where the data comes out from...
+		public get hasStarted():boolean
+		{
+			return this.envelope.hasStarted;
+		}
+		public get hasFinished():boolean
+		{
+			return this.envelope.hasFinished;
+		}
+
+		public get endsAt():number
+		{
+			return this.envelope.endsAt;
+		}
+
+	  public get remaining():number
+	  {
+			return this.envelope.remaining;
+	  }
+
 		// Get the port where the data comes out from...
 		// public set output(port:AudioNode)
 		// {
 		// 	//this.envelope.output.connect( port );
 		// 	port.connect( this.outputGainNode ); // outputGainNode
 		// }
-		
+
 		// // Set which port this device gets it's data from...
 		public set input( port:AudioNode )
 		{
 			this.inputAudioNode = port;
+			console.error("Connecting envelope input to ", port);
 			this.envelope.input = port;//.connect( port );
 		}
-			
+
 		// create
-		constructor( audioContext:AudioContext=undefined )
+		constructor( audioContext?:AudioContext )
 		{
       super(audioContext);
+			this.name = "Instrument";
+
+			// whenever an instrument is created, an instance is cached with the Conductor...
+			// this allows us to send update information to the instrument in realtime
+
+			//
 		}
 
 		public create():void
@@ -43,7 +76,7 @@ export default class Instrument extends AudioComponent
 			//this.output = this.envelope.output; // outputGainNode
 			// from now on, connect all your instruments to the envelope input!
 			// this.envelope.input = sources;
-			
+
       // if (outputTo || source)
       // {
       //     this.connect( outputTo, source );
@@ -51,7 +84,7 @@ export default class Instrument extends AudioComponent
       // TODO: add itself to the conductor so that we can call
       // all instruments together with one call
 		}
-		// 
+		//
     // public connect( outputTo:AudioNode, source:AudioNode=null):void
     // {
     //   if (source)
@@ -66,48 +99,57 @@ export default class Instrument extends AudioComponent
     ////////////////////////////////////////////////////////////////////////////
 		public start( ...args: any[] ):boolean
 		{
-      const initialising:boolean = !this.hasInitialised;
-			if (initialising)
+      if (!this.hasInitialised)
       {
         this.hasInitialised = true;
       }
 
-			const time:number = this.context.currentTime + 0.005;
+			const time:number = this.context.currentTime;// + 0.005;	// fudge factor
       // it might already be fading in, but as we only fade from
       // one volume to another, it would just fade 1 -> 1
+			// or pass in zero for now...
       const position:number = this.envelope.start(time, true);
 
-      this.isPlaying = true;
+			const wasPlaying:boolean = this.playing;
+      this.playing = this.active = true;
       //console.log( "start : "+position, this);
 
-			//console.log( 'start ' +this.isPlaying  );
-      return initialising;
+			//console.log( 'start ' +this.playing  );
+      return wasPlaying;
 		}
 
     public note( frequency:number ):boolean
     {
-      return this.isPlaying;
+      return this.playing;
     }
 
     ////////////////////////////////////////////////////////////////////////////
     // Handles : Hold -> Release
     ////////////////////////////////////////////////////////////////////////////
-		public stop():boolean
+		public stop( time?:number):boolean
 		{
       // already playing or not initialised - nothing to stop
-			if ( !this.hasInitialised || !this.isPlaying )
+			if ( !this.hasInitialised || !this.playing )
       {
+				console.log( "EEROR stopping failed", this);
         return false;
       }
+			console.log( "stopping", this);
 
       this.envelope.stop();
 
       // An exception will be thrown if this value is less than or equal to 0,
 			// or if the value at the time of the previous event is less than or equal to 0.
-			this.isPlaying = false;
-      console.log( "stopping", this);
+			this.playing = false;
+
 
       return true;
+		}
+
+		// called from the conductor... forces the timings to be checked...
+		public update( time:number )
+		{
+
 		}
 
 
@@ -115,7 +157,7 @@ export default class Instrument extends AudioComponent
 		{
 			// do something with this data...
 		}
-		
+
 		public pitchBend( program:number, delay:number=0)
 	  {
 			// pitch bend
@@ -131,16 +173,6 @@ export default class Instrument extends AudioComponent
 
 		}
 
-		public chordOn( chord:number=1, velocity:number=1, delay:number=0)
-		{
-
-		}
-
-		public chordOff( chord:number=1, delay:number=0)
-		{
-
-		}
-
         /*
         // Handles : Delay -> Attack -> Decay -> Sustain -> Hold
 		public fadeIn( duration:number=0.1, decay:number=0.1, sustain:number=0.1, delay:number=0 ):void
@@ -150,7 +182,7 @@ export default class Instrument extends AudioComponent
 			//console.log( "fading out in "+time );
             this.gain.gain.cancelScheduledValues( t );
 
-			if ( this.isPlaying )
+			if ( this.playing )
 			{
 				// this note is already playing so don't tweak it.
 				// this.gain.gain.value = .5;
@@ -192,5 +224,12 @@ export default class Instrument extends AudioComponent
 		}
 
         */
+	public toString():string
+	{
+		let output = "Instrument:" + name+" [input:"+this.input+" output:"+this.output+"]";
+		output += " isPlaying:"+this.isPlaying+", hasStarted:"+this.hasStarted+", hasFinished:"+this.hasFinished;
+		output += " remaining:"+this.remaining+", endsAt:"+this.endsAt+", now:"+this.context.currentTime;
+		return output;
+	}
 
 }

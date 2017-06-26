@@ -2,11 +2,15 @@ import AudioComponent from '../AudioComponent';
 
 export default class Microphone extends AudioComponent
 {
-	public source:MediaStream;
-	public stream:MediaStreamAudioSourceNode;
+	public source:MediaStreamAudioSourceNode;
+	public stream:MediaStream;
 
 	public state:string = "Disconnected";
 
+	public get mediaStream():MediaStream
+	{
+		return this.stream;
+	}
 	constructor( audioContext:AudioContext=undefined )
 	{
 		super(audioContext);
@@ -29,7 +33,7 @@ export default class Microphone extends AudioComponent
 					if (success)
 					{
 						this.onMicAvailable();
-						resolve(this.stream);
+						resolve(this.source);
 					}else{
 						this.onMicUnAvailable(null);
 						reject("User may have cancelled permissions...");
@@ -54,20 +58,20 @@ export default class Microphone extends AudioComponent
 	private determineMicAvailability(streamSource:MediaStream):boolean
 	{
 		// Create an AudioNode from the stream.
-		this.source = streamSource;
-		
+		this.stream = streamSource;
+
 		try{
-			this.stream = this.context.createMediaStreamSource( streamSource );
+			this.source = this.context.createMediaStreamSource( streamSource );
 			//this.input = this.stream;
-			this.outputGainNode.connect(this.stream);
-			
+			this.outputGainNode.connect(this.source);
+
 		}catch(error){
 			this.state = "disconnected";
 			return false;
 		}
 		return true;
 	}
-	
+
 	// success callback when requesting audio input stream
 	private onMicAvailable():void
 	{
