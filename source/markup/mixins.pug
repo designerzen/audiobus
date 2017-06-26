@@ -1,0 +1,415 @@
+//- https://github.com/velenir/html-webpack-template-pug
+
+if !htmlWebpackPlugin.options
+	- htmlWebpackPlugin.options = {};
+
+//- adds title, to be used in <head>
+mixin title
+	title= htmlWebpackPlugin.options.title
+
+//- adds favicon, to be used in <head>
+mixin favicon
+	if htmlWebpackPlugin.files.favicon
+		link(rel='shortcut icon', href=htmlWebpackPlugin.files.favicon)
+
+//- adds mobile meta tag, to be used in <head>
+mixin mobile
+	if htmlWebpackPlugin.options.mobile
+		meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
+
+//- adds a div tag for each supplied id
+	@ids can be an Array or a single id,
+	if none supplied uses appMountId;
+	also accepts attributes to be added to div tags,
+	+appMount("id")(class="mount-point")
+mixin appMount(ids)
+	if ids === undefined
+		- ids = htmlWebpackPlugin.options.appMountId;
+
+	if ids != undefined
+		if !Array.isArray(ids)
+			- ids = [ids];
+		each id in ids
+			div(id=id)&attributes(attributes)
+
+
+- var selfclosingTags =  new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]);
+
+//-
+	injects extra resources
+	@extras is an Array of {tag, ..rest} objects or strings;
+	objects must have valid tag property,
+	strings must end with ".css" or ".js" to be converted into valid objects;
+	innerHTML property of an object is included as innerHTML in non-self-closing tags,
+	other truthy properties of an object are added as attributes to the constructed tag
+mixin injectExtras(extras)
+	each item in extras
+		if typeof item === "string" || item instanceof String
+			if item.endsWith(".css")
+				- item = {tag: "link", href: item, rel: "stylesheet"};
+			else if item.endsWith(".js")
+				- item = {tag: "script", src: item};
+			else
+				- throw new Error("Can't deduce tag from filename: " + item);
+		else if !item.tag
+			- throw new Error("Item " + JSON.stringify(item) + " must have a valid tag property")
+
+		- var attrs = Object.assign({}, item, {tag: null, innerHTML: null});
+		if selfclosingTags.has(item.tag)
+			#{item.tag}&attributes(attrs)/
+		else
+			#{item.tag}&attributes(attrs)!= item.innerHTML
+
+//-
+	injects extra resources passed in injectExtras.head of htmlWebpackPlugin.options
+mixin injectExtrasHead
+	if htmlWebpackPlugin.options.injectExtras && htmlWebpackPlugin.options.injectExtras.head
+		+injectExtras(htmlWebpackPlugin.options.injectExtras.head)
+
+//-
+	injects extra resources passed in injectExtras.body of htmlWebpackPlugin.options
+mixin injectExtrasBody
+	if htmlWebpackPlugin.options.injectExtras && htmlWebpackPlugin.options.injectExtras.body
+		+injectExtras(htmlWebpackPlugin.options.injectExtras.body)
+
+
+- const inlined = new Set(), injected = new Set();
+- const cssToInline = new Set(), cssToInject = new Set(), jsToInline = new Set(), jsToInject = new Set();
+- const toInline = htmlWebpackPlugin.options.inline && new Set(Array.isArray(htmlWebpackPlugin.options.inline) ? htmlWebpackPlugin.options.inline : [htmlWebpackPlugin.options.inline]);
+- const substrStart = htmlWebpackPlugin.files.publicPath ? htmlWebpackPlugin.files.publicPath.length : 0;
+- const excludeJSWithCSS = htmlWebpackPlugin.options.excludeJSWithCSS;
+- const excludeJSChunks = htmlWebpackPlugin.options.excludeJSChunks && new Set(Array.isArray(htmlWebpackPlugin.options.excludeJSChunks) ? htmlWebpackPlugin.options.excludeJSChunks : [htmlWebpackPlugin.options.excludeJSChunks]);
+
+//- if inline array was supplied gather which resources to inline and which to inject
+if toInline
+	each chunk, name in htmlWebpackPlugin.files.chunks
+		if excludeJSWithCSS && chunk.css.length > 0
+			- var rcSet = toInline.has(name) || toInline.has(name + ":css") ? cssToInline : cssToInject;
+			each css in chunk.css
+				- rcSet.add(css);
+			- continue;
+
+		if excludeJSChunks && excludeJSChunks.has(name)
+			- var rcSet = toInline.has(name) || toInline.has(name + ":css") ? cssToInline : cssToInject;
+			each css in chunk.css
+				- rcSet.add(css);
+			- continue;
+
+		if toInline.has(name)
+			- jsToInline.add(chunk.entry);
+			each css in chunk.css
+				- cssToInline.add(css);
+		else
+			- (toInline.has(name + ":js") ? jsToInline : jsToInject).add(chunk.entry);
+			- var rcSet = toInline.has(name + ":css") ? cssToInline : cssToInject;
+			each css in chunk.css
+				- rcSet.add(css);
+else
+	each css in htmlWebpackPlugin.files.css
+		- cssToInject.add(css);
+	each chunk, name in htmlWebpackPlugin.files.chunks
+		if (excludeJSWithCSS && chunk.css.length > 0) || (excludeJSChunks && excludeJSChunks.has(name))
+			- continue;
+		- jsToInject.add(chunk.entry);
+
+//-
+	returns contents of a compiled file
+	@filename -- name of the wanted file
+- function getFileContents(filename) {
+	- return compilation.assets[filename.substr(substrStart)].source();
+- }
+
+
+//-
+	gathers files matching filename from searchWithin
+	@filename string or regexp to filter for
+	@searchWithin Array of files, equals to htmlWebpackPlugin.files by default
+- function gatherFiles(filename, searchWithin) {
+	if searchWithin === undefined
+		- searchWithin = htmlWebpackPlugin.files.css.concat(htmlWebpackPlugin.files.js);
+	if filename instanceof RegExp
+		- return searchWithin.filter(fn => filename.test(fn));
+	else
+		- return searchWithin.indexOf(filename) !== -1 ? [filename] : [];
+- }
+
+//-
+	inlines a resource in a tag
+	@filename is a string or a RegExp to be compared against htmlWebpackPlugin.files
+	@tag if not provided is deduced from file extension
+	@searchWithin -- array of filenames to match against RegExp @filename,
+	equals to [...css, ...js] from htmlWebpackPlugin.files by default;
+	also accepts attributes to be added to div tags, +inline(...)(attributes)
+mixin inline(filename, tag, searchWithin)
+	- var files = gatherFiles(filename, searchWithin)
+	each file in files
+		- var currentTag = tag || (file.endsWith(".css") ? "style" : file.endsWith(".js") ? "script" : "div");
+
+		#{currentTag}&attributes(attributes)!= getFileContents(file)
+
+		- inlined.add(file);
+	else
+		- console.warn("WARNING Nothing to inline for %s query", filename);
+
+//-
+	injects a resource in a tag
+	@filename is a string or a RegExp to be compared against htmlWebpackPlugin.files
+	@tag if not provided is deduced from file extension
+	@searchWithin -- array of filenames to match against RegExp @filename,
+	equals to [...css, ...js] from htmlWebpackPlugin.files by default;
+	also accepts attributes to be added to div tags, +inject(...)(attributes)
+mixin inject(filename, tag, searchWithin)
+	- var files = gatherFiles(filename)
+	each file in files
+		- var currentTag = tag || (file.endsWith(".css") ? "link" : file.endsWith(".js") ? "script" : "div");
+		if currentTag === "link"
+			link(rel="stylesheet", href=file)&attributes(attributes)
+		else if currentTag === "script"
+			script(src=file)&attributes(attributes)
+		else
+			#{currentTag}&attributes(attributes)
+
+		- injected.add(file);
+	else
+		- console.warn("WARNING Nothing to inject for %s query", filename);
+
+
+
+
+//-
+	inlines css resources from htmlWebpackPlugin.files,
+	except for already inlined or injected resources
+	@cssList can be a single filename string, RegExp or an array of them,
+	cssList strings starting with "!" are skipped;
+	also accepts attributes to be added to style tags, +inlineCSS(...)(attributes)
+mixin inlineCSS(cssList)
+	if cssList === undefined
+		- cssList = Array.from(cssToInline);
+
+	- var inclExcl = constructIncludeExclude(cssList, cssToInline);
+
+	- var include = inclExcl.include;
+	- var exclude = inclExcl.exclude;
+
+	- processRc(include, (css) => {
+			+inline(css, "style", htmlWebpackPlugin.files.css)&attributes(attributes)
+	- }, exclude);
+
+
+//-
+	injects css resources from htmlWebpackPlugin.files,
+	except for already inlined or injected resources
+	@cssList can be a single filename string, RegExp or an array of them,
+	cssList strings starting with "!" are skipped;
+	also accepts attributes to be added to link tags, +injectCSS(...)(attributes)
+mixin injectCSS(cssList)
+	if cssList === undefined
+		- cssList = Array.from(cssToInject);
+
+	- var inclExcl = constructIncludeExclude(cssList, cssToInject);
+
+	- var include = inclExcl.include;
+	- var exclude = inclExcl.exclude;
+
+	- processRc(include, (css) => {
+			+inject(css, "link", htmlWebpackPlugin.files.css)&attributes(attributes)
+	- }, exclude);
+
+
+//-
+	inlines js resources from htmlWebpackPlugin.files,
+	except for already inlined or injected resources
+	@jsList can be a single filename string, RegExp or an array of them,
+	jsList strings starting with "!" are skipped;
+	also accepts attributes to be added to script tags, +inlineJS(...)(attributes)
+mixin inlineJS(jsList)
+	if jsList === undefined
+		- jsList = Array.from(jsToInline);
+
+	- var inclExcl = constructIncludeExclude(jsList, jsToInline);
+
+	- var include = inclExcl.include;
+	- var exclude = inclExcl.exclude;
+
+	- processRc(include, (js) => {
+			+inline(js, "script", htmlWebpackPlugin.files.js)&attributes(attributes)
+	- }, exclude);
+
+
+//-
+	injects js resources from htmlWebpackPlugin.files,
+	except for already inlined or injected resources
+	@jsList can be a single filename string, RegExp or an array of them,
+	jsList strings starting with "!" are skipped;
+	also accepts attributes to be added to script tags, +injectJS(...)(attributes)
+mixin injectJS(jsList)
+	if jsList === undefined
+		- jsList = Array.from(jsToInject);
+
+	- var inclExcl = constructIncludeExclude(jsList, jsToInject);
+
+	- var include = inclExcl.include;
+	- var exclude = inclExcl.exclude;
+
+	- processRc(include, (js) => {
+			+inject(js, "script", htmlWebpackPlugin.files.js)&attributes(attributes)
+	- }, exclude);
+
+
+//-
+	inlines css resources from chunks passed in htmlWebpackPlugin.options.inline
+	and injects the rest, in the order they appear htmlWebpackPlugin.files;
+	also accepts attributes to be added to link/style tags, +CSS(...)(attributes)
+mixin CSS
+	each css in htmlWebpackPlugin.files.css
+		if injected.has(css) || inlined.has(css)
+			- continue;
+
+		if cssToInline.has(css)
+			+inline(css, "style")&attributes(attributes)
+		else if cssToInject.has(css)
+			+inject(css, "link")&attributes(attributes)
+
+
+//-
+	inlines js resources from chunks passed in htmlWebpackPlugin.options.inline
+	and injects the rest, in the order they appear htmlWebpackPlugin.files;
+	also accepts attributes to be added to script tags, +JS(...)(attributes)
+mixin JS
+	each js in htmlWebpackPlugin.files.js
+		if injected.has(js) || inlined.has(js)
+			- continue;
+
+		if jsToInline.has(js)
+			+inline(js, "script")&attributes(attributes)
+		else if jsToInject.has(js)
+			+inject(js, "script")&attributes(attributes)
+
+
+//-
+	processes a single resource or a list of resources,
+	except for already inlined or injected resources,
+	calling cb function on each
+	@rcList can be a single filename string, RegExp or an array of them,
+	rcList elements contained in excludeSet are skipped
+- function processRc(rcList, cb, excludeSet) {
+	if !Array.isArray(rcList)
+		- rcList = [rcList];
+
+	each rc in rcList
+		if !injected.has(rc) && !inlined.has(rc) && !excludeSet.has(rc)
+			- cb(rc);
+- }
+
+
+//-
+	constructs an include string or Array and an exclude Set
+	elements from @set starting with "!" go into exclude Set,
+	if set consists only of !elements, include = @defaultSet
+	@set can be a single filename string with an optional "!" prefix
+	or an Array of such strings
+	@defaultSet is a Set to include by default in case of a fully exclusive @set
+- function constructIncludeExclude(set, defaultSet) {
+	- var include;
+	- const exclude = new Set();
+	if (typeof set === "string" || set instanceof String) && set[0] === "!"
+		- exclude.add(set.slice(1));
+		- include = Array.from(defaultSet);
+	else if Array.isArray(set)
+		- var allExcluded = true;
+		each css in set
+			if (typeof css === "string" || css instanceof String) && css[0] ==="!"
+				- exclude.add(css);
+			else
+				- allExcluded = false;
+		//- if set contains only excludes("!") consider include = defaultSet, otherwise = actual set
+		- include = allExcluded ? Array.from(defaultSet) : set;
+	else
+		- include = set;
+
+	- return {include, exclude};
+- }
+
+
+//-
+	inlines files of type @type from chunk with @chunkName name
+	@chunkName - a valid chunk name from htmlWebpackPlugin.files.chunks or an array of names
+	@type - can be "css" or "js", which inlines css or js files respectively,
+	otherwise inlines both types;
+	also accepts attributes to be added to style/script tags, +inlineChunk(...)(attributes)
+mixin inlineChunk(chunkNames, type)
+	if !Array.isArray(chunkNames)
+		- chunkNames = [chunkNames];
+
+	each chunkName in chunkNames
+		- var chunk = htmlWebpackPlugin.files.chunks[chunkName];
+		if !chunk
+			- console.warn("No such chunk", chunkName);
+			- continue;
+
+		if type === "css"
+			each file in chunk.css
+				if injected.has(file) || inlined.has(file)
+					- continue;
+				style&attributes(attributes)!= getFileContents(file)
+				- inlined.add(file);
+			else
+				- console.warn("No css files in %s chunk", chunkName);
+		else if type === "js"
+			if injected.has(chunk.entry) || inlined.has(chunk.entry)
+				- continue;
+			script&attributes(attributes)!= getFileContents(chunk.entry)
+			- inlined.add(chunk.entry);
+		else
+			each file in chunk.css
+				if injected.has(file) || inlined.has(file)
+					- continue;
+				style&attributes(attributes)!= getFileContents(file)
+				- inlined.add(file);
+
+			if injected.has(chunk.entry) || inlined.has(chunk.entry)
+				- continue;
+			script&attributes(attributes)!= getFileContents(chunk.entry)
+			- inlined.add(chunk.entry);
+
+
+//-
+	injects files of type @type from chunk with @chunkName name
+	@chunkName - a valid chunk name from htmlWebpackPlugin.files.chunks or an array of names
+	@type - can be "css" or "js", which injects css or js files respectively,
+	otherwise injects both types;
+	also accepts attributes to be added to link/script tags, +injectChunk(...)(attributes)
+mixin injectChunk(chunkNames, type)
+	if !Array.isArray(chunkNames)
+		- chunkNames = [chunkNames];
+
+	each chunkName in chunkNames
+		- var chunk = htmlWebpackPlugin.files.chunks[chunkName];
+		if !chunk
+			- console.warn("No such chunk", chunkName);
+			- continue;
+
+		if type === "css"
+			each file in chunk.css
+				if injected.has(file) || inlined.has(file)
+					- continue;
+				link(rel="stylesheet", href=file)&attributes(attributes)
+				- injected.add(file);
+			else
+				- console.warn("No css files in %s chunk", chunkName);
+		else if type === "js"
+			if injected.has(chunk.entry) || inlined.has(chunk.entry)
+				- continue;
+			script(src=chunk.entry)&attributes(attributes)
+			- injected.add(chunk.entry);
+		else
+			each file in chunk.css
+				if injected.has(file) || inlined.has(file)
+					- continue;
+				link(rel="stylesheet", href=file)&attributes(attributes)
+				- injected.add(file);
+
+			if injected.has(chunk.entry) || inlined.has(chunk.entry)
+				- continue;
+			script(src=chunk.entry)&attributes(attributes)
+			- injected.add(chunk.entry);

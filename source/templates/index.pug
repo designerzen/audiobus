@@ -1,0 +1,14 @@
+include ../markup/mixins.pug
+
+doctype html
+html(lang='en', manifest=htmlWebpackPlugin.files.manifest)
+	head
+		meta(charset='utf-8')
+		meta(http-equiv='X-UA-Compatible', content='IE=edge')
+
+	body
+	main
+		ul
+			//- loop through all chunks and create links to where they would go
+			each chunk, name in htmlWebpackPlugin.files.chunks
+				li: a(href="name") #{name}
