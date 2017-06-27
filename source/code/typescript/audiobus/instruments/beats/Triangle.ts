@@ -1,8 +1,6 @@
 /*//////////////////////////////////////////////////////////////////////////////
 
-MIT Licence
-
-Bass Drum
+Triangle
 ==============
 Abstract    - Basic Percussion Element
 Description -
@@ -14,7 +12,7 @@ import Instrument from '../Instrument';
 import Envelope from '../../envelopes/Envelope';
 import Noise from '../../synthesis/Noise';
 
-export default class HiHat extends Instrument
+export default class Triangle extends Instrument
 {
 		private osc5:OscillatorNode;
 		private osc6:OscillatorNode;
@@ -38,29 +36,28 @@ export default class HiHat extends Instrument
 
 			this.hiPassFilter = audioContext.createBiquadFilter();
 			this.hiPassFilter.type = 'highpass'; // HP filter
-			this.hiPassFilter.gain.value = 18;
-			this.hiPassFilter.frequency.value = 2700;
-			this.hiPassFilter.Q.value = 10;
+			this.hiPassFilter.gain.value = 12;
+			this.hiPassFilter.frequency.value = 2300;
 
 			this.biQuadFilterB = audioContext.createBiquadFilter();
-			this.biQuadFilterB.type = "peaking";
-			this.biQuadFilterB.gain.value = 9;
+			//this.biQuadFilterB.type = OscillatorTypes.SQUARE; // HP filter
 			this.biQuadFilterB.frequency.value = 200;
-			this.biQuadFilterB.Q.value = 9;
+			this.biQuadFilterB.gain.value = 9;
+			this.biQuadFilterB.type = "peaking";
 
 			const envelope = this.envelope;
       envelope.gain = 3;
 			envelope.amplitude = 0.4;
-      envelope.attackTime = 0.0002;
-      envelope.decayTime = 0.0035;
-      envelope.holdTime = 0.05;
+      envelope.attackTime = 0.002;
+      envelope.decayTime = 0.005;
+      envelope.holdTime = 0.1;
       envelope.hold = false;
       envelope.releaseTime = 0.1;
-      envelope.sustainVolume = 0.05;
+      envelope.sustainVolume = 0.2;
 			envelope.decayType = Envelope.CURVE_TYPE_EXPONENTIAL;
 
-			this.biQuadFilterB.connect( this.hiPassFilter);
-      this.input = this.hiPassFilter;
+			this.hiPassFilter.connect( this.biQuadFilterB);
+      this.input = this.biQuadFilterB;
 		}
 
 		protected createOscillators( lowFrequency:number=600, highFrequency:number=2800 ):void
@@ -100,14 +97,14 @@ export default class HiHat extends Instrument
 			this.noise.loop = true;
 			this.noise.buffer = Noise.white( 1, this.audioContext.sampleRate );
 
-			// this.osc5.connect(this.biQuadFilterB);
-			// this.osc6.connect(this.biQuadFilterB);
-			// this.osc7.connect(this.biQuadFilterB);
-			// this.osc8.connect(this.biQuadFilterB);
-			// this.osc9.connect(this.biQuadFilterB);
-			// this.oscA.connect(this.biQuadFilterB);
+			this.osc5.connect(this.hiPassFilter);
+			this.osc6.connect(this.hiPassFilter);
+			this.osc7.connect(this.hiPassFilter);
+			this.osc8.connect(this.hiPassFilter);
+			this.osc9.connect(this.hiPassFilter);
+			this.oscA.connect(this.hiPassFilter);
 			// skip one biquad
-			this.noise.connect( this.biQuadFilterB);
+			//this.noise.connect( this.biQuadFilterB);
 
 			this.ready = true;
 		}
@@ -117,13 +114,13 @@ export default class HiHat extends Instrument
 			// this.bass.stop( time ); //  transactionTime
 			// this.bass.disconnect( this.compressor );
 			// this.bass = null;
-			// this.osc5.disconnect(this.biQuadFilterB);
-			// this.osc6.disconnect(this.biQuadFilterB);
-			// this.osc7.disconnect(this.biQuadFilterB);
-			// this.osc8.disconnect(this.biQuadFilterB);
-			// this.osc9.disconnect(this.biQuadFilterB);
-			// this.oscA.disconnect(this.biQuadFilterB);
-			this.noise.disconnect(this.biQuadFilterB);
+			this.osc5.disconnect(this.hiPassFilter);
+			this.osc6.disconnect(this.hiPassFilter);
+			this.osc7.disconnect(this.hiPassFilter);
+			this.osc8.disconnect(this.hiPassFilter);
+			this.osc9.disconnect(this.hiPassFilter);
+			this.oscA.disconnect(this.hiPassFilter);
+			//this.noise.disconnect(this.biQuadFilterB);
 
 			this.osc5.stop( 0 ); //  transactionTime
 			this.osc6.stop( 0 ); //  transactionTime
@@ -146,7 +143,7 @@ export default class HiHat extends Instrument
 		}
 
 		// TRIGGERS
-		public start( lowFrequency:number=4400, highFrequency:number=9600, bump:number=0 ):boolean
+		public start( lowFrequency:number=1200, highFrequency:number=4400, bump:number=0 ):boolean
 		{
 			const wasPlaying:boolean = super.start();
       const t:number = this.audioContext.currentTime;
@@ -155,11 +152,11 @@ export default class HiHat extends Instrument
 			//this.noiseGain.gain.setValueAtTime(0.2, t);
 			//this.noiseGain.gain.linearRampToValueAtTime(0,  t + 0.025);
 			const envelopeEndsAt:number = this.envelope.duration + t;
-			this.hiPassFilter.frequency.setValueAtTime(lowFrequency, t);
-			this.hiPassFilter.frequency.linearRampToValueAtTime(highFrequency, envelopeEndsAt);
+			this.hiPassFilter.frequency.setValueAtTime(highFrequency, t);
+			this.hiPassFilter.frequency.linearRampToValueAtTime(lowFrequency, envelopeEndsAt);
 
-			this.biQuadFilterB.frequency.setValueAtTime(lowFrequency, t);
-			this.biQuadFilterB.frequency.linearRampToValueAtTime(highFrequency, envelopeEndsAt);
+			this.biQuadFilterB.frequency.setValueAtTime(highFrequency, t);
+			this.biQuadFilterB.frequency.linearRampToValueAtTime(lowFrequency, envelopeEndsAt);
 
       if ( wasPlaying )
       {
@@ -179,6 +176,8 @@ export default class HiHat extends Instrument
 				// this.osc8.start(0);
 				// this.osc9.start(0);
 				// this.oscA.start(0);
+          //return false;
+
       }
 			this.createOscillators( lowFrequency, highFrequency );
 			this.osc5.start(0);

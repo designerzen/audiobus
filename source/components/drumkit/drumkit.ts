@@ -16,6 +16,7 @@ import Snare from 'audiobus/instruments/beats/Snare';
 import Tom from 'audiobus/instruments/beats/Tom';
 
 import Engine from 'audiobus/Engine';
+import FilterDisplay from 'audiobus/visualisation/FilterDisplay';
 
 // Our omnibus needs an engine
 const context:AudioContext = Engine.fetch();
@@ -37,10 +38,10 @@ const cowbell:CowBell = new CowBell(context);
 const tom:Tom = new Tom(context);
 
 // user interface elements...
-const elementKick = document.getElementById("kick");
-const elementConga = document.getElementById("conga");
-const elementSnare = document.getElementById("snare");
-const elementHat = document.getElementById("hihat");
+const elementKick:HTMLElement = document.getElementById("kick");
+const elementConga:HTMLElement = document.getElementById("conga");
+const elementSnare:HTMLElement = document.getElementById("snare");
+const elementHat:HTMLElement = document.getElementById("hihat");
 
 // connect our drums to either a mixer or the engine directly
 Engine.connect( kick.output );
@@ -77,13 +78,21 @@ Engine.connect( tom.output );
 // }
 
 let documentWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-
 let documentHeight = window.innerHeight || document.documentElement.clientHeight|| document.body.clientHeight;
+const display:FilterDisplay = new FilterDisplay( documentWidth, documentHeight );
+
+const element = display.element;
+element.id = "curves";
+document.body.appendChild( element );
+
+const filters = [  hat.hiPassFilter,  hat.biQuadFilterB ];
+let filterCount:number = 0;
+
 
 // or via a method...
-const onButtonDown = function( element, instrument:Instrument )
+const onButtonDown = function( element:HTMLElement, instrument:Instrument )
 {
-  element.onclick = (event)=>{
+  element.onclick = (event:MouseEvent)=>{
     let x:number = event.pageX - element.offsetLeft ;
     let y:number = event.pageY - element.offsetTop;
     let percentageX:number = x/documentWidth;
@@ -92,6 +101,11 @@ const onButtonDown = function( element, instrument:Instrument )
     console.log(element.id,"clicked",100*percentageX>>0,100*percentageY>>0);
     // start relevant instrument...
     instrument.start();
+
+    // update the curve to the filter...?
+    const filter = filters[ filterCount ] ;
+    display.updateFrequencyResponse( filter );
+    filterCount = filterCount < filters.length-1 ? filterCount + 1 : 0;
   }
 }
 
@@ -99,3 +113,26 @@ onButtonDown(elementKick, kick );
 onButtonDown(elementConga, conga );
 onButtonDown(elementSnare, snare );
 onButtonDown(elementHat, hat );
+
+//sliders..
+const elementInputFrequency:HTMLElement = document.getElementById("input-frequency");
+const elementInputResonance:HTMLElement = document.getElementById("input-resonance");
+const elementInputGain:HTMLElement = document.getElementById("input-gain");
+
+elementInputFrequency.addEventListener("change", ()=> {
+  const filter = filters[ filterCount ] ;
+  filter.frequency.value = this.value;
+  display.updateFrequencyResponse( filter );
+});
+
+elementInputResonance.addEventListener("change", ()=> {
+  const filter = filters[ filterCount ] ;
+  filter.Q.value = this.value;
+  display.updateFrequencyResponse( filter );
+});
+
+elementInputGain.addEventListener("change", ()=> {
+  const filter = filters[ filterCount ] ;
+  filter.gain.value = this.value;
+  display.updateFrequencyResponse( filter );
+});

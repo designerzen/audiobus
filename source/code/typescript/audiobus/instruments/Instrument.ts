@@ -47,11 +47,18 @@ export default class Instrument extends AudioComponent
 		// 	port.connect( this.outputGainNode ); // outputGainNode
 		// }
 
+		// for some lame reason this is not overriding it's parent!
+		public get input():AudioNode
+		{
+			return this.inputAudioNode;
+		}
+
 		// // Set which port this device gets it's data from...
 		public set input( port:AudioNode )
 		{
 			this.inputAudioNode = port;
 			console.error("Connecting envelope input to ", port);
+			// we re-route the output through the envelope :P
 			this.envelope.input = port;//.connect( port );
 		}
 

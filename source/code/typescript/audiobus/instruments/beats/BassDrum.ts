@@ -26,7 +26,6 @@ export default class BassDrum extends Instrument
 		{
 			super( audioContext );
 
-
       // Create a compressor node
       const compressor = audioContext.createDynamicsCompressor();
       compressor.threshold.value = -50;
@@ -38,7 +37,7 @@ export default class BassDrum extends Instrument
       this.compressor = compressor;
 
       const biquadFilter= audioContext.createBiquadFilter();
-      //biquadFilter.type = "lowshelf";
+      biquadFilter.type = "lowshelf";
       biquadFilter.frequency.value = 100;
       biquadFilter.gain.value = 5;
       this.biquadFilter = biquadFilter;
@@ -48,17 +47,18 @@ export default class BassDrum extends Instrument
 			//this.bass.type = "sine";
 
       // Shape the output waveform
-      this.envelope.gain = 8;
-      this.envelope.attackTime = 0.002;
-      this.envelope.decayTime = 0.05;
-      this.envelope.holdTime = 0;
-      this.envelope.hold = false;
-      this.envelope.releaseTime = 0.3;
-      this.envelope.sustainVolume = 0.8;
+			const envelope = this.envelope;
+      envelope.gain = 8;
+      envelope.attackTime = 0.002;
+      envelope.decayTime = 0.05;
+      envelope.holdTime = 0;
+      envelope.hold = false;
+      envelope.releaseTime = 0.3;
+      envelope.sustainVolume = 0.8;
 
       // Connect these bits and pieces together
-
       compressor.connect(biquadFilter);
+			// osciallator fits between...
 			this.input = biquadFilter;
     };
 
@@ -86,7 +86,8 @@ export default class BassDrum extends Instrument
 		{
 			const wasPlaying:boolean = super.start();
       const t:number = this.context.currentTime;
-
+			// time in this context must be sent to the envelope if it is deffered...
+			//if  ( !wasPlaying )
 			if  ( !wasPlaying )
 			{
 				this.createOscillator( endFrequency );
@@ -98,9 +99,10 @@ export default class BassDrum extends Instrument
 				this.bass.start( 0 ); // this.context.currentTime
 				return true;
 			}else{
-
+				// else just modify the existing osciallator
+				this.bass.frequency.cancelScheduledValues(t);
 				this.bass.frequency.setValueAtTime( startFrequency, t );
-				this.bass.frequency.exponentialRampToValueAtTime( endFrequency, t + length );
+				this.bass.frequency.exponentialRampToValueAtTime( endFrequency, t+length );
 
 				return false;
 			}

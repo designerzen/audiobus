@@ -12,68 +12,140 @@ Methods     -
 //////////////////////////////////////////////////////////////////////////////*/
 import Instrument from '../Instrument';
 import Envelope from '../../envelopes/Envelope';
+import Noise from '../../synthesis/Noise';
 
 export default class Snare extends Instrument
 {
 	private noise:AudioBufferSourceNode;
-	private noiseBuffer:AudioBuffer;
-	private noiseData:Float32Array;
+	private oscillator:OscillatorNode;
+	public compressor:DynamicsCompressorNode;
+	public noiseHiPassFilter:BiquadFilterNode;
 
 	// create
 	constructor( audioContext?:AudioContext )
 	{
 		super( audioContext );
 
-		//	GENERATE NOISE >>>
-		this.noiseBuffer = audioContext.createBuffer(1, 22050, 22050);
-		this.noiseData = this.noiseBuffer.getChannelData(0);
+		const masterHighBump = audioContext.createBiquadFilter();
+    masterHighBump.frequency.value = 4000;
+    masterHighBump.gain.value = 6;
+    masterHighBump.type = "peaking";
 
-		for (let i = 0, l = this.noiseData.length; i < l ; ++i)
-		{
-      // 0 -> 1
-			this.noiseData[i] = (Math.random() - 0.5) * 2;
-		}
-		this.noise = audioContext.createBufferSource();
+		const masterLowBump = audioContext.createBiquadFilter();
+    masterLowBump.frequency.value = 200;
+    masterLowBump.gain.value = 12;
+    masterLowBump.type = "peaking";
+
+
+		// a tasty high pass filter to take off some of the lower frequencies of the noise...
+		const noiseHiPassFilter = this.context.createBiquadFilter();
+		noiseHiPassFilter.type = 'highpass';
+		noiseHiPassFilter.gain.value = 12;
+		noiseHiPassFilter.frequency.value = 1000;	// 1200
+		this.noiseHiPassFilter = noiseHiPassFilter
+
+		const compressor = audioContext.createDynamicsCompressor();
+		compressor.threshold.value = -15;
+		compressor.knee.value = 33;
+		compressor.ratio.value = 5;
+		//compressor.reduction = -10;
+		compressor.attack.value = 0.005;
+		compressor.release.value = 0.15;
+
+		this.compressor= compressor;
+
+		compressor.connect(noiseHiPassFilter);
+		noiseHiPassFilter.connect(masterHighBump);
+		masterHighBump.connect(masterLowBump);
+		//masterLowBump.connect(osc);
+		//masterLowBump.connect(noiseHiPassFilter);
+
+		this.input = masterLowBump;
+		console.error( 'this.input ',this.input , masterHighBump);
+		// now connect the input and save a reference...
+
+
+		    // const oscsHighpass = audioContext.createBiquadFilter();
+		    // oscsHighpass.type = "highpass";
+		    // oscsHighpass.frequency.value = 400;
+		    // oscsHighpass.connect(masterBus);
+
+		//this.input = this.noise;
+		// const envelope:Envelope = this.envelope;
+    // envelope.attackTime = 0.025;
+    // envelope.decayTime = 0.050;
+    // envelope.releaseTime = 0.3;
+    // envelope.sustainVolume = 0.2;
+		const envelope = this.envelope;
+		envelope.gain = 8;
+		envelope.amplitude = 0.6;
+		envelope.attackTime = 0.002;
+		envelope.decayTime = 0.005;
+		envelope.holdTime = 0.1;
+		envelope.hold = false;
+		envelope.releaseTime = 0.1;
+		envelope.sustainVolume = 0.5;
+		envelope.decayType = Envelope.CURVE_TYPE_EXPONENTIAL;
+	}
+
+	public createNoise():void
+	{
+		const osc = this.audioContext.createOscillator();
+    osc.frequency.value = 100;	// low freq!
+		osc.type = 'triangle';
+		this.oscillator = osc;
+		this.oscillator.connect( this.compressor );
+
+		this.noise = this.audioContext.createBufferSource();
+		this.noise.buffer = Noise.white( 1, this.audioContext.sampleRate );
 		this.noise.loop = true;
-		this.noise.buffer = this.noiseBuffer;
+		console.error( 'this.input ',this.noiseHiPassFilter );
+		// Connect these bits and pieces together
+		this.noise.connect( this.noiseHiPassFilter );
+	}
 
-    this.envelope.attackTime = 0.025;
-    this.envelope.decayTime = 0.050;
-    this.envelope.releaseTime = 0.3;
-    this.envelope.sustainVolume = 0.2;
+	public destroyNoise():void
+	{
+		this.oscillator.stop();
+		this.oscillator.disconnect( this.compressor );
+		this.oscillator = null;
 
-    // Connect these bits and pieces together
-    this.input = this.noise;
+		this.noise.stop();
+		//this.input = null;
+		this.noise.disconnect( this.noiseHiPassFilter );
+		this.noise = null;
 	}
 
 	// trigger!
-	public start( l:number=2050, attack:number=0.025, offsetB:number=0.050, offsetC:number=0.3):boolean
+	public start( startFrequency:number=10,endFrequency:number=200 ):boolean
 	{
-          /*
-		var t:number = this.context.currentTime;
+		const wasPlaying:boolean = super.start();
+		const time:number = this.audioContext.currentTime;
 
-          // ASDR
-		this.gain.gain.cancelScheduledValues( t );
-		this.gain.gain.setValueAtTime(1, t);
-		this.gain.gain.linearRampToValueAtTime(1, t + attack);
-		this.gain.gain.exponentialRampToValueAtTime(0.2, t + offsetB);
-		this.gain.gain.linearRampToValueAtTime(0.0, t + offsetC);
-          */
-    if  ( super.start() )
+    if  ( wasPlaying )
     {
         // as you always want the snare to sound the same
         // we always start the noise from the same position
-        this.noise.start(0);
-        return true;
+				this.destroyNoise();
+
     }else{
-        return false;
+
     }
+		this.createNoise();
+		this.noise.start(0);
+		// ramp!
+		this.oscillator.frequency.cancelScheduledValues(time);
+		this.oscillator.frequency.setValueAtTime(100, time);
+		this.oscillator.frequency.exponentialRampToValueAtTime( endFrequency, time+length );
+		this.oscillator.start(time)
+
+		return wasPlaying;
 	}
-  /*
+
   public stop():boolean
   {
-      this.envelope.stop();
+      this.destroyNoise();
       return super.stop();
   }
-  */
+
 }

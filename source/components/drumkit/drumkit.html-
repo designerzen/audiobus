@@ -27,6 +27,9 @@
             <li class="drum" id="snare"></li>
             <li class="drum" id="hihat"></li>
         </ul>
+        <input id="frequencySlider" title="Frequency" type="range" min="0" max="2000" value="1000" />
+        <input id="qSlider" title="Q" type="range" min="1" max="100" value="10" />
+        <input id="gainSlider" title="Gain" disabled type="range" min="1" max="100" value="20" />
       </article>
 
     </div>

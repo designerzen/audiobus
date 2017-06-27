@@ -13,14 +13,14 @@ Methods     -
 import Instrument from '../Instrument';
 import Envelope from '../../envelopes/Envelope';
 
-
-enum OscillatorTypes {
-  SINE = 'sine',
-  SQUARE = 'square',
-  SAWTOOTH = 'sawtooth',
-  TRIANGLE = 'triangle',
-  CUSTOM = 'custom'
-}
+//
+// enum OscillatorTypes {
+//   SINE = 'sine',
+//   SQUARE = 'square',
+//   SAWTOOTH = 'sawtooth',
+//   TRIANGLE = 'triangle',
+//   CUSTOM = 'custom'
+// }
 
 
 export default class CowBell extends Instrument

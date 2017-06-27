@@ -64,14 +64,29 @@ export default class AudioComponent
 	// // Set which port this device gets it's data from...
 	public set input( port:AudioNode )
 	{
+		// check to see if we are already connected...
+		if (port === this.inputAudioNode)
+		{
+			// already connected?
+			return;
+		}
+
+		if (this.inputAudioNode && port)
+		{
+			// already connected so disconnect...
+			this.outputGainNode.disconnect( port );
+		}
+
+		// save for next time!
 		this.inputAudioNode = port;
+
+		// if null is passed through we force disconnect...
 		if (port)
 		{
 			this.outputGainNode.connect( port );
 		}else{
 			this.outputGainNode.disconnect( port );
 		}
-
 	}
 
   // if no context is specified we get the engine default...
