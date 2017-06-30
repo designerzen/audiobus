@@ -87,6 +87,7 @@ const destination = function( folder )
     output.assets      = path.join(folder,"assets");
     output.midi        = path.join(output.assets,"midi","[name].mid?[hash]-[name]");
     output.static      = path.join(folder);
+    output.images       = path.join(output.assets ,"images","[name].[ext]");
     output.scripts     = path.join(output.assets ,"scripts","[name].js");
     output.style       = path.join(output.assets, "style", "[name].css" ); // ?[hash]-[name]
     output.examples    = path.join(folder,'examples');

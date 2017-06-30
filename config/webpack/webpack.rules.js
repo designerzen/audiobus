@@ -212,10 +212,11 @@ const rulePugExtracted = {
 // Images...
 const ruleImages = {
   test: /\.(png|svg|jpeg|jpg|gif|webp)$/,
-  include: [ Settings.folders.images ],
+  //include: [ Settings.folders.images ],
   exclude: [ Settings.folders.fonts ],
   // [sha512:hash:base64:7].[ext]
-  loader: 'file-loader?name=[path][name].[ext]'//+destination.images
+  //loader: 'file-loader?name=[path][name].[ext]'//+destination.images
+  loader: 'file-loader?name='+destination.images
 };
 
 const ruleVideos = {

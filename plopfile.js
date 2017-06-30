@@ -1,4 +1,5 @@
 // https://www.npmjs.com/package/plop
+// https://plopjs.com/documentation/#cli-usage
 import inquirer from 'inquirer-directory';
 
 const pathTemplate = "./client/template/";
