@@ -14,12 +14,29 @@ import Instrument from '../Instrument';
 import Envelope from '../../envelopes/Envelope';
 import Noise from '../../synthesis/Noise';
 
+const PI_OVER_180 = Math.PI / 180;
+
 export default class Snare extends Instrument
 {
 	private noise:AudioBufferSourceNode;
 	private oscillator:OscillatorNode;
 	public compressor:DynamicsCompressorNode;
 	public noiseHiPassFilter:BiquadFilterNode;
+
+	private distortionCrve(amount:number=50)
+	{
+	  const n_samples = 44100
+	  const curve = new Float32Array(n_samples);
+	  const deg = PI_OVER_180;
+	  let  x;
+
+	  for ( let i=0; i < n_samples; ++i )
+		{
+	    x = i * 2 / n_samples - 1;
+	    curve[i] = ( 3 + amount ) * x * 20 * deg / ( Math.PI + amount * Math.abs(x) );
+	  }
+	  return curve;
+	}
 
 	// create
 	constructor( audioContext?:AudioContext )
