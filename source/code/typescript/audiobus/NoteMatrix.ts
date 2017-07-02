@@ -24,7 +24,7 @@ export default class NoteMatrix
   public isNoteOff( noteNumber:number ):boolean
   {
     // loose inequality...
-    return this.notes[ noteNumber ] != true;
+    return this.notes[ noteNumber ] !== true;
   }
 
   public chordOn()
@@ -42,14 +42,14 @@ export default class NoteMatrix
   {
     const previousValue:boolean = this.notes[ noteNumber ] || false;
     this.notes[ noteNumber ] = true;
-    return previousValue != true;
+    return previousValue !== true;
   }
 
   public noteOff( noteNumber:number ):boolean
   {
     const previousValue:boolean = this.notes[ noteNumber ] || false;
     this.notes[ noteNumber ] = false;
-    return previousValue != false ;
+    return previousValue !== false ;
   }
 
 }
