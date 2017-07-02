@@ -67,6 +67,14 @@ export default class Command implements ICommand
   // the actual position in the track that the command occurs at
   public timeCode:number;
 
+  // create a duplicate of this object...
+  public clone():Command
+  {
+    const copy:Command = new Command();
+    Object.assign(copy, this);
+    return copy;
+  }
+
   public toString():string
   {
     var ouput:string = '[Command > '+this.subtype+']';

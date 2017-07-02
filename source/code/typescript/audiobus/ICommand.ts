@@ -9,6 +9,8 @@ interface ICommand {
   data:string;
   type:string;        // note on, note off etc
   subtype:string;
+  programNumber:number; // midi number of the instrument, or a custom number
+  clone():ICommand;
 }
 
 export default ICommand;
