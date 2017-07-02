@@ -6,6 +6,7 @@ and disposed of as needed...
 */
 
 import NoteMatrix from './NoteMatrix';
+import PolyphonicMatrix from './PolyphonicMatrix';
 import ICommand from './ICommand';
 import Command from './Command';
 import Instrument from './instruments/Instrument';
@@ -13,22 +14,20 @@ import Scales from './scales/Scales';
 
 export default class VoiceFactory
 {
-
-  // notes on
-  public voices = {};
+  protected context:AudioContext;
 
   // there are 12 possible channels...
-  public channels:Array<NoteMatrix> = [];
+  public channels:PolyphonicMatrix;
   public instruments:object;//}:Array<Instrument>;
+  public voices:Array<Instrument>;
 
   // PMEMode means do we rotate channels?
-  constructor( quantityOfChannels:number=12, PMEMode:boolean=false )
+  constructor( audioContext:AudioContext, quantityOfChannels:number=12 )
   {
-    for ( let c=0, l=quantityOfChannels; c<l; ++c )
-    {
-      this.channels.push( new NoteMatrix() );
-    }
+    this.context = audioContext;
+    this.channels = new PolyphonicMatrix(quantityOfChannels);
     this.instruments = {};
+    this.voices = [];
   }
 
   public chordOn()
@@ -38,6 +37,78 @@ export default class VoiceFactory
 
   public chordOff()
   {
+
+  }
+
+  public getFreeInstruments():Array<Instrument>
+  {
+    const instruments:Array<Instrument> = [];
+    this.voices.forEach( (instrument:Instrument )=>{
+      if (instrument.hasFinished)
+      {
+        instruments.push(instrument);
+      }
+    })
+    return instruments;
+  }
+
+  // This creates a new instrument if one does not exist...
+  private factory<I extends Instrument>( noteNumber:number, InstrumentClass: new (audioContext?:AudioContext) => I ):I
+  {
+    const freeInstruments:Array<Instrument> = this.getFreeInstruments();
+    let instrument:I;// Instrument;
+    console.error("VoiceFactory factory looking for free instruments... "+freeInstruments );
+    if (freeInstruments.length)
+    {
+      instrument = <I>freeInstruments[0] ;
+      console.error("VoiceFactory factory looking for free instrument found recycle?", instrument);
+      return instrument;
+
+    }else{
+      instrument = new InstrumentClass( this.context );
+      // save in our cache...
+      this.instruments[ noteNumber] = instrument;
+      this.voices.push( instrument );
+    }
+
+    return instrument;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // check to see if there is already a note playing on this channel...
+  //////////////////////////////////////////////////////////////////////////////
+  public noteOn<I extends Instrument>( noteNumber:number, channel:number, InstrumentClass: new (audioContext?:AudioContext) => I ):I
+  {
+    const wasPlaying:boolean = this.channels.noteOn( noteNumber, channel );
+    const existing = this.instruments[ noteNumber ];
+    if (existing && wasPlaying)
+    {
+      // if this note was playing before, that means we already have an instance of
+      // the InstrumentClass in memory, playing in this note :)
+      console.error("VoiceFactory:noteOn("+noteNumber+":"+channel+") - found existing", existing, "hasFinished:"+existing.hasFinished );
+      return existing
+    }else{
+      // if not, we need to create a new instance and save that somewhere safe
+      const instrument:I = this.factory(noteNumber, InstrumentClass);
+      console.error("VoiceFactory:noteOn("+noteNumber+":"+channel+") - creating new", instrument);
+      return instrument;
+    }
+  }
+
+  public noteOff<I extends Instrument>( noteNumber:number, channel:number, InstrumentClass: new (audioContext?:AudioContext) => I ):I
+  {
+    const wasPlaying:boolean = this.channels.noteOff( noteNumber, channel );
+    const existing = this.instruments[ noteNumber ];
+    if (existing && wasPlaying)
+    {
+      const instrument:I = this.instruments[ noteNumber ];
+      //delete this.instruments[ noteNumber ];
+      console.error("VoiceFactory:noteOff("+noteNumber+":"+channel+") - found",instrument);
+      return instrument;
+    }else{
+      console.error("VoiceFactory:noteOff("+noteNumber+":"+channel+") - nothing to stop", this.instruments[ noteNumber ]);
+      return null;
+    }
 
   }
 
@@ -52,7 +123,7 @@ export default class VoiceFactory
     console.error( "I.constructor", InstrumentClass.constructor );
 
     let instrument:I = this.instruments[instrumentName];
-
+    let context:AudioContext = this.context;
     // check to see if one exists...
     if ( instrument )
     {
@@ -63,7 +134,7 @@ export default class VoiceFactory
         console.error("VoiceFactory:fetchInstrument:recycle:", instrument.toString() );
       }else{
         // better spawn a new one so it doesn't crash with the one playing...
-        instrument = new InstrumentClass();
+        instrument = new InstrumentClass( context );
         // and overwrite the pointer to the existing one so it can be garbage collected when it is finished...
         this.instruments[instrument.name] = instrument;
         console.error("VoiceFactory:fetchInstrument:overwrite:", instrument.toString() );

@@ -1,5 +1,6 @@
 import Timer from '../timing/Timer';
 import ICommand from '../ICommand';
+import Command from '../Command';
 import ITrack from '../ITrack';
 
 export default class Sequencer
@@ -19,6 +20,7 @@ export default class Sequencer
 
 	// place to store our commands...
 	public commands:Array<ICommand> = [];
+	public activeCommands:object = {};
 	public positions:object = {};
 
 	private timer:Timer= new Timer();
@@ -32,6 +34,10 @@ export default class Sequencer
 	public get isPaused():boolean
 	{
 		return this.timer.isPaused;
+	}
+	public get duration():number
+	{
+		return this.previousTime;
 	}
 
 	constructor()
@@ -83,8 +89,11 @@ export default class Sequencer
 	public add( command:ICommand )
 	{
 		// sets the cue
-		const position:number = this.previousTime + command.deltaTime + 400;
+		const position:number = this.previousTime + command.deltaTime ;
+
+		// time code does not represent a timestamp but an offset from the start of the track
 		command.timeCode = position;
+
 		//this.commands.push( command );
 		// and stores an instance in the dictionary with the time key
 		//this.timings[command.] = command;
@@ -185,11 +194,27 @@ export default class Sequencer
 
 	}
 
+	private addActiveCommand(command:ICommand)
+	{
+		this.activeCommands[ command.noteNumber ] = command;
+
+	}
+	private removeActiveCommand(command:ICommand)
+	{
+		delete this.activeCommands[ command.noteNumber ];
+
+	}
+
 	protected onUpdate(startTime:number, time:number):void
 	{
 
 		const elapsed:number = ( time - startTime) >> 0;  // stupid floating points...
+		const progress:number = elapsed / this.duration;
+		console.log( 'Sequencer:'+Math.round( 100*progress )+'% '+elapsed + '/'+this.duration ) ;
 
+		// if we are paused, we need to re-adjust the last timestamp here...
+		// also, as we are using relative time in the commands, but absolute
+		// time
 		if (this.isPaused)
 		{
 			// update timestamp to something more recent...
@@ -198,21 +223,40 @@ export default class Sequencer
 			return;
 		}
 
-
-		// if we are paused, we need to re-adjust the last timestamp here...
-		const startPosition:number = this.lastTimeStamp;
-		const endPosition:number = elapsed;
-
-		const commands = this.getCommandsBetween( startPosition, endPosition );
-		if (commands && commands.length )
+		if (elapsed >= this.duration)
 		{
-			console.log("Sequencing", elapsed, commands );
-			// now send out all of them!
-			commands.forEach( (command)=>{
-				this.onEvents( this, command, elapsed );
-			});
+			// completed...
+		}else{
+			// play next
+			const startPosition:number = this.lastTimeStamp;
+			const endPosition:number = elapsed;
 
+			const commands = this.getCommandsBetween( startPosition, endPosition );
+			if (commands && commands.length )
+			{
+				console.log(elapsed, "Sequencing "+commands.length+" commands", commands );
+				// now send out all of them!
+				commands.forEach( (command)=>{
+					switch ( command.subtype )
+				  {
+						case Command.COMMAND_NOTE_ON:
+							this.addActiveCommand(command);
+							break;
+
+						case Command.COMMAND_NOTE_OFF:
+							this.removeActiveCommand(command);
+							break;
+
+					}
+					// if it is a note on... add it to our matrix...
+
+					// if it is a note off... remove it from the matrix...
+					this.onEvents( this, command, elapsed );
+				});
+
+			}
 		}
+
 		// now save the last time stamp, ready for the next comparison...
 		this.lastTimeStamp = elapsed;
 	}
