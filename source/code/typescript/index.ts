@@ -45,9 +45,12 @@ import Oscillator from './audiobus/instruments/primitives/Oscillator';
 import OscillatorTypes from './audiobus/instruments/OscillatorTypes';
 import BassDrum from './audiobus/instruments/beats/BassDrum';
 
+import TB303WaveTable from './audiobus/instruments/TB303/TB303WaveTable';
+import TB303 from './audiobus/instruments/TB303/TB303';
+import TB303Config from './audiobus/instruments/TB303/TB303Config';
+
 import Scales from './audiobus/scales/Scales';
 import PitchDetect from './audiobus/analyse/PitchDetect';
-
 
 
 
@@ -61,6 +64,7 @@ if (!engine)
   // Upgrading your browser will fix this. Try Chromium or Firefox!
   throw Error("Browser does not support WebAudio. Try a newer browser.");
 }
+
 
 
 // If our app has more than one audio source, we are also going to need a mixer...
@@ -156,8 +160,8 @@ netronome.beat = ( scope:Timer, startTime:number, time:number ) => {
 
 
 // Some MIDI Hardware to play with...
-const tb303:TB3 = new TB3();
-tb303.onMidi = ( alias:string, device:WebMidi.MIDIInput, event:WebMidi.MIDIMessageEvent ) => {
+const tb3:TB3 = new TB3();
+tb3.onMidi = ( alias:string, device:WebMidi.MIDIInput, event:WebMidi.MIDIMessageEvent ) => {
    //console.error("huzzah for a midi message has been received!", alias, device, event )
    // convert this event into a command!
    let command:MidiCommand = MidiCommandFactory.fromMidiEvent(event);
@@ -170,45 +174,117 @@ tb303.onMidi = ( alias:string, device:WebMidi.MIDIInput, event:WebMidi.MIDIMessa
    }
 };
 
+// Our Emulated 303...
+let tb303Settings:TB303Config = new TB303Config();
+let tb303:TB303 = new TB303( engine );
+Engine.connect( tb303.output );
+//
+// let tb303b:TB303 = new TB303( engine );
+// Engine.connect( tb303b.output );
+//
+// let tb303c:TB303 = new TB303( engine );
+// Engine.connect( tb303c.output );
+
+// first load in our wave table =D
+//TB303WaveTable.generate( sampleRate ).then((waves:Float32Array)=>{
+//TB303WaveTable.fetch( "assets/images/wavetable.png" ).then((waves:Float32Array)=>{
+// TB303WaveTable.fetch().then((waves:Float32Array)=>{
+//
+//     // begin!
+//     tb303 = new TB303( engine );
+//     // const bufferSize = 4096;
+//     // const looper = engine.createScriptProcessor(bufferSize, 1, 1);
+//     // looper.onaudioprocess = (e) => {
+//     //   const output = e.outputBuffer.getChannelData(0);
+//     //   for (var i = 0; i < bufferSize; ++i)
+//     //   {
+//     //     output[i] = tb303.render();
+//     //   }
+//     //   console.log("gah");
+//     // }
+//     // Engine.connect( looper );
+//
+//     //tb303.begin();
+//     Engine.connect( tb303.output );
+//
+//
+//
+// });
+
 // as you can set up your device to be on whatever midi channel you want...
 // here we bind one to another!
 const channels:Array<number> = [0];
 const forceToChannel:number = 1; // my TB3 is expecting commands to channel 1
 const sequencer:Sequencer = new Sequencer();
-
-
 let sequencerIndex:number = 0;
-let notes:NoteMatrix = new NoteMatrix();
 
 
-let voiceFactory = new VoiceFactory();
 
-const playCommand = function( command:ICommand, channel?:number )
+let voiceFactory = new VoiceFactory( engine, 12 );
+
+const playCommand = function( command:ICommand, forceToChannel:number=-1, wasPlaying:boolean=false, transpose:number=2 )
 {
-  tb303.command( command, channel );
+  let instrument;
+  const channel:number = forceToChannel > -1 ? forceToChannel : command.channel;
+  //tb3.command( command, channel );
 
   // Get the port where the data comes out from...
-  let voice:Instrument = voiceFactory.fetchInstrument( Oscillator, Oscillator.NAME );
+  //let voice:Instrument = voiceFactory.fetchInstrument( Oscillator, Oscillator.NAME );
   // //console.log( voice, {hasStarted:oscillator.hasStarted,	hasFinished:oscillator.hasFinished} );
   //
   //
   // // connect if unconnected...
   //Engine.connect( voice.output );
   // mixer.connect( voice.output );
+  const note:number = command.noteNumber + transpose*12;
 
   switch ( command.subtype )
   {
     case "noteOn":
-      const pitch:number = Scales.frequencyFromNoteNumber(command.noteNumber);
+     //const pitch:number = note - downFlag*12 + upFlag*12 + this.tuning;
+     //const freq:number = Math.pow(2.0,(pitch-69)/12);
+
+      const frequency:number = Scales.frequencyFromNoteNumber(note);
+      const name:string = Scales.noteNameFromPitch(frequency);
       //kick.start( pitch-100, pitch );
       //oscillator.start( pitch );
-      voice.start( pitch );
+      //voice.start( pitch );
+      // notes!
+      const accent:boolean = false; //Math.random() >= 0.5;//false;
+      const slide:boolean = wasPlaying; //Math.random() >= 0.5;//false;
+      const gate:boolean = false;
+      const length:number= 100; // ms
+
+      // create
+      instrument = voiceFactory.noteOn( note, channel, TB303 );
+      // set up instrument with our shared settings...
+      instrument.config = tb303Settings;
+      console.log( tb303Settings );
+
+      // instrument.shape = tb303Settings.shape;              // 0 -> 1
+      // instrument.resonance = tb303Settings.resonance;              // 0 -> 1
+      // instrument.accent = tb303Settings.accent;              // 0 -> 1
+      // instrument.threshold = tb303Settings.threshold;              // 0 -> 1  : softness
+      // instrument.cutOff = tb303Settings.cutOff;                // 200 -> 20000
+      // instrument.envelopeModulation = tb303Settings.envelopeModulation;    // 0 -> 1
+      // instrument.tuning = tb303Settings.tuning;                // -12 -> 12
+      //
+      instrument && instrument.start( note, length,accent, slide, gate );
+      Engine.connect( instrument.output );
+
+      //tb303 && tb303.start( note, length,accent, slide, gate );
+      // console.error("Playing note "+name+ " -> " +frequency+"Hz -> "+note);
+
+      //tb3.command( command, channel );
       break;
 
     case"noteOff":
       //oscillator.stop();
       //kick.stop();
-      voice.stop();
+      //voice.stop();
+      //tb303 && tb303.stop();
+       instrument = voiceFactory.noteOff( note, channel, TB303 );
+       instrument && instrument.stop();
       break;
   }
 }
@@ -217,7 +293,7 @@ const playCommand = function( command:ICommand, channel?:number )
 //mergerNode.connect( this.audioContext.destination );
 
 
-const playNextCommand = function()
+const playNextCommand = function( forceNoteOn:boolean=false )
 {
   let satisfied:boolean = false;  // only satisfied if a note on is available ;)
   // This should go in a loop somewhere...
@@ -231,13 +307,17 @@ const playNextCommand = function()
       // check their type to see if they are note on or note off etc...
       console.log(sequencerIndex+". nextCommand", command.subtype );
 
+      // let us play the 303 :P
+      let wasPlayingBefore = false;
       switch ( command.subtype )
       {
         case "noteOn":
           // you can check to see if the status has changed...
-          const wasPlayingBefore:boolean = notes.noteOn( command.noteNumber );
+          //const wasPlayingBefore:boolean = notes.noteOn( command.noteNumber );
           // loop
           satisfied = true;
+          playCommand( command, forceToChannel, wasPlayingBefore );
+
           // if (!wasPlayingBefore)
           // {
           //   satisfied = true;
@@ -247,12 +327,17 @@ const playNextCommand = function()
 
       case"noteOff":
 
-        const wasStoppedBefore:boolean = notes.noteOff( command.noteNumber );
+        //const wasStoppedBefore:boolean = notes.noteOff( command.noteNumber );
+        playCommand( command, forceToChannel, !wasPlayingBefore );
+
+        // if you don't want note offs to be a seperate command...
+        // flip this to false
+          satisfied = forceNoteOn;
         // exit!
         break;
       }
 
-      playCommand( command, forceToChannel );
+
 
     })
     sequencerIndex += nextCommands.length;
@@ -274,7 +359,11 @@ const playNextCommand = function()
 //
 // Interface with MIDI or load a MIDI file
 const midiFile:MidiFile = new MidiFile();
-const midilocation:string = "assets/midi/funktown.mid";
+const midilocation:string = "assets/midi/nyan-cat.mid";
+//const midilocation:string = "assets/midi/banjos.mid";
+//const midilocation:string = "assets/midi/funktown.mid";
+//const midilocation:string = "assets/midi/midi-sans-frontieres.mid";
+//const midilocation:string = "assets/midi/chopin-polishdance.mid";
 
 
 //
@@ -418,9 +507,10 @@ midiFile.load( midilocation ).then(
 
       // now send this out to the midi device & channel(s) specified! :)
       channels.forEach( (channel:number)=>{
-        tb303.command( command, channel );
+
+        playCommand( command, channel, false )
       });
-      // tb303.command( command, forceToChannel );
+      // tb3.command( command, forceToChannel );
     };
     //sequencer.start();
 
@@ -444,6 +534,16 @@ midiFile.load( midilocation ).then(
 
 
 
+
+
+
+
+
+
+
+
+
+
 // now we can start the engine :)
 
 // at any time...
@@ -451,10 +551,9 @@ midiFile.load( midilocation ).then(
 //mixer.volume = 1;
 //mixer.solo();
 
-window.onkeydown = function(event){
-  //console.log("keydown",event);
-  playNextCommand();
-}
+
+
+
 
 window.onfocus = function() {
   // pause timer...
@@ -466,4 +565,112 @@ window.onblur = function() {
   // resume timer
   console.error("Tab lost focus");
   sequencer.pause();
+}
+
+let keyDown:boolean =false;
+
+window.onkeydown = function(event){
+  //console.log("keydown",event);
+  if (keyDown)
+  {
+    return;
+  }
+  keyDown = true;
+  playNextCommand(false);
+
+
+    //location.href = "data:application/octet-stream," + encodeURIComponent(waves.toString());
+    //
+    // const tb303:TB303 = new TB303( waves, sampleRate );
+    // const bufferSize = 4096;
+    // const looper = engine.createScriptProcessor(bufferSize, 1, 1);
+    // looper.onaudioprocess = function(e)
+    // {
+    //     const output = e.outputBuffer.getChannelData(0);
+    //     for (var i = 0; i < bufferSize; ++i)
+    //     {
+    //       output[i] = tb303.render();
+    //     }
+    // }
+    // Engine.connect( looper );
+
+
+}
+window.onkeyup = function(event){
+  //console.log("keydown",event);
+  playNextCommand(true);
+  keyDown = false;
+
+    //location.href = "data:application/octet-stream," + encodeURIComponent(waves.toString());
+    //
+    // const tb303:TB303 = new TB303( waves, sampleRate );
+    // const bufferSize = 4096;
+    // const looper = engine.createScriptProcessor(bufferSize, 1, 1);
+    // looper.onaudioprocess = function(e)
+    // {
+    //     const output = e.outputBuffer.getChannelData(0);
+    //     for (var i = 0; i < bufferSize; ++i)
+    //     {
+    //       output[i] = tb303.render();
+    //     }
+    // }
+    // Engine.connect( looper );
+
+
+}
+
+let documentWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+let documentHeight = window.innerHeight || document.documentElement.clientHeight|| document.body.clientHeight;
+let mouseDown:boolean = false;
+window.onmousedown = ()=>{
+  mouseDown = true;
+}
+window.onmouseup = ()=>{
+  mouseDown = false;
+}
+window.onmousemove = function(event:MouseEvent){
+  // get coords...
+  if (mouseDown)
+  {
+    let x:number = event.pageX ;//- element.offsetLeft ;
+    let y:number = event.pageY ;//- element.offsetTop;
+    let percentageX:number = x/documentWidth;
+    let percentageY:number = y/documentHeight;
+
+    if (tb303)
+    {
+      tb303.resonance = percentageY;              // 0 -> 1
+      tb303.accent = percentageX;              // 0 -> 1
+      tb303.cutOff = percentageX * 20000;                // 200 -> 20000
+
+    }
+    // we should do something with the paramters...
+    //tb303.shape = percentageX;              // 0 -> 1
+    // tb303.resonance = percentageY;              // 0 -> 1
+    // tb303.accent = percentageX;              // 0 -> 1
+    //tb303.decay = percentageY*2000;                  // 100 -> 2000
+    //tb303.threshold = percentageY;              // 0 -> 1  : softness
+    //tb303.cutOff = percentageX * 20000;                // 200 -> 20000
+    //tb303.envelopeModulation = percentageY;    // 0 -> 1
+    // tb303.tuning = 0;                // -12 -> 12
+
+
+    tb303Settings.shape = percentageX;              // 0 -> 1
+    tb303Settings.resonance = percentageY;              // 0 -> 1
+    tb303Settings.accent = percentageX;              // 0 -> 1
+    tb303Settings.threshold = percentageY;              // 0 -> 1  : softness
+    tb303Settings.cutOff = percentageX * 20000;                // 200 -> 20000
+    tb303Settings.envelopeModulation = percentageY;    // 0 -> 1
+    tb303Settings.tuning = 0;                // -12 -> 12
+
+    // voiceFactory.voices.forEach( (voice)=>{
+    //
+    //   voice.resonance = percentageY;              // 0 -> 1
+    //   voice.accent = percentageX;              // 0 -> 1
+    //   //voice.decay = percentageY*2000;                  // 100 -> 2000
+    //   //voice.threshold = percentageY;              // 0 -> 1  : softness
+    //   voice.cutOff = percentageX * 20000;                // 200 -> 20000
+    //   console.log( voice, percentageX, percentageY );
+    // });
+  }
 }

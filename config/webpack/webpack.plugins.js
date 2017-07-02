@@ -98,7 +98,7 @@ const html = new HtmlWebpackPlugin({
 
 const modeUseUniqueFolders = true;
 const templateTypes = ["pug","html"];
-const fallback = path.resolve(  Settings.folders.templates, 'simple.pug' );
+const fallback = path.resolve(  Settings.folders.partials, 'simple.pug' );
 const markup = [];
 
 // now convert our matches to entry points :)

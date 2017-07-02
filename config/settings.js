@@ -18,7 +18,8 @@ const folderNames             = {};
   folderNames.source          = 'source';
   folderNames.code            = 'code';
   folderNames.typescript      = 'typescript';
-  folderNames.templates        = 'templates';
+  folderNames.templates       = 'templates';
+  folderNames.partials       = 'partials';
   folderNames.assets          = 'assets';
   folderNames.fonts           = 'fonts';
   folderNames.images          = 'images';
@@ -47,6 +48,8 @@ const folders             = {};
   folders.styles          = path.resolve(folders.assets, 'styles');
   folders.markup          = path.resolve(folders.source, 'markup');
 
+  folders.examples        = path.resolve(folders.source, 'examples');
+  folders.partials        = path.resolve(folders.markup, 'partials');
   folders.templates       = path.resolve(folders.source, 'templates');
   folders.typings         = path.resolve(folders.root, 'typings');
   folders.build           = path.resolve(folders.root, 'build');
@@ -74,9 +77,13 @@ const files = {};
   files.index = path.resolve(folders.code,'index.js');
   files.webpackConfig = path.resolve(folders.config,'webpack','webpack.config.js');
   files.tsConfig = path.resolve(folders.config,'typescript','tsconfig.json');
-  files.template = path.resolve(folders.templates, 'template.pug');
-  files.templateIndex = path.resolve(folders.templates, 'index.pug');
+  files.template = path.resolve(folders.partials, 'template.pug');
+  files.templateIndex = path.resolve(folders.partials, 'index.pug');
 
+// plop
+const templates = {};
+  templates.root = "";
+  templates.example = path.join(folders.templates, "example");
 
 // Where do the files ends up in the end?
 const destination = function( folder )
@@ -109,5 +116,6 @@ module.exports = {
   files,
   source,
   destinations,
-  server
+  server,
+  templates
 }
