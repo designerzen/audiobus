@@ -1,10 +1,8 @@
-/// <reference path="../../Dependencies.ts" />
-/// <reference path="Visualiser.ts" />
-/// <reference path="IVisualiser.ts" />
-module audiobus.visualisation.visualisers
+import IVisualiser from './IVisualiser';
+import Visualiser from './Visualiser';
+
+export default class Plasma extends Visualiser implements IVisualiser
 {
-	export class Plasma extends Visualiser implements IVisualiser
-    {
 		private palette:Array<number>;
 		private paletteReds:Array<number>;
 		private paletteGreens:Array<number>;
@@ -135,5 +133,3 @@ module audiobus.visualisation.visualisers
 			super.update( spectrum, time, bufferLength );
 		}
 	}
-
-}

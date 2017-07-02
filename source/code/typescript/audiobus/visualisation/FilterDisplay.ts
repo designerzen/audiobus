@@ -1,13 +1,13 @@
 export default class FilterDisplay
 {
-
-  private canvas;
-  private context;
+  private canvas:HTMLCanvasElement;
+  private context:CanvasRenderingContext2d;
 
   private myFrequencyArray:Float32Array;
   private magResponseOutput:Float32Array; // magnitude
+  private phaseResponseOutput:Float32Array;
+  
   private resolution:number;
-  private phaseResponseOutput;
 
   public get element()
   {
@@ -16,9 +16,9 @@ export default class FilterDisplay
 
   constructor( width:number, height:number, bars:number=100 )
   {
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext("2d");
-    canvas.id     = "curves";
+    const canvas:HTMLCanvasElement = document.createElement('canvas');
+    const context:CanvasRenderingContext2D = canvas.getContext("2d");
+    //canvas.id     = "curves";
     canvas.width  = width;
     canvas.height = height;
     this.canvas = canvas;
@@ -41,7 +41,7 @@ export default class FilterDisplay
     //document.body.appendChild(canvas);
   }
 
-  private drawFrequencyResponse (mag, phase)
+  private drawFrequencyResponse (mag:Float32Array, phase:Float32Array )
   {
     const barWidth:number = this.canvas.width / this.resolution;
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -49,7 +49,7 @@ export default class FilterDisplay
     // Magnitude
     this.context.strokeStyle = "white";
     this.context.beginPath();
-    for(var frequencyStep = 0; frequencyStep < this.resolution; ++frequencyStep)
+    for(let frequencyStep = 0; frequencyStep < this.resolution; ++frequencyStep)
     {
       this.context.lineTo(
       frequencyStep * barWidth,
@@ -61,7 +61,7 @@ export default class FilterDisplay
     this.context.strokeStyle = "red";
     this.context.beginPath();
 
-    for(var frequencyStep = 0; frequencyStep < this.resolution; ++frequencyStep)
+    for(let frequencyStep = 0; frequencyStep < this.resolution; ++frequencyStep)
     {
       this.context.lineTo(
       frequencyStep * barWidth,
