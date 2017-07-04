@@ -1,0 +1,72 @@
+/*
+input( type="file", id="files", name="files[]", multiple)
+button( onclick="abortRead()" ) Cancel read
+#progress_bar
+  .percent 0%
+
+output#list
+*/
+
+#drop_zone{
+  position: fixed;
+  top:0;
+  right:0;
+  bottom:0;
+  left:0;
+  z-index:0;
+  text-align: center;
+  display: table-cell;
+  &.hidden{
+    visibility: hidden;
+  }
+}
+
+input#files{
+  position: absolute;
+  right:0;
+  bottom:0;
+  z-index:1;
+}
+
+#progress_bar{
+  position: absolute;
+  left:0;
+  right:0;
+  top:0;
+  height:20px;
+  z-index:2;
+  background:red;
+  visibility: hidden;
+
+  .percent{
+
+  }
+  &.active{
+    visibility: visible;
+  }
+}
+
+.note{
+  border-bottom: teal 1px solid;
+  padding:14px;
+  background: #121212;
+  transition:background 400ms ease-out;
+  &:hover{
+    background-color: teal;
+    border-color: white;
+  }
+  &:before{
+    display: inline-block;
+    width:20px;
+    content:'>';
+    background-color: teal;
+    outline: white solid 1px;
+    margin:3px;
+  }
+  &.type-noteOn:before{
+    background-color: green;
+  }
+  &.type-noteOff:before{
+    background-color: red;
+  }
+}
