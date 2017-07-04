@@ -18,6 +18,9 @@ export default class Sequencer
 	// NB. if < 0, means unknown length
 	protected length:number = -1;
 
+	// this controls the rate of playback... a number lower than 1 slows it down accordingly...
+	protected speed:number = 1;
+
 	// place to store our commands...
 	public commands:Array<ICommand> = [];
 	public activeCommands:object = {};
@@ -37,7 +40,8 @@ export default class Sequencer
 	}
 	public get duration():number
 	{
-		return this.previousTime;
+		// last saved
+		return this.previousTime * this.speed;
 	}
 
 	constructor()
@@ -53,8 +57,9 @@ export default class Sequencer
 		}
 	}
 
-	public start()
+	public start( rate:number=1 )
 	{
+		this.speed = rate;
 		this.timer.start();
 	}
 
@@ -167,7 +172,7 @@ export default class Sequencer
 		for ( let position=startPosition; position<endPosition; ++position )
 		{
 			// check dictionary...
-			let matches:Array<ICommand> = this.positions[position];
+			let matches:Array<ICommand> = this.positions[Math.round(position)];
 			// if not null append!
 			if (matches && matches.length)
 			{
@@ -208,7 +213,8 @@ export default class Sequencer
 	protected onUpdate(startTime:number, time:number):void
 	{
 
-		const elapsed:number = ( time - startTime) >> 0;  // stupid floating points...
+		const elapsed:number = ( time - startTime) * this.speed;  // stupid floating points...
+		// now we can scale this number by the speed factor...
 		const progress:number = elapsed / this.duration;
 		console.log( 'Sequencer:'+Math.round( 100*progress )+'% '+elapsed + '/'+this.duration ) ;
 

@@ -32,6 +32,10 @@ import Styles from 'styles/style.less';
 import MIDIA from 'midi/chopin-polishdance.mid';
 import MIDIB from 'midi/funktown.mid';
 import MIDIC from 'midi/funkytown.mid';
+import MIDID from 'midi/midi-sans-frontieres.mid';
+import MIDIE from 'midi/banjos.mid';
+import MIDIF from 'midi/nyan-cat.mid';
+import MIDIG from 'midi/missionimpossible.mid';
 //import MIDI from './test.midi';
 
 // and now our javascripts...

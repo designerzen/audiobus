@@ -33,7 +33,8 @@ export default class Mixer extends AudioComponent
   public connect( port:AudioNode )
   {
     //this.panner.connect( port );
-    this.outputGainNode.connect( port );
+    //this.outputGainNode.connect( port );
+    port.connect( this.outputGainNode );
   }
 
   // you can use silence to as a channel in the mux
