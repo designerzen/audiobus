@@ -38,16 +38,29 @@ export default class MidiFile
   }
 
   // PUBLIC :
+  public loadDataString( file:string ):Promise<MidiTrack>
+  {
+    const data:string = this.convertResponse( file );
+    const stream:MidiStream = new MidiStream( data );
+    const decoder:MidiFileDecoder = new MidiFileDecoder();
+    const track = decoder.decode(stream);
+
+    return new Promise<MidiTrack>((resolve, reject) => {
+      resolve(track);
+    });
+  }
+
+  // PUBLIC :
   private loadBase64( file:string ):Promise<MidiTrack>
   {
-      const data = window.atob(file.split(',')[1]);
-      const stream:MidiStream = new MidiStream( data );
-      const decoder:MidiFileDecoder = new MidiFileDecoder();
-      const track = decoder.decode(stream);
+    const data = window.atob(file.split(',')[1]);
+    const stream:MidiStream = new MidiStream( data );
+    const decoder:MidiFileDecoder = new MidiFileDecoder();
+    const track = decoder.decode(stream);
 
-      return new Promise<MidiTrack>((resolve, reject) => {
-        resolve(track);
-      });
+    return new Promise<MidiTrack>((resolve, reject) => {
+      resolve(track);
+    });
   }
 
   // PUBLIC :

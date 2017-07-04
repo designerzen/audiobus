@@ -62,7 +62,7 @@ export default class MidiTrack implements ITrack
       switch( event.subtype )
       {
           case "trackName":
-            if (this.trackName.length > 1)
+            if (this.trackName && this.trackName.length > 1)
             {
               //ableton adds some weird stuff to the track
               this.trackName = event.text.replace(/\u0000/g, '')
@@ -89,7 +89,7 @@ export default class MidiTrack implements ITrack
     }
 
     //
-    public getCommandAtPosition( position:number ):Array<MidiCommand>
+    public getCommandsAtPosition( position:number ):Array<MidiCommand>
     {
       return this.positions[position];
     }
@@ -116,11 +116,11 @@ export default class MidiTrack implements ITrack
                     // add
                     //event.deltaTime;
                     //console.log(event.deltaTime);
-                    if (!this.positions[event.deltaTime])
+                    if (!this.positions[event.timeCode])
                     {
-                      this.positions[event.deltaTime] = [event];
+                      this.positions[event.timeCode] = [event];
                     }else{
-                      this.positions[event.deltaTime].push(event);
+                      this.positions[event.timeCode].push(event);
                     }
                     this.tracks.push(event);
             }
