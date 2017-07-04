@@ -27,11 +27,18 @@ export default class ExampleVisualiser
 
   private rainbow:Array<Colour>;
 
+  private visualiserCanvas:HTMLCanvasElement;
+
+  public get canvas():HTMLCanvasElement
+  {
+    return this.visualiserCanvas;
+  }
+
   constructor( audioContext:AudioContext, source:GainNode, type:string=SpectrumAnalyzer.TYPE_FREQUENCY, fftSize:number=1024 )
 	{
     this.analyser = new SpectrumAnalyzer( audioContext, type );
 
-    const canvas = this.analyser.createCanvas( window.innerWidth,  window.innerHeight, 'visualiser' );
+    this.visualiserCanvas = this.analyser.createCanvas( window.innerWidth,  window.innerHeight, 'visualiser' );
     this.rainbow = Rainbows.colour();
 
     this.analyser.connect( audioContext.destination, source );

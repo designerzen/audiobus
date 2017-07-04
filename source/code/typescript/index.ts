@@ -21,6 +21,7 @@ import MidiHardware from './audiobus/io/midi/MidiHardware';
 import MidiHardwareDevice from './audiobus/io/midi/MidiHardwareDevice';
 import MidiCommand from './audiobus/io/midi/MidiCommand';
 import MidiCommandFactory from './audiobus/io/midi/MidiCommandFactory';
+import {MidiInstrumentCodes} from './audiobus/io/midi/MidiGeneralInstuments';
 
 // Some actual physical peripherals...
 import KMix from './audiobus/io/devices/KMix';
@@ -34,6 +35,7 @@ import Timer from './audiobus/timing/Timer';
 import Metronome from './audiobus/timing/Metronome';
 import Netronome from './audiobus/timing/Netronome';
 import Sequencer from './audiobus/sequencing/Sequencer';
+import Command from './audiobus/Command';
 import ICommand from './audiobus/ICommand';
 
 import NoteMatrix from './audiobus/NoteMatrix';
@@ -44,6 +46,7 @@ import Instrument from './audiobus/instruments/Instrument';
 import Oscillator from './audiobus/instruments/primitives/Oscillator';
 import OscillatorTypes from './audiobus/instruments/OscillatorTypes';
 import BassDrum from './audiobus/instruments/beats/BassDrum';
+import PinkTrombone from './audiobus/instruments/wind/PinkTrombone';
 
 import TB303WaveTable from './audiobus/instruments/TB303/TB303WaveTable';
 import TB303 from './audiobus/instruments/TB303/TB303';
@@ -52,7 +55,14 @@ import TB303Config from './audiobus/instruments/TB303/TB303Config';
 import Scales from './audiobus/scales/Scales';
 import PitchDetect from './audiobus/analyse/PitchDetect';
 
+// Visualisations...
+import SpectrumAnalyzer from './audiobus/visualisation/SpectrumAnalyzer';
+import Visualiser from './audiobus/visualisation/ExampleVisualiser';
 
+// input methods...
+// PC Keyboard...
+import Keyboard from './audiobus/io/Keyboard';
+import {KeyEvent} from './audiobus/io/Keyboard';
 
 // Our omnibus needs an engine
 const engine:AudioContext = Engine.fetch();
@@ -66,14 +76,23 @@ if (!engine)
 }
 
 
-
 // If our app has more than one audio source, we are also going to need a mixer...
 
 const mixer:Mixer = new Mixer( engine );
-//Engine.connect( mixer.output );
+Engine.connect( mixer.output );
 
 
+// audioContext:AudioContext, source:GainNode, type
+const vis:Visualiser = new Visualiser( engine, mixer.output, SpectrumAnalyzer.TYPE_FREQUENCY, 1024 );
+// append to document!
+document.body.appendChild( vis.canvas );
+vis.start();
+vis.canvas.onmousedown =(e)=>{
+  vis.next();
+  console.error("vis canvas next!");
+}
 
+//const pink = new PinkTrombone( engine );
 
 // Make some sound! (engine here is optional but we provide it for future proofing)
 
@@ -177,7 +196,7 @@ tb3.onMidi = ( alias:string, device:WebMidi.MIDIInput, event:WebMidi.MIDIMessage
 // Our Emulated 303...
 let tb303Settings:TB303Config = new TB303Config();
 let tb303:TB303 = new TB303( engine );
-Engine.connect( tb303.output );
+//Engine.connect( tb303.output );
 //
 // let tb303b:TB303 = new TB303( engine );
 // Engine.connect( tb303b.output );
@@ -211,6 +230,11 @@ Engine.connect( tb303.output );
 //
 // });
 
+
+
+//
+
+
 // as you can set up your device to be on whatever midi channel you want...
 // here we bind one to another!
 const channels:Array<number> = [0];
@@ -220,9 +244,9 @@ let sequencerIndex:number = 0;
 
 
 
-let voiceFactory = new VoiceFactory( engine, 12 );
+let voiceFactory = new VoiceFactory( engine, 16 );
 
-const playCommand = function( command:ICommand, forceToChannel:number=-1, wasPlaying:boolean=false, transpose:number=2 )
+const playCommand = function( command:ICommand, forceToChannel:number=-1, wasPlaying:boolean=false, transpose:number=1 ):ICommand
 {
   let instrument;
   const channel:number = forceToChannel > -1 ? forceToChannel : command.channel;
@@ -270,7 +294,8 @@ const playCommand = function( command:ICommand, forceToChannel:number=-1, wasPla
       // instrument.tuning = tb303Settings.tuning;                // -12 -> 12
       //
       instrument && instrument.start( note, length,accent, slide, gate );
-      Engine.connect( instrument.output );
+      mixer.connect( instrument.output );
+      //Engine.connect( instrument.output );
 
       //tb303 && tb303.start( note, length,accent, slide, gate );
       // console.error("Playing note "+name+ " -> " +frequency+"Hz -> "+note);
@@ -287,14 +312,19 @@ const playCommand = function( command:ICommand, forceToChannel:number=-1, wasPla
        instrument && instrument.stop();
       break;
   }
+  return command;
 }
 
 //mergerNode = mixer.mux( oscillator.output, oscillator.output );
 //mergerNode.connect( this.audioContext.destination );
 
+// onKeyDown(){
+//
+//}
 
-const playNextCommand = function( forceNoteOn:boolean=false )
+const playNextCommand = function( forceNoteOn:boolean=false ):Array<ICommand>
 {
+  let nextCommand:ICommand;
   let satisfied:boolean = false;  // only satisfied if a note on is available ;)
   // This should go in a loop somewhere...
   const nextCommands = sequencer.getCommandsAtIndex(sequencerIndex);
@@ -303,7 +333,7 @@ const playNextCommand = function( forceNoteOn:boolean=false )
   {
     // we have commands! execute them!
     nextCommands.forEach( (command:ICommand) => {
-
+      // this could be a chord...
       // check their type to see if they are note on or note off etc...
       console.log(sequencerIndex+". nextCommand", command.subtype );
 
@@ -311,12 +341,12 @@ const playNextCommand = function( forceNoteOn:boolean=false )
       let wasPlayingBefore = false;
       switch ( command.subtype )
       {
-        case "noteOn":
+        case Command.COMMAND_NOTE_ON:
           // you can check to see if the status has changed...
           //const wasPlayingBefore:boolean = notes.noteOn( command.noteNumber );
           // loop
           satisfied = true;
-          playCommand( command, forceToChannel, wasPlayingBefore );
+          nextCommand = playCommand( command, command.channel, wasPlayingBefore );
 
           // if (!wasPlayingBefore)
           // {
@@ -325,16 +355,24 @@ const playNextCommand = function( forceNoteOn:boolean=false )
           // }
           break;
 
-      case"noteOff":
+      case Command.COMMAND_NOTE_OFF:
 
+      //  let's ignore note offs...
         //const wasStoppedBefore:boolean = notes.noteOff( command.noteNumber );
-        playCommand( command, forceToChannel, !wasPlayingBefore );
+        //playCommand( command, forceToChannel, !wasPlayingBefore );
 
         // if you don't want note offs to be a seperate command...
         // flip this to false
           satisfied = forceNoteOn;
-        // exit!
-        break;
+          // exit!
+          break;
+
+        case Command.COMMAND_PROGRAM_CHANGE:
+          console.log("Patch Change", MidiInstrumentCodes[command.programNumber]);//
+          break;
+
+        default:
+          console.log("Next Command");// MidiInstrumentCodes[command.programNumber]
       }
 
 
@@ -348,8 +386,9 @@ const playNextCommand = function( forceNoteOn:boolean=false )
     {
       // do it all again!
       // at least until there are no more commands...
-      playNextCommand();
+      return playNextCommand();
     }
+    return nextCommands;
   }
   // now loop and find the corresponding note off...
 }
@@ -359,9 +398,10 @@ const playNextCommand = function( forceNoteOn:boolean=false )
 //
 // Interface with MIDI or load a MIDI file
 const midiFile:MidiFile = new MidiFile();
-const midilocation:string = "assets/midi/nyan-cat.mid";
+//const midilocation:string = "assets/midi/nyan-cat.mid";
 //const midilocation:string = "assets/midi/banjos.mid";
 //const midilocation:string = "assets/midi/funktown.mid";
+const midilocation:string = "assets/midi/missionimpossible.mid";
 //const midilocation:string = "assets/midi/midi-sans-frontieres.mid";
 //const midilocation:string = "assets/midi/chopin-polishdance.mid";
 
@@ -512,7 +552,7 @@ midiFile.load( midilocation ).then(
       });
       // tb3.command( command, forceToChannel );
     };
-    //sequencer.start();
+    sequencer.start( 0.6 );
 
 
 
@@ -559,25 +599,47 @@ window.onfocus = function() {
   // pause timer...
   console.error("Tab focussed");
   sequencer.resume();
-}
-
-window.onblur = function() {
-  // resume timer
-  console.error("Tab lost focus");
-  sequencer.pause();
-}
-
-let keyDown:boolean =false;
-
-window.onkeydown = function(event){
-  //console.log("keydown",event);
-  if (keyDown)
-  {
-    return;
-  }
-  keyDown = true;
-  playNextCommand(false);
-
+// }
+//
+// window.onblur = function() {
+//   // resume timer
+//   console.error("Tab lost focus");
+//   sequencer.pause();
+// }
+//
+// let keyDown:boolean =false;
+//
+// window.onkeydown = function(event){
+//   //console.log("keydown",event);
+//   if (keyDown)
+//   {
+//     return;
+//   }
+//   keyDown = true;
+//   playNextCommand(false);
+//
+//
+//     //location.href = "data:application/octet-stream," + encodeURIComponent(waves.toString());
+//     //
+//     // const tb303:TB303 = new TB303( waves, sampleRate );
+//     // const bufferSize = 4096;
+//     // const looper = engine.createScriptProcessor(bufferSize, 1, 1);
+//     // looper.onaudioprocess = function(e)
+//     // {
+//     //     const output = e.outputBuffer.getChannelData(0);
+//     //     for (var i = 0; i < bufferSize; ++i)
+//     //     {
+//     //       output[i] = tb303.render();
+//     //     }
+//     // }
+//     // Engine.connect( looper );
+//
+//
+// }
+// window.onkeyup = function(event){
+//   //console.log("keydown",event);
+//   playNextCommand(true);
+//   keyDown = false;
 
     //location.href = "data:application/octet-stream," + encodeURIComponent(waves.toString());
     //
@@ -596,28 +658,54 @@ window.onkeydown = function(event){
 
 
 }
-window.onkeyup = function(event){
-  //console.log("keydown",event);
-  playNextCommand(true);
-  keyDown = false;
 
-    //location.href = "data:application/octet-stream," + encodeURIComponent(waves.toString());
-    //
-    // const tb303:TB303 = new TB303( waves, sampleRate );
-    // const bufferSize = 4096;
-    // const looper = engine.createScriptProcessor(bufferSize, 1, 1);
-    // looper.onaudioprocess = function(e)
-    // {
-    //     const output = e.outputBuffer.getChannelData(0);
-    //     for (var i = 0; i < bufferSize; ++i)
-    //     {
-    //       output[i] = tb303.render();
-    //     }
-    // }
-    // Engine.connect( looper );
+// USER INTERACTION
+const polyphonicData:object = {};
+const keyboard:Keyboard = new Keyboard();
+// now set up our event handler...
+
+// for this exmple we want to watch for *all* keypressed...
+// and use the command's noteOn to trigger start and the key up
+// to turn note off for that specific note.
+// se we fetch the key and tie in the keycode to a command...
+
+keyboard.onKeyDown = (keyEvent:KeyEvent)=>{
+  // chords?
+  const commands:Array<ICommand> = playNextCommand();
+  // store our command tied in to this key code...
+  console.error(commands);
+  polyphonicData[ keyEvent.keyCode ] = commands;
+
+  //commands.forEach((command)=>{
+    //check our matrix to see if this note is playing...
+    //polyphonicData[ keyEvent.keyCode ] = command;
+    //polyphonicData[ channel+'-'+noteNumber ] = command;
+  //})
+};
+
+keyboard.onKeyUp = (keyEvent:KeyEvent)=>{
+
+  //const command:ICommand = polyphonicData[ channel+'-'+noteNumber ];
+  const commands:Array<ICommand> = polyphonicData[ keyEvent.keyCode ];
+  commands.forEach((command)=>{
+    // on key up, get the corresponding command and trigger note off...
+    const noteOffClone:ICommand = command.clone();
+    // change it to a note off...
+    noteOffClone.subtype = Command.COMMAND_NOTE_OFF;
+    console.error(noteOffClone);
+
+    playCommand( noteOffClone );
+  });
+  //check our matrix to see if this note is playing...
+  //polyphonicData[ channel+'-'+noteNumber ] = command;
+  //polyphonicData[ event.keyCode ] = command;
+};
+
+// and watch for keypresses...
+keyboard.enable();
 
 
-}
+
 
 let documentWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 let documentHeight = window.innerHeight || document.documentElement.clientHeight|| document.body.clientHeight;
@@ -657,20 +745,15 @@ window.onmousemove = function(event:MouseEvent){
 
     tb303Settings.shape = percentageX;              // 0 -> 1
     tb303Settings.resonance = percentageY;              // 0 -> 1
-    tb303Settings.accent = percentageX;              // 0 -> 1
-    tb303Settings.threshold = percentageY;              // 0 -> 1  : softness
-    tb303Settings.cutOff = percentageX * 20000;                // 200 -> 20000
-    tb303Settings.envelopeModulation = percentageY;    // 0 -> 1
-    tb303Settings.tuning = 0;                // -12 -> 12
+    // tb303Settings.accent = percentageX;              // 0 -> 1
+    // tb303Settings.threshold = percentageY;              // 0 -> 1  : softness
+    // tb303Settings.cutOff = percentageX * 20000;                // 200 -> 20000
+    // tb303Settings.envelopeModulation = percentageY;    // 0 -> 1
+    // tb303Settings.tuning = 0;                // -12 -> 12
 
-    // voiceFactory.voices.forEach( (voice)=>{
-    //
-    //   voice.resonance = percentageY;              // 0 -> 1
-    //   voice.accent = percentageX;              // 0 -> 1
-    //   //voice.decay = percentageY*2000;                  // 100 -> 2000
-    //   //voice.threshold = percentageY;              // 0 -> 1  : softness
-    //   voice.cutOff = percentageX * 20000;                // 200 -> 20000
-    //   console.log( voice, percentageX, percentageY );
-    // });
+    voiceFactory.voices.forEach( (voice)=>{
+      const tb:TB303 = <TB303>voice;
+      tb.config = tb303Settings;
+    });
   }
 }
