@@ -1,113 +1,109 @@
-/// <reference path="../Dependencies.ts"/>
-///<reference path="Instrument.ts" />
-///<reference path="../ISoundControl.ts" />
-module audiobus.instruments
+import Envelope from '../envelopes/Envelope';
+import Instrument from './Instrument';
+
+// Original Theremin JS Sound by Luke from Femur Design
+export default class Theremin extends Instrument
 {
-	// Original Theremin JS Sound by Luke from Femur Design
-    export class Theremin extends Instrument implements ISoundControl
-    {
-		private osc:OscillatorNode;
-		private oscFilter:OscillatorNode;
+	private osc:OscillatorNode;
+	private oscFilter:OscillatorNode;
 
-		public initialVolume:GainNode;
-		public oscVolume:GainNode;
-		public finalVolume:GainNode;
-		public scuzzVolume:GainNode;
-		public feedbackGain:GainNode;
+	public initialVolume:GainNode;
+	public oscVolume:GainNode;
+	public finalVolume:GainNode;
+	public scuzzVolume:GainNode;
+	public feedbackGain:GainNode;
 
-		public filter:BiquadFilterNode;
-		public delay:DelayNode;
-		public analyser:AnalyserNode;
+	public filter:BiquadFilterNode;
+	public delay:DelayNode;
 
-		public compressor:DynamicsCompressorNode;
+	public compressor:DynamicsCompressorNode;
 
-		// create
-		constructor( audioContext:AudioContext, outputTo:GainNode )
-		{
-			super( audioContext, outputTo );
-			this.create();
-		}
-
-		private create():void
-		{
-			// Synthesize!
-			this.osc = this.context.createOscillator();
-			this.osc.type = OscillatorTypes.SINE; // sine wave
-			this.osc.frequency.value = 400;
-			//this.osc.connect( this.gain );
-
-			this.initialVolume = this.context.createGain();
-			this.oscVolume = this.context.createGain();
-			this.finalVolume = this.context.createGain();
-			this.scuzzVolume = this.context.createGain();
-			this.feedbackGain = this.context.createGain();
-
-			this.filter = this.context.createBiquadFilter();
-			this.delay = this.context.createDelay();
-
-			this.compressor = this.context.createDynamicsCompressor();
-
-			this.filter.type = "lowpass";
-			this.feedbackGain.gain.value = 0.5;
-			this.delay.delayTime.value = 0.5;
-			this.scuzzVolume.gain.value = 0.5;
-			this.initialVolume.gain.value =0.5;
-			this.oscVolume.gain.value = 0;
-			this.finalVolume.gain.value = 1;
-
-			this.oscFilter = this.context.createOscillator();
-			this.oscFilter.connect(this.oscVolume);
-
-			this.osc.connect(this.scuzzVolume);
-			this.scuzzVolume.connect( this.oscFilter );
-
-			this.oscVolume.connect(this.filter);
-			this.filter.connect(this.compressor);
-			this.filter.connect(this.delay);
-
-			this.delay.connect(this.feedbackGain);
-			this.delay.connect(this.compressor);
-
-			this.feedbackGain.connect(this.delay);
-			this.compressor.connect(this.initialVolume);
-			this.initialVolume.connect(this.finalVolume);
-			//this.finalVolume.connect(this.analyser);
-
-			//this.analyser.connect(this.context.destination);
-
-		}
-
-		public setFilterFrequency(b:number):number
-		{
-			var c:number = 40,
-				e:number = this.context.sampleRate / 2,
-				f:number = Math.log(e / c) / Math.LN2,
-				g:number = Math.pow(2, f * (2 / b) );
-			return e * g;
-		}
-
-		public start( frequency:number ):boolean
-		{
-			//console.log("Sine commencing at f:"+frequency );
-			var t:number = this.context.currentTime;
-
-			this.osc.frequency.value = frequency;
-			//this.osc.frequency.setValueAtTime(1200, t);
-			//this.osc.frequency.linearRampToValueAtTime(800, t + 0.005);
-
-			//console.log( 'hasInitialised '+this.hasInitialised+ ' state:' + this.osc.playbackState );
-			if ( super.start() )
-			{
-				this.osc.start(t);
-				this.oscFilter.start(t);
-				return true;
-			}else{
-				return false;
-			}
-		}
+	// create
+	constructor( audioContext?:AudioContext )
+	{
+		super( audioContext );
+		this.create();
 	}
 
+	private create():void
+	{
+		// Synthesize!
+		this.osc = this.audioContext.createOscillator();
+		this.osc.type = "sine"; // sine wave
+		this.osc.frequency.value = 400;
+		//this.osc.connect( this.gain );
+
+		this.initialVolume = this.audioContext.createGain();
+		this.oscVolume = this.audioContext.createGain();
+		this.finalVolume = this.audioContext.createGain();
+		this.scuzzVolume = this.audioContext.createGain();
+		this.feedbackGain = this.audioContext.createGain();
+
+		this.filter = this.audioContext.createBiquadFilter();
+		this.delay = this.audioContext.createDelay();
+
+		this.compressor = this.audioContext.createDynamicsCompressor();
+
+		this.filter.type = "lowpass";
+		this.feedbackGain.gain.value = 0.5;
+		this.delay.delayTime.value = 0.5;
+		this.scuzzVolume.gain.value = 0.5;
+		this.initialVolume.gain.value =0.5;
+		this.oscVolume.gain.value = 0;
+		this.finalVolume.gain.value = 1;
+
+		this.oscFilter = this.audioContext.createOscillator();
+		this.oscFilter.connect(this.oscVolume);
+
+		this.osc.connect(this.scuzzVolume);
+		this.scuzzVolume.connect( this.oscFilter );
+
+		this.oscVolume.connect(this.filter);
+		this.filter.connect(this.compressor);
+		this.filter.connect(this.delay);
+
+		this.delay.connect(this.feedbackGain);
+		this.delay.connect(this.compressor);
+
+		this.feedbackGain.connect(this.delay);
+		this.compressor.connect(this.initialVolume);
+		this.initialVolume.connect(this.finalVolume);
+		//this.finalVolume.connect(this.analyser);
+
+		//this.analyser.connect(this.context.destination);
+    this.input = this.finalVolume;
+	}
+
+	public setFilterFrequency(b:number):number
+	{
+		var c:number = 40,
+			e:number = this.audioContext.sampleRate / 2,
+			f:number = Math.log(e / c) / Math.LN2,
+			g:number = Math.pow(2, f * (2 / b) );
+		return e * g;
+	}
+
+	public start( frequency:number ):boolean
+	{
+		//console.log("Sine commencing at f:"+frequency );
+		const t:number = this.audioContext.currentTime;
+
+		this.osc.frequency.value = frequency;
+		//this.osc.frequency.setValueAtTime(1200, t);
+		//this.osc.frequency.linearRampToValueAtTime(800, t + 0.005);
+
+		//console.log( 'hasInitialised '+this.hasInitialised+ ' state:' + this.osc.playbackState );
+		if ( super.start() )
+		{
+			this.osc.start(t);
+			this.oscFilter.start(t);
+			return true;
+		}else{
+			return false;
+		}
+	}
 }
+
 /*
 var a, b, c, d, e, f, g, h = {},
 	i = !1,
