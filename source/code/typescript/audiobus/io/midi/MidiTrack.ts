@@ -127,4 +127,14 @@ export default class MidiTrack implements ITrack
         }
         //console.log(this.positions);
     }
+
+    public toJSON():string
+    {
+      return '';
+    }
+
+    public fromJSON(json:string):void
+    {
+
+    }
 }

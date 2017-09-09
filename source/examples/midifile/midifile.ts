@@ -7,12 +7,6 @@ AudioBus : Example
 // insert date...
 
 */
-interface window {
-    File;
-    FileReader;
-    FileList;
-}
-
 // Load in our parts of the audiobus library...
 import Engine from 'audiobus/Engine';   // * Required
 import ICommand from 'audiobus/ICommand';   // * Required
@@ -29,13 +23,13 @@ import TB303Config from 'audiobus/instruments/TB303/TB303Config';
 
 import Scales from 'audiobus/scales/Scales';
 
-// select a midi file
-// Check for the various File API support.
-if (window.File && window.FileReader && window.FileList && window.Blob) {
-  // Great success! All the File APIs are supported.
-} else {
-  alert('The File APIs are not fully supported in this browser.');
-}
+// // select a midi file
+// // Check for the various File API support.
+// if (window.File && window.FileReader && window.FileList && window.Blob) {
+//   // Great success! All the File APIs are supported.
+// } else {
+//   alert('The File APIs are not fully supported in this browser.');
+// }
 
 // Firstly fetch the DOM elements relevent to this example...
 const progressBar = document.getElementById('progress_bar');
@@ -52,10 +46,10 @@ const tb303:TB303 = new TB303( engine );
 
 Engine.connect( tb303.output );
 
-let reader;
+let reader:FileReader;
 
 
-const playCommand = function( command:ICommand, forceToChannel:number=-1, transpose:number=1 ):ICommand
+const playCommand = function( command:ICommand, forceToChannel:number=-1, transpose:number=2 ):ICommand
 {
   const channel:number = forceToChannel > -1 ? forceToChannel : command.channel;
 
@@ -121,7 +115,7 @@ const displayTrack = function( track:MidiTrack )
 
 
   var output:Array<string> = [];
-  for (var i = 0, f; f = commands[i]; i++)
+  for (let i = 0, f; f = commands[i]; i++)
   {
     //track.getCommandsAtPosition();
     const frequency:number = Scales.frequencyFromNoteNumber(f.noteNumbe);
@@ -142,7 +136,7 @@ const displayTrack = function( track:MidiTrack )
   // now create click handlers to these links...
   const lists = document.querySelector(".midi-file");
   const notes = lists.getElementsByTagName('li');
-  for (var i = 0; i < notes.length; i++)
+  for (let i = 0; i < notes.length; i++)
   {
     var note = notes[i];
     //note.onclick = (e)=>{
@@ -222,16 +216,16 @@ const loadFile = function( target )
         progressBar.textContent = percentLoaded + '%';
       }
     }
-  }
+  };
 
   reader.onabort = (e) => {
     alert('File read cancelled');
-  }
+  };
 
   reader.onloadstart = (e)=>
   {
     progressBar.className = 'loading';
-  }
+  };
 
   reader.onload = (e) =>
   {
@@ -241,7 +235,7 @@ const loadFile = function( target )
     progressBar.className = "complete";
     //setTimeout("progressBar.className='';", 2000);
     loadMidiFile(e.currentTarget.result);
-  }
+  };
 
 
   // FileReader includes four options for reading a file, asynchronously:
@@ -259,56 +253,57 @@ const loadFile = function( target )
   //console.log(target.name);
   progressBar.className = "active";
   dropZone.className = "hidden";
-}
+};
 
 
 const abortRead = function():void
 {
   reader.abort();
-}
+};
 
 
 
-const displayList = function(files):Array<string>
+const displayList = function (files: FileList):string[]
 {
-  var output:Array<string> = [];
-  for (var i = 0, f; f = files[i]; i++)
+  const output:string[] = [];
+  for (let i:number = 0, f:File; f = files[i]; i++)
   {
     output.push('<li><strong>', encodeURI(f.name), '</strong> (', f.type || 'n/a', ') - ',
-                f.size, ' bytes, last modified: ',
+                f.size + ' bytes, last modified: ',
                 f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
                 '</li>');
   }
   fileList.innerHTML = '<ul>' + output.join('') + '</ul>';
-  return output;
-}
 
-const handleDrop = function(evt:any):void
+  return output;
+};
+
+const handleDrop = function (evt: any): void
 {
   evt.stopPropagation();
   evt.preventDefault();
 
-  var files = evt.dataTransfer.files; // FileList object.
+  const files:FileList = evt.dataTransfer.files; // FileList object.
 
   // files is a FileList of File objects. List some properties.
   displayList(files);
   loadFile( files[0] );
-}
+};
 
-const handleDragOver = function(evt:any):void
+const handleDragOver = function (evt: any): void
 {
   evt.stopPropagation();
   evt.preventDefault();
   evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-}
+};
 
 const handleFileSelect = function(evt:any):void
 {
-  var files = evt.target.files; // FileList object
-  var output = [];
+  const files:FileList = evt.target.files; // FileList object
+  const output = [];
   displayList(files);
   loadFile( files[0] );
-}
+};
 
 // watch for a user interacting with the selector
 fileSelector.addEventListener('change', handleFileSelect, false);

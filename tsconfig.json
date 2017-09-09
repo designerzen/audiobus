@@ -31,6 +31,6 @@
         "examples"
     ],
     "paths": {
-      "audiobus/*": [ "source/code/typescript/audiobus/*" ]
+      "audiobus": [ "source/code/typescript/audiobus/*" ]
     }
 }

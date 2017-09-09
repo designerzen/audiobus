@@ -28,7 +28,41 @@ import Rules from './webpack.rules';
 import Plugins from './webpack.plugins';
 import Entry from './webpack.entry';
 import Output from './webpack.output';
+import convertPathsToAliases from 'convert-tsconfig-paths-to-webpack-aliases';
 
+import tsconfig from '../../tsconfig.json'; // all comments in tsconfig.json must be removed
+
+console.log('convertPathsToAliases', convertPathsToAliases);
+console.log('tsconfig',tsconfig);
+tsconfig.baseUrl = '';
+
+// convertPathsToAliases function (tsconfigFile, dirname) {
+//   if (dirname === void 0) { dirname = "."; }
+//   var baseUrl = tsconfigFile.baseUrl, paths = tsconfigFile.paths;
+//   return Object.keys(paths).reduce(function (aliases, pathName) {
+//     var alias = replaceGlobs(pathName);
+//     var path = replaceGlobs(paths[pathName][0]);
+//     return __assign({}, aliases, (_a = {}, _a[alias] = path_1.resolve(dirname, baseUrl, path), _a));
+//     var _a;
+//   }, {});
+// }
+
+const tsAliases = convertPathsToAliases(tsconfig)
+
+const aliases = {
+  styles: Settings.folders.styles,
+  markup:Settings.folders.markup,
+  midi:Settings.folders.midi,
+  images:Settings.folders.images,
+  fonts:Settings.folders.fonts,
+  assets:Settings.folders.assets
+  // audiobus:Settings.folders.audiobus
+}
+
+
+const alias = Object.assign(
+  {}, aliases, tsAliases
+);
 
 console.log( Output );
 
@@ -46,6 +80,8 @@ const rules = [
   Rules.videos,
   Rules.midi
 ];
+
+// depending on what type of env we are in,  we can load prod or dev configs accordingly :)
 
 // Add them together
 let plugins = [
@@ -112,7 +148,7 @@ const config = {
   },
 
   // plugins to modify outputs
-  plugins: plugins,
+  plugins,
 
   // how to deal with files
   resolve: {
@@ -121,15 +157,7 @@ const config = {
     // allow webpack to import files without suffixes
     extensions: ['.ts', '.tsx', '.js', '.jsx','less','mid'],
     // https://decembersoft.com/posts/say-goodbye-to-relative-paths-in-typescript-imports/
-    alias: {
-      styles:Settings.folders.styles,
-      markup:Settings.folders.markup,
-      midi:Settings.folders.midi,
-      images:Settings.folders.images,
-      fonts:Settings.folders.fonts,
-      assets:Settings.folders.assets,
-      audiobus:Settings.folders.audiobus
-    }
+    alias
   },
 
   // Statistics to display
@@ -140,7 +168,7 @@ const config = {
     //errors: true,
     //errorDetails: true,
     //hash: true
-  },
+  }
 };
 
 module.exports = config;
