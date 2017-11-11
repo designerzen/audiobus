@@ -119,9 +119,9 @@ gulp.task('webpack:compile', (cb) => {
   const configPath = Settings.files.webpackConfig;
   const webpackConfig = require( configPath );
 
-  gutil.log( gutil.colors.red("[COMPILING]"), gutil.colors.grey("assets") + " using config", configPath );
-  gutil.log( gutil.colors.red("[COMPILING]"), gutil.colors.grey("Config") + " using config", JSON.stringify(webpackConfig, null, 4) );
-  //gutil.log( JSON.stringify(Config, null, 4) );
+  //gutil.log( gutil.colors.red("[COMPILING]"), gutil.colors.grey("assets") + " using config", configPath );
+  //gutil.log( gutil.colors.red("[COMPILING]"), gutil.colors.grey("Config") + " using config", JSON.stringify(webpackConfig, null, 4) );
+  console.dir(JSON.stringify(webpackConfig, {colors:true}) );
 
   //gutil.log( gutil.colors.grey("From"), config, gutil.colors.grey("to"), paths.entry );
 

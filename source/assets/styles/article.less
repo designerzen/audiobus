@@ -1,0 +1,19 @@
+// https://css-tricks.com/handling-long-unexpected-content-css/
+article{
+  
+  p{
+    // Please test well when using word-break since it has some differences between browsers. 
+    // We recommend you to [read this article on the topic]
+    // (https://css-tricks.com/snippets/css/prevent-long-urls-from-breaking-out-of-container/)
+    word-break: break-all;
+    
+
+    // This solution is safer and better for links. But for words, I would use word-break. 
+    a{
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  
+}

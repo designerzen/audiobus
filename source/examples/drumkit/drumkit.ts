@@ -15,6 +15,9 @@ import HiHat from 'audiobus/instruments/beats/HiHat';
 import Snare from 'audiobus/instruments/beats/Snare';
 import Tom from 'audiobus/instruments/beats/Tom';
 
+import TR808Hat from 'audiobus/instruments/Tr808/TR808Hat';
+import TR808Cowbell from 'audiobus/instruments/Tr808/TR808Cowbell';
+
 import Engine from 'audiobus/Engine';
 import FilterDisplay from 'audiobus/visualisation/FilterDisplay';
 
@@ -37,6 +40,9 @@ const conga:Conga = new Conga(context);
 const cowbell:CowBell = new CowBell(context);
 const tom:Tom = new Tom(context);
 
+const tr808hat: TR808Hat = new TR808Hat(context);
+const tr808cowbell: TR808Cowbell = new TR808Cowbell(context);
+
 // user interface elements...
 const elementKick:HTMLElement = document.getElementById("kick");
 const elementConga:HTMLElement = document.getElementById("conga");
@@ -50,6 +56,8 @@ Engine.connect( snare.output );
 Engine.connect( conga.output );
 Engine.connect( cowbell.output );
 Engine.connect( tom.output );
+Engine.connect(tr808hat.output );
+Engine.connect(tr808cowbell.output );
 
 // const pitch:number = Scales.frequencyFromNoteNumber(command.noteNumber);
 // kick.start( pitch-100, pitch );
@@ -114,6 +122,8 @@ onButtonDown(elementConga, conga );
 onButtonDown(elementSnare, snare );
 onButtonDown(elementHat, hat );
 
+
+// depending on which mode we are in...
 //sliders..
 const elementInputFrequency:HTMLElement = document.getElementById("input-frequency");
 const elementInputResonance:HTMLElement = document.getElementById("input-resonance");

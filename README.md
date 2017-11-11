@@ -1,25 +1,42 @@
 # audio.bus version 3.0.0 #
 ========
 
-Cross Platform Audio Playback and Synthesis using modern web features.
-
-Typescript (compiles into JavaScript)
-Actionscript (depreciated)
+Cross Platform Audio Playback and Synthesis for modern devices.
 
 
-(Github page)[http://github.com/designerzen]
+Developed in Typescript, compiled into JavaScript.
+
+Works on websites, mobiles and tablets.
+
+
+(Github page)[http://github.com/designerzen/]
 (Continuously integrated build)[http://ranger-karina-26013.netlify.com/]
 
 
 ## Features ##
-Sequencing
-Full MIDI implementation
-Synthesised drum kit using oscillators and noise
-Bass sounds
+- Sequencing
+- Solid timing
+- Full MIDI implementation 
+    - Loading MIDI files
+    - Playing MIDI files
+    - Sending MIDI data to a MIDI port
+    - Accepting MIDI data from a MIDI port
+- Synthesised drum kit using oscillators and noise
+- Bass sounds
 
 
 Currently supports and tested on :
 Chrome / Firefox / Edge / Safari / Opera / Vivaldi
+
+
+
+Installation
+===
+Install NodeJS []
+Open a command prompt
+run > npm install -g gulp
+run > npm install
+run > gulp
 
 
 Usage
@@ -55,14 +72,6 @@ README.md
 ### Build ###
 config/settings/
 
-
-Installation
-===
-Install NodeJS
-Open a command prompt
-run > npm install -g gulp
-run > npm install
-run > gulp
 
 
 
@@ -125,6 +134,13 @@ Thanks to
 ===
 
 
+
+Changelog
+===
+Version 2
+- Actionscript (depreciated)
+Version 1
+- Javscript & actionscript bridge
 
 
 Help

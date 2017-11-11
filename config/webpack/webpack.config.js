@@ -23,29 +23,39 @@ CONFIG :
   [query]      The module query, i.e., the string following ? in the filename
 
 ///////////////////////////////////////////////////////////////////////////// */
+import path from 'path';
 import Settings from '../settings';
 import Rules from './webpack.rules';
 import Plugins from './webpack.plugins';
 import Entry from './webpack.entry';
 import Output from './webpack.output';
-import convertPathsToAliases from 'convert-tsconfig-paths-to-webpack-aliases';
+//import convertPathsToAliases from 'convert-tsconfig-paths-to-webpack-aliases';
+//const convertPathsToAliases = require("convert-tsconfig-paths-to-webpack-aliases").default;
 
-import tsconfig from '../../tsconfig.json'; // all comments in tsconfig.json must be removed
+// all comments in tsconfig.json must be removed!
+//import tsconfig from '../../tsconfig.json';
+const tsconfig = require("../../tsconfig.json");
 
 console.log('convertPathsToAliases', convertPathsToAliases);
-console.log('tsconfig',tsconfig);
+console.log('tsconfig',tsconfig.paths);
 tsconfig.baseUrl = '';
 
-// convertPathsToAliases function (tsconfigFile, dirname) {
-//   if (dirname === void 0) { dirname = "."; }
-//   var baseUrl = tsconfigFile.baseUrl, paths = tsconfigFile.paths;
-//   return Object.keys(paths).reduce(function (aliases, pathName) {
-//     var alias = replaceGlobs(pathName);
-//     var path = replaceGlobs(paths[pathName][0]);
-//     return __assign({}, aliases, (_a = {}, _a[alias] = path_1.resolve(dirname, baseUrl, path), _a));
-//     var _a;
-//   }, {});
-// }
+const replaceGlobs = filepath => filepath.replace(/(\/\*\*)*\/\*$/, "");
+
+const convertPathsToAliases = (tsconfigFile, dirname) => {
+  if (dirname === void 0) { dirname = "."; }
+  const baseUrl = tsconfigFile.baseUrl;
+  const paths = tsconfigFile.paths;
+
+  console.log('paths:', tsconfig.paths, Object.keys(tsconfig.paths) );
+
+  return Object.keys(paths).reduce( (aliases, pathName) => {
+    const alias = replaceGlobs(pathName);
+    const filepath = replaceGlobs(paths[pathName][0]);
+    return __assign({}, aliases, (_a = {}, _a[alias] = path.resolve(dirname, baseUrl, filepath), _a));
+    var _a;
+  }, {});
+}
 
 const tsAliases = convertPathsToAliases(tsconfig)
 

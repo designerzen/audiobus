@@ -118,7 +118,7 @@ const displayTrack = function( track:MidiTrack )
   for (let i = 0, f; f = commands[i]; i++)
   {
     //track.getCommandsAtPosition();
-    const frequency:number = Scales.frequencyFromNoteNumber(f.noteNumbe);
+    const frequency:number = Scales.frequencyFromNoteNumber(f.noteNumber);
     const noteName:string = Scales.noteNameFromPitch(frequency);
     switch ( f.subtype )
     {
@@ -126,7 +126,7 @@ const displayTrack = function( track:MidiTrack )
         const elementString:string = '<li class="note note-'+f.noteNumber+ ' channel-'+f.channel+ ' type-'+f.subtype+'" data-note="'+i+'">';
         // elementString += '</li>';
         // create element and add click handler...
-        output.push(elementString ,f.channel,' <strong>',  f.type,'</strong> - ', f.subtype ,  ' #',noteName, ' / '+f.noteNumber, ' @', f.deltaTime , '</li>');
+        output.push(elementString ,f.channel+'',' <strong>',  f.type,'</strong> - ', f.subtype ,  ' #',noteName, ' / '+f.noteNumber, ' @', f.deltaTime , '</li>');
         break;
     }
 
@@ -140,8 +140,8 @@ const displayTrack = function( track:MidiTrack )
   {
     var note = notes[i];
     //note.onclick = (e)=>{
-    note.onmouseover = (e)=>{
-      const element = e.target;
+    note.onmouseover = (scope:HTMLElement, e:MouseEvent )=>{
+      const element:HTMLElement = e.target;
       const note = element.getAttribute('data-note');
       const command =  commands[note];
 
@@ -151,7 +151,10 @@ const displayTrack = function( track:MidiTrack )
       //const p;
       console.log(note+ " NOTE >>> ",element, command);
       // now make some sound!
-      if (command) playCommand(command);
+      if (command){
+        playCommand(command);
+      }
+      return 0;
     };
   }
 }
@@ -171,9 +174,6 @@ const loadMidiFile = function( location )
       console.error(error);
     }
   );
-
-
-
 }
 
 const loadFile = function( target )
@@ -184,7 +184,7 @@ const loadFile = function( target )
 
   reader = new FileReader();
 
-  reader.onerror = (e)=>
+  reader.onerror = (e:ErrorEvent)=>
   {
     switch(e.target.error.code)
     {

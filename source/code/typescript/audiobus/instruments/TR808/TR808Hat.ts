@@ -21,7 +21,7 @@ const ratios:[]string = [2, 3, 4.16, 5.43, 6.79, 8.21];
 
 export default class TR808Hat extends Instrument {
 
-    private oscillators: <OscillatorNode[] = [];
+    private oscillators:OscillatorNode[] = [];
 
     private bandPassFilter: BiquadFilterNode;
     private highPassFilter: BiquadFilterNode;

@@ -398,10 +398,10 @@ const playNextCommand = function( forceNoteOn:boolean=false ):Array<ICommand>
 //
 // Interface with MIDI or load a MIDI file
 const midiFile:MidiFile = new MidiFile();
-//const midilocation:string = "assets/midi/nyan-cat.mid";
-//const midilocation:string = "assets/midi/banjos.mid";
+const midilocation:string = "assets/midi/nyan-cat.mid";
+//const midilocation:string = "/assets/midi/banjos.mid";
 //const midilocation:string = "assets/midi/funktown.mid";
-const midilocation:string = "assets/midi/missionimpossible.mid";
+//const midilocation:string = "/assets/midi/missionimpossible.mid";
 //const midilocation:string = "assets/midi/midi-sans-frontieres.mid";
 //const midilocation:string = "assets/midi/chopin-polishdance.mid";
 
@@ -552,7 +552,7 @@ midiFile.load( midilocation ).then(
       });
       // tb3.command( command, forceToChannel );
     };
-    sequencer.start( 0.6 );
+    //sequencer.start( 0.6 );
 
 
 
@@ -745,9 +745,9 @@ window.onmousemove = function(event:MouseEvent){
 
     tb303Settings.shape = percentageX;              // 0 -> 1
     tb303Settings.resonance = percentageY;              // 0 -> 1
-    // tb303Settings.accent = percentageX;              // 0 -> 1
+     tb303Settings.accent = percentageX;              // 0 -> 1
     // tb303Settings.threshold = percentageY;              // 0 -> 1  : softness
-    // tb303Settings.cutOff = percentageX * 20000;                // 200 -> 20000
+     tb303Settings.cutOff = percentageX * 20000;                // 200 -> 20000
     // tb303Settings.envelopeModulation = percentageY;    // 0 -> 1
     // tb303Settings.tuning = 0;                // -12 -> 12
 

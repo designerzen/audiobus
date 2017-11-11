@@ -19,8 +19,7 @@
       "./source/code/typescript/index.ts"
     ],
     "include": [
-        "./source/code/typescript/audiobus/index.ts",
-        "./typings/*.ts"
+        "./source/code/typescript/audiobus/index.ts"
     ],
     "exclude":[
         "node_modules",
@@ -31,6 +30,6 @@
         "examples"
     ],
     "paths": {
-      "audiobus": [ "source/code/typescript/audiobus/*" ]
+      "audiobus": [ "./source/code/typescript/audiobus/*" ]
     }
 }

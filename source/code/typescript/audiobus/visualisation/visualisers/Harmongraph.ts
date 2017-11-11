@@ -53,11 +53,15 @@ constructor()
 	// limit 1024
 	var limit:number = bufferLength;
 	var quantity:number = limit*8;
+	let smoothener:number = 1;
 		for (var t = 0; t < quantity; ++t)
 		{
 			//this.opacity = 1;//( t*0.2 )>>0;
 
 			var level:number = 0.5+(2 * spectrum[ t%limit ]/255 );//*0.5;
+			smoothener = smoothener + level / 2;
+			level = smoothener;
+
 		// if (level > 0) console.log('level:'+level);
 			//var level:number = (spectrum[ t%256 ] + 1);//*0.5;
 			//var level:number = (spectrum[ this.opacity ] + 1);//*0.5;

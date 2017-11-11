@@ -16,7 +16,21 @@ const ruleTypeScript = {
   exclude: [/node_modules/, /bower_components/, /\.spec\./ ],
   loader: 'ts-loader',
   options:{
-    configFileName :'tsconfig.json'
+    // Allows you to specify where to find the TypeScript configuration file.
+    // You may provide :
+    //  just a file name. The loader then will search for the config file of each entry point in the respective entry point's containing folder. If a config file cannot be found there, it will travel up the parent directory chain and look for the config file in those folders.
+    // - a relative path to the configuration file. It will be resolved relative to the respective .ts entry file.
+    // - an absolute path to the configuration file.
+    configFile :'tsconfig.json',
+    // If you want to speed up compilation significantly you can set this flag. However, many of the benefits you get from static type checking between different dependencies in your application will be lost.
+    // It's advisable to use transpileOnly alongside the fork-ts-checker-webpack-plugin to get full type checking again. To see what this looks like in practice then either take a look at our simple example. For a more complex setup take a look at our more involved example.
+    transpileOnly: false,
+    // If you're using HappyPack or thread-loader to parallise your builds then you'll need to set this to true. This implicitly sets *transpileOnly* to true and WARNING! stops registering all errors to webpack.
+    happyPackMode:false,
+
+    //Can be info, warn or error which limits the log output to the specified log level. Beware of the fact that errors are written to stderr and everything else is written to stderr (or stdout if logInfoToStdOut is true).
+    logLevel:"warn",
+
   }
 };
 
