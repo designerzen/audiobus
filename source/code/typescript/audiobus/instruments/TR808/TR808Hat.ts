@@ -9,14 +9,15 @@ Description - Based on the schematic of the Roland TR808
 Use         - trigger
 Methods     -
 Thanks to   -
-https://web.archive.org/web/20160403115835/http://www.soundonsound.com/sos/allsynthsecrets.htm
+https://web.archive.org/web/20160403115835/
+http://www.soundonsound.com/sos/allsynthsecrets.htm
 
 //////////////////////////////////////////////////////////////////////////////*/
 import Instrument from '../Instrument';
 import Envelope from '../../envelopes/Envelope';
 
 const fundamental = 40;
-const ratios:[]string = [2, 3, 4.16, 5.43, 6.79, 8.21];
+const ratios:number[] = [2, 3, 4.16, 5.43, 6.79, 8.21];
 
 
 export default class TR808Hat extends Instrument {
