@@ -91,7 +91,7 @@ export default class ExampleVisualiser
     {
       //
       case this.harmongraph:
-        const index:number = Math.round( this.count*0.5 )%255;
+        const index:number = Math.round( this.count*0.0005 )%255;
         const colour:Colour = this.rainbow[index];
 
         // recolour

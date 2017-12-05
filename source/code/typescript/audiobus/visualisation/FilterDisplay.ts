@@ -1,12 +1,12 @@
 export default class FilterDisplay
 {
   private canvas:HTMLCanvasElement;
-  private context:CanvasRenderingContext2d;
+  private context:CanvasRenderingContext2D;
 
   private myFrequencyArray:Float32Array;
   private magResponseOutput:Float32Array; // magnitude
   private phaseResponseOutput:Float32Array;
-  
+
   private resolution:number;
 
   public get element()

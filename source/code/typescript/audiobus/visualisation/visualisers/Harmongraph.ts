@@ -57,10 +57,11 @@ constructor()
 		for (var t = 0; t < quantity; ++t)
 		{
 			//this.opacity = 1;//( t*0.2 )>>0;
+			const peak: number = spectrum[t % limit] / 255;
 
-			var level:number = 0.5+(2 * spectrum[ t%limit ]/255 );//*0.5;
-			smoothener = smoothener + level / 2;
-			level = smoothener;
+			var level:number = 0.5+(2 * peak );//*0.5;
+			// smoothener = smoothener + level / 2;
+			// level = smoothener;
 
 		// if (level > 0) console.log('level:'+level);
 			//var level:number = (spectrum[ t%256 ] + 1);//*0.5;
@@ -73,7 +74,7 @@ constructor()
 			// z = ;
 			a *= (1 - this.decay);
 
-			this.drawPixel( this.centreX + sector*x, this.centreY + sector* y, this.red, this.green, this.blue , alpha);
+			this.drawPixel(this.centreX + sector * x, this.centreY + sector * y, (1 - peak) * this.red, (1 - peak) * this.green, (1 - peak) *this.blue , alpha);
 
 			s++;
 
