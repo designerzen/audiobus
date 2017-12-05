@@ -14,6 +14,8 @@ Methods     -
 import Instrument from '../Instrument';
 import Envelope from '../../envelopes/Envelope';
 
+//import { } from BiquadFilterType;
+
 export default class BassDrum extends Instrument
 {
 		protected bass:OscillatorNode;
@@ -37,7 +39,7 @@ export default class BassDrum extends Instrument
       this.compressor = compressor;
 
       const biquadFilter= audioContext.createBiquadFilter();
-      biquadFilter.type = "lowshelf";
+	  biquadFilter.type = 'lowshelf';
       biquadFilter.frequency.value = 100;
       biquadFilter.gain.value = 5;
       this.biquadFilter = biquadFilter;

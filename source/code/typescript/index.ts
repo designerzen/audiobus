@@ -83,7 +83,10 @@ Engine.connect( mixer.output );
 
 
 // audioContext:AudioContext, source:GainNode, type
-const vis:Visualiser = new Visualiser( engine, mixer.output, SpectrumAnalyzer.TYPE_FREQUENCY, 1024 );
+//
+
+//const vis:Visualiser = new Visualiser( engine, mixer.output, SpectrumAnalyzer.TYPE_FREQUENCY, 1024 );
+const vis: Visualiser = new Visualiser(engine, mixer.output, SpectrumAnalyzer.TYPE_TIME_DOMAIN, 1024 );
 // append to document!
 document.body.appendChild( vis.canvas );
 vis.start();

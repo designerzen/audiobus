@@ -36,10 +36,9 @@ export default class MidiHardwareDevice
   protected name:string;
 
   // you should piggyback these!
-  public onmidiconnected:Function = function(message:MidiCommand){};
-  public onmididisconnected:Function = function(message:MidiCommand){};
-
-  public onMidi:{(alias:string, device:WebMidi.MIDIInput, event:WebMidi.MIDIMessageEvent):void} = function(alias:string, device:WebMidi.MIDIInput, event:WebMidi.MIDIMessageEvent):void{};
+  public onmidiconnected:Function = (message:MidiCommand)=>{};
+  public onmididisconnected:Function = (message:MidiCommand)=>{};
+  public onMidi:{(alias:string, device:WebMidi.MIDIInput, event:WebMidi.MIDIMessageEvent):void} = (alias:string, device:WebMidi.MIDIInput, event:WebMidi.MIDIMessageEvent):void=>{};
 
   public get inputs():Array<WebMidi.MIDIInput>
   {
