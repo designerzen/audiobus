@@ -50,7 +50,7 @@ const folders             = {};
 
   folders.examples        = path.resolve(folders.source, 'examples');
   folders.partials        = path.resolve(folders.markup, 'partials');
-  folders.templates       = path.resolve(folders.source, 'templates');
+  folders.templates       = path.resolve(folders.config, 'templates');
   folders.typings         = path.resolve(folders.root, 'typings');
   folders.build           = path.resolve(folders.root, 'build');
   folders.release         = path.resolve(folders.root, 'release');
@@ -82,8 +82,8 @@ const files = {};
 
 // plop
 const templates = {};
-  templates.root = "";
-  templates.example = path.join(folders.templates, "example");
+  templates.root = folders.templates;
+  templates.example = path.join(templates.root, "example");
 
 // Where do the files ends up in the end?
 const destination = function( folder )
