@@ -4,13 +4,13 @@ import inquirer from 'inquirer-directory';
 
 import Settings from './config/settings'
 
-// config...
+const templateName = "example";
 
 // home of templates... Settings.templates.example
-const exampleTemplatePath = Settings.templates.example;
+const exampleTemplatePath = Settings.templates[templateName] ;
 
 // default paths to copy things from... output to Settings.folders.examples;
-const defaultExamplePath = Settings.folders.examples;
+const destinationExampleTemplatePath = Settings.folders.examples + '/';
 
 // const pathComponent = pathTemplate+"component/";
 // const pathRoute = pathTemplate+"route/";
@@ -43,22 +43,22 @@ module.exports = (plop) => {
       {
         type: 'input',
         name: 'name',
-        message: 'What is name of the new example?',
+        message: 'What is name of your new audiobus project?',
         validate: required('name'),
       },
       {
         type: 'confirm',
         name: 'needPath',
-        message: 'Should I place the new example in examples/ directory?',
+        message: 'Should I place the new example in "' + destinationExampleTemplatePath+'" directory?',
         default: true,
       },
       {
         type: 'directory',
         name: 'path',
         message: 'Where shall I create the new example?',
-        basePath: defaultExamplePath,
+        basePath: destinationExampleTemplatePath,
         default: '',
-        when: (answers) => answers.needPath,
+        when: (answers) => !answers.needPath,
       }
     ],
     // stuff to do with the input data...
@@ -66,7 +66,7 @@ module.exports = (plop) => {
     actions: (data) => {
       // create variables that can be accessed within the template files.
       // determine path from the input data above...
-      plop.addPartial('path', '{{#if path}}{{ path }}/{{else}}'+defaultExamplePath+'{{/if}}{{ dashCase name }}');
+      plop.addPartial('path', '{{#if path}}{{ path }}/{{else}}'+destinationExampleTemplatePath+'{{/if}}{{ dashCase name }}');
 
       // where to put these in the end...
       plop.addPartial('fullPath', './{{> path}}');
@@ -78,22 +78,22 @@ module.exports = (plop) => {
         {
           type: 'add',
           path: '{{> fullPath}}/{{dashCase name}}.ts',
-          templateFile: exampleTemplatePath+'.ts',
+          templateFile: exampleTemplatePath + templateName+'.ts',
           abortOnFail: true,
         },
         // copy js index entry point
         {
           type: 'add',
-          path: '{{> fullPath}}/{{dashCase name}}.js',
-          templateFile: exampleTemplatePath+'.js',
+          path: '{{> fullPath}}/index.js',
+          templateFile: exampleTemplatePath+'index.js',
           abortOnFail: true,
         },
         // copy readme file
         {
           type: 'add',
-          path: '{{> fullPath}}/{{dashCase name}}.js',
-          templateFile: exampleTemplatePath+'.js',
-          abortOnFail: true,
+          path: '{{> fullPath}}/readme.txt',
+          templateFile: exampleTemplatePath+'readme.txt',
+          abortOnFail: false,
         }
       ];
 
@@ -102,16 +102,16 @@ module.exports = (plop) => {
       actions.push({
         type: 'add',
         path: '{{> fullPath}}/{{dashCase name}}.less',
-        templateFile: exampleTemplatePath+'.less',
-        abortOnFail: true,
+        templateFile: exampleTemplatePath + templateName +'.less',
+        abortOnFail: false,
       });
 
       // copy css file
       actions.push({
         type: 'add',
         path: '{{> fullPath}}/{{dashCase name}}.css',
-        templateFile: exampleTemplatePath+'.css',
-        abortOnFail: true,
+        templateFile: exampleTemplatePath + templateName +'.css',
+        abortOnFail: false,
       });
 
 
@@ -119,15 +119,15 @@ module.exports = (plop) => {
       actions.push({
         type: 'add',
         path: '{{> fullPath}}/{{dashCase name}}.html',
-        templateFile: exampleTemplatePath+'.html',
-        abortOnFail: true,
+        templateFile: exampleTemplatePath + templateName +'.html',
+        abortOnFail: false,
       });
 
       actions.push({
         type: 'add',
         path: '{{> fullPath}}/{{dashCase name}}.pug',
-        templateFile: exampleTemplatePath+'.pug',
-        abortOnFail: true,
+        templateFile: exampleTemplatePath + templateName +'.pug',
+        abortOnFail: false,
       });
 
       // expose
