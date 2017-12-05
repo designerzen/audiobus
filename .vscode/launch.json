@@ -5,8 +5,8 @@
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Launch Chrome against localhost",
-            "url": "http://localhost:8080",
+            "name": "AudioBus Launch Chrome against localhost",
+            "url": "http://localhost:808",
             "webRoot": "${workspaceRoot}"
         },
         {
