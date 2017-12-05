@@ -22,71 +22,16 @@ import TB303WaveTable from './TB303WaveTable';
 import Scales from '../../scales/Scales';
 import AudioComponent from '../../AudioComponent';
 import Instrument from '../Instrument';
+import {
+	tau, sinh,
+	coeff_integrator, coeff_highpass, coeff_allpass, coeff_biquad_lowpass12db, coeff_biquad_notch
+} from '../../maths/AcceleratedMaths';
 
-// This only replaces the inbuilt Maths.sinh as it isn't available everywhere...
-const sinh = function(x:number):number
-{
-	return (Math.exp(x)-Math.exp(-x))*0.5;
-}
-
-const tau = 2*Math.PI;
-// SUPER FAST! ///
-
-// shortcuts to maths functions to prevent .dot lookups and allow better uglification
-// if we are going to town, may as well go all out!
-
-// leaky integrator coefficient from decay time in ms
-const coeff_integrator = function(decaytime:number,sampleRate:number)
-{
-	return Math.exp(-1.0/(sampleRate*0.001*decaytime));
-}
-
-// onepole filter coefficients
-const coeff_highpass = function(cutoff:number,sampleRate:number):Array<number>
-{
-	const x = Math.exp(-tau*cutoff*(1.0/sampleRate));
-	return [0,0,0.5*(1.0+x),-0.5*(1.0+x),x];
-}
-
-const coeff_allpass = function(cutoff:number,sampleRate:number):Array<number>
-{
-	const t = Math.tan( Math.PI*cutoff*(1.0/sampleRate) );
-	const x = (t-1.0)/(1+1.0);
-	return [0,0,x,1.0,-x];
-}
-
-// biquad filter coefficients
-const coeff_biquad_lowpass12db = function(freq:number , gain:number,sampleRate:number):Array<number>
-{
-	const w = tau*freq/sampleRate;
-	const s = Math.sin(w);
-	const c = Math.cos(w);
-	const q = gain;
-	const alpha = s/(2.0*q);
-	const scale = 1.0/(1.0+alpha);
-	const a1 = 2.0*c*scale;
-	const a2 = (alpha-1.0)*scale;
-	const b1 = (1.0-c)*scale;
-	const b0 = 0.5*b1;
-	const b2 = b0;
-	return [0,0,0,0,b0,b1,b2,a1,a2];
-}
-
-const coeff_biquad_notch = function(freq:number,bandwidth:number,sampleRate:number):Array<number>
-{
-	const w = tau*freq/sampleRate;
-	const s = Math.sin(w);
-	const c = Math.cos(w);
-	const alpha = s*sinh(0.5*Math.log(2.0)*bandwidth*w/s);
-	const scale = 1.0/(1.0+alpha);
-	const a1 = 2.0*c*scale;
-	const a2 = (alpha-1.0)*scale;
-	const b0 = 1.0*scale;
-	const b1 = -2.0*c*scale;
-	const b2 = 1.0*scale;
-	return [0,0,0,0,b0,b1,b2,a1,a2];
-}
-
+// to prevent floating points going into mega decimal place mode that frags memory
+// we add a tiny little number to all outputs...
+// rounding performance improver
+const anti_denormal: number = 1.0e-20;
+const bufferSize = 4096;
 
 // 303 class
 export default class TB303 extends Instrument
@@ -130,10 +75,10 @@ export default class TB303 extends Instrument
   protected slide=0;
   protected filtermult=0;
   protected ampmult = 0;
-  protected accentgain = 0.0;
-  protected envscaler = 0.0;
-  protected envoffset = 0.0;
-  protected dist_gain = 1.0/this.dist_threshold;
+  protected accentgain = 0;
+  protected envscaler = 0;
+  protected envoffset = 0;
+  protected dist_gain = 1/this.dist_threshold;
   protected delaybuffer:Float32Array;
   protected delaypos = 0;
   protected sampleRate:number;
@@ -227,8 +172,8 @@ export default class TB303 extends Instrument
   {
 		// TODO: this destroys threshold value
 		this.thresholdValue = value;
-		this.dist_threshold = 1.0-0.9*value;
-		this.dist_gain = 1.0/this.dist_threshold;
+		this.dist_threshold = 1-0.9*value;
+		this.dist_gain = 1/this.dist_threshold;
 	}
 
 	public get threshold():number
@@ -269,20 +214,19 @@ export default class TB303 extends Instrument
 		console.error("TB303:Constructed");
 		// load wavetable if it don't exist....
 		TB303WaveTable.fetch().then( (wavetable:Float32Array) =>{
+
 			console.error("TB303:Loaded",this.sampleRate);
 			this.wavetable = wavetable;
 
 			this.delaybuffer = new Float32Array(2*sampleRate);
 			this.reset();
 			this.begin();
-
 		});
 
   }
 
 	public begin()
 	{
-		const bufferSize = 4096;
 		const looper = this.audioContext.createScriptProcessor(bufferSize, 1, 1);
 
 		looper.onaudioprocess = (e) => {
@@ -407,11 +351,7 @@ export default class TB303 extends Instrument
 	// renderer
 	// needs to be called 4096 times a frame so try and keep it light!
 	public render ( flush:boolean=false ):number
-  {
-    // to prevent floating points going into mega decimal place mode that frags memory
-    // we add a tiny little number to all outputs...
-		const anti_denormal:number = 1.0e-20;
-
+  	{
 		if (this.justPlayed)
 		{
 			// so we have just played a note we don;t want to overwrite the amp env...
@@ -439,7 +379,6 @@ export default class TB303 extends Instrument
 
 		let sample:number = ((1-r)*this.wavetable[this.table+idx]+r * this.wavetable[this.table+((idx+1)&4095)] );
 
-
 		this.oscpos+=this.oscdelta;
 
 		//should this be while'd?
@@ -449,7 +388,7 @@ export default class TB303 extends Instrument
 		}
 
 		// Modulators
-		if ((this.samplepos&63)==0)
+		if ((this.samplepos&63)===0)
     {
 			// Portamento
 			if (this.slidestep++<64)
@@ -461,14 +400,14 @@ export default class TB303 extends Instrument
 			// Cutoff modulation
 			const tmp1:number = this.envscaler*(this.filterenv-this.envoffset);
 			const tmp2:number= this.accentgain*this.filterenv;
-			const effectivecutoff:number = Math.min(this.cutOffValue*Math.pow(2.0,tmp1+tmp2),20000);
+			const effectivecutoff:number = Math.min(this.cutOffValue*Math.pow(2,tmp1+tmp2),20000);
 
 			// Recalculate main filter coefficients
 			// TODO: optimize into lookup table!
 			const wc:number = ((tau)/this.sampleRate)*effectivecutoff;
 			const r:number = this.resonance_skewed;
 			const fx:number = wc * 0.11253953951963826; // (1.0/sqrt(2))/(2.0*PI)
-			this.tbf_b0 = (0.00045522346 + 6.1922189 * fx) / (1.0 + 12.358354 * fx + 4.4156345 * (fx * fx));
+			this.tbf_b0 = (0.00045522346 + 6.1922189 * fx) / (1 + 12.358354 * fx + 4.4156345 * (fx * fx));
 			const k:number = fx*(fx*(fx*(fx*(fx*(fx+7198.6997)-5837.7917)-476.47308)+614.95611)+213.87126)+16.998792;
 			this.tbf_g = (((k * 0.058823529411764705)-1.0)*r+1.0)*(1.0+r);
 			this.tbf_k = k*r;
@@ -535,8 +474,8 @@ export default class TB303 extends Instrument
 		if (sample>this.dist_threshold||sample<-this.dist_threshold)
     {
 			//sample = Math.abs(Math.abs((sample-dist_threshold)%(dist_threshold*4.0))-dist_threshold*2.0)-dist_threshold;
-			const clipped:number = (sample>0.0?1.0:-1.0)*this.dist_threshold;
-			sample = (Math.abs(Math.abs((((1.0-this.dist_shape)*clipped+this.dist_shape*sample)-this.dist_threshold)%(this.dist_threshold*4.0))-this.dist_threshold*2.0)-this.dist_threshold);
+			const clipped:number = (sample>0?1:-1)*this.dist_threshold;
+			sample = (Math.abs(Math.abs((((1-this.dist_shape)*clipped+this.dist_shape*sample)-this.dist_threshold)%(this.dist_threshold*4))-this.dist_threshold*2)-this.dist_threshold);
 		}
 		sample *= this.dist_gain;
 
