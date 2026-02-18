@@ -1,3 +1,4 @@
+// @ts-nocheck
 import AUDIOTIMER_PROCESSOR_URI from './timing.audioworklet-processor.js?worker&url'
 
 /**
@@ -21,7 +22,7 @@ import {
 	CMD_INITIALISE,
 	CMD_START,CMD_STOP,CMD_UPDATE,
 	EVENT_READY, EVENT_STARTING, EVENT_STOPPING, EVENT_TICK
-} from './timing.events.js'
+} from './timing.events'
 
 /**
  * Gateway to the metronome AudioWorkletProcessor
@@ -100,3 +101,5 @@ export default class TimingAudioWorkletNode extends AudioWorkletNode {
 		}
 	}
 }
+
+

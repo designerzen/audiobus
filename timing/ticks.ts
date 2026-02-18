@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export const Ticks = {
     /** How many ticks pass in "1 whole note" or 4x1/4th notes in a 4/4th beat, independent of tempo. */

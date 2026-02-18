@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BASIC MUSICAL INTERVALS (in semitones)
  * These define the fundamental building blocks of Western music.

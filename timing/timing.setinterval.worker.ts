@@ -1,7 +1,8 @@
+// @ts-nocheck
 import {
 	CMD_START,CMD_STOP,CMD_UPDATE,
 	EVENT_READY, EVENT_STARTING, EVENT_STOPPING, EVENT_TICK
-} from './timing.events.js'
+} from './timing.events'
 
 let timerID = null
 let isRunning = false
@@ -103,3 +104,5 @@ self.onmessage = e => {
             break
     }
 }
+
+

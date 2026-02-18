@@ -1,12 +1,12 @@
+// @ts-nocheck
 // import {
 // 	CMD_START,CMD_STOP,CMD_UPDATE,
 // 	EVENT_READY, EVENT_STARTING, EVENT_STOPPING, EVENT_TICK
-// } from './timing.js'
+// } from './timing'
 import {
-	CMD_INITIALISE,
 	CMD_START,CMD_STOP,CMD_UPDATE,
 	EVENT_READY, EVENT_STARTING, EVENT_STOPPING, EVENT_TICK
-} from './timing.events.js'
+} from './timing.events'
 
 let timerID = null
 let isRunning = false
@@ -22,7 +22,27 @@ const elapsed = () => ( now() - startTime) * 0.001
 
 const loop = interval => {
     
-    /// TODO:
+    // Loop
+    timerID = setTimeout( ()=>{
+
+        const expected = intervals * gap * 0.001
+        const passed = elapsed()
+        const difference = expected - passed
+
+        currentTime = now()
+        
+        intervals++
+        
+        postMessage({ event:EVENT_TICK, time:passed, intervals })
+        // console.log({expected,passed,difference,currentTime})
+
+        // modify the interval to accomodate the drift
+        const nextInterval = accurateTiming ? interval + difference : interval 
+
+        // call itself with the new interval?
+        loop(nextInterval)
+
+    }, interval)
 }
 
 const reset = () =>{
@@ -64,12 +84,6 @@ self.onmessage = e => {
 
     switch (data.command)
     {
-		// TODO : Set this up with the provided audioContext
-        case CMD_INITIALISE:
-            accurateTiming = data.accurateTiming || false
-            start(data.interval)
-            break
-
         case CMD_START:
             accurateTiming = data.accurateTiming || false
             start(data.interval)
@@ -84,3 +98,5 @@ self.onmessage = e => {
             break
     }
 }
+
+

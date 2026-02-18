@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 const rotateArray = (a, n) => {
     n = n % a.length

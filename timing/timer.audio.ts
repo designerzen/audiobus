@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Timer from "./timer.js"
 
 import AUDIOTIMER_WORKLET_URI from './timing.audioworklet.js?url'

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Web Worker for executing transformer operations
  * Runs transform methods off the main thread
@@ -139,3 +140,4 @@ function getOrCreateTransformer(transformerId, state) {
 }
 
 console.log('[Worker] TransformWorker loaded and ready')
+

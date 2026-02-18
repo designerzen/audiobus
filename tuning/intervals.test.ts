@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Vitest tests for intervals.js
  * Validates all interval definitions and their correctness
@@ -525,3 +526,4 @@ describe('Interval Validation', () => {
         expect(POWER_CHORD_INTERVALS).toHaveLength(2)
     })
 })
+

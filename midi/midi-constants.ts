@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Control Change
 export const BANK_SELECT                      = 0x00
 export const MODULATION_WHEEL                 = 0x01

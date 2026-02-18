@@ -6,18 +6,18 @@
 import {
 	CMD_START,CMD_STOP,CMD_UPDATE,
 	EVENT_READY, EVENT_STARTING, EVENT_STOPPING, EVENT_TICK
-} from './timing.events.js'
+} from './timing.events'
 
 import AUDIOCONTEXT_WORKER_URI from './timing.audiocontext.worker.js?url'
 import AUDIOCONTEXT_WORKLET_URI from './timing.audioworklet.js?url'
 
-import { tapTempoQuick } from './tap-tempo.js'
-import { Ticks } from './ticks.js'
+import { tapTempoQuick } from './tap-tempo'
+import { Ticks } from './ticks'
 
 // import AUDIOCONTEXT_WORKER_URI from './timing.audiocontext.worker.js?worker&url'
 // import AUDIOTIMER_WORKLET_URI from './timing.audioworklet.js?worker&url'
 // import AUDIOTIMER_PROCESSOR_URI from './timing.audioworklet-processor.js?worker&url'
-// import { createTimingProcessor } from './timing.audioworklet.js'
+// import { createTimingProcessor } from './timing.audioworklet'
 
 
 // Timing Constants and conversions
@@ -976,3 +976,4 @@ export default class Timer {
 		})
 	}
 }
+

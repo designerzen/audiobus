@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createChord } from './chords.js'
 import { 
 	IONIAN_INTERVALS,

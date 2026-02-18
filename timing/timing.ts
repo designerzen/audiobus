@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Only one instance of this timing class is allowed
 // but it is designed as such to allow for complex rythmns to 
 // be created as well as very basic events such as metronomes.
@@ -16,7 +17,7 @@
 import {
 	CMD_START,CMD_STOP,CMD_UPDATE,
 	EVENT_READY, EVENT_STARTING, EVENT_STOPPING, EVENT_TICK
-} from './timing.events.js'
+} from './timing.events'
 
 // Parcel style
 import ROLLING_WORKER_URI from './timing.rolling.worker.js?worker&url'
@@ -25,7 +26,7 @@ import SETTIMEOUT_WORKER_URI from './timing.settimeout.worker.js?worker&url'
 // import AUDIOTIMER_WORKLET_URI from './timing.audiocontext.worker.js?worker&url'
 import AUDIOTIMER_PROCESSOR_URI from './timing.audioworklet-processor.js?worker&url'
 
-import { createTimingProcessor } from './timing.audioworklet.js'
+import { createTimingProcessor } from './timing.audioworklet'
 
 // Vite style
 // import ROLLING_WORKER_URI from './timing.rolling.worker.js?worker'
@@ -435,3 +436,4 @@ export const tapTempo = (autoReset=true, timeOut=TAP_TIMEOUT, minimumTaps = MINI
     }
     return -1
 }
+

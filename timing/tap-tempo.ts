@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * TODO: Implement lienar regression like nayuki

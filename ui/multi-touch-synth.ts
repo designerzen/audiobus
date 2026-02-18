@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const registerMultiTouchSynth = ( notes=[], noteOnCallback=null, noteOffCallback=null, onAvailableNoteChange=null) => {
 
     const controller = new AbortController()

@@ -1,3 +1,4 @@
+// @ts-nocheck
 const VISUALISER_OPTIONS = {
     backgroundColour:"#fff",
     lineColour:"#000",

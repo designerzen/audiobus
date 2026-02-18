@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
 	createChord,
@@ -492,3 +493,4 @@ describe('Mode Utility Functions', () => {
 		})
 	})
 })
+

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * This is a Sequence containing all Audio Commands
  * and a series of super helpful methods to read them

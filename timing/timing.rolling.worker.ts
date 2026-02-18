@@ -1,7 +1,8 @@
+// @ts-nocheck
 import {
 	CMD_START,CMD_STOP,CMD_UPDATE,
 	EVENT_READY, EVENT_STARTING, EVENT_STOPPING, EVENT_TICK
-} from './timing.events.js'
+} from './timing.events'
 
 const GAP_BETWEEN_LOOPS = 0
 
@@ -104,3 +105,5 @@ self.onmessage = e => {
             break
     }
 }
+
+

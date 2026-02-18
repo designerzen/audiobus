@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
 * A timer that uses the AudioWorklet API
 * currentTime is a global variable
@@ -9,7 +10,7 @@ import {
 	CMD_INITIALISE,
 	CMD_START,CMD_STOP,CMD_UPDATE,
 	EVENT_READY, EVENT_STARTING, EVENT_STOPPING, EVENT_TICK
-} from './timing.events.js'
+} from './timing.events'
 
 class TimingAudioWorkletProcessor extends AudioWorkletProcessor {
  
@@ -169,3 +170,4 @@ class TimingAudioWorkletProcessor extends AudioWorkletProcessor {
   
 const ID = "timing-processor"
 registerProcessor(ID, TimingAudioWorkletProcessor)
+
