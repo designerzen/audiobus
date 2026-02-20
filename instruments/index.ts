@@ -2,9 +2,8 @@
  * Instruments & Synthesis
  * Virtual instruments, oscillators, and sound generation
  */
-export {
-  SynthOscillator,
-} from './oscillators/synth-oscillator.ts'
+import SynthOscillator from './oscillators/synth-oscillator.ts'
+export {SynthOscillator}
 
 export {
   ToneSynth,
