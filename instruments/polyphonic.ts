@@ -1,6 +1,7 @@
 /**
  * Lets you play many synths at once.
- * Can be of any instrument but currently limited to only one 
+ * Can be of any instrument but defaults
+ * to the single oscillator
  */
 import SynthOscillator, { OSCILLATORS } from "./oscillators/synth-oscillator.ts"
 
@@ -22,9 +23,9 @@ export default class PolySynth implements IAudioOutput{
 	#audioContext: AudioContext
 	#activeVoices = 0
 
-	#uuid : string = 'poly-synth-' + (PolySynth.ID++)
+	#uuid : string = 'polyphonic-' + (PolySynth.ID++)
 	
-    SynthClass
+    InstrumentClass
 
     get output():AudioNode{
         return this.#gainNode
@@ -54,10 +55,10 @@ export default class PolySynth implements IAudioOutput{
         this.#audioContext = audioContext
         this.options = Object.assign({}, this.options, options)
        
-        this.SynthClass = this.options.class
+        this.InstrumentClass = this.options.class
         this.#gainNode = audioContext.createGain()
 		this.#gainNode.gain.value = 2 // Start at 2 for single voice
-        this.factory( this.SynthClass, this.options.maxPolyphony)
+        this.factory( this.InstrumentClass, this.options.maxPolyphony)
     }
 
     /**

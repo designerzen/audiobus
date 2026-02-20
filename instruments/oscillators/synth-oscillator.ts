@@ -41,8 +41,8 @@ export default class SynthOscillator implements IAudioOutput{
         reuseOscillators:true
     }
     
-    #uuid = "SynthOscillator-"+(SynthOscillator.ID++)
-    #id = this.#uuid
+	#id = "SynthOscillator"
+    #uuid = this.#id + "-" + (SynthOscillator.ID++)
     
     #startedAt = -1
     oscillatorsActive:boolean = false

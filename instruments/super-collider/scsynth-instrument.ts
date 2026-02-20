@@ -1,4 +1,5 @@
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
+import { IAudioOutput } from "../../io/outputs/output-interface.ts"
 
 const SILENCE = 0.00000000009
 
@@ -6,7 +7,9 @@ const SILENCE = 0.00000000009
  * SuperCollider Synth Instrument
  * Uses supersonic-scsynth-bundle for SC synthesis
  */
-export default class SCSynthInstrument {
+export default class SCSynthInstrument implements IAudioOutput{
+	
+	static ID:number = 0
 
     options = {
         // default amplitude
@@ -39,16 +42,33 @@ export default class SCSynthInstrument {
         synthDef: 'sine_synth',  // default SynthDef name
         numChannels: 1
     }
-
-    #id = "SCSynthInstrument"
+  
+	#id = "SCSynthInstrument"
+	#uuid =  this.#id + "-" + (SCSynthInstrument.ID++)
+  	
     synthNodes = new Map()  // Map of note IDs to synth nodes
     
     startedAt = -1
     activeNote = null
 
-    get isNoteDown() {
-        return this.activeNote !== null
+	#audioContext:AudioContext
+	#gainNode:GainNode
+
+    get title() {
+        return this.options.title ?? "SCSynthInstrument"
     }
+	
+	get name(): string {
+		return "Super-Collider"
+	}
+
+	get description(): string {
+		return "Super Collider is an expressive synthesizer"
+	}
+	
+	get uuid(): string {
+		return this.#uuid
+	}
 
     get id() {
         return this.#id
@@ -59,7 +79,7 @@ export default class SCSynthInstrument {
     }
 
     get now() {
-        return this.audioContext.currentTime
+        return this.#audioContext.currentTime
     }
 
     get gain() {
@@ -71,50 +91,78 @@ export default class SCSynthInstrument {
     }
 
     get volume() {
-        return this.gainNode.gain.value
+        return this.#gainNode.gain.value
     }
 
     set volume(value) {
         const now = this.now
-        this.gainNode.gain.cancelScheduledValues(now)
-        this.gainNode.gain.linearRampToValueAtTime(value, now + this.options.fadeDuration)
+        this.#gainNode.gain.cancelScheduledValues(now)
+        this.#gainNode.gain.linearRampToValueAtTime(value, now + this.options.fadeDuration)
     }
 
     get output() {
-        return this.dcFilterNode
+        return this.#gainNode
+    }
+	
+	get audioContext(): BaseAudioContext{
+		return this.#audioContext
+	}
+
+    get isNoteDown() {
+        return this.activeNote !== null
     }
 
-    get title() {
-        return this.options.title ?? "SCSynthInstrument"
-    }
+	get isConnected(): boolean {
+		return this.startedAt > -1
+	}
 
-    constructor(audioContext, scsynth, options = {}) {
-        this.audioContext = audioContext
+	get isHidden(): boolean {
+		return false
+	}
+
+    constructor(audioContext:AudioContext, scsynth, options = {}) {
+
+		this.#id = "SCSynthInstrument-" + SCSynthInstrument.ID++
+        this.#audioContext = audioContext
         this.scsynth = scsynth  // supersonic-scsynth instance
         this.options = Object.assign({}, this.options, options)
 
-        // Add a highpass filter at 20Hz to remove DC offset
-        this.dcFilterNode = new BiquadFilterNode(audioContext, {
-            type: 'highpass',
-            frequency: 20,
-            Q: 0.707
-        })
-
-        this.filterNode = new BiquadFilterNode(audioContext, {
-            type: 'lowpass',
-            Q: this.options.filterResonance,
-            frequency: this.options.filterCutOff,
-            detune: 0,
-            gain: 1
-        })
-
-        this.gainNode = audioContext.createGain()
-        this.gainNode.gain.value = 0  // start silently
-
-        // Connect: filterNode -> gainNode -> dcFilterNode
-        this.filterNode.connect(this.gainNode)
-        this.gainNode.connect(this.dcFilterNode)
+        this.#gainNode = audioContext.createGain()
+        this.#gainNode.gain.value = 0  // start silently
     }
+
+	// TODO:
+	// connect?(): Promise<void | Function> | Function {
+	// 	throw new Error("Method not implemented.")
+	// }
+	// disconnect?(): Promise<void | Function> | Function {
+	// 	throw new Error("Method not implemented.")
+	// }
+	// createGui?(): Promise<HTMLElement> {
+	// 	throw new Error("Method not implemented.")
+	// }
+	// destroyGui?(): Promise<void> {
+	// 	throw new Error("Method not implemented.")
+	// }
+
+	hasMidiOutput(): boolean {
+		return false
+	}
+	hasAudioOutput(): boolean {
+		return true
+	}
+	hasAutomationOutput(): boolean {
+		return false
+	}
+	hasMpeOutput(): boolean {
+		return false
+	}
+	hasOscOutput(): boolean {
+		return true
+	}
+	hasSysexOutput(): boolean {
+		return false
+	}
 
     /**
      * Create a synth node via SuperCollider
@@ -124,7 +172,7 @@ export default class SCSynthInstrument {
      * @param {Number} startTime 
      * @returns {Number} synth node ID
      */
-    createSynthNode(frequency = 440, startTime = this.audioContext.currentTime) {
+    createSynthNode(frequency = 440, startTime = this.#audioContext.currentTime) {
         if (!this.scsynth) {
             console.warn("SuperCollider synth not available")
             return null
@@ -208,11 +256,11 @@ export default class SCSynthInstrument {
 
         clearInterval(this.timerInterval)
 
-        this.gainNode.gain.cancelScheduledValues(startTime)
+        this.#gainNode.gain.cancelScheduledValues(startTime)
         // Attack
-        this.gainNode.gain.linearRampToValueAtTime(amplitude, startTime + this.options.attack)
+        this.#gainNode.gain.linearRampToValueAtTime(amplitude, startTime + this.options.attack)
         // Decay to Sustain
-        this.gainNode.gain.linearRampToValueAtTime(amplitudeSustain, startTime + this.options.attack + this.options.decay)
+        this.#gainNode.gain.linearRampToValueAtTime(amplitudeSustain, startTime + this.options.attack + this.options.decay)
 
         if (!this.isNoteDown) {
             const synthId = this.createSynthNode(frequency, startTime)
@@ -267,8 +315,8 @@ export default class SCSynthInstrument {
         }
 
         // Fade out the Web Audio gainNode in parallel
-        this.gainNode.gain.cancelScheduledValues(extendNow)
-        this.gainNode.gain.linearRampToValueAtTime(SILENCE, extendNow + releaseDuration)
+        this.#gainNode.gain.cancelScheduledValues(extendNow)
+        this.#gainNode.gain.linearRampToValueAtTime(SILENCE, extendNow + releaseDuration)
 
         this.timerInterval = setTimeout(() => this.activeNote = null, releaseDuration)
         this.startedAt = -1
@@ -299,7 +347,7 @@ export default class SCSynthInstrument {
 
         // Cancel any scheduled gain changes
         const now = this.now
-        this.gainNode.gain.cancelScheduledValues(now)
-        this.gainNode.gain.linearRampToValueAtTime(SILENCE, now + this.options.release)
+        this.#gainNode.gain.cancelScheduledValues(now)
+        this.#gainNode.gain.linearRampToValueAtTime(SILENCE, now + this.options.release)
     }
 }
