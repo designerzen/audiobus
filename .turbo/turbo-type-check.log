@@ -1,170 +1,0 @@
-[6n[?9001h[?1004h[m]0;C:\ProgramData\chocolatey\bin\pnpm.exe[?25h[?25l
-> @harmoneasy/audiobus@0.15.1 type-check S:\Synch\Work\Code\harmoneasy\packages\audiobus
-> tsc --noEmit[6;1H[?25hVersion 5.9.3
-[?25ltsc: The TypeScript Compiler - Version 5.9.3[25X[48;5;68m[25C     [m
-[69X[97m[48;5;68m[69C  TS [m[1m
-COMMON COMMANDS[22m[11;1H  [94mtsc[m
-  Compiles the current project (tsconfig.json in the working directory.)[14;1H  [94mtsc app.ts util.ts[m
-  Ignoring tsconfig.json, compiles the specified files with default compiler options.[18;1H  [94mtsc -b[m
-  Build a composite project in the working directory.[?25h
-
-  [94mtsc --init[K[m
-  Creates a tsconfig.json with the recommended settings in the working dir
-[18;74Hrectory.
-
-  [94mtsc -p ./path/to/tsconfig.json[K[m
-  Compiles the TypeScript project located at the specified path.
-
-  [94mtsc --help --all[K[m
-  An expanded version of this information, showing all possible compiler o
-[18;74Hoptions
-
-  [94mtsc --noEmit[K[m
-  [94mtsc --target esnext[K[m
-  Compiles the current project, with additional settings.
-
-[1mCOMMAND LINE FLAGS[22m[K
-
-[94m--help, -h[m
-Print this message.
-
-[94m--watch, -w[m
-Watch input files.
-
-[94m--all[m
-Show all compiler options.
-
-[94m--version, -v[m
-Print the compiler's version.
-
-[94m--init[m
-Initializes a TypeScript project and creates a tsconfig.json file.        
-
-[94m--project, -p[m
-Compile the project given the path to its configuration file, or to a fold
-[18;74Hder with a 'tsconfig.json'.
-
-[94m--showConfig[m
-Print the final configuration instead of building.
-
-[94m--build, -b[m
-Build one or more projects and their dependencies, if out of date
-
-[1mCOMMON COMPILER OPTIONS[22m[K
-
-[94m--pretty[m
-Enable color and formatting in TypeScript's output to make compiler errors
-[18;74Hs easier to read.
-type: boolean
-default: true
-
-[94m--declaration, -d[m
-Generate .d.ts files from TypeScript and JavaScript files in your project.[19;1H
-type: boolean
-default: `false`, unless `composite` is set
-
-[94m--declarationMap[m
-Create sourcemaps for d.ts files.
-type: boolean
-default: false
-
-[94m--emitDeclarationOnly[m
-Only output d.ts files and not JavaScript files.
-type: boolean
-default: false
-
-[94m--sourceMap[m
-Create source map files for emitted JavaScript files.
-type: boolean
-default: false
-
-[94m--noEmit[m
-Disable emitting files from a compilation.
-type: boolean
-default: false
-
-[94m--target, -t[m
-Set the JavaScript language version for emitted JavaScript and include com
-[18;74Hmpatible library declarations.
-one of: es5, es6/es2015, es2016, es2017, es2018, es2019, es2020, es2021, e
-[18;74Hes2022, es2023, es2024, esnext
-default: es5
-
-[94m--module, -m[m
-Specify what module code is generated.
-one of: none, commonjs, amd, umd, system, es6/es2015, es2020, es2022, esne
-[18;74Hext, node16, node18, node20, nodenext, preserve
-default: undefined
-
-[94m--lib[m
-Specify a set of bundled library declaration files that describe the targe
-[18;74Het runtime environment.
-one or more: es5, es6/es2015, es7/es2016, es2017, es2018, es2019, es2020, 
-[18;74H es2021, es2022, es2023, es2024, esnext, dom, dom.iterable, dom.asynciterab
-[18;74Hble, webworker, webworker.importscripts, webworker.iterable, webworker.asyn
-[18;74Hnciterable, scripthost, es2015.core, es2015.collection, es2015.generator, e
-[18;74Hes2015.iterable, es2015.promise, es2015.proxy, es2015.reflect, es2015.symbo
-[18;74Hol, es2015.symbol.wellknown, es2016.array.include, es2016.intl, es2017.arra
-[18;74Haybuffer, es2017.date, es2017.object, es2017.sharedmemory, es2017.string, e
-[18;74Hes2017.intl, es2017.typedarrays, es2018.asyncgenerator, es2018.asynciterabl
-[18;74Hle/esnext.asynciterable, es2018.intl, es2018.promise, es2018.regexp, es2019
-[18;74H9.array, es2019.object, es2019.string, es2019.symbol/esnext.symbol, es2019.
-[18;74H.intl, es2020.bigint/esnext.bigint, es2020.date, es2020.promise, es2020.sha
-[18;74Haredmemory, es2020.string, es2020.symbol.wellknown, es2020.intl, es2020.num
-[18;74Hmber, es2021.promise, es2021.string, es2021.weakref/esnext.weakref, es2021.
-[18;74H.intl, es2022.array, es2022.error, es2022.intl, es2022.object, es2022.strin
-[18;74Hng, es2022.regexp, es2023.array, es2023.collection, es2023.intl, es2024.arr
-[18;74Hraybuffer, es2024.collection, es2024.object/esnext.object, es2024.promise, 
-[18;74H es2024.regexp/esnext.regexp, es2024.sharedmemory, es2024.string/esnext.str
-[18;74Hring, esnext.array, esnext.collection, esnext.intl, esnext.disposable, esne
-[18;74Hext.promise, esnext.decorators, esnext.iterator, esnext.float16, esnext.err
-[18;74Hror, esnext.sharedmemory, decorators, decorators.legacy
-default: undefined
-
-[94m--allowJs[m
-Allow JavaScript files to be a part of your program. Use the 'checkJs' opt
-[18;74Htion to get errors from these files.
-type: boolean
-default: false
-
-[94m--checkJs[m
-Enable error reporting in type-checked JavaScript files.
-type: boolean
-default: false
-
-[94m--jsx[m
-Specify what JSX code is generated.
-one of: preserve, react, react-native, react-jsx, react-jsxdev
-default: undefined
-
-[94m--outFile[m
-Specify a file that bundles all outputs into one JavaScript file. If 'decl
-[18;74Hlaration' is true, also designates a file that bundles all .d.ts output.   
-
-[94m--outDir[m
-Specify an output folder for all emitted files.
-
-[94m--removeComments[m
-Disable emitting comments.
-type: boolean
-default: false
-
-[94m--strict[m
-Enable all strict type-checking options.
-type: boolean
-default: false
-
-[94m--types[m
-Specify type package names to be included without being referenced in a so
-[18;74Hource file.
-
-[94m--esModuleInterop[m
-Emit additional JavaScript to ease support for importing CommonJS modules.
-[18;74H. This enables 'allowSyntheticDefaultImports' for type compatibility.      
-type: boolean
-default: false
-
-You can learn about all of the compiler options at https://aka.ms/tsc     
-
-[30m[41m ELIFECYCLE [m [31mCommand failed with exit code 1.[m
-[?9001l[?1004l
