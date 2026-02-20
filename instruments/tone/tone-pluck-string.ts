@@ -1,6 +1,8 @@
-import { PluckString } from "tone"
+
+import { PluckSynth } from "tone"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
+
 
 /**
  * Tone.js PluckString Instrument
@@ -42,7 +44,7 @@ export default class TonePluckString implements IAudioOutput {
 	#uuid = this.#id + "-" + TonePluckString.ID++
 
 	activeNote = null
-	#synth: PluckString
+	#synth: PluckSynth
 	#audioContext: BaseAudioContext
 
 	get isNoteDown() {
@@ -130,7 +132,7 @@ export default class TonePluckString implements IAudioOutput {
 		this.options = Object.assign({}, this.options, options)
 
 		// Initialize Tone.js PluckString
-		this.#synth = new PluckString({
+		this.#synth = new PluckSynth({
 			dampening: this.options.dampening,
 			volume: this.dbToLinear(this.options.gain)
 		}).toDestination()
