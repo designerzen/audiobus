@@ -4,7 +4,7 @@ export default class OutputMetronome extends EventTarget implements IAudioOutput
 
 	static ID: number = 0
 
-	#uuid: string
+	#uuid: string = "Output-Metronome-" + OutputMetronome.ID++
 	#audioContext: AudioContext | null = null
 	#oscillator: OscillatorNode | null = null
 	#gainNode: GainNode | null = null
@@ -41,24 +41,16 @@ export default class OutputMetronome extends EventTarget implements IAudioOutput
 		return false
 	}
 
-	constructor() {
+	constructor( audioContext:AudioContext ) {
 		super()
-		this.#uuid = "Output-Metronome-" + OutputMetronome.ID++
-		this.#initAudioContext()
+		this.#audioContext = audioContext ?? new AudioContext()
+		this.createGainNode()
 	}
 
-	#initAudioContext(): void {
-		try {
-			const AudioContextClass = (window as any).AudioContext || (window as any).webkitAudioContext
-			if (AudioContextClass) {
-				this.#audioContext = new AudioContextClass()
-				this.#gainNode = this.#audioContext.createGain()
-				this.#gainNode.connect(this.#audioContext.destination)
-				this.#gainNode.gain.value = 0.3
-			}
-		} catch (e) {
-			console.warn("Could not initialize AudioContext for metronome", e)
-		}
+	createGainNode(): void {
+		this.#gainNode = this.#audioContext.createGain()
+		this.#gainNode.connect(this.#audioContext.destination)
+		this.#gainNode.gain.value = 0.3
 	}
 
 	hasMidiOutput(): boolean {
