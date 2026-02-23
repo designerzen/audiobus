@@ -27,7 +27,7 @@ export default class OutputSpeechSynthesis extends EventTarget implements IAudio
 
 	static ID:number = 0
 
-	#uuid:string
+	#uuid:string = "Output-Speech-Synthesis-"+(OutputSpeechSynthesis.ID++)
 	config: Config
 	synth: SpeechSynthesis | null = null
 	currentUtterances: SpeechSynthesisUtterance[] = []
@@ -54,7 +54,6 @@ export default class OutputSpeechSynthesis extends EventTarget implements IAudio
 
 	constructor(config: Partial<Config> = DEFAULT_OPTIONS) {
 		super()
-		this.#uuid = "Output-Speech-Synthesis-"+(OutputSpeechSynthesis.ID++)
 		this.config = { ...DEFAULT_OPTIONS, ...config }
 		this.initialise()
 	}

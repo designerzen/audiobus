@@ -17,7 +17,7 @@ export default class OutputNotation implements IAudioOutput {
 	
 	static ID: number = 0
 
-	#uuid: string
+	#uuid: string = "Output-Notation-" + OutputNotation.ID++
 	#name: string = "Notation Output"
 	#isConnected: boolean = false
 	#container: HTMLElement | null = null
@@ -64,7 +64,6 @@ export default class OutputNotation implements IAudioOutput {
 	}
 
 	constructor() {
-		this.#uuid = "Output-Notation-" + OutputNotation.ID++
 	}
 
 	/**

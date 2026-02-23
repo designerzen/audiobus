@@ -28,7 +28,7 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 
 	static ID: number = 0
 
-	#uuid: string
+	#uuid: string = "Output-Pink-Trombone-" + (OutputPinkTrombone.ID++)
 	#config: Config
 	#pinkTromboneElement: HTMLElement | null = null
 	#audioContext: AudioContext | null = null
@@ -57,7 +57,6 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 
 	constructor(config: Partial<Config> = DEFAULT_OPTIONS) {
 		super()
-		this.#uuid = "Output-Pink-Trombone-" + (OutputPinkTrombone.ID++)
 		this.#config = { ...DEFAULT_OPTIONS, ...config }
 		this.initialise()
 	}

@@ -61,7 +61,7 @@ export default class OutputSuperSonic implements IAudioOutput {
     private activeNotes: Map<number, number> = new Map() // noteNumber -> nodeId
     private nodeIdCounter: number = 1000
 
-    #uuid: string
+    #uuid: string = "Output-SuperSonic-" + (OutputSuperSonic.ID++)
     #connected: boolean = false
 
     get uuid(): string {
@@ -110,7 +110,7 @@ export default class OutputSuperSonic implements IAudioOutput {
     }
 
     constructor() {
-        this.#uuid = "Output-SuperSonic-" + (OutputSuperSonic.ID++)
+        
     }
 
 	hasMidiOutput(): boolean {

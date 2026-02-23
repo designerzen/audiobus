@@ -44,7 +44,7 @@ const DEFAULT_OPTIONS = {
 export default class OutputNativeMIDIDevice extends EventTarget implements IAudioOutput {
 	static ID: number = 0
 
-	#uuid: string
+	#uuid: string = "Output-NativeMIDI-" + (OutputNativeMIDIDevice.ID++)
 	#deviceIndex: number | null = null
 	#activeNotes: Set<number> = new Set()
 	#options: any
@@ -73,7 +73,6 @@ export default class OutputNativeMIDIDevice extends EventTarget implements IAudi
 
 	constructor(options = DEFAULT_OPTIONS) {
 		super()
-		this.#uuid = "Output-NativeMIDI-" + (OutputNativeMIDIDevice.ID++)
 		this.#options = { ...DEFAULT_OPTIONS, ...options }
 	}
 

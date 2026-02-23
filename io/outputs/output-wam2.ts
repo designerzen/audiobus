@@ -28,7 +28,7 @@ export default class OutputWAM2 implements IAudioOutput {
 	
 	static ID :number= 0
 
-	#uuid: string
+	#uuid: string = "Output-WAM2-"+(OutputWAM2.ID++)
 	#name: string = "WAM2 Output"
 	#audioContext: AudioContext
 	#pluginUrl: string | null = null
@@ -77,8 +77,7 @@ export default class OutputWAM2 implements IAudioOutput {
 	constructor(audioContext: AudioContext, pluginUrl?: string, name?: string) {
 		this.#audioContext = audioContext
 		this.#pluginUrl = pluginUrl || null
-		this.#uuid = "Output-WAM2-"+(OutputWAM2.ID++)
-
+		
 		if (name) {
 			this.#name = name
 		}

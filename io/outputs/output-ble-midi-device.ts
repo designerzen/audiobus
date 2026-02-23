@@ -24,8 +24,7 @@ export default class OutputBLEMIDIDevice extends EventTarget implements IAudioOu
 	
 	static ID:number = 0
 	
-	#uuid:string
-
+	#uuid:string = "Output-BLE-MIDI--"+(OutputBLEMIDIDevice.ID++)
 	#bluetoothDevice: BluetoothDevice | undefined
 	#bluetoothMIDICharacteristic: BluetoothRemoteGATTCharacteristic | undefined
 	#selectedMIDIChannel: number = 1
@@ -51,9 +50,12 @@ export default class OutputBLEMIDIDevice extends EventTarget implements IAudioOu
 		return this.#bluetoothMIDICharacteristic !== undefined
 	}
 
+	get isHidden():boolean{
+		return false
+	}
+
 	constructor(characteristic?: BluetoothRemoteGATTCharacteristic, channel: number = 1) {
 		super()
-		this.#uuid = "Output-BLE-MIDI--"+(OutputBLEMIDIDevice.ID++)
 		if (characteristic)
 		{
 			this.setCharacteristic(characteristic)

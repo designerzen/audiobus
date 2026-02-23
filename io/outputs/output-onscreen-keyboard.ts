@@ -10,7 +10,7 @@ export default class OutputOnScreenKeyboard implements IAudioOutput{
 		
 	static ID:number = 0
 	
-	#uuid:string
+	#uuid:string = "Output-Onscreen-Keyboard-"+(OutputOnScreenKeyboard.ID++)
 	#keyboard:SVGKeyboard
 
 	get uuid(): string {
@@ -38,9 +38,7 @@ export default class OutputOnScreenKeyboard implements IAudioOutput{
 		return true
 	}
 
-
 	constructor( keyboard:SVGKeyboard ) { 
-		this.#uuid = "Output-Onscreen-Keyboard-"+(OutputOnScreenKeyboard.ID++)
 		this.#keyboard = keyboard
 	}
 	

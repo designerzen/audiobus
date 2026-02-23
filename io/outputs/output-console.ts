@@ -6,7 +6,7 @@ export default class OutputConsole extends EventTarget implements IAudioOutput{
 
 	static ID:number = 0
 
-	#uuid:string
+	#uuid:string = "Output-Console-"+(OutputConsole.ID++)
 	#activeNotes: Map<number, number> = new Map() // noteNumber -> velocity
 	#container: HTMLElement | null = null
 
@@ -32,10 +32,8 @@ export default class OutputConsole extends EventTarget implements IAudioOutput{
 
 	constructor() {
 		super()
-		this.#uuid = "Output-Console-"+(OutputConsole.ID++)
 	}
 
-	
 	hasMidiOutput(): boolean {
 		return false
 	}

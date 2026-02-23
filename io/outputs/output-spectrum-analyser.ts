@@ -5,7 +5,7 @@ import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
 export default class OutputSpectrumAnalyser extends EventTarget implements IAudioOutput {
 	static ID: number = 0
 
-	#uuid: string
+	#uuid: string = "Output-SpectrumAnalyser-" + OutputSpectrumAnalyser.ID++
 	#analyser: AnalyserNode
 	#animationFrameId: number | null = null
 	#dataArray: Uint8Array
@@ -38,7 +38,6 @@ export default class OutputSpectrumAnalyser extends EventTarget implements IAudi
 
 	constructor(mixerNode: GainNode) {
 		super()
-		this.#uuid = "Output-SpectrumAnalyser-" + OutputSpectrumAnalyser.ID++
 		const audioContext = (mixerNode as any).context || new AudioContext()
 		
 		// Create analyser node
