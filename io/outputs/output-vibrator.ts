@@ -221,7 +221,7 @@ export default class OutputVibrator extends EventTarget implements IAudioOutput 
 	 * @param velocity 
 	 * @returns 
 	 */
-	noteOn(noteNumber: number, velocity: number): void {
+	noteOn(noteNumber: number, _velocity?: number): void {
 		if (!this.config.enabled) {
 			return
 		}

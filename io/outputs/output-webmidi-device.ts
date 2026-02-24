@@ -44,6 +44,10 @@ export default class OutputWebMIDIDevice extends EventTarget implements IAudioOu
 		return this.#midiOutput !== undefined
 	}
 
+	get isHidden(): boolean {
+		return false
+	}
+
 	get output(): Output | undefined {
 		return this.#midiOutput
 	}

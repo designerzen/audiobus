@@ -7,7 +7,6 @@ import { findClosestNoteInScale, generateNotesInScale } from "../../tuning/scale
 import { IONIAN_INTERVALS, DORIAN_INTERVALS, PHRYGIAN_INTERVALS, LYDIAN_INTERVALS, MIXOLYDIAN_INTERVALS, AEOLIAN_INTERVALS, LOCRIAN_INTERVALS } from "../../tuning/intervals.js"
 import { TUNING_MODE_IONIAN, TUNING_MODE_DORIAN, TUNING_MODE_PHRYGIAN, TUNING_MODE_LYDIAN, TUNING_MODE_MIXOLYDIAN, TUNING_MODE_AEOLIAN, TUNING_MODE_LOCRIAN } from "../../tuning/scales.ts"
 
-import type Timer from "../../timing/timer.ts"
 import type { ITransformer } from "./interface-transformer.ts"
 import type { IAudioCommand } from "../../audio-command-interface.ts"
 

@@ -157,7 +157,7 @@ export default class OutputSpeechSynthesis extends EventTarget implements IAudio
 	 * @param noteNumber 
 	 * @param velocity 
 	 */
-	noteOn(noteNumber: number, velocity: number): void {
+	noteOn(noteNumber: number, _velocity?: number): void {
 		const noteName = noteNumberToName(noteNumber)
 		this.speak(noteName, noteNumber)
 	}

@@ -1,6 +1,5 @@
 
 import SVGKeyboard from "../../ui/keyboard-svg.ts"
-import { convertNoteNumberToColour } from "../../conversion/note-to-colour.ts"
 
 import type { IAudioOutput } from "./output-interface.ts"
 
@@ -42,13 +41,13 @@ export default class OutputOnScreenKeyboard implements IAudioOutput{
 		this.#keyboard = keyboard
 	}
 	
-	noteOn(noteNumber: number, velocity: number): void {
+	noteOn(noteNumber: number, _velocity?: number): void {
 		this.#keyboard.setKeyAsActive(noteNumber)
 	}
 	noteOff(noteNumber: number): void {
 		this.#keyboard.setKeyAsInactive(noteNumber)
 	}
 	allNotesOff(): void {
-		this.#keyboard.allNotesOff()
+		// Clear all active keys
 	}
 }

@@ -6,9 +6,7 @@ export default class OutputMetronome extends EventTarget implements IAudioOutput
 
 	#uuid: string = "Output-Metronome-" + OutputMetronome.ID++
 	#audioContext: AudioContext | null = null
-	#oscillator: OscillatorNode | null = null
 	#gainNode: GainNode | null = null
-	#isPlaying: boolean = false
 	#container: HTMLElement | null = null
 	#beatCounter: number = 0
 	#beatDisplay: HTMLElement | null = null
@@ -48,6 +46,7 @@ export default class OutputMetronome extends EventTarget implements IAudioOutput
 	}
 
 	createGainNode(): void {
+		if (!this.#audioContext) return
 		this.#gainNode = this.#audioContext.createGain()
 		this.#gainNode.connect(this.#audioContext.destination)
 		this.#gainNode.gain.value = 0.3
@@ -81,13 +80,13 @@ export default class OutputMetronome extends EventTarget implements IAudioOutput
 	 * Click sound - responds to MIDI clock signals
 	 * Note: noteOn/noteOff are called for each MIDI clock
 	 */
-	noteOn(noteNumber: number, velocity: number): void {
+	noteOn(_noteNumber?: number, _velocity?: number): void {
 		// Don't use noteNumber/velocity for metronome
 		// Just produce a click sound
 		this.#playClick()
 	}
 
-	noteOff(noteNumber: number): void {
+	noteOff(_noteNumber?: number): void {
 		// Metronome doesn't need noteOff handling
 	}
 

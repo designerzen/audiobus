@@ -15,7 +15,6 @@ import {
 } from "../../midi/midi-ble/ble-constants.ts"
 
 import type { IAudioOutput } from "./output-interface.ts"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
 import { connectToBLEDevice, disconnectBLEDevice, describeDevice } from "../../midi/midi-ble/ble-connection.ts"
 
 export const BLE_OUTPUT_ID = "BLE MIDI"
@@ -31,8 +30,6 @@ export default class OutputBLEMIDIDevice extends EventTarget implements IAudioOu
 	#packetQueue: Array<number> = []
 
 	#activeNotes: Map<number, number> = new Map()
-	
-	#bluetoothWatchUnsubscribes: any
 
 	get uuid(): string {
 		return this.#uuid

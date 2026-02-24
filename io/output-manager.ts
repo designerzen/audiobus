@@ -1,8 +1,7 @@
-import { OUTPUT_EVENT, NOTE_OFF, NOTE_ON } from '../commands'
+import { NOTE_OFF, NOTE_ON } from '../commands'
 import OutputAudioEvent from "./events/output-audio-event.ts"
 
 import type { IAudioOutput } from "./outputs/output-interface.ts"
-import type { IAudioCommand } from "../audio-command-interface.ts"
 
 export const EVENT_OUTPUTS_UPDATED = "outputsUpdated"
 
@@ -30,6 +29,10 @@ export default class OutputManager extends EventTarget implements IAudioOutput{
 
 	get isConnected(): boolean {
 		return true
+	}
+
+	get isHidden(): boolean {
+		return false
 	}
 
 	constructor(){

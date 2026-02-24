@@ -5,7 +5,7 @@
  */
 import InputManager, { EVENT_INPUTS_UPDATED } from "./input-manager"
 import OutputManager, { EVENT_OUTPUTS_UPDATED } from "./output-manager"
-import TransformerManager, { EVENT_TRANSFORMERS_UPDATED } from "./transformer-manager"
+import TransformerManager from "./transformer-manager"
 import TransformerManagerWorker from "./transformer-manager-worker"
 
 import { INPUT_EVENT, NOTE_OFF, NOTE_ON, OUTPUT_EVENT, PLAYBACK_START, PLAYBACK_STOP, PLAYBACK_TOGGLE, TEMPO_DECREASE, TEMPO_INCREASE, TEMPO_TAP, MIDI_CLOCK, MIDI_CONTINUE, MIDI_START, MIDI_STOP } from '../commands'
