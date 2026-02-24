@@ -4,25 +4,9 @@
  */
 
 export {
-  IOEvent,
-  IOEventType,
-} from './io-event.ts'
+  default as InputAudioEvent,
+} from './input-audio-event.ts'
 
 export {
-  EventEmitter,
-} from './event-emitter.ts'
-
-export {
-  InputEvent,
-  InputEventType,
-} from './input-event.ts'
-
-export {
-  OutputEvent,
-  OutputEventType,
-} from './output-event.ts'
-
-export {
-  TransformerEvent,
-  TransformerEventType,
-} from './transformer-event.ts'
+  default as OutputAudioEvent,
+} from './output-audio-event.ts'

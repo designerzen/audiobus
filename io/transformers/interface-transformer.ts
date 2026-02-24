@@ -1,5 +1,5 @@
 import type { IAudioCommand } from "../../audio-command-interface.ts"
-import type Timer from "../../timing/timer.ts"
+import type { ITimerControl as Timer } from "netronome"
 
 export interface ITransformer {
     uuid: string

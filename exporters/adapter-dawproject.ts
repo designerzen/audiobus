@@ -2,7 +2,7 @@ import RecorderAudioEvent from '../audio-event-recorder.ts'
 import AudioEvent from '../audio-event.ts'
 import { NOTE_ON } from '../commands'
 
-import type Timer from '../timing/timer.ts'
+import type { ITimerControl as Timer } from "netronome"
 
 /**
  * Create a .dawProject XML file from audio event recording

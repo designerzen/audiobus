@@ -2,7 +2,7 @@
  * Put into time domain
  */
 import type { IAudioCommand } from "../../audio-command-interface.ts";
-import type Timer from "../../timing/timer.ts";
+import type { ITimerControl as Timer } from "netronome"
 import { Transformer } from "./abstract-transformer.ts"
 import type { ITransformer } from "./interface-transformer.ts";
 import { TRANSFORMER_CATEGORY_TIMING } from "./transformer-categories.ts";

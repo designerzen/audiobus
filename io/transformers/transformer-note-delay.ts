@@ -2,7 +2,7 @@ import type { IAudioCommand } from "../../audio-command-interface.ts"
 import { Transformer } from "./abstract-transformer.ts"
 import AudioCommand from "../../audio-command.ts"
 import * as Commands from '../../commands'
-import type Timer from "../../timing/timer.ts"
+import type { ITimerControl as Timer } from "netronome"
 import type { ITransformer } from "./interface-transformer.ts"
 import { TRANSFORMER_CATEGORY_TIMING } from "./transformer-categories.ts"
 

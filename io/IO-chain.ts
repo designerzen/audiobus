@@ -12,7 +12,7 @@ import { INPUT_EVENT, NOTE_OFF, NOTE_ON, OUTPUT_EVENT, PLAYBACK_START, PLAYBACK_
 import AudioEvent from "../audio-event"
 
 import type { IAudioCommand } from "../audio-command-interface"
-import type Timer from "../timing/timer"
+import type { ITimerControl as Timer } from "netronome"
 import type AbstractInput from "./inputs/abstract-input"
 import type InputAudioEvent from "./events/input-audio-event"
 import type { IAudioOutput } from "./outputs/output-interface"

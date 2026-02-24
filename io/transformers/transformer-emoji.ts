@@ -28,7 +28,7 @@ import {
     PERFECT_FIFTH
 } from "../../tuning/intervals.js"
 
-import type Timer from "../../timing/timer.ts"
+import type { ITimerControl as Timer } from "netronome"
 import type { IAudioCommand } from "../../audio-command-interface.ts"
 import type { FieldConfig, ITransformer } from "./interface-transformer.ts"
 

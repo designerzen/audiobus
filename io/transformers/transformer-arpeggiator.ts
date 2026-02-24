@@ -5,7 +5,7 @@ import { Transformer } from "./abstract-transformer.ts"
 import * as Commands from '../../commands'
 
 import type { IAudioCommand } from "../../audio-command-interface.ts"
-import type Timer from "../../timing/timer.ts"
+import type { ITimerControl as Timer } from "netronome"
 import type { ITransformer } from "./interface-transformer.ts"
 
 export const ID_ARPEGGIATOR = "Arpeggiator"

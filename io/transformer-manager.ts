@@ -8,7 +8,7 @@ import { Transformer } from "./transformers/abstract-transformer.ts"
 import { TransformerHarmoniser } from "./transformers/transformer-harmoniser.ts"
 import { ID_QUANTISE, TransformerQuantise } from "./transformers/transformer-quantise.ts"
 
-import type Timer from "../timing/timer.ts"
+import type { ITimerControl as Timer } from "netronome"
 import type { FieldConfig, ITransformer } from "./transformers/interface-transformer.ts"
 import type { IAudioCommand } from "../audio-command-interface.ts"
 

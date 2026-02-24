@@ -4,7 +4,7 @@ import AudioCommand from "../../audio-command.ts"
 import * as Commands from '../../commands'
 import { Midi } from "@tonejs/midi"
 
-import type Timer from "../../timing/timer.ts"
+import type { ITimerControl as Timer } from "netronome"
 import type { ITransformer, FieldConfig } from "./interface-transformer.ts"
 import type { IAudioCommand } from "../../audio-command-interface.ts"
 

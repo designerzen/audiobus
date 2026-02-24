@@ -7,7 +7,7 @@
  * scale definition, compatible with MIDI 1.0 pitch bend control.
  */
 import type AudioCommand from "../../audio-command.ts"
-import type Timer from "../../timing/timer.ts"
+import type { ITimerControl as Timer } from "netronome"
 
 import type { ITransformer } from "./interface-transformer.ts"
 import { Transformer } from "./abstract-transformer.ts"

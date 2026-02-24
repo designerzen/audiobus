@@ -7,7 +7,7 @@
  */
 import type { IAudioCommand } from "./audio-command-interface.ts"
 import AudioCommand from "./audio-command.ts"
-import type Timer from "./timing/timer.ts"
+import type { ITimerControl } from "netronome"
 
 export default class AudioEvent extends AudioCommand implements IAudioCommand { 
 

@@ -22,7 +22,7 @@ import { getIntervalFormulaForMode } from "../../tuning/chords/modal-chords.js"
 import { TRANSFORMER_CATEGORY_TUNING } from "./transformer-categories.ts"
 import { cloneAudioCommand } from "../../audio-command-factory.ts"
 
-import type Timer from "../../timing/timer.ts"
+import type { ITimerControl as Timer } from "netronome"
 import type { IAudioCommand } from "../../audio-command-interface.ts"
 import type { ITransformer } from "./interface-transformer.ts"
 import { ALL_KEYBOARD_NUMBERS } from "../inputs/input-onscreen-keyboard.ts"

@@ -1,6 +1,6 @@
 import type RecorderAudioEvent from '../audio-event-recorder'
 import type AudioEvent from '../audio-event'
-import type Timer from '../timing/timer'
+import type { ITimerControl as Timer } from "netronome"
 import { NOTE_ON } from '../commands'
 
 /**

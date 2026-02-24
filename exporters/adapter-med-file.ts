@@ -6,7 +6,7 @@
 import { MEDExporter } from '../med/med-exporter.ts';
 import type RecorderAudioEvent from '../audio-event-recorder.ts';
 import type AudioEvent from '../audio-event.ts';
-import type Timer from '../timing/timer.ts';
+import type { ITimerControl as Timer } from "netronome"
 import { NOTE_OFF, NOTE_ON } from '../commands';
 
 /**
