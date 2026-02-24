@@ -13,9 +13,7 @@ export default class NoteVisualiser extends AbstractResizeable implements IAudio
 
     notes:NoteModel[]
     canvas:HTMLCanvasElement
-    context:CanvasRenderingContext2D
-
-    height:number
+    context:CanvasRenderingContext2D | null = null
 
     counter:number = 0
     notesOn:number = 0
@@ -57,12 +55,20 @@ export default class NoteVisualiser extends AbstractResizeable implements IAudio
 		return "Visualises note data as bars on a timeline"
 	}
 
+	get isConnected(): boolean {
+		return this.worker !== null
+	}
+
+	get isHidden(): boolean {
+		return false
+	}
+
     constructor( notes:NoteModel[], canvas:HTMLCanvasElement, vertical:boolean=false, wave:number=0 ){
         super(canvas, NOTE_VISUALISER_CANVAS_WORKER, {vertical, notes})
 		this.#uuid = "Output-Note-Visualiser-"+(NoteVisualiser.ID++)		
         this.notes = notes
         this.canvas = canvas
-        this.wave = wave
+        this.wave = wave > 0
         this.vertical = vertical
     }
 
