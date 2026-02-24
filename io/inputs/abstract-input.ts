@@ -51,6 +51,10 @@ export default abstract class AbstractInput extends EventTarget implements IAudi
 		return this.#connected
 	}
 
+	get isHidden():boolean {
+		return false
+	}
+
 	get now():number {
 		return this.#options?.now() ?? performance.now
 	}
