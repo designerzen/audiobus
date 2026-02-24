@@ -26,7 +26,7 @@ export default class NoteVisualiser extends AbstractResizeable implements IAudio
     mouseX:number = 0
     mouseY:number = 0
 
-	#uuid:string
+	#uuid:string = "Output-Note-Visualiser-"+(NoteVisualiser.ID++)
     #blendMode:number = 23
 
     set blendMode(value:number){
@@ -65,10 +65,9 @@ export default class NoteVisualiser extends AbstractResizeable implements IAudio
 
     constructor( notes:NoteModel[], canvas:HTMLCanvasElement, vertical:boolean=false, wave:number=0 ){
         super(canvas, NOTE_VISUALISER_CANVAS_WORKER, {vertical, notes})
-		this.#uuid = "Output-Note-Visualiser-"+(NoteVisualiser.ID++)		
-        this.notes = notes
+		this.notes = notes
         this.canvas = canvas
-        this.wave = wave > 0
+        this.wave = wave > 0 ? true : false
         this.vertical = vertical
     }
 
