@@ -13,11 +13,9 @@ import SONG_VISUALISER_WORKER from "./song-visualiser-worker.ts?url";
 import { NOTE_ON, NOTE_OFF } from "../commands.ts";
 import NoteModel from "../note-model.ts";
 
-import type AudioCommand from "../audio-command.ts";
-import type OPFSStorage from "../storage/opfs-storage.ts";
 import type { IAudioCommand } from "../audio-command-interface.ts";
-import type RecorderAudioEvent from "../audio-event-recorder.ts";
 import type { IAudioOutput } from "../io/outputs/output-interface.ts";
+import type OPFSStorage from "../storage/opfs-storage.ts";
 
 interface NoteBarData {
     startTime: number;
@@ -47,10 +45,13 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
     private commands: IAudioCommand[] = [];
     private noteBars: NoteBarData[] = [];
     private liveNotes: Map<number, { startTime: number; velocity: number; colour: string }> = new Map();
-    private recorder: RecorderAudioEvent | null = null;
     private worker: Worker | null = null;
     private options: Required<VisualisationOptions>;
     private baseTime: number = 0;
+    private themeMediaQuery: MediaQueryList | null = null;
+
+    static ID = 0;
+    #uuid = `song-visualiser-${SongVisualiser.ID++}`;
 
     constructor() {
         super();
@@ -67,6 +68,89 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
         };
     }
 
+    // IAudioOutput required properties
+    get uuid(): string {
+        return this.#uuid;
+    }
+
+    get name(): string {
+        return "Song Visualiser";
+    }
+
+    get description(): string {
+        return "Visualizes audio commands as a timeline";
+    }
+
+    get isConnected(): boolean {
+        return this.worker !== null;
+    }
+
+    get isHidden(): boolean {
+        return false;
+    }
+
+    // IAudioOutput required methods
+    noteOn(noteNumber: number, velocity: number = 1): void {
+        const startTime = (Date.now() - this.baseTime) / 1000;
+        const noteModel = new NoteModel(noteNumber);
+        this.liveNotes.set(noteNumber, {
+            startTime,
+            velocity,
+            colour: noteModel.colour,
+        });
+
+        if (this.worker) {
+            this.worker.postMessage({
+                type: "noteOn",
+                data: { note: noteNumber, velocity },
+            });
+        }
+    }
+
+    noteOff(noteNumber: number): void {
+        const liveNote = this.liveNotes.get(noteNumber);
+        if (liveNote) {
+            const endTime = (Date.now() - this.baseTime) / 1000;
+            this.noteBars.push({
+                startTime: liveNote.startTime,
+                endTime,
+                noteNumber,
+                velocity: liveNote.velocity,
+                colour: liveNote.colour,
+                source: "live",
+            });
+            this.liveNotes.delete(noteNumber);
+            this.sendCommandsToWorker();
+        }
+
+        if (this.worker) {
+            this.worker.postMessage({
+                type: "noteOff",
+                data: { note: noteNumber },
+            });
+        }
+    }
+
+    allNotesOff(): void {
+        const endTime = (Date.now() - this.baseTime) / 1000;
+        for (const [noteNumber, liveNote] of this.liveNotes.entries()) {
+            this.noteBars.push({
+                startTime: liveNote.startTime,
+                endTime,
+                noteNumber,
+                velocity: liveNote.velocity,
+                colour: liveNote.colour,
+                source: "live",
+            });
+        }
+        this.liveNotes.clear();
+        this.sendCommandsToWorker();
+
+        if (this.worker) {
+            this.worker.postMessage({ type: "allNotesOff" });
+        }
+    }
+
     connectedCallback() {
         this.detectAndApplyTheme();
         this.render();
@@ -77,13 +161,13 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
     disconnectedCallback() {
         if (this.worker) {
             this.worker.terminate();
+            this.worker = null;
         }
         if (this.themeMediaQuery) {
             this.themeMediaQuery.removeEventListener("change", this.themeChangeHandler);
         }
     }
 
-    private themeMediaQuery: MediaQueryList | null = null;
     private themeChangeHandler = (e: MediaQueryListEvent) => {
         this.options.darkMode = e.matches;
         if (this.worker) {
@@ -105,11 +189,6 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
             // Auto-detect system preference
             this.options.darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
         }
-        console.log("[SongVisualiser] Theme detected:", {
-            attribute: themeAttr,
-            darkMode: this.options.darkMode,
-            systemPreference: window.matchMedia("(prefers-color-scheme: dark)").matches,
-        });
     }
 
     private setupThemeListener() {
@@ -221,26 +300,8 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
      * Load AudioCommand array and visualise it
      */
     async loadCommands(commands: IAudioCommand[]) {
-        this.commands = commands;
+        this.commands = [...commands];
         this.processCommands();
-        this.sendCommandsToWorker();
-    }
-
-    /**
-     * Link a Recorder instance to visualize recorded data
-     */
-    linkRecorder(recorder: RecorderAudioEvent) {
-        this.recorder = recorder;
-    }
-
-    /**
-     * Load recorded data from Recorder
-     */
-    async loadRecordedData() {
-        if (!this.recorder) return;
-
-        const recordedCommands = this.recorder.exportData();
-        this.processRecordedCommands(recordedCommands);
         this.sendCommandsToWorker();
     }
 
@@ -250,7 +311,7 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
     async loadFromOPFS(storage: OPFSStorage) {
         try {
             const commands = await storage.readAll();
-            this.loadCommands(commands);
+            await this.loadCommands(commands as IAudioCommand[]);
             return true;
         } catch (error) {
             console.error("Failed to load commands from OPFS:", error);
@@ -262,33 +323,30 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
      * Process AudioCommand array into note bar data
      */
     private processCommands() {
-        const notesMap = new Map<number, AudioCommand>();
+        const notesMap = new Map<number, IAudioCommand>();
         this.noteBars = [];
 
-        let noteOnCount = 0;
-        let noteOffCount = 0;
-
         for (const command of this.commands) {
-            if (command.subtype === NOTE_ON && command.noteNumber != null) {
-                notesMap.set(command.noteNumber, command);
-                noteOnCount++;
-            } else if (command.subtype === NOTE_OFF && command.noteNumber != null) {
-                const noteOnCommand = notesMap.get(command.noteNumber);
+            // Check if command has noteNumber property
+            const noteNumber = (command as any).noteNumber || command.number;
+
+            if (command.subtype === NOTE_ON && noteNumber != null) {
+                notesMap.set(noteNumber, command);
+            } else if (command.subtype === NOTE_OFF && noteNumber != null) {
+                const noteOnCommand = notesMap.get(noteNumber);
                 if (noteOnCommand) {
+                    const velocity = (command as any).velocity || command.number || 1;
                     this.noteBars.push({
                         startTime: noteOnCommand.startAt || noteOnCommand.time || 0,
                         endTime: command.startAt || command.time || 0,
-                        noteNumber: command.noteNumber,
-                        velocity: command.velocity || 1,
-                        colour: (command as any).colour,
+                        noteNumber,
+                        velocity,
                     });
-                    notesMap.delete(command.noteNumber);
+                    notesMap.delete(noteNumber);
                 }
-                noteOffCount++;
             }
         }
 
-        // FIXME: This is a BAD idea...
         // Sort by start time
         this.noteBars.sort((a, b) => a.startTime - b.startTime);
     }
@@ -299,120 +357,61 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
     private sendCommandsToWorker() {
         if (!this.worker || !this.canvas) return;
 
-        this.worker.postMessage({
-            type: "loadCommands",
-            data: { commands: this.noteBars },
-        });
-
-        // Calculate required height based on layout mode
-        let requiredHeight: number;
         const rect = this.getBoundingClientRect();
         const dpr = window.devicePixelRatio || 1;
-        const PADDING = 4;
-
-        if (this.options.layoutMode === "timeline") {
-            // Timeline mode: height based on note range, width for time
-            const noteRange = this.options.endNote - this.options.startNote;
-            requiredHeight = noteRange * this.options.noteHeight + 40; // Add padding
-        } else {
-            // Stacked mode: height based on number of bars and configurable bar height
-            const barHeight = this.options.barHeight || 1;
-            requiredHeight = this.noteBars.length * (barHeight + PADDING);
-        }
-
-        const displayWidth = Math.ceil(rect.width * dpr);
-        const displayHeight = Math.ceil(requiredHeight * dpr);
-
-        // Update canvas CSS size
-        this.canvas.style.width = `${rect.width}px`;
-        this.canvas.style.height = `${requiredHeight}px`;
 
         this.worker.postMessage({
-            type: "resize",
+            type: "setNoteBars",
             data: {
-                displayWidth,
-                displayHeight,
+                noteBars: this.noteBars,
+                displayWidth: Math.ceil(rect.width * dpr),
+                displayHeight: Math.ceil(rect.height * dpr),
             },
         });
+
+        // Auto-adjust canvas height based on note count
+        const uniqueNotes = new Set(this.noteBars.map((bar) => bar.noteNumber));
+        const minHeight = Math.max(100, uniqueNotes.size * (this.options.noteHeight || 8));
+
+        if (this.canvas) {
+            this.canvas.style.height = `${minHeight}px`;
+
+            this.worker.postMessage({
+                type: "resize",
+                data: {
+                    displayWidth: Math.ceil(rect.width * dpr),
+                    displayHeight: Math.ceil(minHeight * dpr),
+                },
+            });
+        }
     }
 
     /**
-     * Process recorded commands into note bars with source tracking
+     * Process recorded commands
      */
-    private processRecordedCommands(recordedCommands: IAudioCommand[]) {
+    private processRecordedCommands(commands: IAudioCommand[]) {
         const notesMap = new Map<number, IAudioCommand>();
 
-        for (const command of recordedCommands) {
-            if (command.subtype === NOTE_ON && command.noteNumber != null) {
-                notesMap.set(command.noteNumber, command);
-            } else if (command.subtype === NOTE_OFF && command.noteNumber != null) {
-                const noteOnCommand = notesMap.get(command.noteNumber);
+        for (const command of commands) {
+            const noteNumber = (command as any).noteNumber || command.number;
+
+            if (command.subtype === NOTE_ON && noteNumber != null) {
+                notesMap.set(noteNumber, command);
+            } else if (command.subtype === NOTE_OFF && noteNumber != null) {
+                const noteOnCommand = notesMap.get(noteNumber);
                 if (noteOnCommand) {
-                    const noteModel = new NoteModel(command.noteNumber);
+                    const velocity = (command as any).velocity || 1;
                     this.noteBars.push({
                         startTime: noteOnCommand.startAt || noteOnCommand.time || 0,
                         endTime: command.startAt || command.time || 0,
-                        noteNumber: command.noteNumber,
-                        velocity: command.velocity || 1,
-                        colour: (command as any).colour || noteModel.colour,
+                        noteNumber,
+                        velocity,
                         source: "recorded",
                     });
-                    notesMap.delete(command.noteNumber);
+                    notesMap.delete(noteNumber);
                 }
             }
         }
-
-        this.noteBars.sort((a, b) => a.startTime - b.startTime);
-    }
-
-    /**
-     * Send a noteOn message to the worker (live data)
-     */
-    noteOn(noteNumber: number, velocity: number = 1, colour?: string) {
-        if (!this.worker) return;
-
-        // Get colour from NoteModel if not provided
-        const noteColour = colour || new NoteModel(noteNumber).colour;
-
-        // Track live note
-        const startTime = Date.now() - this.baseTime;
-        this.liveNotes.set(noteNumber, {
-            startTime,
-            velocity,
-            colour: noteColour,
-        });
-
-        this.worker.postMessage({
-            type: "noteOn",
-            data: { note: noteNumber, velocity, colour: noteColour },
-        });
-    }
-
-    /**
-     * Send a noteOff message to the worker (live data)
-     */
-    noteOff(noteNumber: number) {
-        if (!this.worker) return;
-
-        const liveNote = this.liveNotes.get(noteNumber);
-        if (liveNote) {
-            const endTime = Date.now() - this.baseTime;
-            this.noteBars.push({
-                startTime: liveNote.startTime,
-                endTime,
-                noteNumber,
-                velocity: liveNote.velocity,
-                colour: liveNote.colour,
-                source: "live",
-            });
-            this.liveNotes.delete(noteNumber);
-            this.sendCommandsToWorker();
-        }
-
-        this.worker.postMessage({
-            type: "noteOff",
-            data: { note: noteNumber },
-        });
     }
 
     /**
@@ -511,7 +510,7 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
     /**
      * Get current commands
      */
-    getCommands(): AudioCommand[] {
+    getCommands(): IAudioCommand[] {
         return [...this.commands];
     }
 
@@ -526,12 +525,15 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
      * Merge live and recorded data for visualization
      */
     async mergeAndDisplay() {
-        // Load recorded data and append to current live notes
-        if (this.recorder) {
-            const recordedCommands = this.recorder.exportData();
-            this.processRecordedCommands(recordedCommands);
-        }
+        // Merge data and redraw
+        this.sendCommandsToWorker();
+    }
 
+    /**
+     * Link recorded data from another source
+     */
+    mergeRecordedCommands(commands: IAudioCommand[]) {
+        this.processRecordedCommands(commands);
         this.sendCommandsToWorker();
     }
 
@@ -548,6 +550,5 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
 
 // Register as custom element
 if (!customElements.get("song-visualiser")) {
-	customElements.define("song-visualiser", SongVisualiser);
+    customElements.define("song-visualiser", SongVisualiser);
 }
-

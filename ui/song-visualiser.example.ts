@@ -5,7 +5,8 @@
 import SongVisualiser from "./song-visualiser.js"
 import { SongVisualiserUI } from "./song-visualiser-ui.js"
 import AudioCommand from "../audio-command.ts"
-import OPFSStorage from "../storage/opfs-storage.ts"
+import type { IAudioCommand } from "../audio-command-interface.ts"
+import type OPFSStorage from "../storage/opfs-storage.ts"
 import { NOTE_ON, NOTE_OFF } from "../commands.ts"
 
 /**
@@ -27,7 +28,7 @@ export async function example1_BasicUsage() {
     // NoteOn
     const noteOn = new AudioCommand()
     noteOn.subtype = NOTE_ON
-    noteOn.noteNumber = noteNum
+    noteOn.number = noteNum
     noteOn.velocity = 0.8
     noteOn.startAt = currentTime
     noteOn.time = currentTime
@@ -36,7 +37,7 @@ export async function example1_BasicUsage() {
     // NoteOff (half second later)
     const noteOff = new AudioCommand()
     noteOff.subtype = NOTE_OFF
-    noteOff.noteNumber = noteNum
+    noteOff.number = noteNum
     noteOff.velocity = 0
     noteOff.startAt = currentTime + 500
     noteOff.time = currentTime + 500
@@ -46,7 +47,7 @@ export async function example1_BasicUsage() {
   }
 
   // Load commands
-  await visualiser.loadCommands(commands)
+  await visualiser.loadCommands(commands as IAudioCommand[])
 }
 
 /**
@@ -58,307 +59,252 @@ export async function example2_WithUIWrapper() {
   document.body.appendChild(ui)
 
   // Create test commands
-  const commands = createTestCommands()
-
-  // Load commands
-  await ui.loadCommands(commands)
-
-  // Listen for note clicks
-  ui.getVisualiser()?.addEventListener("noteClick", (e: any) => {
-    console.log("User clicked note:", e.detail)
-  })
-}
-
-/**
- * Example 3: Loading from OPFS
- */
-export async function example3_LoadFromOPFS() {
-  // Initialize OPFS storage
-  const storage = new OPFSStorage()
-  const initialized = await storage.prepare("my-song.jsonl")
-
-  if (!initialized) {
-    console.error("OPFS not available")
-    return
-  }
-
-  // Create visualiser
-  const visualiser = new SongVisualiser()
-  document.body.appendChild(visualiser)
-
-  // Load from OPFS
-  const success = await visualiser.loadFromOPFS(storage)
-
-  if (success) {
-    console.log("Commands loaded from OPFS")
-    const commands = visualiser.getCommands()
-    console.log(`Loaded ${commands.length} commands`)
-  } else {
-    console.error("Failed to load from OPFS")
-  }
-}
-
-/**
- * Example 4: Configuration and styling
- */
-export async function example4_CustomConfiguration() {
-  const visualiser = new SongVisualiser()
-  document.body.appendChild(visualiser)
-
-  // Configure visualiser
-  visualiser.setOptions({
-    pixelsPerSecond: 200, // Zoom in (more pixels per second)
-    noteHeight: 12, // Bigger notes
-    startNote: 48, // C3 (middle-ish)
-    endNote: 84, // C6
-    showLabels: true,
-    darkMode: true // Enable dark mode
-  })
-
-  // Load commands
-  const commands = createTestCommands()
-  await visualiser.loadCommands(commands)
-
-  // Style with CSS
-  visualiser.style.border = "2px solid #007bff"
-  visualiser.style.borderRadius = "8px"
-  visualiser.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)"
-}
-
-/**
- * Example 5: Interactive note selection and playback
- */
-export async function example5_InteractivePlayback() {
-  const visualiser = new SongVisualiser()
-  document.body.appendChild(visualiser)
-
-  const commands = createTestCommands()
-  await visualiser.loadCommands(commands)
-
-  // Track selected notes
-  const selectedNotes: number[] = []
-
-  // Listen for clicks
-  visualiser.addEventListener("noteClick", (e: any) => {
-    const noteBar = e.detail
-    console.log(
-      `Selected: Note ${noteBar.noteNumber}, Duration: ${noteBar.endTime - noteBar.startTime}ms`
-    )
-
-    selectedNotes.push(noteBar.noteNumber)
-
-    // Could play the note here using Web Audio API
-    // playNote(noteBar.noteNumber, noteBar.velocity)
-  })
-
-  // Export function
-  const exportBtn = document.createElement("button")
-  exportBtn.textContent = "Export Selection"
-  exportBtn.onclick = () => {
-    const json = visualiser.exportAsJSON()
-    console.log("Exported:", json)
-
-    // Download as file
-    const blob = new Blob([json], { type: "application/json" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `song-export-${Date.now()}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-  document.body.appendChild(exportBtn)
-}
-
-/**
- * Example 6: Comparing multiple files
- */
-export async function example6_CompareMultipleFiles() {
-  const container = document.createElement("div")
-  container.style.display = "grid"
-  container.style.gridTemplateColumns = "1fr 1fr"
-  container.style.gap = "20px"
-  container.style.height = "500px"
-  document.body.appendChild(container)
-
-  // Load two different command sets
-  const commands1 = createTestCommands()
-  const commands2 = createTestCommands(12) // Transposed by octave
-
-  // Create two visualisers
-  const vis1 = new SongVisualiser()
-  const vis2 = new SongVisualiser()
-
-  container.appendChild(vis1)
-  container.appendChild(vis2)
-
-  // Configure both
-  vis1.setOptions({ darkMode: false })
-  vis2.setOptions({ darkMode: false })
-
-  // Load different data
-  await vis1.loadCommands(commands1)
-  await vis2.loadCommands(commands2)
-
-  // Add labels
-  const label1 = document.createElement("div")
-  label1.textContent = "Original"
-  label1.style.position = "absolute"
-  label1.style.padding = "10px"
-  label1.style.fontWeight = "bold"
-
-  const label2 = document.createElement("div")
-  label2.textContent = "Transposed"
-  label2.style.position = "absolute"
-  label2.style.padding = "10px"
-  label2.style.fontWeight = "bold"
-
-  container.appendChild(label1)
-  container.appendChild(label2)
-}
-
-/**
- * Helper function to create test commands
- */
-function createTestCommands(transpose: number = 0): AudioCommand[] {
   const commands: AudioCommand[] = []
 
-  // Pentatonic scale pattern
-  const notes = [60, 62, 64, 67, 69, 72] // C D E G A C
+  // Create a simple melody
+  const melody = [
+    { note: 60, duration: 500 },   // C
+    { note: 62, duration: 500 },   // D
+    { note: 64, duration: 1000 },  // E
+    { note: 65, duration: 500 },   // F
+    { note: 67, duration: 1500 },  // G
+  ]
+
   let currentTime = 0
+  for (const { note, duration } of melody) {
+    const noteOn = new AudioCommand()
+    noteOn.subtype = NOTE_ON
+    noteOn.number = note
+    noteOn.velocity = 1.0
+    noteOn.startAt = currentTime
+    noteOn.time = currentTime
+    commands.push(noteOn)
 
-  // Play 3 octaves
-  for (let octave = 0; octave < 3; octave++) {
-    for (const baseNote of notes) {
-      const noteNum = baseNote + octave * 12 + transpose
+    const noteOff = new AudioCommand()
+    noteOff.subtype = NOTE_OFF
+    noteOff.number = note
+    noteOff.startAt = currentTime + duration
+    noteOff.time = currentTime + duration
+    commands.push(noteOff)
 
-      // Validate note range (0-127)
-      if (noteNum < 0 || noteNum > 127) continue
-
-      // NoteOn
-      const noteOn = new AudioCommand()
-      noteOn.subtype = NOTE_ON
-      noteOn.noteNumber = noteNum
-      noteOn.velocity = 0.7 + Math.random() * 0.2
-      noteOn.startAt = currentTime
-      noteOn.time = currentTime
-      noteOn.colour = getColourForNote(noteNum)
-      commands.push(noteOn)
-
-      // Random duration between 200-600ms
-      const duration = 200 + Math.random() * 400
-
-      // NoteOff
-      const noteOff = new AudioCommand()
-      noteOff.subtype = NOTE_OFF
-      noteOff.noteNumber = noteNum
-      noteOff.velocity = 0
-      noteOff.startAt = currentTime + duration
-      noteOff.time = currentTime + duration
-      commands.push(noteOff)
-
-      // Gap before next note
-      currentTime += duration + 100
-    }
+    currentTime += duration
   }
 
-  return commands
+  // Load via UI
+  await ui.loadCommands(commands as IAudioCommand[])
 }
 
 /**
- * Helper to get colour for a note
+ * Example 3: Live note input visualization
  */
-function getColourForNote(noteNum: number): string {
-  // Map note to colour based on note class (C, C#, D, etc.)
-  const hue = ((noteNum % 12) / 12) * 360
-  return `hsl(${hue}, 70%, 50%)`
-}
-
-/**
- * Example 7: Realtime recording visualization
- */
-export async function example7_RealtimeRecording() {
+export function example3_LiveNoteInput() {
   const visualiser = new SongVisualiser()
   document.body.appendChild(visualiser)
 
-  const recordedCommands: AudioCommand[] = []
-
-  // Mock recording from input
-  const recordBtn = document.createElement("button")
-  recordBtn.textContent = "Record (Demo)"
-  recordBtn.style.marginBottom = "10px"
-
-  let isRecording = false
-
-  recordBtn.onclick = async () => {
-    isRecording = !isRecording
-    recordBtn.textContent = isRecording ? "Stop Recording" : "Start Recording"
-
-    if (isRecording) {
-      // Simulate recording
-      const startTime = Date.now()
-      const notes = [60, 64, 67, 72] // C E G C
-
-      for (const note of notes) {
-        const noteOn = new AudioCommand()
-        noteOn.subtype = NOTE_ON
-        noteOn.noteNumber = note
-        noteOn.velocity = 0.8
-        noteOn.startAt = Date.now() - startTime
-        recordedCommands.push(noteOn)
-
-        // Wait 500ms then send noteOff
-        await new Promise((r) => setTimeout(r, 500))
-
-        const noteOff = new AudioCommand()
-        noteOff.subtype = NOTE_OFF
-        noteOff.noteNumber = note
-        noteOff.startAt = Date.now() - startTime
-        recordedCommands.push(noteOff)
-
-        // Update visualisation in real-time
-        await visualiser.loadCommands([...recordedCommands])
-
-        await new Promise((r) => setTimeout(r, 200))
-      }
-
-      isRecording = false
-      recordBtn.textContent = "Start Recording"
-    }
+  // Simulate live input with keyboard
+  const notes = new Map<string, number>()
+  const keyMap: { [key: string]: number } = {
+    a: 60, // C
+    s: 62, // D
+    d: 64, // E
+    f: 65, // F
+    g: 67, // G
+    h: 69, // A
+    j: 71, // B
+    k: 72, // C
   }
 
-  document.body.insertBefore(recordBtn, visualiser)
-}
-
-/**
- * Example 8: Keyboard-controlled zooming and panning
- */
-export async function example8_ZoomAndPan() {
-  const visualiser = new SongVisualiser()
-  document.body.appendChild(visualiser)
-
-  const commands = createTestCommands()
-  await visualiser.loadCommands(commands)
-
-  let pixelsPerSecond = 100
-
-  // Keyboard controls
   document.addEventListener("keydown", (e) => {
-    if (e.key === "+") {
-      pixelsPerSecond += 20
-      visualiser.setOptions({ pixelsPerSecond })
-    } else if (e.key === "-") {
-      pixelsPerSecond = Math.max(20, pixelsPerSecond - 20)
-      visualiser.setOptions({ pixelsPerSecond })
+    const note = keyMap[e.key.toLowerCase()]
+    if (note && !notes.has(e.key)) {
+      notes.set(e.key, Date.now())
+      visualiser.noteOn(note, 0.8)
     }
   })
 
-  // Info
-  const info = document.createElement("div")
-  info.style.padding = "10px"
-  info.style.fontSize = "12px"
-  info.textContent = "Press + or - to zoom"
-  document.body.insertBefore(info, visualiser)
+  document.addEventListener("keyup", (e) => {
+    const note = keyMap[e.key.toLowerCase()]
+    if (note) {
+      notes.delete(e.key)
+      visualiser.noteOff(note)
+    }
+  })
 }
 
+/**
+ * Example 4: Loading from OPFS storage
+ */
+export async function example4_LoadFromOPFS(storage: OPFSStorage) {
+  const visualiser = new SongVisualiser()
+  document.body.appendChild(visualiser)
 
+  // Load all commands from OPFS
+  const commands = await storage.readAll()
+  await visualiser.loadCommands(commands as IAudioCommand[])
+}
+
+/**
+ * Example 5: With custom styling options
+ */
+export async function example5_CustomStyling() {
+  const visualiser = new SongVisualiser()
+  document.body.appendChild(visualiser)
+
+  // Set custom options
+  visualiser.setOptions({
+    pixelsPerSecond: 150,
+    noteHeight: 10,
+    darkMode: true,
+    showLabels: true,
+  })
+
+  // Create test commands
+  const commands: AudioCommand[] = []
+
+  // Create a chord progression
+  const chords = [
+    [60, 64, 67],  // C major
+    [62, 65, 69],  // D minor
+    [64, 67, 71],  // E minor
+    [65, 69, 72],  // F major
+  ]
+
+  let currentTime = 0
+  for (const chord of chords) {
+    for (const note of chord) {
+      const noteOn = new AudioCommand()
+      noteOn.subtype = NOTE_ON
+      noteOn.number = note
+      noteOn.velocity = 0.7
+      noteOn.startAt = currentTime
+      noteOn.time = currentTime
+      commands.push(noteOn)
+
+      const noteOff = new AudioCommand()
+      noteOff.subtype = NOTE_OFF
+      noteOff.number = note
+      noteOff.startAt = currentTime + 2000
+      noteOff.time = currentTime + 2000
+      commands.push(noteOff)
+    }
+    currentTime += 2000
+  }
+
+  await visualiser.loadCommands(commands as IAudioCommand[])
+}
+
+/**
+ * Example 6: Event handling
+ */
+export async function example6_EventHandling() {
+  const visualiser = new SongVisualiser()
+  document.body.appendChild(visualiser)
+
+  // Listen for note bar clicks
+  visualiser.addEventListener("noteClick", (e: Event) => {
+    const event = e as CustomEvent
+    const bar = event.detail
+    console.log(
+      `Clicked note: ${bar.noteNumber}, Duration: ${bar.endTime - bar.startTime}s`,
+    )
+  })
+
+  // Create test data
+  const commands: AudioCommand[] = []
+  let currentTime = 0
+
+  for (let i = 0; i < 5; i++) {
+    const note = 60 + Math.floor(Math.random() * 12)
+    const duration = 500 + Math.floor(Math.random() * 1000)
+
+    const noteOn = new AudioCommand()
+    noteOn.subtype = NOTE_ON
+    noteOn.number = note
+    noteOn.startAt = currentTime
+    noteOn.time = currentTime
+    commands.push(noteOn)
+
+    const noteOff = new AudioCommand()
+    noteOff.subtype = NOTE_OFF
+    noteOff.number = note
+    noteOff.startAt = currentTime + duration
+    noteOff.time = currentTime + duration
+    commands.push(noteOff)
+
+    currentTime += duration
+  }
+
+  await visualiser.loadCommands(commands as IAudioCommand[])
+}
+
+/**
+ * Example 7: Merging live and recorded data
+ */
+export async function example7_MergeLiveAndRecorded() {
+  const visualiser = new SongVisualiser()
+  document.body.appendChild(visualiser)
+
+  // First, load some "recorded" data
+  const recordedCommands: AudioCommand[] = []
+  for (let i = 0; i < 3; i++) {
+    const note = 60 + i * 2
+
+    const noteOn = new AudioCommand()
+    noteOn.subtype = NOTE_ON
+    noteOn.number = note
+    noteOn.startAt = i * 500
+    noteOn.time = i * 500
+    recordedCommands.push(noteOn)
+
+    const noteOff = new AudioCommand()
+    noteOff.subtype = NOTE_OFF
+    noteOff.number = note
+    noteOff.startAt = (i + 1) * 500
+    noteOff.time = (i + 1) * 500
+    recordedCommands.push(noteOff)
+  }
+
+  await visualiser.loadCommands(recordedCommands as IAudioCommand[])
+
+  // Simulate live input on top
+  setTimeout(() => {
+    visualiser.noteOn(65, 0.9)
+  }, 100)
+
+  setTimeout(() => {
+    visualiser.noteOff(65)
+  }, 600)
+}
+
+/**
+ * Example 8: Export and reimport data
+ */
+export async function example8_ExportAndReimport() {
+  const visualiser = new SongVisualiser()
+  document.body.appendChild(visualiser)
+
+  // Create initial data
+  const commands: AudioCommand[] = []
+  const noteOn = new AudioCommand()
+  noteOn.subtype = NOTE_ON
+  noteOn.number = 72
+  noteOn.startAt = 0
+  noteOn.time = 0
+  commands.push(noteOn)
+
+  const noteOff = new AudioCommand()
+  noteOff.subtype = NOTE_OFF
+  noteOff.number = 72
+  noteOff.startAt = 1000
+  noteOff.time = 1000
+  commands.push(noteOff)
+
+  await visualiser.loadCommands(commands as IAudioCommand[])
+
+  // Export as JSON
+  const json = visualiser.exportAsJSON()
+  console.log("Exported data:", json)
+
+  // Could be reimported elsewhere
+  localStorage.setItem("visualiserData", json)
+}

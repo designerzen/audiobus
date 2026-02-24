@@ -5,7 +5,7 @@
  */
 
 import SongVisualiser from "./song-visualiser.js"
-import type AudioCommand from "../audio-command.ts"
+import type { IAudioCommand } from "../audio-command-interface.ts"
 import type OPFSStorage from "../storage/opfs-storage.ts"
 
 export class SongVisualiserUI extends HTMLElement {
@@ -272,7 +272,7 @@ export class SongVisualiserUI extends HTMLElement {
   /**
    * Load audio commands to visualise
    */
-  async loadCommands(commands: AudioCommand[]) {
+  async loadCommands(commands: IAudioCommand[]) {
     // Wait for visualiser to be initialized if not ready yet
     if (!this.visualiser) {
       await new Promise(resolve => {
@@ -286,7 +286,7 @@ export class SongVisualiserUI extends HTMLElement {
     }
     
     if (this.visualiser) {
-      await this.visualiser.loadCommands(commands)
+      await this.visualiser.loadCommands(commands as IAudioCommand[])
       this.updateInfo()
     }
   }
@@ -313,7 +313,6 @@ export class SongVisualiserUI extends HTMLElement {
   }
 
   private getStyles(): string {
-    const bgPrimary = this.darkMode ? "#1e1e1e" : "#ffffff"
     const bgSecondary = this.darkMode ? "#2d2d2d" : "#f5f5f5"
     const textPrimary = this.darkMode ? "#ffffff" : "#333333"
     const textSecondary = this.darkMode ? "#aaaaaa" : "#666666"
