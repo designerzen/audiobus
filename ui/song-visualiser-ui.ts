@@ -11,7 +11,6 @@ import type OPFSStorage from "../storage/opfs-storage.ts"
 export class SongVisualiserUI extends HTMLElement {
   private visualiser: SongVisualiser | null = null
   private storage: OPFSStorage | null = null
-  private isLoading: boolean = false
   private darkMode: boolean = false
   private themeMediaQuery: MediaQueryList | null = null
 

@@ -227,7 +227,7 @@ export class NotationStaff {
 	/**
 	 * Draw a single note head with stem
 	 */
-	private drawNote(x: number, y: number, noteNumber: number, opacity: number): void {
+	private drawNote(x: number, y: number, _noteNumber: number, opacity: number): void {
 		const { noteRadius, noteColor } = this.config
 
 		this.ctx.globalAlpha = opacity

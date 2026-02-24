@@ -27,22 +27,22 @@ export default class AudioCommand implements IAudioCommand {
 	}
 	
 	// MIDI GM Note number for setting pitch
-    number:number
+    number:number = 0
 
 	// UNOFFICAl: Used for MIDI channelling (can be transformed too)
     channel:number = -1	// all
 
 	// velocity / amplitude value
-    velocity:number
-    startAt:number
-    endAt:number
+    velocity:number = 0
+    startAt:number = 0
+    endAt:number = 0
 
 	// pitch value from MIDI is 0 -> 16383
-	value:number
+	value:number = 0
 	pitchBend:number = 0
 
 	// UNOFFICAl: Uint8Array
-	raw:Uint8Array
+	raw:Uint8Array = new Uint8Array()
 	// data:
 
 	// these are both in the MIDI spec and relate to different things confusingly
@@ -50,18 +50,18 @@ export default class AudioCommand implements IAudioCommand {
 	timeCode:number = 0
 
 	// Handy places to store information about this command
-	id:number
+	id:number | string = ""
 	// Note Event / Transport Event etc.
-	type:string
+	type:string = ""
 	// Note On / Note Off etc.
-	subtype:string
+	subtype:string = ""
 
-	text:string
+	text:string = ""
 
 	// CUSTOM (UNOFFICAl) : 
 	// which device created this command (e.g. "MIDI", "OSC", "WebRTC")
 	from:string = "Unknown"
-	patch:number
+	patch:number = 0
 
 	// for linked lists
 	previous:IAudioCommand = undefined

@@ -68,7 +68,7 @@ export default class SVGKeyboard extends AbstractInteractive {
 		const unique = `keyboard-${SVGKeyboard.uniqueID++}`
 		this.titleID = `${unique}-title`
 		this.descriptionID = `${unique}-desc`
-		const { svg, whiteKeyElements, blackKeyElements } = this.createKeyboard(notes)
+		const { svg } = this.createKeyboard(notes)
 
 		this.htmlElement = document.createDocumentFragment()
 		const pianoElement = this.htmlElement.appendChild(document.createElement('div'))

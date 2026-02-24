@@ -144,7 +144,7 @@ export default class CanvasKeyboard extends AbstractInteractive {
     keys: any[],
     blackKeyWidth = 13,
     whiteKeyWidth = 23,
-    indicatorWidth = 8,
+    _indicatorWidth = 8,
     blackKeyScale = 0.5,
     whiteKeyHeight = 140,
     startX = 0,

@@ -193,7 +193,6 @@ class MEDEncoder {
       if (command.type === 'NOTE_ON') {
         // Use the note number from the command
         const note = command.number || 0;
-        const velocity = command.velocity || 100;
         
         currentNote = note;
         currentInstrument = 1;
