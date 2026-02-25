@@ -123,7 +123,7 @@ export default class AudioTrack
 	}
 
 	copyCommand( command ) {
-		return Object.assign){}, command )
+		return Object.assign({}, command )
 	}
 
 	addInstrument(instrumentName){
