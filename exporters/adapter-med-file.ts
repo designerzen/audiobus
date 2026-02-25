@@ -3,7 +3,7 @@
  * Converts AudioEvent recording to ProTracker MED format
  */
 
-import { MEDExporter } from '../med/med-exporter.ts';
+import { MEDExporter } from '../formats/med/med-exporter.ts';
 import type RecorderAudioEvent from '../audio-event-recorder.ts';
 import type AudioEvent from '../audio-event.ts';
 import type { ITimerControl as Timer } from "netronome"
