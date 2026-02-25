@@ -49,6 +49,32 @@ export {
   getTransformerPresets,
 } from './transformer-presets.ts'
 
+// Definitions and metadata
+export * from './definitions-index.ts'
+export {
+  INPUT_DEFINITIONS,
+  getInputDefinition,
+  getInputIcon,
+  getInputsByCategory,
+  type InputDefinition,
+} from './input-definitions.ts'
+
+export {
+  OUTPUT_DEFINITIONS,
+  getOutputDefinition,
+  getOutputIcon,
+  getOutputsByCategory,
+  type OutputDefinition,
+} from './output-definitions.ts'
+
+export {
+  TRANSFORMER_DEFINITIONS,
+  getTransformerDefinition,
+  getTransformerIcon,
+  getTransformersByCategory,
+  type TransformerDefinition,
+} from './transformer-definitions.ts'
+
 // Sub-module exports
 export * from './inputs/index.ts'
 export * from './outputs/index.ts'
