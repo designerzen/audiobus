@@ -78,7 +78,7 @@ const loadSupportingLibraries = async (type: string): Promise<any> => {
 /**
  * Create an output instance for a given type
  * @param type Output type identifier
- * @param options Optional configuration for the output
+ * @param options Optional configuration for the output (must include audioContext where required)
  * @returns A new instance of the requested output type
  */
 const createOutput = async (type: string, options?: Record<string, any>): Promise<IAudioOutput> => {
@@ -86,12 +86,15 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
 	
 	// Handle special cases that need parameters
 	if (type === OUTPUT_TYPES.SPECTRUM_ANALYSER) {
-		const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
-		const mixer = audioContext.createGain()
-		return new Class(mixer)
+		if (!options?.mixer) {
+			throw new Error('SPECTRUM_ANALYSER output requires mixer (GainNode) in options')
+		}
+		return new Class(options.mixer)
 	} else if (type === OUTPUT_TYPES.WAM2) {
-		const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
-		return new Class(audioContext, "")
+		if (!options?.audioContext) {
+			throw new Error('WAM2 output requires audioContext in options')
+		}
+		return new Class(options.audioContext, "")
 	} else if (type === OUTPUT_TYPES.SUPERSONIC) {
 		const output = new Class()
 		output.connect()

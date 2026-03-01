@@ -38,7 +38,10 @@ export default class OutputSpectrumAnalyser extends EventTarget implements IAudi
 
 	constructor(mixerNode: GainNode) {
 		super()
-		const audioContext = (mixerNode as any).context || new AudioContext()
+		const audioContext = (mixerNode as any).context
+		if (!audioContext) {
+			throw new Error('OutputSpectrumAnalyser requires mixer (GainNode) with valid audioContext')
+		}
 		
 		// Create analyser node
 		this.#analyser = audioContext.createAnalyser()

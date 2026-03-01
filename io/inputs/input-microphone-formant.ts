@@ -29,7 +29,8 @@ const DEFAULT_OPTIONS = {
 	minFrequency: 80,
 	maxFrequency: 1000,
 	confidenceThreshold: 0.9,
-	analyzeInterval: 50 		// ms
+	analyzeInterval: 50, 		// ms
+	audioContext: undefined 	// Required: must be passed from app
 }
 
 export const VOCAL_OPTIONS = {
@@ -246,9 +247,17 @@ export default class InputMicrophoneFormant extends AbstractInput implements IAu
 
 	/**
 	 * Request microphone access and initialize audio processing
+	 * Requires audioContext to be passed via options
 	 */
 	async connect(): Promise<void> {
 		try {
+			// AudioContext must be provided from app
+			if (!this.options.audioContext) {
+				throw new Error('InputMicrophoneFormant requires audioContext to be passed via options')
+			}
+
+			this.#audioContext = this.options.audioContext
+
 			// Get microphone access
 			this.#mediaStream = await navigator.mediaDevices.getUserMedia({
 				audio: {
@@ -258,9 +267,6 @@ export default class InputMicrophoneFormant extends AbstractInput implements IAu
 					sampleRate: 44100
 				}
 			})
-
-			// Create audio context and nodes
-			this.#audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
 
 			this.#sourceNode = this.#audioContext.createMediaStreamSource(this.#mediaStream)
 			this.#analyser = this.#audioContext.createAnalyser()

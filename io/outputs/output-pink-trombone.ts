@@ -9,6 +9,7 @@ interface Config {
 	frequency: number // Base frequency for the voice
 	loudness: number // 0-1, volume of the synthesis
 	tenseness: number // 0-1, controls voiced/voiceless balance
+	audioContext?: AudioContext // Required: must be passed from app
 }
 
 const DEFAULT_OPTIONS: Config = {
@@ -62,7 +63,8 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 	}
 
 	/**
-	 * Initialize Pink Trombone element and Audio Context
+	 * Initialize Pink Trombone element
+	 * AudioContext must be provided via config.audioContext
 	 */
 	private initialise(): void {
 		if (typeof window === 'undefined') {
@@ -70,6 +72,14 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 		}
 
 		try {
+			// AudioContext must be provided from app
+			if (!this.#config.audioContext) {
+				console.error('[PINK-TROMBONE] AudioContext must be passed via config.audioContext')
+				return
+			}
+
+			this.#audioContext = this.#config.audioContext
+
 			// Create or find Pink Trombone element
 			let element = document.querySelector('pink-trombone')
 
@@ -79,9 +89,6 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 			}
 
 			this.#pinkTromboneElement = element as HTMLElement
-
-			// Create AudioContext
-			this.#audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
 
 			// Wait for Pink Trombone to load
 			this.#pinkTromboneElement.addEventListener('load', () => {

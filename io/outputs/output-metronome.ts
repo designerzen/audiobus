@@ -41,7 +41,10 @@ export default class OutputMetronome extends EventTarget implements IAudioOutput
 
 	constructor( audioContext:AudioContext ) {
 		super()
-		this.#audioContext = audioContext ?? new AudioContext()
+		if (!audioContext) {
+			throw new Error('OutputMetronome requires audioContext to be passed in constructor')
+		}
+		this.#audioContext = audioContext
 		this.createGainNode()
 	}
 
