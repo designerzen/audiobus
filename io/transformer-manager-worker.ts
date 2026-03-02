@@ -2,7 +2,7 @@
  * TRANSFORMER MANAGER WITH WORKER SUPPORT -----------------------------------------------
  * Delegates transform operations to Web Workers to avoid blocking the main thread
  */
-import { compress, decompress } from 'lz-string'
+import { compress, decompress, compressToBase64, decompressFromBase64 } from 'lz-string'
 
 import { Transformer } from "./transformers/abstract-transformer.ts"
 import { TransformerHarmoniser } from "./transformers/transformer-harmoniser.ts"
@@ -209,8 +209,7 @@ export default class TransformerManagerWorker extends EventTarget implements ITr
 
     importData(encoded: string): void {
         try {
-            const compressed = atob(encoded)
-            const json = decompress(compressed)
+            const json = decompressFromBase64(encoded)
 
             if (!json) {
                 throw new Error('Failed to decompress transformer data')
@@ -239,8 +238,7 @@ export default class TransformerManagerWorker extends EventTarget implements ITr
 
     exportData(): string {
         const json = this.exportConfig()
-        const compressed = compress(json)
-        return btoa(compressed)
+        return compressToBase64(json)
     }
 
     clear(): void {

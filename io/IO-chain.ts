@@ -3,11 +3,11 @@
  * through the transformerManager
  * into the outputManager
  */
-import { compress, decompress } from 'lz-string'
+import { compress, decompress, compressToBase64, decompressFromBase64 } from 'lz-string'
 
 import InputManager, { EVENT_INPUTS_UPDATED } from "./input-manager"
 import OutputManager, { EVENT_OUTPUTS_UPDATED } from "./output-manager"
-import TransformerManager from "./transformer-manager"
+import TransformerManager, { EVENT_TRANSFORMERS_UPDATED } from "./transformer-manager"
 import TransformerManagerWorker from "./transformer-manager-worker"
 
 import { INPUT_EVENT, NOTE_OFF, NOTE_ON, OUTPUT_EVENT, PLAYBACK_START, PLAYBACK_STOP, PLAYBACK_TOGGLE, TEMPO_DECREASE, TEMPO_INCREASE, TEMPO_TAP, MIDI_CLOCK, MIDI_CONTINUE, MIDI_START, MIDI_STOP } from '../commands'
@@ -385,7 +385,7 @@ export default class IOChain extends EventTarget {
     /**
      * Export the entire IOChain state to a compressed, URL-safe string
      * The string can be stored, transmitted, or used in URLs
-     * @returns URL-safe base64url encoded string containing all chain data
+     * @returns Compressed base64 string containing all chain data
      */
     exportString(): string {
         const data: IOChainSerializedData = {
@@ -401,21 +401,16 @@ export default class IOChain extends EventTarget {
         }
 
         const json = JSON.stringify(data)
-        const compressed = compress(json)
-        // Convert to URL-safe base64url (replace + with -, / with _, and remove padding =)
-        const base64 = btoa(compressed)
-        const urlSafe = base64
-            .replace(/\+/g, '-')
-            .replace(/\//g, '_')
-            .replace(/=/g, '')
+        // Use compressToBase64 which handles Unicode characters properly
+        const compressed = compressToBase64(json)
 
-        return urlSafe
+        return compressed
     }
 
     /**
      * Import an IOChain state from an exported string
      * This will restore all transformers, timer state, and queued commands
-     * @param encodedString URL-safe base64url encoded string from exportString()
+     * @param encodedString Compressed base64 string from exportString()
      * @param options Optional configuration to merge with imported state:
      *   - Passed to restore methods for internal processing
      *   - Merged with restored options from the export
@@ -423,20 +418,8 @@ export default class IOChain extends EventTarget {
      */
     importString(encodedString: string, options?: Record<string, any>): void {
         try {
-            // Convert from URL-safe base64url back to standard base64
-            let base64 = encodedString
-                .replace(/-/g, '+')
-                .replace(/_/g, '/')
-
-            // Add padding if needed
-            const padding = 4 - (base64.length % 4)
-            if (padding !== 4) {
-                base64 += '='.repeat(padding)
-            }
-
-            // Decode and decompress
-            const compressed = atob(base64)
-            const json = decompress(compressed)
+            // Decompress using lz-string which handles base64 properly
+            const json = decompressFromBase64(encodedString)
 
             if (!json) {
                 throw new Error('Failed to decompress data')
