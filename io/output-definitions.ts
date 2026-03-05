@@ -131,6 +131,14 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		icon: "/icons/output-metronome.svg",
 		category: "Utility",
 	},
+
+	[OUTPUT_TYPES.AUDIO_CLICK]: {
+		id: OUTPUT_TYPES.AUDIO_CLICK,
+		name: "Audio Click",
+		description: "Plays audio click sounds from a selected asset library on every bar",
+		icon: "/icons/output-audio-click.svg",
+		category: "Utility",
+	},
 }
 
 /**

@@ -49,6 +49,8 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./outputs/output-supersonic.ts")
 		case OUTPUT_TYPES.METRONOME:
 			return await import("./outputs/output-metronome.ts")
+		case OUTPUT_TYPES.AUDIO_CLICK:
+			return await import("./outputs/output-audio-click.ts")
 		default:
 			throw new Error(`Unknown output type: ${type}`)
 	}
@@ -99,6 +101,11 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
 		const output = new Class()
 		output.connect()
 		return output
+	} else if (type === OUTPUT_TYPES.METRONOME || type === OUTPUT_TYPES.AUDIO_CLICK) {
+		if (!options?.audioContext) {
+			throw new Error(`${type} output requires audioContext in options`)
+		}
+		return new Class(options.audioContext)
 	}
 	
 	return new Class(options)
@@ -207,6 +214,13 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		description: "Produces audible clicks in response to MIDI clock signals",
 		isAvailable: () => typeof AudioContext !== "undefined" || typeof (window as any).webkitAudioContext !== "undefined",
 		create: (options) => createOutput(OUTPUT_TYPES.METRONOME, options),
+	},
+	{
+		id: OUTPUT_TYPES.AUDIO_CLICK,
+		name: "Audio Click",
+		description: "Plays audio click sounds from a selected asset library on every bar",
+		isAvailable: () => typeof AudioContext !== "undefined" || typeof (window as any).webkitAudioContext !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.AUDIO_CLICK, options),
 	}
 ]
 

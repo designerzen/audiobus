@@ -17,6 +17,7 @@ export const MIDI2 = "midi2" as const
 export const MIDI2_NATIVE = "midi2-native" as const
 export const SUPERSONIC = "supersonic" as const
 export const METRONOME = "metronome" as const
+export const AUDIO_CLICK = "audio-click" as const
 
 export type OutputId =
 	| typeof CONSOLE
@@ -33,3 +34,4 @@ export type OutputId =
 	| typeof MIDI2_NATIVE
 	| typeof SUPERSONIC
 	| typeof METRONOME
+	| typeof AUDIO_CLICK
