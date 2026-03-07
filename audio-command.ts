@@ -50,7 +50,7 @@ export default class AudioCommand implements IAudioCommand {
 	timeCode:number = 0
 
 	// Handy places to store information about this command
-	id:number | string = ""
+	id:string = "C-" + AudioCommand.counter++
 	// Note Event / Transport Event etc.
 	type:string = ""
 	// Note On / Note Off etc.
@@ -67,9 +67,7 @@ export default class AudioCommand implements IAudioCommand {
 	previous:IAudioCommand = undefined
 	next:IAudioCommand = undefined
 
-	constructor() {
-		this.id = "C-" + AudioCommand.counter++
-	}
+	constructor() {}
 
 	remove(){
 		if (this.previous)
