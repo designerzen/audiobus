@@ -30,6 +30,8 @@
 	},
 	"scripts": {
 		"test": "vitest",
+		"lint": "oxlint .",
+		"lint:fix": "oxlint --fix .",
 		"upgrader": "npx npm-check-updates --interactive -u"
 	},
 	"files": [
@@ -49,6 +51,7 @@
 		"visualisation"
 	],
 	"dependencies": {
+		"@harmoneasy/shared-config": "workspace:^",
 		"@msgpack/msgpack": "^3.1.3",
 		"@opendaw/studio-sdk": "^0.0.121",
 		"@tonejs/midi": "^2.0.28",
