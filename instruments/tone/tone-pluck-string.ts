@@ -2,6 +2,8 @@
 import { PluckSynth } from "tone"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
+import { dbToLinear } from "../../conversion/decibels-to-linear.ts"
+import { linearToDb } from "../../conversion/linear-to-decibels.ts"
 
 
 /**
@@ -90,7 +92,7 @@ export default class TonePluckString implements IAudioOutput {
 	set gain(value) {
 		this.options.gain = value
 		if (this.#synth) {
-			this.#synth.volume.value = this.dbToLinear(value)
+			this.#synth.volume.value = dbToLinear(value)
 		}
 	}
 
@@ -100,7 +102,7 @@ export default class TonePluckString implements IAudioOutput {
 
 	set volume(value) {
 		if (this.#synth) {
-			const dbValue = this.linearToDb(value)
+			const dbValue = linearToDb(value)
 			this.#synth.volume.rampTo(dbValue, this.options.fadeDuration)
 		}
 	}
@@ -134,24 +136,8 @@ export default class TonePluckString implements IAudioOutput {
 		// Initialize Tone.js PluckString
 		this.#synth = new PluckSynth({
 			dampening: this.options.dampening,
-			volume: this.dbToLinear(this.options.gain)
+			volume: dbToLinear(this.options.gain)
 		}).toDestination()
-	}
-
-	/**
-	 * Convert linear (0-1) to dB
-	 */
-	private linearToDb(value: number): number {
-		if (value <= 0) return -Infinity
-		return 20 * Math.log10(value)
-	}
-
-	/**
-	 * Convert dB to linear (0-1)
-	 */
-	private dbToLinear(value: number): number {
-		if (value <= 0) return 0
-		return Math.pow(10, value / 20)
 	}
 
 	hasMidiOutput(): boolean {

@@ -1,6 +1,9 @@
 import { Sampler } from "tone"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
+import { linearToDb } from "../../conversion/linear-to-decibels.ts"
+import { dbToLinear } from "../../conversion/decibels-to-linear.ts"
+import { noteNumberToName } from "../../conversion/note-to-name.ts"
 
 /**
  * Tone.js Sampler Instrument
@@ -97,7 +100,7 @@ export default class ToneSampler implements IAudioOutput {
 	set gain(value) {
 		this.options.gain = value
 		if (this.#sampler) {
-			this.#sampler.volume.value = this.dbToLinear(value)
+			this.#sampler.volume.value = dbToLinear(value)
 		}
 	}
 
@@ -107,7 +110,7 @@ export default class ToneSampler implements IAudioOutput {
 
 	set volume(value) {
 		if (this.#sampler) {
-			const dbValue = this.linearToDb(value)
+			const dbValue = linearToDb(value)
 			this.#sampler.volume.rampTo(dbValue, this.options.fadeDuration)
 		}
 	}
@@ -132,34 +135,8 @@ export default class ToneSampler implements IAudioOutput {
 		this.#sampler = new Sampler({
 			urls: this.options.urls,
 			baseUrl: this.options.baseUrl,
-			volume: this.dbToLinear(this.options.gain)
+			volume: dbToLinear(this.options.gain)
 		}).toDestination()
-	}
-
-	/**
-	 * Convert linear (0-1) to dB
-	 */
-	private linearToDb(value: number): number {
-		if (value <= 0) return -Infinity
-		return 20 * Math.log10(value)
-	}
-
-	/**
-	 * Convert dB to linear (0-1)
-	 */
-	private dbToLinear(value: number): number {
-		if (value <= 0) return 0
-		return Math.pow(10, value / 20)
-	}
-
-	/**
-	 * Convert MIDI note number to note name (e.g., 60 -> "C4")
-	 */
-	private noteNumberToNoteName(noteNumber: number): string {
-		const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-		const octave = Math.floor(noteNumber / 12) - 1
-		const noteIndex = noteNumber % 12
-		return notes[noteIndex] + octave
 	}
 
 	hasMidiOutput(): boolean {
@@ -194,7 +171,7 @@ export default class ToneSampler implements IAudioOutput {
 	 * @param {Number} delay - number to pause before playing
 	 */
 	noteOn(noteNumber: number, velocity: number = 1, arp = null, delay: number = 0) {
-		const noteName = this.noteNumberToNoteName(noteNumber)
+		const noteName = noteNumberToName(noteNumber)
 		const amplitude = Math.max(0.001, velocity * this.options.gain)
 
 		// Track the note
@@ -221,7 +198,7 @@ export default class ToneSampler implements IAudioOutput {
 			return
 		}
 
-		const noteName = this.noteNumberToNoteName(noteNumber)
+		const noteName = noteNumberToName(noteNumber)
 		this.activeNotes.delete(noteNumber)
 
 		try {
@@ -241,7 +218,7 @@ export default class ToneSampler implements IAudioOutput {
 			try {
 				// Release all active notes
 				for (const noteNumber of this.activeNotes.keys()) {
-					const noteName = this.noteNumberToNoteName(noteNumber)
+					const noteName = noteNumberToName(noteNumber)
 					this.#sampler.triggerRelease(noteName)
 				}
 				this.activeNotes.clear()
