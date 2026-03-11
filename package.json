@@ -1,6 +1,6 @@
 {
 	"name": "audiobus",
-	"version": "0.15.1",
+	"version": "3.2.1",
 	"description": "Core audio engine with MIDI processing, synthesis, and audio routing",
 	"type": "module",
 	"main": "index.ts",

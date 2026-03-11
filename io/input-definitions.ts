@@ -108,6 +108,14 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		category: "AI",
 	},
 
+	[INPUT_TYPES.PROMPT_AI_SPEECH]: {
+		id: INPUT_TYPES.PROMPT_AI_SPEECH,
+		name: "PromptAI Speech",
+		description: "AI-powered input with speech recognition for generating note sequences via voice",
+		icon: "/icons/input-prompt-ai-speech.svg",
+		category: "AI",
+	},
+
 	[INPUT_TYPES.MIDI_TRANSPORT_CLOCK]: {
 		id: INPUT_TYPES.MIDI_TRANSPORT_CLOCK,
 		name: "MIDI Transport Clock",

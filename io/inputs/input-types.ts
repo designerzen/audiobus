@@ -14,6 +14,7 @@ export const MICROPHONE_FORMANT = "microphone-formant" as const
 export const LEAP_MOTION = "leap-motion" as const
 export const ONSCREEN_KEYBOARD = "onscreen-keyboard" as const
 export const PROMPT_AI = "prompt-ai" as const
+export const PROMPT_AI_SPEECH = "prompt-ai-speech" as const
 export const MIDI_TRANSPORT_CLOCK = "midi-transport-clock" as const
 
 export type InputId =
@@ -28,4 +29,5 @@ export type InputId =
 	| typeof LEAP_MOTION
 	| typeof ONSCREEN_KEYBOARD
 	| typeof PROMPT_AI
+	| typeof PROMPT_AI_SPEECH
 	| typeof MIDI_TRANSPORT_CLOCK
