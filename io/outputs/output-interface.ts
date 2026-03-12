@@ -6,7 +6,7 @@ export interface IAudioOutput{
 	get isHidden():boolean
 	
 	// TODO: implement pitchBend etc
-	noteOn(note: number, velocity: number): void
+	noteOn(note: number, velocity: number): void | Promise<void>
 	noteOff(note: number): void
 	allNotesOff(): void
 

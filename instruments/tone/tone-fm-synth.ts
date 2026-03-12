@@ -1,4 +1,3 @@
-import { FMSynth } from "tone"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
 import { dbToLinear } from "../../conversion/decibels-to-linear.ts"
@@ -9,6 +8,7 @@ const SILENCE = 0.00000000009
 /**
  * Tone.js FMSynth Instrument
  * Frequency modulation synthesizer
+ * Lazy loads Tone.js library only when instantiated
  */
 export default class ToneFMSynth implements IAudioOutput {
 	static ID: number = 0
@@ -65,8 +65,9 @@ export default class ToneFMSynth implements IAudioOutput {
 	#uuid = this.#id + "-" + ToneFMSynth.ID++
 
 	activeNotes = new Map() // Map of note numbers to their trigger times
-	#synth: FMSynth
+	#synth: any
 	#audioContext: BaseAudioContext
+	#initialized = false
 
 	get isNoteDown() {
 		return this.activeNotes.size > 0
@@ -141,7 +142,14 @@ export default class ToneFMSynth implements IAudioOutput {
 	constructor(audioContext: BaseAudioContext, options = {}) {
 		this.#audioContext = audioContext
 		this.options = Object.assign({}, this.options, options)
+		// Lazy initialization - Tone.js will be loaded on first use
+	}
 
+	private async ensureInitialized() {
+		if (this.#initialized) return
+		
+		const { FMSynth } = await import("tone")
+		
 		// Initialize Tone.js FMSynth
 		this.#synth = new FMSynth({
 			harmonicity: this.options.harmonicity,
@@ -152,6 +160,8 @@ export default class ToneFMSynth implements IAudioOutput {
 			modulationEnvelope: this.options.modulationEnvelope,
 			volume: dbToLinear(this.options.gain)
 		}).toDestination()
+		
+		this.#initialized = true
 	}
 
 	hasMidiOutput(): boolean {
@@ -185,7 +195,9 @@ export default class ToneFMSynth implements IAudioOutput {
 	 * @param {Array<Number>} arp - intervals (currently unused)
 	 * @param {Number} delay - number to pause before playing
 	 */
-	noteOn(noteNumber: number, velocity: number = 1, arp = null, delay: number = 0) {
+	async noteOn(noteNumber: number, velocity: number = 1, arp = null, delay: number = 0) {
+		await this.ensureInitialized()
+		
 		const frequency = noteNumberToFrequency(noteNumber)
 		const startTime = this.now + delay
 		const amplitude = Math.max(0.001, velocity * this.options.gain)

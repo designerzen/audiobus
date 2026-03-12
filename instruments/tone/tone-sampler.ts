@@ -1,4 +1,3 @@
-import { Sampler } from "tone"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
 import { linearToDb } from "../../conversion/linear-to-decibels.ts"
@@ -8,6 +7,7 @@ import { noteNumberToName } from "../../conversion/note-to-name.ts"
 /**
  * Tone.js Sampler Instrument
  * Sample-based playback with pitch shifting capability
+ * Lazy loads Tone.js library only when instantiated
  */
 export default class ToneSampler implements IAudioOutput {
 	static ID: number = 0
@@ -54,8 +54,9 @@ export default class ToneSampler implements IAudioOutput {
 	#uuid = this.#id + "-" + ToneSampler.ID++
 
 	activeNotes = new Map() // Map of note numbers to their trigger times
-	#sampler: Sampler
+	#sampler: any
 	#audioContext: BaseAudioContext
+	#initialized = false
 
 	get isNoteDown() {
 		return this.activeNotes.size > 0
@@ -130,13 +131,22 @@ export default class ToneSampler implements IAudioOutput {
 	constructor(audioContext: BaseAudioContext, options = {}) {
 		this.#audioContext = audioContext
 		this.options = Object.assign({}, this.options, options)
+		// Lazy initialization - Tone.js will be loaded on first use
+	}
 
+	private async ensureInitialized() {
+		if (this.#initialized) return
+		
+		const { Sampler } = await import("tone")
+		
 		// Initialize Tone.js Sampler
 		this.#sampler = new Sampler({
 			urls: this.options.urls,
 			baseUrl: this.options.baseUrl,
 			volume: dbToLinear(this.options.gain)
 		}).toDestination()
+		
+		this.#initialized = true
 	}
 
 	hasMidiOutput(): boolean {
@@ -170,7 +180,9 @@ export default class ToneSampler implements IAudioOutput {
 	 * @param {Array<Number>} arp - intervals (currently unused)
 	 * @param {Number} delay - number to pause before playing
 	 */
-	noteOn(noteNumber: number, velocity: number = 1, arp = null, delay: number = 0) {
+	async noteOn(noteNumber: number, velocity: number = 1, arp = null, delay: number = 0) {
+		await this.ensureInitialized()
+		
 		const noteName = noteNumberToName(noteNumber)
 		const amplitude = Math.max(0.001, velocity * this.options.gain)
 

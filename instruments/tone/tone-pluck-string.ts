@@ -1,14 +1,12 @@
-
-import { PluckSynth } from "tone"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
 import { dbToLinear } from "../../conversion/decibels-to-linear.ts"
 import { linearToDb } from "../../conversion/linear-to-decibels.ts"
 
-
 /**
  * Tone.js PluckString Instrument
  * Physical model of a plucked string using Karplus-Strong algorithm
+ * Lazy loads Tone.js library only when instantiated
  */
 export default class TonePluckString implements IAudioOutput {
 	static ID: number = 0
@@ -46,8 +44,9 @@ export default class TonePluckString implements IAudioOutput {
 	#uuid = this.#id + "-" + TonePluckString.ID++
 
 	activeNote = null
-	#synth: PluckSynth
+	#synth: any
 	#audioContext: BaseAudioContext
+	#initialized = false
 
 	get isNoteDown() {
 		return this.activeNote !== null
@@ -132,12 +131,21 @@ export default class TonePluckString implements IAudioOutput {
 	constructor(audioContext: BaseAudioContext, options = {}) {
 		this.#audioContext = audioContext
 		this.options = Object.assign({}, this.options, options)
+		// Lazy initialization - Tone.js will be loaded on first use
+	}
 
+	private async ensureInitialized() {
+		if (this.#initialized) return
+		
+		const { PluckSynth } = await import("tone")
+		
 		// Initialize Tone.js PluckString
 		this.#synth = new PluckSynth({
 			dampening: this.options.dampening,
 			volume: dbToLinear(this.options.gain)
 		}).toDestination()
+		
+		this.#initialized = true
 	}
 
 	hasMidiOutput(): boolean {
@@ -171,7 +179,9 @@ export default class TonePluckString implements IAudioOutput {
 	 * @param {Array<Number>} arp - intervals (currently unused)
 	 * @param {Number} delay - number to pause before playing
 	 */
-	noteOn(noteNumber: number, velocity: number = 1, arp = null, delay: number = 0) {
+	async noteOn(noteNumber: number, velocity: number = 1, arp = null, delay: number = 0) {
+		await this.ensureInitialized()
+		
 		const frequency = noteNumberToFrequency(noteNumber)
 		const amplitude = Math.max(0.001, velocity * this.options.gain)
 

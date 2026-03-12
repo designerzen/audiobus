@@ -73,14 +73,15 @@ export default class OutputManager extends EventTarget implements IAudioOutput{
 	 * @param note 
 	 * @param velocity 
 	 */
-	noteOn(noteNumber:number, velocity: number): void{
+	async noteOn(noteNumber:number, velocity: number): Promise<void>{
 		//console.log("noteOn", note, velocity, this.outputs)
 		const command:IAudioCommand = {
 			number: noteNumber,
 			velocity,
 			type:NOTE_ON
 		}
-		this.#outputs.forEach(output => output.noteOn(noteNumber, velocity))
+		// Wait for all outputs to handle noteOn (some may be async)
+		await Promise.all(this.#outputs.map(output => output.noteOn(noteNumber, velocity)))
 		this.dispatchEvent( new OutputAudioEvent(command) )
 	}
 
@@ -111,7 +112,7 @@ export default class OutputManager extends EventTarget implements IAudioOutput{
 	 * @param output 
 	 * @returns 
 	 */
-	triggerAudioCommandOnDevice(command:IAudioCommand, output:IAudioOutput):IAudioCommand{
+	async triggerAudioCommandOnDevice(command:IAudioCommand, output:IAudioOutput):Promise<IAudioCommand>{
 		//console.info("OutputManager", {command, output})
 		if (!Number.isFinite(command.number)) {
 			console.warn("[OutputManager] Invalid note number in command", command)
@@ -119,7 +120,7 @@ export default class OutputManager extends EventTarget implements IAudioOutput{
 		}
 		switch (command.type) {
 			case NOTE_ON:
-				output.noteOn( command.number, command.velocity)
+				await output.noteOn( command.number, command.velocity)
 				break
 
 			case NOTE_OFF:
@@ -138,11 +139,11 @@ export default class OutputManager extends EventTarget implements IAudioOutput{
 	 * @param commands 
 	 * @returns 
 	 */
-	triggerAudioCommandsOnOutputs(commands: IAudioCommand[]){
+	async triggerAudioCommandsOnOutputs(commands: IAudioCommand[]){
 		
-		this.#outputs.forEach( output => {
-			commands.forEach( command => this.triggerAudioCommandOnDevice( command, output ) )
-		})
+		await Promise.all(this.#outputs.map( output => 
+			Promise.all(commands.map( command => this.triggerAudioCommandOnDevice( command, output ) ))
+		))
 		
 		return commands
 	}

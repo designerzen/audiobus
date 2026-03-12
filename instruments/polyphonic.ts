@@ -81,24 +81,23 @@ export default class PolySynth implements IAudioOutput{
      * @param {Array<Number>} arp - intervals
      * @param {Number} delay - number to pause before playing
      */
-    noteOn( noteNumber: number, velocity=1, arp=null, delay=0 ){
+    async noteOn( noteNumber: number, velocity=1, arp=null, delay=0 ){
        
         if ( this.instrumentActivity.has(noteNumber) )
         {
             // already playing!
         }else{
 
-            this.instruments.every( instrument => {
+            for (const instrument of this.instruments) {
                 if (!instrument.isNoteDown)
                 {
-                    instrument.noteOn( noteNumber, velocity, arp, delay )
+                    await instrument.noteOn( noteNumber, velocity, arp, delay )
                     this.instrumentActivity.set( noteNumber, instrument )
                     this.#activeVoices++
                     this.updateMasterGain()
-                    return false
+                    break
                 }
-                return true
-            })
+            }
 
             return this.instrumentActivity.get( noteNumber )
         }

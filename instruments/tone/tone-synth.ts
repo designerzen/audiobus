@@ -1,4 +1,3 @@
-import { Synth, Draw } from "tone"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
 
@@ -7,6 +6,7 @@ const SILENCE = 0.00000000009
 /**
  * Tone.js Synth Instrument
  * Polyphonic synthesizer with ADSR envelope
+ * Lazy loads Tone.js library only when instantiated
  */
 export default class ToneSynth implements IAudioOutput {
 	static ID: number = 0
@@ -53,8 +53,9 @@ export default class ToneSynth implements IAudioOutput {
 	#uuid = this.#id + "-" + ToneSynth.ID++
 
 	activeNotes = new Map() // Map of note numbers to their trigger times
-	#synth: Synth
+	#synth: any
 	#audioContext: BaseAudioContext
+	#initialized = false
 
 	get isNoteDown() {
 		return this.activeNotes.size > 0
@@ -129,13 +130,22 @@ export default class ToneSynth implements IAudioOutput {
 	constructor(audioContext: BaseAudioContext, options = {}) {
 		this.#audioContext = audioContext
 		this.options = Object.assign({}, this.options, options)
+		// Lazy initialization - Tone.js will be loaded on first use
+	}
 
+	private async ensureInitialized() {
+		if (this.#initialized) return
+		
+		const { Synth } = await import("tone")
+		
 		// Initialize Tone.js Synth
 		this.#synth = new Synth({
 			oscillator: this.options.oscillator,
 			envelope: this.options.envelope,
 			volume: this.dbToLinear(this.options.gain)
 		}).toDestination()
+		
+		this.#initialized = true
 	}
 
 	/**
@@ -185,7 +195,9 @@ export default class ToneSynth implements IAudioOutput {
 	 * @param {Array<Number>} arp - intervals (currently unused)
 	 * @param {Number} delay - number to pause before playing
 	 */
-	noteOn(noteNumber: number, velocity: number = 1, arp = null, delay: number = 0) {
+	async noteOn(noteNumber: number, velocity: number = 1, arp = null, delay: number = 0) {
+		await this.ensureInitialized()
+		
 		const frequency = noteNumberToFrequency(noteNumber)
 		const startTime = this.now + delay
 		const amplitude = Math.max(0.001, velocity * this.options.gain)
