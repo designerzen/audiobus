@@ -8,6 +8,7 @@ export const INSTRUMENT_TYPE_TONE_FM_SYNTH = "tone-fm-synth"
 export const INSTRUMENT_TYPE_TONE_PLUCK_STRING = "tone-pluck-string"
 export const INSTRUMENT_TYPE_TONE_SAMPLER = "tone-sampler"
 export const INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT = "scsynth-instrument"
+export const INSTRUMENT_TYPE_CLAP = "clap"
 
 /**
  * Instrument Category Constants
@@ -111,6 +112,16 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 			category: INSTRUMENT_CATEGORY_SUPERCOLLIDER,
 			loader: () => import("./super-collider/scsynth-instrument.ts"),
 			requiresExternalData: [EXTERNAL_DATA_KEY_SCSYNTH]
+		}
+	],
+	[
+		INSTRUMENT_TYPE_CLAP,
+		{
+			id: INSTRUMENT_TYPE_CLAP,
+			name: "CLAP Instrument",
+			description: "Web CLAP plugin synthesizer with automatic patch loading",
+			category: "synthesis",
+			loader: () => import("./clap/clap-instrument.ts")
 		}
 	]
 ])

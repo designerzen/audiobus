@@ -7,6 +7,7 @@ import {
 	INSTRUMENT_TYPE_TONE_PLUCK_STRING,
 	INSTRUMENT_TYPE_TONE_SAMPLER,
 	INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT,
+	INSTRUMENT_TYPE_CLAP,
 	EXTERNAL_DATA_KEY_SCSYNTH,
 	EXTERNAL_DATA_KEY_SAMPLE_URLS,
 	INSTRUMENTS,
@@ -22,6 +23,7 @@ export {
 	INSTRUMENT_TYPE_TONE_PLUCK_STRING,
 	INSTRUMENT_TYPE_TONE_SAMPLER,
 	INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT,
+	INSTRUMENT_TYPE_CLAP,
 	INSTRUMENT_CATEGORY_OSCILLATOR,
 	INSTRUMENT_CATEGORY_SYNTHESIS,
 	INSTRUMENT_CATEGORY_FM,
@@ -109,6 +111,16 @@ export class InstrumentFactory {
 					externalData[EXTERNAL_DATA_KEY_SCSYNTH],
 					options
 				)
+				break
+
+			case INSTRUMENT_TYPE_CLAP:
+				// CLAP instrument with optional default patch ID
+				instance = new InstrumentClass(
+					audioContext,
+					options.defaultPatchId || null
+				)
+				// Auto-connect CLAP to initialize and load default patch
+				await (instance as any).connect()
 				break
 
 			case INSTRUMENT_TYPE_SYNTH_OSCILLATOR:
