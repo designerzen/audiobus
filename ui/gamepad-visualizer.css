@@ -1,0 +1,378 @@
+.gamepad-visualizer-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 1.5rem;
+	padding: 2rem;
+	background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+	border-radius: 12px;
+	min-height: 400px;
+	max-width: 900px;
+	margin: 0 auto;
+}
+
+.gamepad-visualizer {
+	width: 100%;
+	max-width: 800px;
+	height: auto;
+	filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
+}
+
+/* Placeholder when no controller is connected */
+.gamepad-placeholder {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 1.5rem;
+	padding: 4rem 2rem;
+	width: 100%;
+	max-width: 600px;
+	margin: 0 auto;
+	text-align: center;
+}
+
+.placeholder-icon {
+	font-size: 5rem;
+	opacity: 0.6;
+	animation: placeholderBounce 2s ease-in-out infinite;
+}
+
+.placeholder-text {
+	font-size: 1.8rem;
+	font-weight: 600;
+	color: #e0e0e0;
+	letter-spacing: 0.5px;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.placeholder-hint {
+	font-size: 1rem;
+	color: #a0a0b0;
+	line-height: 1.6;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Gamepad body styling */
+.gamepad-body {
+	filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+}
+
+/* D-Pad buttons */
+.dpad-button {
+	fill: #444;
+	stroke: #555;
+	stroke-width: 1;
+	transition: all 0.1s ease-out;
+	cursor: pointer;
+}
+
+.dpad-button.active {
+	fill: #00ff00;
+	stroke: #00cc00;
+	filter: drop-shadow(0 0 8px rgba(0, 255, 0, 0.6));
+	animation: buttonPress 0.15s ease-out;
+}
+
+.dpad-up.active {
+	transform: translateY(-3px);
+}
+
+.dpad-down.active {
+	transform: translateY(3px);
+}
+
+.dpad-left.active {
+	transform: translateX(-3px);
+}
+
+.dpad-right.active {
+	transform: translateX(3px);
+}
+
+/* Action buttons (ABXY) */
+.action-button {
+	fill: #555;
+	stroke: #666;
+	stroke-width: 2;
+	transition: all 0.1s ease-out;
+	cursor: pointer;
+}
+
+.button-a.active {
+	fill: #00dd00;
+	stroke: #00aa00;
+	filter: drop-shadow(0 0 12px rgba(0, 221, 0, 0.8));
+	animation: buttonPress 0.15s ease-out;
+	transform: scale(1.15);
+}
+
+.button-b.active {
+	fill: #dd0000;
+	stroke: #aa0000;
+	filter: drop-shadow(0 0 12px rgba(221, 0, 0, 0.8));
+	animation: buttonPress 0.15s ease-out;
+	transform: scale(1.15);
+}
+
+.button-x.active {
+	fill: #0099dd;
+	stroke: #0066aa;
+	filter: drop-shadow(0 0 12px rgba(0, 153, 221, 0.8));
+	animation: buttonPress 0.15s ease-out;
+	transform: scale(1.15);
+}
+
+.button-y.active {
+	fill: #dddd00;
+	stroke: #aaaa00;
+	filter: drop-shadow(0 0 12px rgba(221, 221, 0, 0.8));
+	animation: buttonPress 0.15s ease-out;
+	transform: scale(1.15);
+}
+
+/* Shoulder buttons */
+.shoulder-button {
+	fill: #444;
+	stroke: #555;
+	stroke-width: 1;
+	transition: all 0.1s ease-out;
+	cursor: pointer;
+}
+
+.lb-button.active,
+.rb-button.active {
+	fill: #ff6600;
+	stroke: #cc5500;
+	filter: drop-shadow(0 0 10px rgba(255, 102, 0, 0.7));
+	animation: shoulderPress 0.15s ease-out;
+	transform: translateY(-2px);
+}
+
+/* Trigger buttons */
+.trigger-button {
+	fill: #555;
+	stroke: #666;
+	stroke-width: 1;
+	transition: all 0.1s ease-out;
+	cursor: pointer;
+}
+
+.lt-button.active,
+.rt-button.active {
+	fill: #cc00ff;
+	stroke: #aa00cc;
+	filter: drop-shadow(0 0 10px rgba(204, 0, 255, 0.7));
+	animation: triggerPress 0.15s ease-out;
+	transform: translateY(2px);
+}
+
+/* Menu buttons */
+.menu-button {
+	fill: #333;
+	stroke: #555;
+	stroke-width: 1;
+	transition: all 0.1s ease-out;
+	cursor: pointer;
+}
+
+.select-button.active,
+.start-button.active {
+	fill: #00ccff;
+	stroke: #0099cc;
+	filter: drop-shadow(0 0 10px rgba(0, 204, 255, 0.7));
+	animation: buttonPress 0.15s ease-out;
+	transform: scale(1.05);
+}
+
+/* Stick buttons */
+.stick-button {
+	fill: #666;
+	stroke: #777;
+	stroke-width: 1;
+	transition: all 0.1s ease-out;
+	cursor: pointer;
+}
+
+.stick-button.active {
+	fill: #ffcc00;
+	stroke: #ffaa00;
+	filter: drop-shadow(0 0 8px rgba(255, 204, 0, 0.7));
+	animation: stickClick 0.15s ease-out;
+}
+
+/* Stick positions */
+.stick-inner {
+	transition: transform 0.05s ease-out;
+}
+
+.left-stick-group,
+.right-stick-group {
+	transition: all 0.05s ease-out;
+}
+
+/* Text labels */
+.button-label,
+.shoulder-label,
+.trigger-label,
+.menu-label {
+	fill: #ccc;
+	font-weight: bold;
+	font-size: 12px;
+	pointer-events: none;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	font-family: monospace;
+}
+
+.menu-label.text-small {
+	font-size: 10px;
+}
+
+.action-button:active ~ .button-label {
+	fill: #ffffff;
+}
+
+/* Status indicator */
+.gamepad-status {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.75rem 1.5rem;
+	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 8px;
+	font-size: 0.9rem;
+	color: #aaa;
+	backdrop-filter: blur(10px);
+}
+
+.status-indicator {
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background-color: #666;
+	animation: statusPulse 2s infinite;
+}
+
+.gamepad-status.connected .status-indicator {
+	background-color: #00ff00;
+	animation: statusPulseActive 1s infinite;
+}
+
+.gamepad-status.connected .status-text {
+	color: #00ff00;
+}
+
+/* Animations */
+@keyframes buttonPress {
+	0% {
+		filter: drop-shadow(0 0 0px currentColor);
+	}
+	50% {
+		filter: drop-shadow(0 0 15px currentColor);
+	}
+	100% {
+		filter: drop-shadow(0 0 8px currentColor);
+	}
+}
+
+@keyframes shoulderPress {
+	0% {
+		transform: translateY(-2px) scale(1);
+	}
+	50% {
+		transform: translateY(-5px) scale(1.05);
+	}
+	100% {
+		transform: translateY(-2px) scale(1);
+	}
+}
+
+@keyframes triggerPress {
+	0% {
+		transform: translateY(2px) scale(1);
+	}
+	50% {
+		transform: translateY(5px) scale(1.05);
+	}
+	100% {
+		transform: translateY(2px) scale(1);
+	}
+}
+
+@keyframes stickClick {
+	0% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.12);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+@keyframes statusPulse {
+	0%,
+	100% {
+		opacity: 0.6;
+	}
+	50% {
+		opacity: 1;
+	}
+}
+
+@keyframes statusPulseActive {
+	0%,
+	100% {
+		box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7);
+	}
+	50% {
+		box-shadow: 0 0 0 6px rgba(0, 255, 0, 0);
+	}
+}
+
+@keyframes placeholderBounce {
+	0%,
+	100% {
+		transform: translateY(0);
+		opacity: 0.6;
+	}
+	50% {
+		transform: translateY(-10px);
+		opacity: 0.8;
+	}
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+	.gamepad-visualizer-container {
+		padding: 1rem;
+	}
+
+	.button-label,
+	.shoulder-label,
+	.trigger-label,
+	.menu-label {
+		font-size: 10px;
+	}
+
+	.menu-label.text-small {
+		font-size: 8px;
+	}
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+	.gamepad-visualizer-container {
+		background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
+	}
+
+	.gamepad-status {
+		background: rgba(0, 0, 0, 0.3);
+		border-color: rgba(255, 255, 255, 0.05);
+	}
+}

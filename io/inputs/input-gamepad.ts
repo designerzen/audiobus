@@ -11,6 +11,7 @@ import { NOTE_OFF, NOTE_ON } from '../../commands'
 import { COMMANDS, GAME_PAD_CONNECTED, GAME_PAD_DISCONNECTED, GamePadManager } from "../../hardware/gamepad/gamepad"
 import AudioCommand from "../../audio-command"
 import AbstractInput from "./abstract-input"
+import GamepadVisualizerComponent from "../../ui/GamepadVisualizerComponent"
 import type { IAudioInput } from "./input-interface"
 
 export const GAMEPAD_INPUT_ID = "GamePad"
@@ -19,6 +20,10 @@ export default class InputGamePad extends AbstractInput implements IAudioInput {
 
 	gamePadManager: GamePadManager
 	gamepadHeld:Map<string, number> = new Map()
+	#visualizer: GamepadVisualizerComponent | null = null
+	#isConnected: boolean = false
+	#animFrameId: number | null = null
+	#checkConnectionIntervalId: number | null = null
 		
 	get name():string {
 		return GAMEPAD_INPUT_ID
@@ -37,10 +42,79 @@ export default class InputGamePad extends AbstractInput implements IAudioInput {
 		this.setAsConnected()
 	}
 
+	async createGui(): Promise<HTMLElement> {
+		this.#visualizer = new GamepadVisualizerComponent()
+		const container = this.#visualizer.createContainer()
+
+		// Start monitoring for connections and animate visuals
+		this.startConnectionMonitoring()
+
+		return container
+	}
+
+	private startConnectionMonitoring(): void {
+		this.#checkConnectionIntervalId = window.setInterval(() => {
+			const hasAnyConnected = Array.from(this.gamePadManager.controllers.values()).some(
+				(pad) => pad.connected
+			)
+
+			if (hasAnyConnected && !this.#isConnected) {
+				this.#isConnected = true
+				this.#visualizer?.createGamepadSVG()
+				this.startSticksUpdateLoop()
+			} else if (!hasAnyConnected && this.#isConnected) {
+				this.#isConnected = false
+				if (this.#animFrameId !== null) {
+					cancelAnimationFrame(this.#animFrameId)
+					this.#animFrameId = null
+				}
+				this.#visualizer?.showPlaceholder()
+			}
+		}, 500)
+	}
+
+	private startSticksUpdateLoop(): void {
+		const updateSticks = () => {
+			let hasConnectedPad = false
+			this.gamePadManager.controllers.forEach((pad) => {
+				if (pad.connected) {
+					hasConnectedPad = true
+					this.#visualizer?.updateStickPosition("left", pad.leftstickX, pad.leftstickY)
+					this.#visualizer?.updateStickPosition("right", pad.rightstickX, pad.rightstickY)
+				}
+			})
+
+			if (hasConnectedPad) {
+				this.#animFrameId = requestAnimationFrame(updateSticks)
+			} else {
+				this.#animFrameId = null
+			}
+		}
+
+		this.#animFrameId = requestAnimationFrame(updateSticks)
+	}
+
+	async destroyGui(): Promise<void> {
+		if (this.#checkConnectionIntervalId !== null) {
+			clearInterval(this.#checkConnectionIntervalId)
+		}
+		if (this.#animFrameId !== null) {
+			cancelAnimationFrame(this.#animFrameId)
+		}
+		this.#visualizer?.destroy()
+	}
+
 	/**
 	 * Remove any connections
 	 */
 	override destroy(): void {
+		if (this.#checkConnectionIntervalId !== null) {
+			clearInterval(this.#checkConnectionIntervalId)
+		}
+		if (this.#animFrameId !== null) {
+			cancelAnimationFrame(this.#animFrameId)
+		}
+		this.#visualizer?.destroy()
 		this.gamePadManager.removeEventListener( this.onGamePadEvent )
 		this.gamePadManager.destroy()
 		this.gamepadHeld.clear()
@@ -57,6 +131,9 @@ export default class InputGamePad extends AbstractInput implements IAudioInput {
 	 */
 	protected onGamePadEvent( button: string, value: number, gamePad: Gamepad, heldFor: number ) {
 		
+		// Update visual representation
+		this.#visualizer?.updateButtonVisual(button, value > 0)
+
 		const isHeld = this.gamePadManager.isHeld(button)
 
 		const command = new AudioCommand()
