@@ -30,6 +30,9 @@ export const addKeyboardDownEvents = ( callback:Function, midiNoteSequence:numbe
 		const isNumber = !isNaN( parseInt(event.key) )
 		const focussedElement = document.activeElement
 
+		// Dispatch visual feedback event for QWERTY keyboard display
+		window.dispatchEvent(new CustomEvent('keyboardKeyDown', { detail: { key: event.key } }))
+
 		if ( keysPressed.has(event.key) )
 		{
 			// already pressed so ignore
@@ -306,6 +309,9 @@ export const addKeyboardDownEvents = ( callback:Function, midiNoteSequence:numbe
 
 	// depress notes held
 	window.addEventListener('keyup', async (event)=>{
+
+		// Dispatch visual feedback event for QWERTY keyboard display
+		window.dispatchEvent(new CustomEvent('keyboardKeyUp', { detail: { key: event.key } }))
 
 		// if ( event.key !== 'Tab' ){
 		// 	event.preventDefault()
