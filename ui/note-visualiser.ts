@@ -2,7 +2,7 @@
  * Scrolling note on / off visualisation
  */
 
-import NOTE_VISUALISER_CANVAS_WORKER from "./note-visualiser-worker.js?url"
+import NOTE_VISUALISER_CANVAS_WORKER from "./note-visualiser-worker.js?worker"
 import { AbstractResizeable } from "./abstract-resizeable-canvas.ts"
 import type { IAudioOutput } from "../io/outputs/output-interface.ts"
 import type NoteModel from "../note-model.ts"

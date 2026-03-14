@@ -31,17 +31,18 @@ export class AbstractResizeable {
 	/**
 	 * Initialize a resizeable canvas with worker support
 	 * @param canvas - HTML canvas element to manage
-	 * @param workerURI - URI to the worker script
+	 * @param workerURI - URI to the worker script or Worker constructor (from ?worker import)
 	 * @param optional - Configuration options
 	 */
-	constructor(canvas: HTMLCanvasElement, workerURI: string, optional: ResizeableOptions = {}) {
+	constructor(canvas: HTMLCanvasElement, workerURI: string | { new(): Worker }, optional: ResizeableOptions = {}) {
 		this.element = canvas
 		this.optional = { ...DEFAULT_OPTIONS, ...optional }
 		this.onResize = this.onResize.bind(this)
 
 		const canvasWorker = canvas.transferControlToOffscreen()
 		const payload = { canvas: canvasWorker, ...this.optional }
-		this.worker = new Worker(workerURI)
+		// Handle both string URIs and Worker constructors from ?worker imports
+		this.worker = typeof workerURI === 'string' ? new Worker(workerURI) : new workerURI()
 		this.worker.postMessage(payload, [canvasWorker])
 
 		// Add error listeners for the worker

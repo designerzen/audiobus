@@ -9,7 +9,7 @@
  * Uses a Worker for rendering to keep main thread responsive
  */
 
-import SONG_VISUALISER_WORKER from "./song-visualiser-worker.ts?url";
+import SONG_VISUALISER_WORKER from "./song-visualiser-worker.ts?worker";
 import { NOTE_ON, NOTE_OFF } from "../commands.ts";
 import NoteModel from "../note-model.ts";
 
@@ -224,10 +224,8 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
 
     private initWorker() {
         try {
-            // Create worker from inline code to avoid MIME type issues on static servers
-            this.worker = new Worker(new URL(SONG_VISUALISER_WORKER, import.meta.url), {
-                type: "module",
-            });
+            // Create worker from ?worker import (which is already a Worker constructor)
+            this.worker = new SONG_VISUALISER_WORKER();
 
             this.worker.onmessage = (event) => this.handleWorkerMessage(event);
             this.worker.onerror = (error) => {
