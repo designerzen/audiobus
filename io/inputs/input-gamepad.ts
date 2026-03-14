@@ -11,7 +11,7 @@ import { NOTE_OFF, NOTE_ON } from '../../commands'
 import { COMMANDS, GAME_PAD_CONNECTED, GAME_PAD_DISCONNECTED, GamePadManager } from "../../hardware/gamepad/gamepad"
 import AudioCommand from "../../audio-command"
 import AbstractInput from "./abstract-input"
-import GamepadVisualizerComponent from "../../ui/GamepadVisualizerComponent"
+import { GamepadVisualizerComponent } from "../../ui/gamepad-visualizer-component.ts"
 import type { IAudioInput } from "./input-interface"
 
 export const GAMEPAD_INPUT_ID = "GamePad"
