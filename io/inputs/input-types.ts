@@ -16,6 +16,7 @@ export const ONSCREEN_KEYBOARD = "onscreen-keyboard" as const
 export const PROMPT_AI = "prompt-ai" as const
 export const PROMPT_AI_SPEECH = "prompt-ai-speech" as const
 export const MIDI_TRANSPORT_CLOCK = "midi-transport-clock" as const
+export const MUSIC_MOUSE = "music-mouse" as const
 
 export type InputId =
 	| typeof KEYBOARD
@@ -31,3 +32,4 @@ export type InputId =
 	| typeof PROMPT_AI
 	| typeof PROMPT_AI_SPEECH
 	| typeof MIDI_TRANSPORT_CLOCK
+	| typeof MUSIC_MOUSE

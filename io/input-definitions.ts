@@ -123,6 +123,14 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		icon: "/icons/input-midi-transport-clock.svg",
 		category: "Sync",
 	},
+
+	[INPUT_TYPES.MUSIC_MOUSE]: {
+		id: INPUT_TYPES.MUSIC_MOUSE,
+		name: "Music Mouse",
+		description: "Cursor-controlled musical instrument inspired by Laurie Spiegel's classic Music Mouse",
+		icon: "/icons/input-music-mouse.svg",
+		category: "UI",
+	},
 }
 
 /**

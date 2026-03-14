@@ -206,13 +206,9 @@ export class IOChainFactory {
 		}
 
 		try {
-			if (
-				typeof navigator !== "undefined" &&
-				(navigator?.vibrate || (navigator as any)?.webkitVibrate || (navigator as any)?.mozVibrate)
-			) {
-				const outputVibrator = await createOutputById(OUTPUT_TYPES.VIBRATOR)
-				outputs.push(outputVibrator)
-			}
+			// Add vibrator output - supports both mobile vibration API and gamepad vibration
+			const outputVibrator = await createOutputById(OUTPUT_TYPES.VIBRATOR)
+			outputs.push(outputVibrator)
 		} catch (e) {
 			console.debug("Vibrator output not available", e)
 		}

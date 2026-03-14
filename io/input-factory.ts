@@ -43,6 +43,8 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./inputs/input-prompt-ai-speech.ts")
 		case INPUT_TYPES.MIDI_TRANSPORT_CLOCK:
 			return await import("./inputs/input-midi-transport-clock.ts")
+		case INPUT_TYPES.MUSIC_MOUSE:
+			return await import("./inputs/input-music-mouse.ts")
 		default:
 			throw new Error(`Unknown input type: ${type}`)
 	}
@@ -177,6 +179,13 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		description: "MIDI transport clock input for timing synchronization (24 clocks per quarter note)",
 		isAvailable: () => true, // Available on all platforms with MIDI support
 		create: (options) => createInput(INPUT_TYPES.MIDI_TRANSPORT_CLOCK, options),
+	},
+	{
+		id: INPUT_TYPES.MUSIC_MOUSE,
+		name: "Music Mouse",
+		description: "Cursor-controlled musical instrument inspired by Laurie Spiegel's classic Music Mouse",
+		isAvailable: () => true,
+		create: (options) => createInput(INPUT_TYPES.MUSIC_MOUSE, options),
 	},
 ]
 
