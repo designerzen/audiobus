@@ -295,7 +295,7 @@ export default class OutputNotation implements IAudioOutput {
 	/**
 	 * Draw notes on the staff
 	 */
-	#drawNotes(_ctx: CanvasRenderingContext2D, _width: number, height: number): void {
+	#drawNotes(ctx: CanvasRenderingContext2D, width: number, height: number): void {
 		const topMargin = height / 2 - (this.#staffLineCount - 1) * this.#lineSpacing / 2
 		const bottomMargin = topMargin + (this.#staffLineCount - 1) * this.#lineSpacing
 
