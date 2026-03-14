@@ -5,7 +5,7 @@
  */
 
 import { COMMANDS } from "../hardware/gamepad/gamepad.ts"
-import "../../ui/gamepad-visualizer.css"
+import "./gamepad-visualizer.css"
 
 export class GamepadVisualizerComponent {
 	#containerElement: HTMLElement | null = null
