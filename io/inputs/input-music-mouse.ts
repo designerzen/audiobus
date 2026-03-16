@@ -69,14 +69,6 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 	}
 
 	async createGui(): Promise<HTMLElement> {
-		// Find or create container
-		let container = document.querySelector(this.#containerSelector) as HTMLElement
-		if (!container) {
-			container = document.createElement("div")
-			container.id = "music-mouse-container"
-			document.body.appendChild(container)
-		}
-
 		// Create canvas
 		this.#canvas = document.createElement("canvas")
 		this.#canvas.id = "music-mouse-canvas"
@@ -87,19 +79,17 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 		this.#canvas.style.display = "block"
 		this.#canvas.style.backgroundColor = "#f0f0f0"
 
-		container.appendChild(this.#canvas)
-
-		// Set canvas resolution
-		this.#canvas.width = this.#canvas.offsetWidth * window.devicePixelRatio
-		this.#canvas.height = this.#canvas.offsetHeight * window.devicePixelRatio
+		// Set initial canvas resolution
+		this.#canvas.width = 800
+		this.#canvas.height = 400
 
 		this.#context = this.#canvas.getContext("2d")
 		if (this.#context) {
 			this.#context.scale(window.devicePixelRatio, window.devicePixelRatio)
 		}
 
-		this.#gridWidth = this.#canvas.offsetWidth
-		this.#gridHeight = this.#canvas.offsetHeight
+		this.#gridWidth = 800 / window.devicePixelRatio
+		this.#gridHeight = 400 / window.devicePixelRatio
 
 		// Add event listeners
 		this.#canvas.addEventListener("mousemove", this.onMouseMove)
@@ -109,8 +99,8 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 		// Initial draw
 		this.draw()
 
-		this.#containerElement = container
-		return container
+		this.#containerElement = this.#canvas
+		return this.#canvas
 	}
 
 	async destroyGui(): Promise<void> {
@@ -144,6 +134,10 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 		const rect = this.#canvas.getBoundingClientRect()
 		this.#mouseX = event.clientX - rect.left
 		this.#mouseY = event.clientY - rect.top
+
+		// Clamp to canvas bounds
+		this.#mouseX = Math.max(0, Math.min(this.#gridWidth, this.#mouseX))
+		this.#mouseY = Math.max(0, Math.min(this.#gridHeight, this.#mouseY))
 
 		// Calculate note number from position
 		const noteNumber = this.calculateNoteFromPosition(this.#mouseX, this.#mouseY)
