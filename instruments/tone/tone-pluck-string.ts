@@ -12,6 +12,9 @@ export default class TonePluckString implements IAudioOutput {
 	static ID: number = 0
 
 	options = {
+		// custom title if required
+		titls:"Tone.js PluckString Instrument",
+
 		// Default amplitude
 		gain: 0.2, // ratio 0-1
 		attack: 0.1, // in s
@@ -46,6 +49,7 @@ export default class TonePluckString implements IAudioOutput {
 	activeNote = null
 	#synth: any
 	#audioContext: BaseAudioContext
+	#gainNode: GainNode
 	#initialized = false
 
 	get isNoteDown() {
@@ -90,8 +94,8 @@ export default class TonePluckString implements IAudioOutput {
 
 	set gain(value) {
 		this.options.gain = value
-		if (this.#synth) {
-			this.#synth.volume.value = dbToLinear(value)
+		if (this.#gainNode) {
+			this.#gainNode.gain.value = dbToLinear(value)
 		}
 	}
 
@@ -117,7 +121,7 @@ export default class TonePluckString implements IAudioOutput {
 	}
 
 	get output() {
-		return this.#synth
+		return this.#gainNode
 	}
 
 	get audioContext(): BaseAudioContext {
@@ -137,13 +141,24 @@ export default class TonePluckString implements IAudioOutput {
 	private async ensureInitialized() {
 		if (this.#initialized) return
 		
-		const { PluckSynth } = await import("tone")
+		const Tone = await import("tone")
+		const { PluckSynth } = Tone
 		
-		// Initialize Tone.js PluckString
+		// Tell Tone.js to use the shared AudioContext
+		Tone.setContext(this.#audioContext as any)
+		
+		// Create a gain node to handle volume and routing through the shared audio graph
+		this.#gainNode = this.#audioContext.createGain()
+		this.#gainNode.gain.value = dbToLinear(this.options.gain)
+		
+		// Initialize Tone.js PluckSynth and connect to our gain node
 		this.#synth = new PluckSynth({
 			dampening: this.options.dampening,
-			volume: dbToLinear(this.options.gain)
-		}).toDestination()
+			volume: 0 // Tone volume is 0, use our gainNode instead
+		})
+		
+		// Connect the synth's output to our gain node for routing through the app's audio graph
+		this.#synth.connect(this.#gainNode)
 		
 		this.#initialized = true
 	}
@@ -188,8 +203,7 @@ export default class TonePluckString implements IAudioOutput {
 		this.activeNote = noteNumber
 
 		try {
-			this.frequency = frequency
-			// PluckString uses triggerAttack to pluck the string
+			// PluckString uses triggerAttack to pluck the string with frequency parameter
 			this.#synth.triggerAttack(frequency, "+0.1")
 		} catch (e) {
 			console.error("Failed to pluck string:", e)

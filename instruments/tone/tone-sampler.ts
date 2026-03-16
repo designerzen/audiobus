@@ -117,7 +117,7 @@ export default class ToneSampler implements IAudioOutput {
 	}
 
 	get output() {
-		return this.#sampler
+		return this.#gainNode
 	}
 
 	get audioContext(): BaseAudioContext {
@@ -128,6 +128,8 @@ export default class ToneSampler implements IAudioOutput {
 		return this.options.title ?? "Tone.js Sampler"
 	}
 
+	#gainNode: GainNode
+
 	constructor(audioContext: BaseAudioContext, options = {}) {
 		this.#audioContext = audioContext
 		this.options = Object.assign({}, this.options, options)
@@ -137,14 +139,25 @@ export default class ToneSampler implements IAudioOutput {
 	private async ensureInitialized() {
 		if (this.#initialized) return
 		
-		const { Sampler } = await import("tone")
+		const Tone = await import("tone")
+		const { Sampler } = Tone
 		
-		// Initialize Tone.js Sampler
+		// Tell Tone.js to use the shared AudioContext
+		Tone.setContext(this.#audioContext as any)
+		
+		// Create a gain node to handle volume and routing through the shared audio graph
+		this.#gainNode = this.#audioContext.createGain()
+		this.#gainNode.gain.value = dbToLinear(this.options.gain)
+		
+		// Initialize Tone.js Sampler and connect to our gain node
 		this.#sampler = new Sampler({
 			urls: this.options.urls,
 			baseUrl: this.options.baseUrl,
-			volume: dbToLinear(this.options.gain)
-		}).toDestination()
+			volume: 0 // Tone volume is 0, use our gainNode instead
+		})
+		
+		// Connect the sampler's output to our gain node for routing through the app's audio graph
+		this.#sampler.connect(this.#gainNode)
 		
 		this.#initialized = true
 	}

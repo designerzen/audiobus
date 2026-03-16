@@ -57,7 +57,7 @@ export default class PolySynth implements IAudioOutput{
        
         this.InstrumentClass = this.options.class
         this.#gainNode = audioContext.createGain()
-		this.#gainNode.gain.value = 2 // Start at 2 for single voice
+		this.#gainNode.gain.value = 1 // Master gain for polyphonic output
         this.factory( this.InstrumentClass, this.options.maxPolyphony)
     }
 

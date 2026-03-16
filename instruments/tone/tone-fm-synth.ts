@@ -14,6 +14,7 @@ export default class ToneFMSynth implements IAudioOutput {
 	static ID: number = 0
 
 	options = {
+		title:"Tone.js FMSynth Instrument",
 		// Default amplitude
 		gain: 0.2, // ratio 0-1
 		attack: 0.4, // in s
@@ -128,7 +129,7 @@ export default class ToneFMSynth implements IAudioOutput {
 	}
 
 	get output() {
-		return this.#synth
+		return this.#gainNode
 	}
 
 	get audioContext(): BaseAudioContext {
@@ -139,6 +140,8 @@ export default class ToneFMSynth implements IAudioOutput {
 		return this.options.title ?? "Tone.js FM Synth"
 	}
 
+	#gainNode: GainNode
+
 	constructor(audioContext: BaseAudioContext, options = {}) {
 		this.#audioContext = audioContext
 		this.options = Object.assign({}, this.options, options)
@@ -148,9 +151,17 @@ export default class ToneFMSynth implements IAudioOutput {
 	private async ensureInitialized() {
 		if (this.#initialized) return
 		
-		const { FMSynth } = await import("tone")
+		const Tone = await import("tone")
+		const { FMSynth } = Tone
 		
-		// Initialize Tone.js FMSynth
+		// Tell Tone.js to use the shared AudioContext
+		Tone.setContext(this.#audioContext as any)
+		
+		// Create a gain node to handle volume and routing through the shared audio graph
+		this.#gainNode = this.#audioContext.createGain()
+		this.#gainNode.gain.value = dbToLinear(this.options.gain)
+		
+		// Initialize Tone.js FMSynth and connect to our gain node
 		this.#synth = new FMSynth({
 			harmonicity: this.options.harmonicity,
 			modulationIndex: this.options.modulationIndex,
@@ -158,8 +169,11 @@ export default class ToneFMSynth implements IAudioOutput {
 			envelope: this.options.envelope,
 			modulation: this.options.modulation,
 			modulationEnvelope: this.options.modulationEnvelope,
-			volume: dbToLinear(this.options.gain)
-		}).toDestination()
+			volume: 0 // Tone volume is 0, use our gainNode instead
+		})
+		
+		// Connect the synth's output to our gain node for routing through the app's audio graph
+		this.#synth.connect(this.#gainNode)
 		
 		this.#initialized = true
 	}
