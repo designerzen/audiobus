@@ -51,6 +51,8 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./outputs/output-metronome.ts")
 		case OUTPUT_TYPES.AUDIO_CLICK:
 			return await import("./outputs/output-audio-click.ts")
+		case OUTPUT_TYPES.BUTTERCHURN:
+			return await import("./outputs/output-butterchurn.ts")
 		default:
 			throw new Error(`Unknown output type: ${type}`)
 	}
@@ -91,7 +93,18 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
 		if (!options?.mixer) {
 			throw new Error('SPECTRUM_ANALYSER output requires mixer (GainNode) in options')
 		}
-		return new Class(options.mixer)
+		if (!options?.audioContext) {
+			throw new Error('SPECTRUM_ANALYSER output requires audioContext in options')
+		}
+		return new Class(options.mixer, options.audioContext)
+	} else if (type === OUTPUT_TYPES.BUTTERCHURN) {
+		if (!options?.mixer) {
+			throw new Error('BUTTERCHURN output requires mixer (GainNode) in options')
+		}
+		if (!options?.audioContext) {
+			throw new Error('BUTTERCHURN output requires audioContext in options')
+		}
+		return new Class(options.mixer, options.audioContext)
 	} else if (type === OUTPUT_TYPES.WAM2) {
 		if (!options?.audioContext) {
 			throw new Error('WAM2 output requires audioContext in options')
@@ -156,7 +169,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		id: OUTPUT_TYPES.VIBRATOR,
 		name: "Vibrator",
 		description: "Triggers device vibration when a note within a range is played",
-		isAvailable: () => typeof navigator !== "undefined" && (!!navigator?.vibrate || !!(navigator as any)?.webkitVibrate || !!(navigator as any)?.mozVibrate),
+		isAvailable: () => true, // Available on all platforms - supports mobile vibration API and gamepad vibration
 		create: (options) => createOutput(OUTPUT_TYPES.VIBRATOR, options),
 	},
 	{
@@ -221,6 +234,13 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		description: "Plays audio click sounds from a selected asset library on every bar",
 		isAvailable: () => typeof AudioContext !== "undefined" || typeof (window as any).webkitAudioContext !== "undefined",
 		create: (options) => createOutput(OUTPUT_TYPES.AUDIO_CLICK, options),
+	},
+	{
+		id: OUTPUT_TYPES.BUTTERCHURN,
+		name: "Butterchurn",
+		description: "WebGL music visualizer with animated psychedelic patterns synced to audio",
+		isAvailable: () => typeof WebGL2RenderingContext !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.BUTTERCHURN, options),
 	}
 ]
 

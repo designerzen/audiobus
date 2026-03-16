@@ -256,7 +256,7 @@ export default class IOChain extends EventTarget {
 
         // Always process the queue, with or without quantisation
         if (this.transformerManager.isQuantised) {
-            console.info("TICK:QUANTISED", { divisionsElapsed, quantisationFidelity: chain.transformerManager.quantiseFidelity })
+            //console.info("TICK:QUANTISED", { divisionsElapsed, quantisationFidelity: chain.transformerManager.quantiseFidelity })
             // When quantised, only trigger events on the grid
             const gridSize = this.transformerManager.quantiseFidelity
             if ((this.#pausedQueue === 0) && (divisionsElapsed % gridSize) === 0) {

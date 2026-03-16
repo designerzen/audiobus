@@ -279,8 +279,11 @@ export class IOChainFactory {
 			try {
 				let output: IAudioOutput
 
-				if (outputId === OUTPUT_TYPES.SPECTRUM_ANALYSER) {
-					output = await createOutputById(outputId, { mixer: options.outputMixer })
+				if (outputId === OUTPUT_TYPES.SPECTRUM_ANALYSER || outputId === OUTPUT_TYPES.BUTTERCHURN) {
+					output = await createOutputById(outputId, { 
+						mixer: options.outputMixer,
+						audioContext: options.audioContext 
+					})
 				} else if (outputId === OUTPUT_TYPES.PINK_TROMBONE || outputId === OUTPUT_TYPES.WAM2) {
 					output = await createOutputById(outputId, { audioContext: options.audioContext })
 				} else {

@@ -66,6 +66,14 @@ export class IOChainManager extends EventTarget {
 		return this.#activeChainId
 	}
 
+	get outputMixer(): GainNode {
+		return this.#options.outputMixer
+	}
+
+	get audioContext(): AudioContext | undefined {
+		return this.#options.audioContext
+	}
+
 	constructor(options: IOChainManagerOptions) {
 		super()
 		this.#options = options
