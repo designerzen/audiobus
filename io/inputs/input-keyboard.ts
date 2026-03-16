@@ -11,6 +11,7 @@
 import AudioCommand from "../../audio-command.ts"
 import AbstractInput from "./abstract-input.ts"
 import { addKeyboardDownEvents } from "../../hardware/keyboard/keyboard"
+import KeyboardDisplayManager from "../../ui/keyboard-display-manager.ts"
 import type { IAudioInput } from "./input-interface.ts"
 
 export const KEYBOARD_INPUT_ID = "Keyboard"
@@ -18,6 +19,7 @@ export const KEYBOARD_INPUT_ID = "Keyboard"
 export default class InputKeyboard extends AbstractInput implements IAudioInput{
 
 	#destroyKeyboardListener:Function
+	#keyboardDisplayManager:KeyboardDisplayManager | null = null
 	
 	get name():string {
 		return KEYBOARD_INPUT_ID
@@ -34,7 +36,23 @@ export default class InputKeyboard extends AbstractInput implements IAudioInput{
 		this.setAsConnected()
 	}
 
+	async createGui(): Promise<HTMLElement> {
+		this.#keyboardDisplayManager = new KeyboardDisplayManager()
+		const container = document.createElement('div')
+		container.className = 'keyboard-input-gui'
+		container.appendChild(this.#keyboardDisplayManager.getElement())
+		return container
+	}
+
+	async destroyGui(): Promise<void> {
+		if (this.#keyboardDisplayManager) {
+			this.#keyboardDisplayManager.destroy()
+			this.#keyboardDisplayManager = null
+		}
+	}
+
 	override destroy(): void {
+		this.destroyGui()
 		this.#destroyKeyboardListener()
 		this.setAsDisconnected()
 	}
