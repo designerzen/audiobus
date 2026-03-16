@@ -17,35 +17,17 @@ export interface InstrumentUIFactory {
 	description: string
 	category: string
 	isAvailable: () => boolean
-	create: (options?: Record<string, any>) => IAudioOutput | Promise<IAudioOutput>
-}
-
-/**
- * Get audio context - uses the global context if available
- */
-const getAudioContext = (): BaseAudioContext | AudioContext => {
-	// Try to get from window first
-	if ((window as any).audioContext) {
-		return (window as any).audioContext
-	}
-	
-	// Try to create a new one
-	const AudioContextClass = (window as any).AudioContext || (window as any).webkitAudioContext
-	if (AudioContextClass) {
-		return new AudioContextClass()
-	}
-	
-	throw new Error("Web Audio API not available")
+	create: (audioContext: BaseAudioContext | AudioContext, options?: Record<string, any>) => IAudioOutput | Promise<IAudioOutput>
 }
 
 /**
  * Create an instrument instance for UI use
  */
 const createInstrument = async (
+	audioContext: BaseAudioContext | AudioContext,
 	instrumentId: string,
 	options?: Record<string, any>
 ): Promise<IAudioOutput> => {
-	const audioContext = getAudioContext()
 	const externalData: Record<string, any> = {}
 
 	// Handle special cases that need external data
@@ -92,7 +74,7 @@ const metadataToUIFactory = (metadata: InstrumentMetadata): InstrumentUIFactory 
 		return typeof (window as any).AudioContext !== "undefined" || 
 		       typeof (window as any).webkitAudioContext !== "undefined"
 	},
-	create: (options) => createInstrument(metadata.id, options)
+	create: (audioContext, options) => createInstrument(audioContext, metadata.id, options)
 })
 
 /**
@@ -117,6 +99,7 @@ export function getInstrumentFactoriesByCategory(category: string): InstrumentUI
  * Create an instrument by ID
  */
 export async function createInstrumentById(
+	audioContext: BaseAudioContext | AudioContext,
 	id: string,
 	options?: Record<string, any>
 ): Promise<IAudioOutput> {
@@ -130,7 +113,7 @@ export async function createInstrumentById(
 		throw new Error(`Instrument not available: ${metadata.name}`)
 	}
 
-	return factory.create(options)
+	return factory.create(audioContext, options)
 }
 
 /**

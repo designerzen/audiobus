@@ -9,6 +9,11 @@ export const INSTRUMENT_TYPE_TONE_PLUCK_STRING = "tone-pluck-string"
 export const INSTRUMENT_TYPE_TONE_SAMPLER = "tone-sampler"
 export const INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT = "scsynth-instrument"
 export const INSTRUMENT_TYPE_CLAP = "clap"
+export const INSTRUMENT_TYPE_OPENDAW_PLAYFIELD = "opendaw-playfield"
+export const INSTRUMENT_TYPE_OPENDAW_NANO = "opendaw-nano"
+export const INSTRUMENT_TYPE_OPENDAW_TAPE = "opendaw-tape"
+export const INSTRUMENT_TYPE_OPENDAW_SOUNDFONT = "opendaw-soundfont"
+export const INSTRUMENT_TYPE_OPENDAW_VAPORISATEUR = "opendaw-vaporisateur"
 
 /**
  * Instrument Category Constants
@@ -122,6 +127,56 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 			description: "Web CLAP plugin synthesizer with automatic patch loading",
 			category: "synthesis",
 			loader: () => import("./clap/clap-instrument.ts")
+		}
+	],
+	[
+		INSTRUMENT_TYPE_OPENDAW_PLAYFIELD,
+		{
+			id: INSTRUMENT_TYPE_OPENDAW_PLAYFIELD,
+			name: "openDAW Playfield",
+			description: "Playfield instrument using openDAW framework",
+			category: INSTRUMENT_CATEGORY_SYNTHESIS,
+			loader: () => import("./openDAW/opendaw-playfield.ts")
+		}
+	],
+	[
+		INSTRUMENT_TYPE_OPENDAW_NANO,
+		{
+			id: INSTRUMENT_TYPE_OPENDAW_NANO,
+			name: "openDAW Nano",
+			description: "Nano synthesizer using openDAW framework",
+			category: INSTRUMENT_CATEGORY_SYNTHESIS,
+			loader: () => import("./openDAW/opendaw-nano.ts")
+		}
+	],
+	[
+		INSTRUMENT_TYPE_OPENDAW_TAPE,
+		{
+			id: INSTRUMENT_TYPE_OPENDAW_TAPE,
+			name: "openDAW Tape",
+			description: "Tape synthesizer using openDAW framework",
+			category: INSTRUMENT_CATEGORY_SYNTHESIS,
+			loader: () => import("./openDAW/opendaw-tape.ts")
+		}
+	],
+	[
+		INSTRUMENT_TYPE_OPENDAW_SOUNDFONT,
+		{
+			id: INSTRUMENT_TYPE_OPENDAW_SOUNDFONT,
+			name: "openDAW SoundFont",
+			description: "SoundFont sampler using openDAW framework",
+			category: INSTRUMENT_CATEGORY_SAMPLING,
+			loader: () => import("./openDAW/opendaw-soundfont.ts")
+		}
+	],
+	[
+		INSTRUMENT_TYPE_OPENDAW_VAPORISATEUR,
+		{
+			id: INSTRUMENT_TYPE_OPENDAW_VAPORISATEUR,
+			name: "openDAW Vaporisateur",
+			description: "Vaporisateur instrument using openDAW framework",
+			category: INSTRUMENT_CATEGORY_SYNTHESIS,
+			loader: () => import("./openDAW/opendaw-vaporisateur.ts")
 		}
 	]
 ])
