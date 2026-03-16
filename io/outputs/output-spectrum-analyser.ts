@@ -1,6 +1,7 @@
 import type { IAudioOutput } from "./output-interface.ts"
 import { convertNoteNumberToColour } from "../../conversion/note-to-colour.ts"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
+import "./output-spectrum-analyser.css"
 
 export default class OutputSpectrumAnalyser extends EventTarget implements IAudioOutput {
 	static ID: number = 0
@@ -36,19 +37,22 @@ export default class OutputSpectrumAnalyser extends EventTarget implements IAudi
 	}
 
 
-	constructor(mixerNode: GainNode) {
+	constructor(audioNodeToAnalyse: GainNode, audioContext?: AudioContext) {
 		super()
-		const audioContext = (mixerNode as any).context
-		if (!audioContext) {
-			throw new Error('OutputSpectrumAnalyser requires mixer (GainNode) with valid audioContext')
+		let context = audioContext || (audioNodeToAnalyse as any).context
+		if (!context && (audioNodeToAnalyse as any).context instanceof AudioContext) {
+			context = (audioNodeToAnalyse as any).context
+		}
+		if (!context) {
+			throw new Error('OutputSpectrumAnalyser requires AudioContext - pass it explicitly or ensure mixerNode.context exists')
 		}
 		
 		// Create analyser node
-		this.#analyser = audioContext.createAnalyser()
+		this.#analyser = context.createAnalyser()
 		this.#analyser.fftSize = this.#fftSize
 		
 		// Connect mixer to analyser
-		mixerNode.connect(this.#analyser)
+		audioNodeToAnalyse.connect(this.#analyser)
 		
 		// Create data buffer
 		const bufferLength = this.#analyser.frequencyBinCount
@@ -90,10 +94,7 @@ export default class OutputSpectrumAnalyser extends EventTarget implements IAudi
 		this.#canvas = document.createElement("canvas")
 		this.#canvas.width = 404
 		this.#canvas.height = 202
-		this.#canvas.style.cssText = `
-			display: block;
-			background: #000;
-		`
+		this.#canvas.className = "audiobus-spectrum-analyser"
 		document.body.appendChild(this.#canvas)
 
 		// Transfer control to OffscreenCanvas immediately (must be before initializing worker)
