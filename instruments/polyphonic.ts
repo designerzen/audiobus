@@ -3,8 +3,6 @@
  * Can be of any instrument but defaults
  * to the single oscillator
  */
-import SynthOscillator, { OSCILLATORS } from "./oscillators/synth-oscillator.ts"
-
 import type { IAudioOutput } from "../io/outputs/output-interface.ts"
 
 export default class PolySynth implements IAudioOutput{
@@ -13,7 +11,7 @@ export default class PolySynth implements IAudioOutput{
 
     options = {
         maxPolyphony: 24,
-        class:SynthOscillator
+        class: null as any
     }
 
     instruments = []
@@ -51,15 +49,24 @@ export default class PolySynth implements IAudioOutput{
 		return false
 	}
 
-    constructor(audioContext: AudioContext,  options = {}) {
-        this.#audioContext = audioContext
-        this.options = Object.assign({}, this.options, options)
-       
-        this.InstrumentClass = this.options.class
-        this.#gainNode = audioContext.createGain()
-		this.#gainNode.gain.value = 1 // Master gain for polyphonic output
-        this.factory( this.InstrumentClass, this.options.maxPolyphony)
+    async #initializeDefaults() {
+        if (this.InstrumentClass === undefined) {
+            const { default: SynthOscillator } = await import('./oscillators/synth-oscillator.ts')
+            this.InstrumentClass = this.options.class || SynthOscillator
+        }
     }
+
+    constructor(audioContext: AudioContext,  options = {}) {
+         this.#audioContext = audioContext
+         this.options = Object.assign({}, this.options, options)
+        
+         this.InstrumentClass = this.options.class
+         this.#gainNode = audioContext.createGain()
+    this.#gainNode.gain.value = 1 // Master gain for polyphonic output
+         this.#initializeDefaults().then(() => {
+             this.factory( this.InstrumentClass, this.options.maxPolyphony)
+         })
+     }
 
     /**
      * 
@@ -151,8 +158,9 @@ export default class PolySynth implements IAudioOutput{
     /**
      * Set a random oscillator timbre from the collection
      */
-    setRandomTimbre(){
-		const randomShape = OSCILLATORS[Math.floor(Math.random() * (OSCILLATORS.length - 1))]
-		this.instruments.forEach( instrument => instrument.shape = randomShape )
-    }
+    async setRandomTimbre(){
+        const { OSCILLATORS } = await import('./oscillators/synth-oscillator.ts')
+    const randomShape = OSCILLATORS[Math.floor(Math.random() * (OSCILLATORS.length - 1))]
+    this.instruments.forEach( instrument => instrument.shape = randomShape )
+     }
 }
