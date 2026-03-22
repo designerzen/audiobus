@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>webYOSHIMI</title>
+  <script src="libs/audioworklet.js"></script>
+  <script src="libs/keys.js"></script>
+  <script src="libs/gunzip.js"></script>
+</head>
+<script>
+  let yoshimi,root;
+  let initialized = false;
+
+  function initMidi () {
+    let combo = document.querySelector("#midiIn");
+    if (navigator.requestMIDIAccess) {
+      navigator.requestMIDIAccess().then((midiIF) => {
+        midiIF.inputs.forEach((input) => {
+          let option = new Option(input.name);
+          option.port = input;
+          combo.appendChild(option);
+        });
+        combo.onchange = e => {
+          yoshimi.midiIn = e.target.options[e.target.selectedIndex].port;
+        }
+        if (combo.options.length > 0)
+          combo.onchange({ target:combo });
+        combo.style.display = "block";
+      })
+    }
+    else combo.style.display = "none";
+  }
+
+  async function loadScript (url) {
+    return new Promise((resolve) => {
+      let script = document.createElement("script");
+      script.src = url;
+      script.onload = () => { resolve(); }
+      document.head.appendChild(script);
+    })
+  }
+
+  async function loadFile (url, type) {
+    let resp = await fetch(url);
+    let data = await (type == "bin") ? resp.arrayBuffer() : resp.text();
+    return data;
+  }
+
+  function onbank (name) {
+    curbank = name;
+    for (let i=0; i<root.length; i++) {
+      let bank = root[i];
+      if (bank.name == name) {
+        let insts = document.querySelector("#instruments");
+        insts.innerHTML = "";
+        bank.instruments.forEach((inst) => { insts.appendChild(new Option(inst)); })
+        if (initialized)
+          oninstrument(insts.value);
+        initialized = true;
+        break;
+      }
+    }
+  }
+
+  async function oninstrument (filename) {
+    filename = "banks/" + curbank + "/" + filename;
+    try {
+      let data = await loadFile(filename, "bin");
+      let gzip = new Zlib.Gunzip(new Uint8Array(data));
+      let utf8 = gzip.decompress();
+      var xml  = new TextDecoder("utf-8").decode(utf8);
+    } catch(err) {
+      var xml  = await loadFile(filename, "text");
+    }
+    yoshimi.sendMessage("set", "patch", xml);
+    document.querySelector("#keys").focus();
+  }
+
+  async function main() {
+
+    // -- audiocontext and autoplay policy
+    let actx = new AudioContext();
+    function resumeAudio () {
+      actx.resume();
+      console.log("webaudio resumed");
+      window.removeEventListener("mousedown", resumeAudio);
+      window.removeEventListener("keydown", resumeAudio);
+    }
+    window.addEventListener("mousedown", resumeAudio);
+    window.addEventListener("keydown", resumeAudio);
+
+    // -- polyfill for AudioWorklet support
+    AWPF.polyfill( actx ).then( async () => {
+
+      await loadScript("libs/wam-controller.js");
+      await loadScript("yoshimi.js");
+
+      // -- create WAM
+      // AWPF.origin = "http://127.0.0.1:44102/dist/";
+      AWPF.origin = "https://webaudiomodules.org/demos/jariseon/yoshimi/";
+      await WAM.YOSHIMI.importScripts(actx, AWPF.origin);
+      yoshimi = new WAM.YOSHIMI(actx);
+      yoshimi.connect(actx.destination);
+
+      // -- presets
+      let resp = await fetch("banks/root.json");
+      let json = await resp.text();
+      root = JSON.parse(json);
+      let banks = document.querySelector("#banks");
+      root.forEach((bank) => { banks.appendChild(new Option(bank.name)); })
+      banks.value = "Will_Godfrey_Collection";
+      onbank(banks.value);
+      oninstrument("0040-Master Synth Low.xiz");
+      document.querySelector("#instruments").value = "0040-Master Synth Low.xiz";
+
+      // -- midi
+      let midikeys = new QwertyHancock({
+        container: document.querySelector("#keys"), height: 60,
+        octaves: 7, startNote: 'C1', oct:4,
+        whiteNotesColour: 'white', blackNotesColour: 'black', activeColour:'orange'
+        });
+      midikeys.keyDown = (note, name) => yoshimi.onMidi([0x90, note, 100]);
+      midikeys.keyUp   = (note, name) => yoshimi.onMidi([0x80, note, 100]);
+      initMidi();
+
+      const scriptelm = document.createElement('script');
+      scriptelm.type = "module";
+      scriptelm.src = "livecoding/song.js";
+      document.documentElement.appendChild(scriptelm);
+    });
+  }
+</script>
+<body onload="main()">
+  <h1>yoshimi</h1>
+  <h3>zynaddsubfx (Paul Nasca), yoshimi (Alan Calvert, Will Godfrey and others)</h3>
+  <div id="wam-container">
+    <div id="caption">
+      <select id="banks" onchange="onbank(this.value)"></select>
+      <select id="instruments" onchange="oninstrument(this.value)"></select>
+      <select id="midiIn" onchange="onmidi(this.value)"></select>
+    </div>
+    <div id="frontpanel"></div>
+    <div id="keys"></div>
+  </div>
+  <div class="credit"><a href="https://github.com/jariseon/yoshimi">web port</a> by <a href="mailto:jari@webaudiomodules.org">jari kleimola</a> 2019</div>
+
+  <br />
+  <button onclick="playsong()">play song</button> by <a href="https://github.com/petersalomonsen/javascriptmusic/blob/master/songs/upbeat.js">peter salomonsen</a>
+  <br />
+  <br />
+  
+  <style>
+    * { cursor:default; }
+    body { font-family:sans-serif; font-weight:100; user-select:none; -webkit-user-select:none; margin-left:20px; }
+    h1 { font-weight:100; margin:0; }
+    h3 { font-weight:100; margin:0 0 10px 0; font-size:12px; }
+    #wam-container { background:#1a1a1a; padding:5px; width:844px; position:relative; }
+    #caption { display:flex; }
+    #frontpanel { border-bottom:3px solid darkgreen; padding-bottom:5px; }
+    #keys li { cursor:pointer; }
+    #wam-container select { color:#fff; border:1px solid #888; margin-right:10px; cursor:pointer; }
+    #midiIn { position:absolute; right:5px; display:none; }
+    .credit { width:854px; color:#666; text-align:right; font-size:10px; line-height:12px; margin-right:10px; }
+    .credit a, .credit a:visited, .credit a:link { color:#666; text-decoration:none; }
+    .credit a:hover { color:#000; cursor:pointer; }
+
+    /* restyle standard combobox */
+    select {
+      padding-left:5px;
+      padding-right: 25px;
+      height:18px;
+      line-height: 10px;
+      background-image: url("data:image/svg+xml,\
+        <svg version='1.1' xmlns='http://www.w3.org/2000/svg' width='12px'\
+             height='12px' transform='translate(0,-1) scale(0.75)' viewBox='0 0 1200 1000' fill='rgb(0,0,0))'>\
+          <path fill='rgb(150,150,150)' d='M1100 411l-198 -199l-353 353l-353 -353l-197 199l551 551z'/>\
+        </svg>");
+      background-repeat: no-repeat;
+      background-position: calc(100% - 4px) 50%;
+      appearance: none; -webkit-appearance: none;
+      border:1px solid #aaa;
+      border-radius:4px;
+      font-size:11px;
+      font-weight:100;
+      background-color:#1a1a1a;
+      outline:none;
+    }
+  </style>
+</body>
+</html>
