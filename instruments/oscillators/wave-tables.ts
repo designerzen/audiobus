@@ -3,8 +3,6 @@
 // import { WAVE_FORM_NAMES_GOOGLE, WAVE_TABLE_LOCATIONS_GOOGLE } from "./tables/wave-table-google"
 // import { generateImageFromWaveTable, loadWaveTableFromImage } from "./wave-table-utils"
 
-import {OSCILLATORS} from "./synth-oscillator.ts"
-
 // external dependencies
 import { unzip, strFromU8 } from 'fflate'
 
@@ -207,7 +205,8 @@ export const getRandomWaveTableName = () => {
 }
 
 // get all the map's keys
-export const getAllWaveTables = () => {
+export const getAllWaveTables = async () => {
+    const { OSCILLATORS } = await import('./synth-oscillator.ts')
     const p = Array.from(waveTables.keys())
     p.unshift(...OSCILLATORS)
     return p
