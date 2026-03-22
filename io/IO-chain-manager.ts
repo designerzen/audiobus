@@ -10,7 +10,6 @@ import type { IAudioInput } from "./inputs/input-interface"
 import type { IAudioOutput } from "./outputs/output-interface"
 import type { IAudioCommand } from "audiobus/audio-command-interface"
 import type AudioEvent from "audiobus/audio-event"
-import type State from "../../../app/harmoneasy/source/libs/state"
 
 export const EVENT_CHAIN_ADDED = "chainAdded"
 export const EVENT_CHAIN_REMOVED = "chainRemoved"
@@ -87,10 +86,11 @@ export class IOChainManager extends EventTarget {
 		return `chain-${++this.#chainIdCounter}`
 	}
 
-	public updateTime(now:number, divisionsElapsed:number, state:State){
+	public updateTime(now:number, divisionsElapsed:number, options={} ){
+		
 		return this.chains.map(chain => {
 		  	// Always process the queue, with or without quantisation
-			const activeCommands: IAudioCommand[] = chain.updateTimeForCommandQueue(now, divisionsElapsed, state)
+			const activeCommands: IAudioCommand[] = chain.updateTimeForCommandQueue(now, divisionsElapsed, options)
 	
 			// Act upon any command that has now been executed
 			if (activeCommands && activeCommands.length > 0) {

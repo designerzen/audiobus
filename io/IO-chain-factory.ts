@@ -3,11 +3,6 @@
  * Handles creation with optional predefined configurations
  */
 import IOChain from "./IO-chain"
-import { createInputById, getAvailableInputFactories } from "./input-factory"
-import { createOutputById, getAvailableOutputFactories } from "./output-factory"
-import InputOnScreenKeyboard, { ONSCREEN_KEYBOARD_INPUT_ID } from "./inputs/input-onscreen-keyboard"
-import OutputOnScreenKeyboard from "./outputs/output-onscreen-keyboard"
-import PolySynth from "../instruments/polyphonic"
 import * as INPUT_TYPES from "./inputs/input-types"
 import * as OUTPUT_TYPES from "./outputs/output-types"
 
@@ -122,6 +117,12 @@ export class IOChainFactory {
 			audioContext: options.audioContext
 		}
 
+		// Dynamically import factories
+		const { createInputById } = await import("./input-factory")
+		const { InputOnScreenKeyboard } = await import("./inputs/input-onscreen-keyboard")
+		const { OutputOnScreenKeyboard } = await import("./outputs/output-onscreen-keyboard")
+		const { PolySynth } = await import("../instruments/polyphonic")
+
 		// Inputs
 		const inputKeyboard = await createInputById(INPUT_TYPES.KEYBOARD, createOptions)
 		const inputGamePad = await createInputById(INPUT_TYPES.GAMEPAD, createOptions)
@@ -177,6 +178,9 @@ export class IOChainFactory {
 			musicalOutput.output.connect(options.outputMixer)
 			outputs.push(musicalOutput)
 		}
+
+		// Dynamically import output factory
+		const { createOutputById } = await import("./output-factory")
 
 		// Standard outputs
 		try {
@@ -256,6 +260,10 @@ export class IOChainFactory {
 			now: () => options.timer.now,
 			audioContext: options.audioContext
 		}
+
+		// Dynamically import factories
+		const { createInputById } = await import("./input-factory")
+		const { createOutputById } = await import("./output-factory")
 
 		// Create inputs from preset
 		const inputs: IAudioInput[] = []

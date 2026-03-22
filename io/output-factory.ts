@@ -35,6 +35,8 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./outputs/output-vibrator.ts")
 		case OUTPUT_TYPES.WAM2:
 			return await import("./outputs/output-wam2.ts")
+		case OUTPUT_TYPES.YOSHIMI:
+			return await import("./outputs/output-yoshimi.ts")
 		case OUTPUT_TYPES.WEBMIDI:
 			return await import("./outputs/output-webmidi-device.ts")
 		case OUTPUT_TYPES.NATIVE_MIDI:
@@ -110,6 +112,11 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
 			throw new Error('WAM2 output requires audioContext in options')
 		}
 		return new Class(options.audioContext, "")
+	} else if (type === OUTPUT_TYPES.YOSHIMI) {
+		if (!options?.audioContext) {
+			throw new Error('YOSHIMI output requires audioContext in options')
+		}
+		return new Class(options.audioContext)
 	} else if (type === OUTPUT_TYPES.SUPERSONIC) {
 		const output = new Class()
 		output.connect()
@@ -220,6 +227,13 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		description: "Manages the WAM2 Audio Engine",
 		isAvailable: () => typeof AudioWorklet !== "undefined",
 		create: (options) => createOutput(OUTPUT_TYPES.WAM2, options),
+	},
+	{
+		id: OUTPUT_TYPES.YOSHIMI,
+		name: "Yoshimi",
+		description: "Free and open source high quality software synthesizer with 700+ presets",
+		isAvailable: () => typeof AudioWorklet !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.YOSHIMI, options),
 	},
 	{
 		id: OUTPUT_TYPES.METRONOME,

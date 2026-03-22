@@ -13,8 +13,8 @@ import TransformerManagerWorker from "./transformer-manager-worker"
 import { INPUT_EVENT, NOTE_OFF, NOTE_ON, OUTPUT_EVENT, PLAYBACK_START, PLAYBACK_STOP, PLAYBACK_TOGGLE, TEMPO_DECREASE, TEMPO_INCREASE, TEMPO_TAP, MIDI_CLOCK, MIDI_CONTINUE, MIDI_START, MIDI_STOP } from '../commands'
 import AudioEvent from "../audio-event"
 
-import type { IAudioCommand } from "../audio-command-interface"
 import type { ITimerControl as Timer } from "netronome"
+import type { IAudioCommand } from "../audio-command-interface"
 import type AbstractInput from "./inputs/abstract-input"
 import type InputAudioEvent from "./events/input-audio-event"
 import type { IAudioOutput } from "./outputs/output-interface"
@@ -118,7 +118,6 @@ export default class IOChain extends EventTarget {
         this.#transformerManager = new TransformerManagerWorker()
         this.#inputManager = new InputManager()
         this.#outputManager = new OutputManager()
-
         this.#abortController = new AbortController()
 
         // If layout option provided as string, restore state from export
@@ -248,10 +247,10 @@ export default class IOChain extends EventTarget {
      * Check queue for Commands in the past
      * @param now 
      * @param divisionsElapsed 
-     * @param state 
+     * @param options  
      * @returns IAudioCommand[]
      */
-    updateTimeForCommandQueue(now: number, divisionsElapsed: number, state: State): IAudioCommand[] {
+    updateTimeForCommandQueue(now: number, divisionsElapsed: number, options: {}): IAudioCommand[] {
         let activeCommands: IAudioCommand[]
 
         // Always process the queue, with or without quantisation
@@ -264,7 +263,7 @@ export default class IOChain extends EventTarget {
 
                 // if grid is set to true in options, we can only ever play one
                 // note at a time on this grid point
-                this.#pausedQueue = state && state.get("grid") ? gridSize - 1 : 0
+                this.#pausedQueue = options && options["grid"] ? gridSize - 1 : 0
                 // console.info( pausedQueue, "TICK:QUANTISED", {buffer: audioCommandQueue, divisionsElapsed, quantisationFidelity:transformerManager.quantiseFidelity})
             } else {
                 // reset duplicator
@@ -278,9 +277,9 @@ export default class IOChain extends EventTarget {
             // When not quantised, process queue immediately on every tick
             activeCommands = this.executeQueueAndClearComplete(now)
 
-            if (activeCommands.length) {
-                console.info("TICK:IMMEDIATE", { activeCommands, divisionsElapsed })
-            }
+            // if (activeCommands.length) {
+            //     console.info("TICK:IMMEDIATE", { activeCommands, divisionsElapsed })
+            // }
         }
 
         return activeCommands

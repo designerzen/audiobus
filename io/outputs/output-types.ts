@@ -10,6 +10,7 @@ export const SPECTRUM_ANALYSER = "spectrum-analyser" as const
 export const SPEECH_SYNTHESIS = "speech-synthesis" as const
 export const VIBRATOR = "vibrator" as const
 export const WAM2 = "wam2" as const
+export const YOSHIMI = "yoshimi" as const
 export const WEBMIDI = "webmidi" as const
 export const NATIVE_MIDI = "native-midi" as const
 export const BLE_MIDI = "ble-midi" as const
@@ -28,6 +29,7 @@ export type OutputId =
 	| typeof SPEECH_SYNTHESIS
 	| typeof VIBRATOR
 	| typeof WAM2
+	| typeof YOSHIMI
 	| typeof WEBMIDI
 	| typeof NATIVE_MIDI
 	| typeof BLE_MIDI

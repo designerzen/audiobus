@@ -57,7 +57,7 @@ export default class TransformerManagerWorker extends EventTarget implements ITr
         return this.#transformers.length
     }
 
-    constructor(initialTransformers?: Array<Transformer> = DEFAULT_TRANSFORMERS) {
+    constructor(initialTransformers: Array<Transformer> = DEFAULT_TRANSFORMERS) {
         super()
         this.setTransformers([...this.#transformers, ...(initialTransformers ?? [])])
     }

@@ -148,7 +148,7 @@ export default class InputMIDI2Native extends AbstractInput implements IAudioInp
 	/**
 	 * Start listening to a specific MIDI device
 	 */
-	private async #listenToDevice(deviceIndex: number): Promise<void> {
+	async #listenToDevice(deviceIndex: number): Promise<void> {
 		if (!nativeMIDI) return
 
 		const listener = (inDeviceIndex: number, umpPacket: number) => {
@@ -170,7 +170,7 @@ export default class InputMIDI2Native extends AbstractInput implements IAudioInp
 	/**
 	 * Stop listening to a specific MIDI device
 	 */
-	private #stopListeningToDevice(deviceIndex: number): void {
+	#stopListeningToDevice(deviceIndex: number): void {
 		if (!nativeMIDI) return
 
 		try {
@@ -184,7 +184,7 @@ export default class InputMIDI2Native extends AbstractInput implements IAudioInp
 	/**
 	 * Handle incoming UMP packet (MIDI 2.0 format)
 	 */
-	private #handleUmpPacket(deviceIndex: number, packet: number): void {
+	#handleUmpPacket(deviceIndex: number, packet: number): void {
 		const status = packet & 0xFF
 		const data1 = (packet >> 8) & 0xFF
 		const data2 = (packet >> 16) & 0xFF

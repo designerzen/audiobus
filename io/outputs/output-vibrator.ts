@@ -402,7 +402,7 @@ export default class OutputVibrator extends EventTarget implements IAudioOutput 
     /**
      * Trigger the circle expansion animation
      */
-    private #triggerCircleAnimation(): void {
+    #triggerCircleAnimation(): void {
         if (!this.#circleIndicator) return
 
         // Remove animation classes
