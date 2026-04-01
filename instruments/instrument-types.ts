@@ -9,6 +9,7 @@ export const INSTRUMENT_TYPE_TONE_PLUCK_STRING = "tone-pluck-string"
 export const INSTRUMENT_TYPE_TONE_SAMPLER = "tone-sampler"
 export const INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT = "scsynth-instrument"
 export const INSTRUMENT_TYPE_CLAP = "clap"
+export const INSTRUMENT_TYPE_FAUST = "faust"
 export const INSTRUMENT_TYPE_OPENDAW_PLAYFIELD = "opendaw-playfield"
 export const INSTRUMENT_TYPE_OPENDAW_NANO = "opendaw-nano"
 export const INSTRUMENT_TYPE_OPENDAW_TAPE = "opendaw-tape"
@@ -24,6 +25,7 @@ export const INSTRUMENT_CATEGORY_FM = "fm"
 export const INSTRUMENT_CATEGORY_PHYSICAL = "physical"
 export const INSTRUMENT_CATEGORY_SAMPLING = "sampling"
 export const INSTRUMENT_CATEGORY_SUPERCOLLIDER = "supercollider"
+export const INSTRUMENT_CATEGORY_FAUST = "faust"
 
 /**
  * External Data Key Constants
@@ -38,7 +40,7 @@ export interface InstrumentMetadata {
 	id: string
 	name: string
 	description: string
-	category: "oscillator" | "synthesis" | "sampling" | "physical" | "fm" | "supercollider"
+	category: "oscillator" | "synthesis" | "sampling" | "physical" | "fm" | "supercollider" | "faust"
 	loader: () => Promise<any>
 	requiresExternalData?: string[] // e.g., ["scsynth", "sampleUrls"]
 }
@@ -127,6 +129,16 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 			description: "Web CLAP plugin synthesizer with automatic patch loading",
 			category: "synthesis",
 			loader: () => import("./clap/clap-instrument.ts")
+		}
+	],
+	[
+		INSTRUMENT_TYPE_FAUST,
+		{
+			id: INSTRUMENT_TYPE_FAUST,
+			name: "FAUST Synthesizer",
+			description: "Functional DSP synthesizer using FAUST compiled to WebAssembly",
+			category: INSTRUMENT_CATEGORY_FAUST,
+			loader: () => import("./faust/faust-instrument.ts")
 		}
 	],
 	[

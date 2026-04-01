@@ -11,6 +11,16 @@
 
 import { ALL_MIDI_CHANNELS } from "../../midi/midi-channels.ts"
 import type { IAudioOutput } from "./output-interface.ts"
+import {
+	createNoteOn,
+	createNoteOff,
+	createControlChange,
+	createPerNoteController,
+	velocityMidi1ToMidi2,
+	controlValueMidi1ToMidi2,
+	clampChannel,
+	clampNote
+} from "../../midi/midi2-utils.ts"
 
 export const MIDI2_NATIVE_OUTPUT_ID = "MIDI 2.0 Native"
 
@@ -176,7 +186,7 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
 	}
 
 	/**
-	 * Send MIDI 2.0 Note On with 16-bit velocity and per-note controllers
+	 * Send MIDI 2.0 Note On with 16-bit velocity
 	 */
 	noteOn(noteNumber: number, velocity: number = 100, channel: number = 1): void {
 		if (this.#deviceIndex === null || !nativeMIDI) {
@@ -184,8 +194,12 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
 			return
 		}
 
+		// Clamp values to valid ranges
+		const note = clampNote(noteNumber)
+		const ch = clampChannel(channel - 1) // Convert to 0-15 range
+		
 		// Convert MIDI 1.0 velocity (0-127) to MIDI 2.0 (0-65535)
-		const midi2Velocity = Math.round((velocity / 127) * 65535)
+		const midi2Velocity = velocityMidi1ToMidi2(velocity)
 
 		this.#activeNotes.set(noteNumber, {
 			velocity: midi2Velocity,
@@ -193,18 +207,14 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
 		})
 
 		try {
-			// MIDI 2.0 Note On: 64-bit UMP
-			// Header (32-bit): Message type 0x4 (Channel Voice), Group, Status 0x9 (Note On), Channel
-			// Data (32-bit): Note number, 16-bit velocity
-			const status = 0x90 | (channel - 1)
-			const msg32 = status | (noteNumber << 8) | ((midi2Velocity & 0xFF) << 16)
-			const msg32_2 = (midi2Velocity >> 8) & 0xFF // Upper 8 bits of velocity
+			// Create MIDI 2.0 Note On UMP packet
+			// Uses group 0 (all devices), channel, note, velocity
+			const ump = createNoteOn(0, ch, note, midi2Velocity)
 
-			nativeMIDI.sendUmp(this.#deviceIndex, msg32)
-			nativeMIDI.sendUmp(this.#deviceIndex, msg32_2)
+			nativeMIDI.sendUmp(this.#deviceIndex, ump)
 
-			console.info('[OutputMIDI2Native] MIDI 2.0 Note On sent', {
-				note: noteNumber,
+			console.debug('[OutputMIDI2Native] Note On sent', {
+				note,
 				velocity: midi2Velocity,
 				channel
 			})
@@ -222,21 +232,22 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
 			return
 		}
 
+		const note = clampNote(noteNumber)
+		const ch = clampChannel(channel - 1) // Convert to 0-15 range
+		
 		const noteData = this.#activeNotes.get(noteNumber)
 		const velocity = noteData?.velocity || 0
 
 		this.#activeNotes.delete(noteNumber)
 
 		try {
-			const status = 0x80 | (channel - 1)
-			const msg32 = status | (noteNumber << 8) | ((velocity & 0xFF) << 16)
-			const msg32_2 = (velocity >> 8) & 0xFF
+			// Create MIDI 2.0 Note Off UMP packet
+			const ump = createNoteOff(0, ch, note, velocity)
 
-			nativeMIDI.sendUmp(this.#deviceIndex, msg32)
-			nativeMIDI.sendUmp(this.#deviceIndex, msg32_2)
+			nativeMIDI.sendUmp(this.#deviceIndex, ump)
 
-			console.info('[OutputMIDI2Native] MIDI 2.0 Note Off sent', {
-				note: noteNumber,
+			console.debug('[OutputMIDI2Native] Note Off sent', {
+				note,
 				velocity,
 				channel
 			})
@@ -254,12 +265,14 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
 			return
 		}
 
-		try {
-			const status = 0xB0 | (channel - 1)
-			const msg = status | (123 << 8) | (0 << 16)
-			nativeMIDI.sendUmp(this.#deviceIndex, msg)
+		const ch = clampChannel(channel - 1) // Convert to 0-15 range
 
-			console.info('[OutputMIDI2Native] All Notes Off sent', { channel })
+		try {
+			// Create MIDI 2.0 Control Change UMP for All Notes Off (CC#123)
+			const ump = createControlChange(0, ch, 123, 0)
+			nativeMIDI.sendUmp(this.#deviceIndex, ump)
+
+			console.debug('[OutputMIDI2Native] All Notes Off sent', { channel })
 			this.#activeNotes.clear()
 		} catch (error) {
 			console.error('[OutputMIDI2Native] Error sending All Notes Off:', error)
@@ -275,18 +288,17 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
 			return
 		}
 
-		// Convert to 16-bit value
-		const midi2Value = Math.round((value / 127) * 65535)
+		const ch = clampChannel(channel - 1) // Convert to 0-15 range
+
+		// Convert MIDI 1.0 value (0-127) to MIDI 2.0 (0-65535)
+		const midi2Value = controlValueMidi1ToMidi2(value)
 
 		try {
-			const status = 0xB0 | (channel - 1)
-			const msg32 = status | (controlNumber << 8) | ((midi2Value & 0xFF) << 16)
-			const msg32_2 = (midi2Value >> 8) & 0xFF
+			// Create MIDI 2.0 Control Change UMP packet with 16-bit value
+			const ump = createControlChange(0, ch, controlNumber, midi2Value)
+			nativeMIDI.sendUmp(this.#deviceIndex, ump)
 
-			nativeMIDI.sendUmp(this.#deviceIndex, msg32)
-			nativeMIDI.sendUmp(this.#deviceIndex, msg32_2)
-
-			console.info('[OutputMIDI2Native] MIDI 2.0 Control Change sent', {
+			console.debug('[OutputMIDI2Native] Control Change sent', {
 				controller: controlNumber,
 				value: midi2Value,
 				channel
@@ -297,7 +309,8 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
 	}
 
 	/**
-	 * Send MIDI 2.0 Per-Note Controller
+	 * Send MIDI 2.0 Per-Note Controller (16-bit resolution)
+	 * Allows independent control of parameters for each note
 	 */
 	sendPerNoteController(
 		noteNumber: number,
@@ -310,28 +323,30 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
 			return
 		}
 
+		const note = clampNote(noteNumber)
+		const ch = clampChannel(channel - 1) // Convert to 0-15 range
+
 		const noteData = this.#activeNotes.get(noteNumber)
 		if (!noteData) {
 			console.warn('[OutputMIDI2Native] Per-note controller on inactive note:', noteNumber)
 			return
 		}
 
+		// Convert to 16-bit value if needed
+		const midi2Value = controlValueMidi1ToMidi2(Math.min(127, Math.max(0, value)))
+
 		// Store controller value
-		noteData.controllers.set(controllerType, value)
+		noteData.controllers.set(controllerType, midi2Value)
 
 		try {
-			// MIDI 2.0 Per-Note Controller message
-			const status = 0x00 // Per-note controller
-			const msg32 = status | (noteNumber << 8) | (controllerType << 16) | ((value & 0xFF) << 24)
-			const msg32_2 = (value >> 8) & 0xFF
+			// Create MIDI 2.0 Per-Note Controller UMP packet
+			const ump = createPerNoteController(0, ch, note, controllerType, midi2Value)
+			nativeMIDI.sendUmp(this.#deviceIndex, ump)
 
-			nativeMIDI.sendUmp(this.#deviceIndex, msg32)
-			nativeMIDI.sendUmp(this.#deviceIndex, msg32_2)
-
-			console.info('[OutputMIDI2Native] Per-Note Controller sent', {
-				note: noteNumber,
+			console.debug('[OutputMIDI2Native] Per-Note Controller sent', {
+				note,
 				controller: controllerType,
-				value,
+				value: midi2Value,
 				channel
 			})
 		} catch (error) {

@@ -119,9 +119,9 @@ export class IOChainFactory {
 
 		// Dynamically import factories
 		const { createInputById } = await import("./input-factory")
-		const { InputOnScreenKeyboard } = await import("./inputs/input-onscreen-keyboard")
-		const { OutputOnScreenKeyboard } = await import("./outputs/output-onscreen-keyboard")
-		const { PolySynth } = await import("../instruments/polyphonic")
+		const { default: InputOnScreenKeyboard } = await import("./inputs/input-onscreen-keyboard")
+		const { default: OutputOnScreenKeyboard } = await import("./outputs/output-onscreen-keyboard")
+		const { default: PolySynth } = await import("../instruments/polyphonic")
 
 		// Inputs
 		const inputKeyboard = await createInputById(INPUT_TYPES.KEYBOARD, createOptions)
@@ -161,6 +161,15 @@ export class IOChainFactory {
 			}
 		} catch (e) {
 			console.debug("WebMIDI input not available", e)
+		}
+
+		try {
+			// Add MIDI 2.0 native input (Windows, macOS, Linux)
+			const inputMIDI2Native = await createInputById(INPUT_TYPES.MIDI2_NATIVE, createOptions)
+			inputs.push(inputMIDI2Native)
+			console.debug("MIDI 2.0 native input added")
+		} catch (e) {
+			console.debug("MIDI 2.0 native input not available", e)
 		}
 
 		// Outputs
@@ -233,6 +242,15 @@ export class IOChainFactory {
 			}
 		} catch (e) {
 			console.debug("BLE MIDI output not available", e)
+		}
+
+		try {
+			// Add MIDI 2.0 native output (Windows, macOS, Linux)
+			const outputMIDI2Native = await createOutputById(OUTPUT_TYPES.MIDI2_NATIVE)
+			outputs.push(outputMIDI2Native)
+			console.debug("MIDI 2.0 native output added")
+		} catch (e) {
+			console.debug("MIDI 2.0 native output not available", e)
 		}
 
 		if (import.meta.env.DEV) {
