@@ -1,8 +1,12 @@
 /**
  * Native MIDI 2.0 Input Device
  * Uses 64-bit UMP (Universal MIDI Packet) format
- * Supports per-note controllers, high-resolution values, and native OS APIs
- * Windows: MM API, macOS: CoreMIDI, Linux: ALSA
+ * Supports per-note controllers, high-resolution values (0-65535), and native OS APIs
+ * 
+ * Platform implementations:
+ * - Windows: Windows MIDI Services 2.0 (Windows 11+) with WinMM fallback
+ * - macOS: CoreMIDI
+ * - Linux: ALSA
  */
 
 import AbstractInput from "./abstract-input.ts"
