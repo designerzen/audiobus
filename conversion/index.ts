@@ -1,9 +1,20 @@
 /**
  * Conversion Utilities
  * Convert between MIDI notes, frequencies, note names, and timing units
- */
+ * Tonic
+ * Supertonic
+ * Mediant
+ * Subdominant
+ * Dominant
+ * Submediant
+ * Leading Tone
+ * Sub-Tonic
+ * 
+ * Charles Goes Dancing At Every Big Fun Celebration.
+ * From G D A E B...
+ * 
+ * */
 
-// Conversion Functions
 export { centsToPitch } from './cents-to-pitch'
 export { convertNoteNumberToColour } from './note-to-colour'
 export { dbToLinear } from './decibels-to-linear'
