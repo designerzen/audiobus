@@ -13,7 +13,6 @@ export interface InputFactory {
 	create: (options?: Record<string, any>) => IAudioInput | Promise<IAudioInput>
 }
 
-
 const loadSupportingLibrary = async (type: string) => {
 	// Create and return instance based on type
 	switch (type) {
@@ -45,6 +44,8 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./inputs/input-midi-transport-clock.ts")
 		case INPUT_TYPES.MUSIC_MOUSE:
 			return await import("./inputs/input-music-mouse.ts")
+		case INPUT_TYPES.MICROPHONE_PITCH:
+			return await import("./inputs/input-microphone-pitch.ts")
 		default:
 			throw new Error(`Unknown input type: ${type}`)
 	}
@@ -186,6 +187,13 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		description: "Cursor-controlled musical instrument inspired by Laurie Spiegel's classic Music Mouse",
 		isAvailable: () => true,
 		create: (options) => createInput(INPUT_TYPES.MUSIC_MOUSE, options),
+	},
+	{
+		id: INPUT_TYPES.MICROPHONE_PITCH,
+		name: "Microphone Pitch (ML)",
+		description: "Polyphonic pitch detection from microphone using Spotify's Basic Pitch neural network",
+		isAvailable: () => typeof navigator !== "undefined" && !!navigator.mediaDevices,
+		create: (options) => createInput(INPUT_TYPES.MICROPHONE_PITCH, options),
 	},
 ]
 

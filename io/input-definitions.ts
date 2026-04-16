@@ -131,6 +131,14 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		icon: "/icons/input-music-mouse.svg",
 		category: "UI",
 	},
+
+	[INPUT_TYPES.MICROPHONE_PITCH]: {
+		id: INPUT_TYPES.MICROPHONE_PITCH,
+		name: "Microphone Pitch (ML)",
+		description: "Polyphonic pitch detection from microphone using Spotify's Basic Pitch neural network",
+		icon: "/icons/input-microphone-pitch.svg",
+		category: "Audio",
+	},
 }
 
 /**
