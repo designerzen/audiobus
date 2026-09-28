@@ -1,7 +1,7 @@
 /**
  * Microphone Input with ML-based Polyphonic Pitch Detection
  * 
- * Uses Spotify's Basic Pitch (TensorFlow.js) neural network to detect
+ * Uses Spotify's Basic Pitch neural network to detect
  * polyphonic notes from microphone audio in near-real-time.
  * Audio is captured in chunks, resampled to 22050Hz, and fed through
  * the model which outputs note events with pitch bend data.
@@ -9,6 +9,7 @@
  * https://github.com/spotify/basic-pitch-ts/tree/main
  */
 import AbstractInput from "./abstract-input.ts"
+import { loadCaptureWorklet } from './load-capture-worklet.ts'
 import { createAudioCommand } from "../../audio-command-factory.ts"
 import { NOTE_ON, NOTE_OFF, PITCH_BEND } from '../../commands.ts'
 
@@ -29,12 +30,37 @@ const DEFAULT_OPTIONS = {
 	audioContext: undefined as AudioContext | undefined,
 }
 
+const WORKLET_PROCESSOR_CODE = `
+class PitchCaptureProcessor extends AudioWorkletProcessor {
+	constructor(options) {
+		super()
+		this._bufferSize = options.processorOptions?.bufferSize || 4096
+		this._buffer = new Float32Array(this._bufferSize)
+		this._writeIndex = 0
+	}
+	process(inputs) {
+		const input = inputs[0]
+		if (!input || !input[0]) return true
+		const channel = input[0]
+		for (let i = 0; i < channel.length; i++) {
+			this._buffer[this._writeIndex++] = channel[i]
+			if (this._writeIndex >= this._bufferSize) {
+				this.port.postMessage({ audioData: this._buffer.slice() })
+				this._writeIndex = 0
+			}
+		}
+		return true
+	}
+}
+registerProcessor('pitch-capture-processor', PitchCaptureProcessor)
+`
+
 export default class InputMicrophonePitch extends AbstractInput implements IAudioInput {
 
 	#audioContext: AudioContext | null = null
 	#mediaStream: MediaStream | null = null
 	#sourceNode: MediaStreamAudioSourceNode | null = null
-	#scriptProcessor: ScriptProcessorNode | null = null
+	#workletNode: AudioWorkletNode | null = null
 	#isListening: boolean = false
 	#activeNotes: Set<number> = new Set()
 
@@ -43,8 +69,6 @@ export default class InputMicrophonePitch extends AbstractInput implements IAudi
 	#samplesCollected: number = 0
 	#samplesNeeded: number = 0
 	#processing: boolean = false
-
-	#offlineContext: OfflineAudioContext | null = null
 
 	get name(): string {
 		return MICROPHONE_PITCH_INPUT_ID
@@ -67,12 +91,15 @@ export default class InputMicrophonePitch extends AbstractInput implements IAudi
 		return true
 	}
 
-	async connect(): Promise<void> {
+	async connect(): Promise<Function> {
+		if (this.#isListening) return () => this.disconnect()
 		if (!this.options.audioContext) {
 			throw new Error('InputMicrophonePitch requires audioContext to be passed via options')
 		}
 
-		this.#audioContext = this.options.audioContext
+		const audioContext: AudioContext = this.options.audioContext
+		this.#audioContext = audioContext
+		await loadCaptureWorklet(audioContext, 'pitch-capture-processor', WORKLET_PROCESSOR_CODE)
 
 		const { BasicPitch } = await import("@spotify/basic-pitch")
 		this.#basicPitch = new BasicPitch(this.options.modelUrl || DEFAULT_OPTIONS.modelUrl)
@@ -85,23 +112,24 @@ export default class InputMicrophonePitch extends AbstractInput implements IAudi
 			}
 		})
 
-		this.#sourceNode = this.#audioContext.createMediaStreamSource(this.#mediaStream)
+		this.#sourceNode = audioContext.createMediaStreamSource(this.#mediaStream)
 
-		// Use ScriptProcessorNode to capture raw PCM for resampling
-		const bufferSize = 4096
-		this.#scriptProcessor = this.#audioContext.createScriptProcessor(bufferSize, 1, 1)
-		this.#scriptProcessor.onaudioprocess = (event) => this.#onAudioProcess(event)
+		this.#workletNode = new AudioWorkletNode(audioContext, 'pitch-capture-processor', {
+			processorOptions: { bufferSize: 4096 }
+		})
+		this.#workletNode.port.onmessage = (event) => this.#onAudioData(event.data.audioData)
 
-		this.#sourceNode.connect(this.#scriptProcessor)
-		this.#scriptProcessor.connect(this.#audioContext.destination)
+		this.#sourceNode.connect(this.#workletNode)
 
 		this.#isListening = true
 		this.setAsConnected()
 
 		console.info("[MicrophonePitch] Connected and listening", {
-			sampleRate: this.#audioContext.sampleRate,
+			sampleRate: audioContext.sampleRate,
 			modelUrl: this.options.modelUrl
 		})
+
+		return () => this.disconnect()
 	}
 
 	async disconnect(): Promise<void> {
@@ -113,10 +141,10 @@ export default class InputMicrophonePitch extends AbstractInput implements IAudi
 		}
 		this.#activeNotes.clear()
 
-		if (this.#scriptProcessor) {
-			this.#scriptProcessor.onaudioprocess = null
-			this.#scriptProcessor.disconnect()
-			this.#scriptProcessor = null
+		if (this.#workletNode) {
+			this.#workletNode.port.onmessage = null
+			this.#workletNode.disconnect()
+			this.#workletNode = null
 		}
 
 		if (this.#sourceNode) {
@@ -136,12 +164,11 @@ export default class InputMicrophonePitch extends AbstractInput implements IAudi
 		console.info("[MicrophonePitch] Disconnected")
 	}
 
-	#onAudioProcess(event: AudioProcessingEvent): void {
+	#onAudioData(audioData: Float32Array): void {
 		if (!this.#isListening) return
 
-		const inputData = event.inputBuffer.getChannelData(0)
-		this.#audioBuffer.push(new Float32Array(inputData))
-		this.#samplesCollected += inputData.length
+		this.#audioBuffer.push(audioData)
+		this.#samplesCollected += audioData.length
 
 		if (this.#samplesCollected >= this.#samplesNeeded && !this.#processing) {
 			this.#processBuffer()

@@ -1,9 +1,12 @@
+import { midiToCommand } from '../../midi/midi-command-conversion.ts'
+import { BleMidiDecoder } from '../../midi/midi-ble/ble-midi-decoder.ts'
 /**
  * This is a BLE MIDI Device adapter
  * that takes BLE MIDI events and converts them
  * into AudioCommands and dispatches them
  */
 
+import { acceptsMidiInput, createMidiInputControls } from './midi-input-controls.ts'
 import AbstractInput from "./abstract-input.ts"
 import { createAudioCommand } from "../../audio-command-factory.ts"
 import { NOTE_OFF, NOTE_ON } from '../../commands'
@@ -23,7 +26,10 @@ export default class InputBLEMIDIDevice extends AbstractInput implements IAudioI
     #bluetoothDevice: BluetoothDevice | null = null
     #bluetoothMIDICharacteristic: BluetoothRemoteGATTCharacteristic | undefined
     #bluetoothWatchUnsubscribes: Array<() => Promise<void>> = []
-    #selectedMIDIChannel: number = 1
+    #selectedMIDIChannel: number = 0
+    #decoder = new BleMidiDecoder()
+    #notes = new Map<string, { note: number; channel: number }>()
+    #gui?: ReturnType<typeof createMidiInputControls>
 
     get name(): string {
         return BLE_INPUT_ID
@@ -42,11 +48,23 @@ export default class InputBLEMIDIDevice extends AbstractInput implements IAudioI
     }
 
 	get channel():number{
-		return this.#selectedMIDIChannel
+		return Number(this.options.selectedChannel ?? this.#selectedMIDIChannel)
 	}
 
     constructor(options: Record<string, any> = {}) {
         super(options)
+    }
+
+    async createGui(): Promise<HTMLElement> {
+        if (!this.#gui) this.#gui = createMidiInputControls(this.options,
+            () => this.#bluetoothDevice ? [{ id: this.#bluetoothDevice.id, name: this.#bluetoothDevice.name ?? 'Bluetooth MIDI device' }] : [],
+            () => { this.releaseNotes(); this.dispatchEvent(new Event('configurationChanged')) })
+        return this.#gui.element
+    }
+
+    async destroyGui(): Promise<void> {
+        this.#gui?.destroy()
+        this.#gui = undefined
     }
 
     /**
@@ -62,6 +80,7 @@ export default class InputBLEMIDIDevice extends AbstractInput implements IAudioI
 
             this.#bluetoothMIDICharacteristic = result.characteristic
             this.#bluetoothDevice = result.device
+            this.#gui?.refresh()
 
             console.info("[BLE Input] Device connected", describeDevice(this.#bluetoothDevice))
 
@@ -94,6 +113,8 @@ export default class InputBLEMIDIDevice extends AbstractInput implements IAudioI
      * Disconnect from the BLE MIDI device
      */
     async disconnect(): Promise<void> {
+        this.releaseNotes()
+        this.#decoder.reset()
         console.info("[BLE Input] Disconnecting from device...", {
             device: this.#bluetoothDevice?.name
         })
@@ -116,6 +137,7 @@ export default class InputBLEMIDIDevice extends AbstractInput implements IAudioI
         this.#bluetoothWatchUnsubscribes = []
         this.#bluetoothMIDICharacteristic = undefined
         this.#bluetoothDevice = null
+        this.#gui?.refresh()
 
 		this.setAsDisconnected()
     }
@@ -124,8 +146,9 @@ export default class InputBLEMIDIDevice extends AbstractInput implements IAudioI
      * Set the MIDI channel for outgoing messages
      */
     setChannel(channel: number): void {
-        if (channel >= 1 && channel <= 16) {
+        if (Number.isInteger(channel) && channel >= 0 && channel <= 16) {
             this.#selectedMIDIChannel = channel
+            this.options.selectedChannel = channel
         }else{
 			throw new Error("Invalid MIDI channel #" + channel)
 		}
@@ -135,66 +158,19 @@ export default class InputBLEMIDIDevice extends AbstractInput implements IAudioI
      * Handle incoming MIDI data from BLE characteristic
      */
     onBLEMIDIDataReceived(value: DataView): void {
-		const data = new Uint8Array(value.buffer)
-       
-		console.log("[BLE Input] MIDI Data received", { data })
-
-        // Parse MIDI data according to BLE MIDI spec
-        // Format: [header][timestamp][status][data1][data2]...
-        if (data.length < 3 || ((data[1] & 128) === 0) ) {
-            return
+        for (const bytes of this.#decoder.decode(value)) {
+            const command = midiToCommand(bytes, this.now, this.#bluetoothDevice?.id ?? this.name)
+            if (!command || !acceptsMidiInput(this.options, this.#bluetoothDevice?.id ?? '', command.channel)) continue
+            const key = `${command.channel}:${command.number}`
+            if (command.type === NOTE_ON) this.#notes.set(key, { note: command.number, channel: command.channel })
+            else if (command.type === NOTE_OFF) this.#notes.delete(key)
+            this.dispatch(command)
         }
+    }
 
-		const timestampHigh: number = data[0] & 63
-		const timestampLow: number = data[1] & 127
-		const timestamp: number = (timestampHigh << 7) | timestampLow
-		const midiStatus: number = data[2]
-	
-        const status: number = data[2]
-        const channel: number = (status & 0xf) + 1
-        const type: number = status >> 4
-
-        const data1: number = data[3] ?? 0
-        const data2: number = data[4] ?? 0
-
-        // Handle different MIDI message types
-        switch (type) {
-            case 0x9: // Note On
-                if (data2 > 0) {
-                    this.onNoteOn(data1, data2, channel)
-                } else {
-                    // Note On with velocity 0 is treated as Note Off
-                    this.onNoteOff(data1, channel)
-                }
-                break
-
-            case 0x8: // Note Off
-                this.onNoteOff(data1, channel)
-                break
-
-            case 0xb: // Control Change
-                this.onControlChange(data1, data2, channel)
-                break
-
-            case 0xc: // Program Change
-                this.onProgramChange(data1, channel)
-                break
-
-            case 0xa: // Polyphonic Key Pressure
-                // TODO: Implement if needed
-                break
-
-            case 0xd: // Channel Pressure
-                // TODO: Implement if needed
-                break
-
-            case 0xe: // Pitch Bend
-                // TODO: Implement if needed
-                break
-
-            default:
-                console.warn("[BLE Input] Unknown MIDI message type", { type, status })
-        }
+    private releaseNotes(): void {
+        for (const note of this.#notes.values()) this.onNoteOff(note.note, note.channel)
+        this.#notes.clear()
     }
 
     /**
@@ -208,6 +184,8 @@ export default class InputBLEMIDIDevice extends AbstractInput implements IAudioI
             this.name
         )
 
+        command.channel = channel
+        command.velocity = velocity
         console.info("[BLE Input] Note On", { note: noteNumber, velocity, channel })
         this.dispatch(command)
     }
@@ -223,6 +201,8 @@ export default class InputBLEMIDIDevice extends AbstractInput implements IAudioI
             this.name
         )
 
+        command.channel = channel
+        command.velocity = 0
         console.info("[BLE Input] Note Off", { note: noteNumber, channel })
         this.dispatch(command)
     }
@@ -247,6 +227,7 @@ export default class InputBLEMIDIDevice extends AbstractInput implements IAudioI
      * Cleanup when destroying the input
      */
     async destroy(): Promise<void> {
+        await this.destroyGui()
         if (this.isConnected) {
             await this.disconnect()
         }

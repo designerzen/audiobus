@@ -1,3 +1,4 @@
+import { defineDevice } from './device-definition'
 /**
  * Factory for creating audio input instances
  * Handles instantiation of available input types
@@ -46,6 +47,8 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./inputs/input-music-mouse.ts")
 		case INPUT_TYPES.MICROPHONE_PITCH:
 			return await import("./inputs/input-microphone-pitch.ts")
+		case INPUT_TYPES.DVS_CONTROL_VINYL:
+			return await import("./inputs/input-dvs-control-vinyl.ts")
 		default:
 			throw new Error(`Unknown input type: ${type}`)
 	}
@@ -171,7 +174,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		id: INPUT_TYPES.PROMPT_AI_SPEECH,
 		name: "PromptAI Speech",
 		description: "AI-powered input with speech recognition for generating note sequences via voice",
-		isAvailable: () => typeof window !== "undefined" && !!(window as any).SpeechRecognition || !!(window as any).webkitSpeechRecognition,
+		isAvailable: () => typeof window !== "undefined" && (!!(window as any).SpeechRecognition || !!(window as any).webkitSpeechRecognition),
 		create: (options) => createInput(INPUT_TYPES.PROMPT_AI_SPEECH, options),
 	},
 	{
@@ -195,6 +198,13 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		isAvailable: () => typeof navigator !== "undefined" && !!navigator.mediaDevices,
 		create: (options) => createInput(INPUT_TYPES.MICROPHONE_PITCH, options),
 	},
+	{
+		id: INPUT_TYPES.DVS_CONTROL_VINYL,
+		name: "DVS Control Vinyl",
+		description: "Control vinyl pilot-tone clock - estimates relative speed and generates DVS_CLOCK or MIDI_CLOCK (no direction or absolute position decoding)",
+		isAvailable: () => typeof navigator !== "undefined" && !!navigator.mediaDevices,
+		create: (options) => createInput(INPUT_TYPES.DVS_CONTROL_VINYL, options),
+	},
 ]
 
 /**
@@ -215,5 +225,5 @@ export async function createInputById(id: string, options?: Record<string, any>)
 	if (!factory.isAvailable()) {
 		throw new Error(`Input is not available: ${factory.name}`)
 	}
-	return factory.create(options)
+	return defineDevice(await factory.create(options), { factory: 'input', type: id, options })
 }

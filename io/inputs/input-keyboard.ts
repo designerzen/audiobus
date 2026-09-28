@@ -9,6 +9,7 @@
 
 
 import AudioCommand from "../../audio-command.ts"
+import { NOTE_ON } from "../../commands"
 import AbstractInput from "./abstract-input.ts"
 import { addKeyboardDownEvents } from "../../hardware/keyboard/keyboard"
 import KeyboardDisplayManager from "../../ui/keyboard-display-manager.ts"
@@ -67,6 +68,7 @@ export default class InputKeyboard extends AbstractInput implements IAudioInput{
 	protected onKeyEvent( commandType:string, key:string, value:number, event:KeyboardEvent ) {
 		const command = new AudioCommand()
 		command.type = commandType
+		command.velocity = commandType === NOTE_ON ? 127 : 0
 		command.value = value
 		command.number = value // noteNumberToFrequency(key)
 		command.from = KEYBOARD_INPUT_ID

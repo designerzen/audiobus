@@ -13,6 +13,11 @@ export const EVENT_INPUTS_UPDATED = "EVENT_INPUTS_UPDATED"
 
 export default class InputManager extends AbstractInput {
 	
+    async getAvailableFactories() {
+        const { getAvailableInputFactories } = await import('./input-factory')
+        return getAvailableInputFactories()
+    }
+
 	#inputs:AbstractInput[] = []
 	#inputMap:Map = new Map()
 	#abortController:AbortController
@@ -33,6 +38,7 @@ export default class InputManager extends AbstractInput {
 	 * @param input 
 	 */
 	add(input:AbstractInput){
+		if (this.#inputs.includes(input)) return
 		this.#inputs.push(input)
 		this.#inputMap.set(input.name, input)
 		input.addEventListener(INPUT_EVENT, this.onAudioInputEvent, { signal:this.#abortController.signal } )

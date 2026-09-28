@@ -1,7 +1,8 @@
 import AbstractInput from "./abstract-input.ts"
 import AudioCommand from "../../audio-command.ts"
-import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON } from "../../commands"
-import NoteModel from "../../note-model.ts"
+import { NOTE_OFF, NOTE_ON } from "../../commands"
+import { noteNumberToName } from "../../conversion/note-to-name"
+import { noteNumberToKeyName } from "../../conversion/note-to-key-name"
 
 import type { IAudioInput } from "./input-interface.ts"
 
@@ -12,6 +13,7 @@ const DEFAULT_OPTIONS = {
 	scale: [0, 2, 4, 5, 7, 9, 11, 12], // Major scale (C D E F G A B C)
 	octaves: 3, // Number of octaves in vertical axis
 	containerSelector: "body",
+	onlyWhileMouseDown: false,
 }
 
 interface MusicMouseOptions extends Record<string, any> {
@@ -19,6 +21,7 @@ interface MusicMouseOptions extends Record<string, any> {
 	scale?: number[]
 	octaves?: number
 	containerSelector?: string
+	onlyWhileMouseDown?: boolean
 }
 
 /**
@@ -41,6 +44,7 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 	#mouseY: number = 0
 	#gridWidth: number = 0
 	#gridHeight: number = 0
+	#guiEvents: AbortController | null = null
 
 	get name(): string {
 		return MUSIC_MOUSE_INPUT_ID
@@ -69,12 +73,28 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 	}
 
 	async createGui(): Promise<HTMLElement> {
+		if (this.#containerElement) return this.#containerElement
+		this.#guiEvents = new AbortController()
+		const { signal } = this.#guiEvents
+		const container = document.createElement("div")
+		container.className = "music-mouse nodrag nopan nowheel"
+		const label = document.createElement("label")
+		const toggle = document.createElement("input")
+		toggle.type = "checkbox"
+		toggle.checked = this.options.onlyWhileMouseDown
+		toggle.addEventListener("change", () => {
+			this.options.onlyWhileMouseDown = toggle.checked
+			this.allNotesOff()
+			this.draw()
+		}, { signal })
+		label.append(toggle, " Play only while mouse button is held")
+		container.appendChild(label)
 		// Create canvas
 		this.#canvas = document.createElement("canvas")
-		this.#canvas.id = "music-mouse-canvas"
 		this.#canvas.style.width = "100%"
 		this.#canvas.style.height = "400px"
-		this.#canvas.style.border = "1px solid #ccc"
+		this.#canvas.style.border = "0"
+		this.#canvas.style.outline = "1px solid #ccc"
 		this.#canvas.style.cursor = "crosshair"
 		this.#canvas.style.display = "block"
 		this.#canvas.style.backgroundColor = "#f0f0f0"
@@ -84,26 +104,37 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 		this.#canvas.height = 400
 
 		this.#context = this.#canvas.getContext("2d")
-		if (this.#context) {
-			this.#context.scale(window.devicePixelRatio, window.devicePixelRatio)
-		}
-
-		this.#gridWidth = 800 / window.devicePixelRatio
-		this.#gridHeight = 400 / window.devicePixelRatio
+		this.#gridWidth = this.#canvas.width
+		this.#gridHeight = this.#canvas.height
 
 		// Add event listeners
-		this.#canvas.addEventListener("mousemove", this.onMouseMove)
-		this.#canvas.addEventListener("mouseenter", this.onMouseEnter)
-		this.#canvas.addEventListener("mouseleave", this.onMouseLeave)
+		this.#canvas.addEventListener("mousemove", this.onMouseMove, { signal })
+		this.#canvas.addEventListener("mouseenter", this.onMouseEnter, { signal })
+		this.#canvas.addEventListener("mouseleave", this.onMouseLeave, { signal })
+		this.#canvas.addEventListener("mousedown", event => {
+			if (event.button !== 0) return
+			event.preventDefault()
+			this.#isActive = true
+			this.onMouseMove(event)
+		}, { signal })
+		window.addEventListener("mouseup", () => {
+			if (this.options.onlyWhileMouseDown) this.allNotesOff()
+		}, { signal })
+		window.addEventListener("blur", this.onMouseLeave, { signal })
 
 		// Initial draw
 		this.draw()
 
-		this.#containerElement = this.#canvas
-		return this.#canvas
+		container.appendChild(this.#canvas)
+		this.#containerElement = container
+		return container
 	}
 
 	async destroyGui(): Promise<void> {
+		this.allNotesOff()
+		this.#isActive = false
+		this.#guiEvents?.abort()
+		this.#guiEvents = null
 		if (this.#canvas) {
 			this.#canvas.removeEventListener("mousemove", this.onMouseMove)
 			this.#canvas.removeEventListener("mouseenter", this.onMouseEnter)
@@ -111,11 +142,14 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 			this.#canvas.remove()
 			this.#canvas = null
 		}
+		this.#context = null
+		this.#containerElement?.remove()
+		this.#containerElement = null
 		return Promise.resolve()
 	}
 
 	override destroy(): void {
-		this.allNotesOff()
+		void this.destroyGui()
 		this.setAsDisconnected()
 	}
 
@@ -126,18 +160,26 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 	private onMouseLeave(): void {
 		this.allNotesOff()
 		this.#isActive = false
+		this.draw()
 	}
 
 	private onMouseMove(event: MouseEvent): void {
 		if (!this.#canvas || !this.#isActive) return
 
 		const rect = this.#canvas.getBoundingClientRect()
-		this.#mouseX = event.clientX - rect.left
-		this.#mouseY = event.clientY - rect.top
+		if (!rect.width || !rect.height) return
+		this.#mouseX = (event.clientX - rect.left) / rect.width * this.#gridWidth
+		this.#mouseY = (event.clientY - rect.top) / rect.height * this.#gridHeight
 
 		// Clamp to canvas bounds
 		this.#mouseX = Math.max(0, Math.min(this.#gridWidth, this.#mouseX))
 		this.#mouseY = Math.max(0, Math.min(this.#gridHeight, this.#mouseY))
+
+		if (this.options.onlyWhileMouseDown && !(event.buttons & 1)) {
+			this.allNotesOff()
+			this.draw()
+			return
+		}
 
 		// Calculate note number from position
 		const noteNumber = this.calculateNoteFromPosition(this.#mouseX, this.#mouseY)
@@ -168,7 +210,7 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 		const octaveIndex = Math.floor((y / this.#gridHeight) * this.#octaves)
 		const constrainedOctave = Math.max(0, Math.min(this.#octaves - 1, octaveIndex))
 
-		return this.#rootNote + noteInScale + constrainedOctave * 12
+		return Math.max(0, Math.min(127, this.#rootNote + noteInScale + constrainedOctave * 12))
 	}
 
 	private calculateVelocityFromPosition(x: number, y: number): number {
@@ -218,6 +260,7 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 		const ctx = this.#context
 		const width = this.#gridWidth
 		const height = this.#gridHeight
+		ctx.textAlign = "left"
 
 		// Clear canvas
 		ctx.fillStyle = "#f0f0f0"
@@ -269,13 +312,12 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 
 			// Draw note info
 			const noteNumber = this.calculateNoteFromPosition(this.#mouseX, this.#mouseY)
-			const note = new NoteModel(noteNumber)
 			const velocity = this.calculateVelocityFromPosition(this.#mouseX, this.#mouseY)
 
 			ctx.fillStyle = "#000"
 			ctx.font = "14px sans-serif"
 			ctx.fillText(
-				`${note.name}${Math.floor(note.octave)} (${noteNumber}) | Vel: ${velocity}`,
+				`${noteNumberToName(noteNumber)} (${noteNumber}) | Vel: ${velocity}`,
 				10,
 				20
 			)
@@ -284,7 +326,7 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 			ctx.fillStyle = "#999"
 			ctx.font = "14px sans-serif"
 			ctx.textAlign = "center"
-			ctx.fillText("Move mouse to play", width / 2, height / 2)
+			ctx.fillText(this.options.onlyWhileMouseDown ? "Hold mouse button and move to play" : "Move mouse to play", width / 2, height / 2)
 		}
 
 		// Draw scale name
@@ -301,6 +343,6 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 		ctx.fillStyle = "#666"
 		ctx.font = "12px sans-serif"
 		ctx.textAlign = "left"
-		ctx.fillText(`Scale: ${scaleName} | Root: ${new NoteModel(this.#rootNote).name}`, 10, height - 10)
+		ctx.fillText(`Scale: ${scaleName} | Root: ${noteNumberToKeyName(this.#rootNote)}`, 10, height - 10)
 	}
 }

@@ -41,7 +41,14 @@ export default class InputOnScreenKeyboard extends AbstractInput implements IAud
 
 	constructor( options:Record<string, any> = DEFAULT_OPTIONS ) { 
 		super({...DEFAULT_OPTIONS,...options})
-		const keys = this.options.keys
+		const savedKeys = this.options.keys
+		// Older workspaces serialized NoteModel instances as null array entries.
+		const notes = Array.isArray(savedKeys) && savedKeys.length > 0 && savedKeys.every(key =>
+			key != null && Number.isInteger(key.noteNumber) && key.noteNumber >= 0 && key.noteNumber < 128
+		) ? savedKeys : ALL_KEYBOARD_NOTES
+		// Keep plain data in options, including the NoteModel prototype getters.
+		const keys = notes.map(key => ({ ...key, noteNumber: key.noteNumber, colour: key.colour }))
+		this.options.keys = keys
 		this.onKeyDown = this.onKeyDown.bind(this)
 		this.onKeyUp = this.onKeyUp.bind(this)
 		this.#keyboard = new SVGKeyboard(keys, this.onKeyDown, this.onKeyUp)
@@ -80,10 +87,11 @@ export default class InputOnScreenKeyboard extends AbstractInput implements IAud
 	 * @param noteNumber 
 	 * @param velocity 
 	 */
-	onKeyDown(noteNumber:number, velocity:number){
+	onKeyDown(noteNumber:number, pressure:number){
 		const command:AudioCommand = new AudioCommand()
 		command.type = NOTE_ON
-		command.velocity = velocity
+		// The keyboard reports pointer pressure (0–1); commands use MIDI velocity.
+		command.velocity = Math.round(Math.max(0, Math.min(1, pressure)) * 127)
 		command.number = noteNumber
 		command.from = ONSCREEN_KEYBOARD_INPUT_ID
 		command.startAt = this.now

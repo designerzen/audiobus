@@ -1,3 +1,4 @@
+import { midiToCommand } from '../../midi/midi-command-conversion.ts'
 /**
  * Native MIDI 2.0 Input Device
  * Uses 64-bit UMP (Universal MIDI Packet) format
@@ -9,6 +10,7 @@
  * - Linux: ALSA
  */
 
+import { acceptsMidiInput, createMidiInputControls } from './midi-input-controls.ts'
 import AbstractInput from "./abstract-input.ts"
 import type { IAudioInput } from "./input-interface.ts"
 import { ALL_MIDI_CHANNELS } from "../../midi/midi-channels.ts"
@@ -70,6 +72,7 @@ enum PerNoteController {
 export default class InputMIDI2Native extends AbstractInput implements IAudioInput {
 	
 	#devices: NativeDevice[] = []
+	#gui?: ReturnType<typeof createMidiInputControls>
 	#activeDevices: Set<number> = new Set()
 	#listeners: Map<number, Function> = new Map()
 	#nativeMIDIEnabled: boolean = false
@@ -92,13 +95,26 @@ export default class InputMIDI2Native extends AbstractInput implements IAudioInp
 	}
 
 	constructor(options: Record<string, any> = DEFAULT_OPTIONS) {
-		super(options)
+		super({ ...DEFAULT_OPTIONS, ...options })
 	}
+
+    async createGui(): Promise<HTMLElement> {
+        if (!this.#gui) this.#gui = createMidiInputControls(this.options,
+            () => this.#devices.map(device => ({ id: String(device.index), name: device.name })),
+            () => this.dispatchEvent(new Event('configurationChanged')))
+        return this.#gui.element
+    }
+
+    async destroyGui(): Promise<void> {
+        this.#gui?.destroy()
+        this.#gui = undefined
+    }
 
 	/**
 	 * Initialize and enumerate available MIDI input devices
 	 */
 	async connect(): Promise<void> {
+		if (this.#nativeMIDIEnabled) return
 		// Load native module if not already loaded
 		if (nativeMIDI === null) {
 			await loadNativeMIDI()
@@ -111,6 +127,7 @@ export default class InputMIDI2Native extends AbstractInput implements IAudioInp
 
 		try {
 			this.#devices = nativeMIDI.getUmpInputs()
+			this.#gui?.refresh()
 			console.log('[InputMIDI2Native] Available MIDI inputs:', this.#devices)
 
 			if (this.#devices.length === 0) {
@@ -156,7 +173,7 @@ export default class InputMIDI2Native extends AbstractInput implements IAudioInp
 		if (!nativeMIDI) return
 
 		const listener = (inDeviceIndex: number, umpPacket: number) => {
-			if (inDeviceIndex === deviceIndex) {
+			if (this.#nativeMIDIEnabled && this.#listeners.get(deviceIndex) === listener && inDeviceIndex === deviceIndex) {
 				this.#handleUmpPacket(deviceIndex, umpPacket)
 			}
 		}
@@ -192,7 +209,11 @@ export default class InputMIDI2Native extends AbstractInput implements IAudioInp
 		const status = packet & 0xFF
 		const data1 = (packet >> 8) & 0xFF
 		const data2 = (packet >> 16) & 0xFF
-		const channel = (status & 0x0F) + 1
+		const channel = status < 0xf0 ? (status & 0x0F) + 1 : 0
+		if (!acceptsMidiInput(this.options, String(deviceIndex), channel)) return
+
+        const audioCommand = midiToCommand([status, data1, data2], this.now, String(deviceIndex))
+        if (audioCommand) this.dispatch(audioCommand)
 
 		const command = status >> 4
 		const timestamp = performance.now()
@@ -385,5 +406,6 @@ export default class InputMIDI2Native extends AbstractInput implements IAudioInp
 	 */
 	destroy(): void {
 		this.disconnect()
+		void this.destroyGui()
 	}
 }
