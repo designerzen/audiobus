@@ -50,7 +50,7 @@ export default class PolySynth implements IAudioOutput{
 	}
 
     async #initializeDefaults() {
-        if (this.InstrumentClass === undefined) {
+        if (this.InstrumentClass === undefined || this.InstrumentClass === null) {
             const { default: SynthOscillator } = await import('./oscillators/synth-oscillator.ts')
             this.InstrumentClass = this.options.class || SynthOscillator
         }
@@ -62,9 +62,9 @@ export default class PolySynth implements IAudioOutput{
         
          this.InstrumentClass = this.options.class
          this.#gainNode = audioContext.createGain()
-    this.#gainNode.gain.value = 1 // Master gain for polyphonic output
+         this.updateMasterGain()
          this.#initializeDefaults().then(() => {
-             this.factory( this.InstrumentClass, this.options.maxPolyphony)
+             this.factory(this.InstrumentClass, this.options.maxPolyphony)
          })
      }
 
@@ -88,7 +88,7 @@ export default class PolySynth implements IAudioOutput{
      * @param {Array<Number>} arp - intervals
      * @param {Number} delay - number to pause before playing
      */
-    async noteOn( noteNumber: number, velocity=1, arp=null, delay=0 ){
+    async noteOn( noteNumber: number, velocity=127, arp=null, delay=0 ){
        
         if ( this.instrumentActivity.has(noteNumber) )
         {
@@ -136,6 +136,7 @@ export default class PolySynth implements IAudioOutput{
      */
     allNotesOff(){
         this.instrumentActivity.forEach( (instrument, noteNumber) => instrument.allNotesOff() )
+        this.instrumentActivity.clear()
         this.#activeVoices = 0
         this.updateMasterGain()
         // If the synth has an all notes off method, use it
@@ -147,12 +148,11 @@ export default class PolySynth implements IAudioOutput{
     }
 
     /**
-     * Update master gain based on active voice count
-     * Ensures consistent volume across different polyphony levels
+     * Reserve headroom for the voice pool, including notes in their release phase.
+     * Releasing keys must not boost voices that are still sounding.
      */
     updateMasterGain(){
-        const activeCount = Math.max(1, this.#activeVoices)
-        this.#gainNode.gain.value = 2 / activeCount
+        this.#gainNode.gain.value = 1 / Math.sqrt(Math.max(1, this.options.maxPolyphony))
     }
 
     /**
