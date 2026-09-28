@@ -1,3 +1,4 @@
+import { defineDevice } from '../io/device-definition'
 /**
  * Factory interface for creating instrument UI factories
  * Bridges InstrumentFactory with the UI layer
@@ -44,7 +45,11 @@ const createInstrument = async (
 		// but options can include sample URLs
 	}
 
-	return InstrumentFactory.createInstrument(instrumentId, audioContext, externalData, options)
+	const instrument = await InstrumentFactory.createInstrument(instrumentId, audioContext, externalData, options)
+	if (instrument.output && options?.mixer) {
+		instrument.output.connect(options.mixer)
+	}
+	return instrument
 }
 
 /**
@@ -113,7 +118,7 @@ export async function createInstrumentById(
 		throw new Error(`Instrument not available: ${metadata.name}`)
 	}
 
-	return factory.create(audioContext, options)
+	return defineDevice(await factory.create(audioContext, options), { factory: 'instrument', type: id, options })
 }
 
 /**
