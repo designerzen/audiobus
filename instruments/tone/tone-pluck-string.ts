@@ -1,3 +1,4 @@
+import { velocityToGain } from "../../conversion/velocity-to-gain.ts"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
 import { dbToLinear } from "../../conversion/decibels-to-linear.ts"
@@ -95,12 +96,12 @@ export default class TonePluckString implements IAudioOutput {
 	set gain(value) {
 		this.options.gain = value
 		if (this.#gainNode) {
-			this.#gainNode.gain.value = dbToLinear(value)
+			this.#gainNode.gain.value = value
 		}
 	}
 
 	get volume() {
-		return this.#synth?.volume.value ?? 0
+		return this.#synth ? dbToLinear(this.#synth.volume.value) : 1
 	}
 
 	set volume(value) {
@@ -135,6 +136,9 @@ export default class TonePluckString implements IAudioOutput {
 	constructor(audioContext: BaseAudioContext, options = {}) {
 		this.#audioContext = audioContext
 		this.options = Object.assign({}, this.options, options)
+		// Expose a stable output before the first note so the mixer can connect it.
+		this.#gainNode = audioContext.createGain()
+		this.#gainNode.gain.value = this.options.gain
 		// Lazy initialization - Tone.js will be loaded on first use
 	}
 
@@ -147,9 +151,6 @@ export default class TonePluckString implements IAudioOutput {
 		// Tell Tone.js to use the shared AudioContext
 		Tone.setContext(this.#audioContext as any)
 		
-		// Create a gain node to handle volume and routing through the shared audio graph
-		this.#gainNode = this.#audioContext.createGain()
-		this.#gainNode.gain.value = dbToLinear(this.options.gain)
 		
 		// Initialize Tone.js PluckSynth and connect to our gain node
 		this.#synth = new PluckSynth({
@@ -190,19 +191,20 @@ export default class TonePluckString implements IAudioOutput {
 	/**
 	 * Note ON - Plucks the string
 	 * @param {Number} noteNumber - MIDI note number
-	 * @param {Number} velocity - strength of the pluck (0-1)
+	 * @param {Number} velocity - strength of the pluck (0-127)
 	 * @param {Array<Number>} arp - intervals (currently unused)
 	 * @param {Number} delay - number to pause before playing
 	 */
-	async noteOn(noteNumber: number, velocity: number = 1, arp = null, delay: number = 0) {
+	async noteOn(noteNumber: number, velocity: number = 127, arp = null, delay: number = 0) {
 		await this.ensureInitialized()
 		
 		const frequency = noteNumberToFrequency(noteNumber)
-		const amplitude = Math.max(0.001, velocity * this.options.gain)
+		const amplitude = velocityToGain(velocity)
 
 		this.activeNote = noteNumber
 
 		try {
+			this.#gainNode.gain.setValueAtTime(this.options.gain * amplitude, this.now + delay)
 			// PluckString uses triggerAttack to pluck the string with frequency parameter
 			this.#synth.triggerAttack(frequency, "+0.1")
 		} catch (e) {
