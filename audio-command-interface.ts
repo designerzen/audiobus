@@ -4,10 +4,15 @@ export interface IAudioCommand {
 	id:number
 	
     type:string
+	bpm?: number
 	subtype:string
     number:number
 
     channel:number
+
+    // Recording provenance when the same input feeds multiple chains.
+    chainId?: string
+    chainName?: string
 
     // velocity / amplitude value
     velocity:number

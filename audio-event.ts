@@ -11,6 +11,9 @@ import type { ITimerControl } from "netronome"
 
 export default class AudioEvent extends AudioCommand implements IAudioCommand { 
 
+    chainId?: string
+    chainName?: string
+
 	get duration():number{
         // fallback to always having *some* duration
 		return this.endAt ? this.endAt - this.time : 0.1
