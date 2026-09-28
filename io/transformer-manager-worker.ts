@@ -2,11 +2,12 @@
  * TRANSFORMER MANAGER WITH WORKER SUPPORT -----------------------------------------------
  * Delegates transform operations to Web Workers to avoid blocking the main thread
  */
-import { compress, decompress, compressToBase64, decompressFromBase64 } from 'lz-string'
+import { compressToBase64, decompressFromBase64 } from 'lz-string'
 
 import { Transformer } from "./transformers/abstract-transformer.ts"
 import { TransformerHarmoniser } from "./transformers/transformer-harmoniser.ts"
 import { ID_QUANTISE, TransformerQuantise } from "./transformers/transformer-quantise.ts"
+import { tranformerFactory } from './transformer-factory'
 
 import type { ITimerControl as Timer } from "netronome"
 import type { FieldConfig, ITransformer } from "./transformers/interface-transformer.ts"
@@ -16,18 +17,14 @@ const EVENT_TRANSFORMERS_UPDATED = "EVENT_TRANSFORMERS_UPDATED"
 const EVENT_TRANSFORMERS_ADDED = "EVENT_TRANSFORMER_ADDED"
 const EVENT_TRANSFORMERS_REMOVED = "EVENT_TRANSFORMER_REMOVED"
 
-const DEFAULT_TRANSFORMERS = [
-    new TransformerHarmoniser()
-]
-
 export default class TransformerManagerWorker extends EventTarget implements ITransformer {
 
     public id: string = Transformer.getUniqueID()
     public name: string = 'TransformerManager'
     public timer: Timer | undefined
 
-    #transformersMap: Map<string, Array<Transformer>> = new Map()
-    #transformers: Array<Transformer> = []
+    #transformersMap: Map<string, Array<Transformer<any>>> = new Map()
+    #transformers: Array<Transformer<any>> = []
 
     get fields(): FieldConfig[] {
         return this.#transformers.flatMap(t => t.config)
@@ -57,7 +54,7 @@ export default class TransformerManagerWorker extends EventTarget implements ITr
         return this.#transformers.length
     }
 
-    constructor(initialTransformers: Array<Transformer> = DEFAULT_TRANSFORMERS) {
+    constructor(initialTransformers: Array<Transformer<any>> = [new TransformerHarmoniser()]) {
         super()
         this.setTransformers([...this.#transformers, ...(initialTransformers ?? [])])
     }
@@ -68,8 +65,8 @@ export default class TransformerManagerWorker extends EventTarget implements ITr
     /**
      * Append to the end of the queue the specified transformer
      */
-    appendTransformer(transformerToAdd: Transformer, dispatchEvents: boolean = true) {
-        const collection: Transformer[] = this.#transformersMap.has(transformerToAdd.type)
+    appendTransformer(transformerToAdd: Transformer<any>, dispatchEvents: boolean = true) {
+        const collection: Transformer<any>[] = this.#transformersMap.has(transformerToAdd.type)
             ? [...this.#transformersMap.get(transformerToAdd.type)!, transformerToAdd]
             : [transformerToAdd]
         this.#transformersMap.set(transformerToAdd.type, collection)
@@ -84,7 +81,7 @@ export default class TransformerManagerWorker extends EventTarget implements ITr
     /**
      * Remove a transformer from the pipeline
      */
-    removeTransformer(transformerToRemove: Transformer, dispatchEvents: boolean = true) {
+    removeTransformer(transformerToRemove: Transformer<any>, dispatchEvents: boolean = true) {
         this.#transformers = this.#transformers.filter(transformer => transformer.uuid !== transformerToRemove.uuid)
         transformerToRemove.index = -1
 
@@ -104,9 +101,9 @@ export default class TransformerManagerWorker extends EventTarget implements ITr
     /**
      * Overwrite the whole transformers queue stack
      */
-    setTransformers(transformers: Array<Transformer>): void {
+    setTransformers(transformers: Array<Transformer<any>>): void {
         this.clear()
-        transformers.forEach((transformer: Transformer) => this.appendTransformer(transformer, false))
+        transformers.forEach((transformer: Transformer<any>) => this.appendTransformer(transformer, false))
         this.dispatchEvent(new CustomEvent(EVENT_TRANSFORMERS_UPDATED))
     }
 
@@ -120,7 +117,7 @@ export default class TransformerManagerWorker extends EventTarget implements ITr
     /**
      * Get all transformers
      */
-    getTransformers(): Array<Transformer> {
+    getTransformers(): Array<Transformer<any>> {
         return this.#transformers
     }
 
@@ -221,15 +218,7 @@ export default class TransformerManagerWorker extends EventTarget implements ITr
                 throw new Error('Invalid transformer configuration format')
             }
 
-            // Clear existing transformers
-            this.clear()
-
-            // Note: This is a simplified import that restores JSON configs
-            // Full deserialization of transformer instances would require a factory pattern
-            // For now, store the raw config data that can be used with transformerFactory
-            // TODO: Implement full transformer factory deserialization
-
-            console.warn('TransformerManager.importData: Full deserialization requires factory pattern - configs stored as JSON')
+            this.importConfig(JSON.stringify(configArray))
         } catch (error) {
             console.error('Failed to import transformer data:', error)
             throw new Error(`Invalid transformer data: ${error instanceof Error ? error.message : String(error)}`)
@@ -241,6 +230,21 @@ export default class TransformerManagerWorker extends EventTarget implements ITr
         return compressToBase64(json)
     }
 
+    importConfig(json: string): void {
+        const configs = JSON.parse(json)
+        if (!Array.isArray(configs)) throw new Error('Invalid transformer configuration')
+        const transformers = configs.map(value => {
+            const config = typeof value === 'string' ? JSON.parse(value) : value
+            if (!config || typeof config.type !== 'string') throw new Error('Missing transformer type')
+            const transformer = tranformerFactory(config.type, config)
+            if (JSON.parse(transformer.exportConfig()).type !== config.type) {
+                throw new Error(`Unknown transformer type: ${config.type}`)
+            }
+            return transformer
+        })
+        this.setTransformers(transformers)
+    }
+
     clear(): void {
         this.#transformers = []
         this.#transformersMap = new Map()
@@ -250,7 +254,6 @@ export default class TransformerManagerWorker extends EventTarget implements ITr
      * Cleanup
      */
     destroy(): void {
-        // No worker resources to clean up
+        this.clear()
     }
 }
-
