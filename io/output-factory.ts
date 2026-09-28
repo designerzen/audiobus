@@ -1,3 +1,4 @@
+import { defineDevice } from './device-definition'
 /**
  * Factory for creating audio output instances
  * Handles instantiation of available output types
@@ -277,5 +278,5 @@ export async function createOutputById(id: string, options?: Record<string, any>
 	if (!isAvailable) {
 		throw new Error(`Output is not available: ${factory.name}`)
 	}
-	return factory.create(options)
+	return defineDevice(await factory.create(options), { factory: 'output', type: id, options })
 }

@@ -2,6 +2,7 @@
 	display: block;
 	width: 100%;
 	height: auto;
+	aspect-ratio: 404 / 256;
 	background: #000;
 	border-radius: 4px;
 	margin-top: 8px;

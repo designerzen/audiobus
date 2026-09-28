@@ -1,3 +1,5 @@
+import { MidiOutputRouting } from './midi-output-routing.ts'
+import type { IAudioCommand } from '../../audio-command-interface.ts'
 /**
  * MIDI 2.0 Output - Universal MIDI Packet (UMP) Implementation
  * Supports high-resolution controllers, per-note effects, and MIDI-CI
@@ -80,6 +82,14 @@ export default class OutputMIDI2 implements IAudioOutput {
 
     static ID: number = 0
 
+    readonly options: Record<string, any>
+    private routing: MidiOutputRouting
+    private devices: Array<{ index: number; name: string }> = []
+    createGui(): Promise<HTMLElement> { return this.routing.createGui() }
+    destroyGui(): Promise<void> { return this.routing.destroyGui() }
+    getNoteKey(command: IAudioCommand): string { return this.routing.noteKey(command) }
+    sendCommand(command: IAudioCommand): Promise<void> { return this.routing.sendCommand(command) }
+
     private deviceIndex: number
     private deviceInfo: any
     private midi2Native: any = null
@@ -118,14 +128,24 @@ export default class OutputMIDI2 implements IAudioOutput {
         return this.deviceInfo
     }
 
-    constructor(deviceIndex: number, deviceInfo: any) {
-        this.deviceIndex = deviceIndex
+    constructor(deviceIndex: number | Record<string, any> = {}, deviceInfo?: any) {
+        this.options = typeof deviceIndex === 'number' ? { selectedDevice: String(deviceIndex) } : { ...deviceIndex }
+        this.deviceIndex = Number(this.options.selectedDevice ?? 0)
         this.deviceInfo = deviceInfo
+        this.routing = new MidiOutputRouting(this.options,
+            () => this.devices.map(device => ({ id: String(device.index), name: device.name })),
+            (id, bytes) => {
+                if (!this.#connected || !this.midi2Native) return
+                const index = Number(id)
+                try { this.midi2Native.openUmpOutput(index) } catch (error: any) { if (error.code !== 'ALREADY_OPEN') throw error }
+                if (typeof this.midi2Native.sendMidiMessage === 'function') this.midi2Native.sendMidiMessage(index, Uint8Array.from(bytes))
+                else if (bytes.length <= 3) this.midi2Native.sendUmp(index, ((bytes[0] << 24) | ((bytes[1] ?? 0) << 16) | ((bytes[2] ?? 0) << 8)) >>> 0)
+                else throw new Error('This native MIDI addon does not support SysEx; use WebMIDI output')
+            })
 
         // Try to load native MIDI2 binding
         try {
             // eslint-disable-next-line global-require, @typescript-eslint/no-var-requires
-            // @ts-expect-error - Native module type not available
             this.midi2Native = require('../../../build/Release/midi2-native.node')
         } catch (error) {
             console.warn('[OutputMIDI2] Native module not available, falling back to MIDI 1 API')
@@ -219,6 +239,7 @@ export default class OutputMIDI2 implements IAudioOutput {
      */
     setChannel(channel: number): void {
         this.#currentChannel = clampChannel(channel)
+        this.routing.setChannel(this.#currentChannel + 1)
     }
 
     /**
@@ -255,15 +276,19 @@ export default class OutputMIDI2 implements IAudioOutput {
     /**
      * Open the MIDI 2.0 output device
      */
-    // @ts-expect-error - Interface signature mismatch
     async connect(): Promise<void> {
         if (this.#connected) return;
 
+        if (!this.midi2Native) this.midi2Native = await import('../../../build/Release/midi2-native.node' as any)
         if (this.midi2Native) {
             try {
-                this.midi2Native.openUmpOutput(this.deviceIndex);
+                this.devices = this.midi2Native.getUmpOutputs()
+                if (this.options.selectedDevice == null && this.devices[0]) this.options.selectedDevice = String(this.devices[0].index)
+                this.deviceIndex = Number(this.options.selectedDevice ?? this.devices[0]?.index ?? 0)
+                this.routing.refresh()
+                try { this.midi2Native.openUmpOutput(this.deviceIndex) } catch (error: any) { if (error.code !== 'ALREADY_OPEN') throw error }
                 this.#connected = true;
-                console.log(`[OutputMIDI2] Opened: ${this.deviceInfo.name}`);
+                console.log(`[OutputMIDI2] Opened: ${this.deviceInfo?.name ?? 'MIDI output'}`);
             } catch (error) {
                 console.error(`[OutputMIDI2] Failed to open device: ${error}`);
                 throw error;
@@ -281,9 +306,9 @@ export default class OutputMIDI2 implements IAudioOutput {
 
         if (this.midi2Native) {
             try {
-                this.midi2Native.closeUmpOutput(this.deviceIndex);
+                await this.routing.release();
                 this.#connected = false;
-                console.log(`[OutputMIDI2] Closed: ${this.deviceInfo.name}`);
+                console.log(`[OutputMIDI2] Closed: ${this.deviceInfo?.name ?? 'MIDI output'}`);
             } catch (error) {
                 console.error(`[OutputMIDI2] Failed to close device: ${error}`);
             }

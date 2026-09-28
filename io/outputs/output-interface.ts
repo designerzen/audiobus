@@ -1,3 +1,5 @@
+import type { IAudioCommand } from '../../audio-command-interface.ts'
+
 export interface IAudioOutput{
 	get uuid(): string
 	get name():string
@@ -6,11 +8,16 @@ export interface IAudioOutput{
 	get isHidden():boolean
 	
 	// TODO: implement pitchBend etc
-	noteOn(note: number, velocity: number): void | Promise<void>
-	noteOff(note: number): void
+	noteOn(noteNumber: number, velocity: number): void | Promise<void>
+	noteOff(noteNumber: number): void
 	allNotesOff(): void
 
+	// Full MIDI commands retain channel, controller, pressure, and system data.
+	sendCommand?(command: IAudioCommand): void | Promise<void>
+	getNoteKey?(command: IAudioCommand): string
+
 	// optional
+	readonly output?: AudioNode
 	connect?():Promise<void|Function>|Function
 	disconnect?():Promise<void|Function>|Function
 	createGui?():Promise<HTMLElement>

@@ -97,20 +97,27 @@ export default class OutputMetronome extends EventTarget implements IAudioOutput
 		this.#stopClick()
 	}
 
+	/** Play a transport beat, preserving the accent when enabled mid-bar. */
+	playBeat(beat: number, beatsPerMeasure: number = 4, contextTime?: number): void {
+		this.#beatCounter = beat
+		this.#beatsPerMeasure = beatsPerMeasure
+		this.#playClick(contextTime)
+	}
+
 	/**
 	 * Play a click sound
 	 */
-	#playClick(): void {
+	#playClick(contextTime?: number): void {
 		if (!this.#audioContext || !this.#gainNode) return
 
 		try {
-			// Determine if this is a downbeat (every 24 MIDI clocks = quarter note)
+			// Accent the first beat of each measure.
 			const isDownbeat = this.#beatCounter % this.#beatsPerMeasure === 0
 			const frequency = isDownbeat ? this.#accentFrequency : this.#frequency
 			const displayColor = isDownbeat ? this.#accentColor : this.#normalColor
 
 			// Create and play oscillator
-			const now = this.#audioContext.currentTime
+			const now = Math.max(this.#audioContext.currentTime, contextTime ?? this.#audioContext.currentTime)
 			const oscillator = this.#audioContext.createOscillator()
 			const envelopeGain = this.#audioContext.createGain()
 
@@ -128,6 +135,10 @@ export default class OutputMetronome extends EventTarget implements IAudioOutput
 			// Play
 			oscillator.start(now)
 			oscillator.stop(now + this.#toneDuration / 1000)
+			oscillator.onended = () => {
+				oscillator.disconnect()
+				envelopeGain.disconnect()
+			}
 
 			// Update display
 			this.#updateBeatDisplay(this.#beatCounter, displayColor)

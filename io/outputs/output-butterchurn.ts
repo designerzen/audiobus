@@ -13,6 +13,7 @@ export default class OutputButterchurn implements IAudioOutput {
 	#gainNode: GainNode
 	#animationFrameId: number | null = null
 	#isRunning: boolean = false
+	#resizeObserver: ResizeObserver | null = null
 	#presets: any = null
 	#currentPresetIndex: number = 0
 	#activeNotes: Set<number> = new Set()
@@ -75,11 +76,15 @@ export default class OutputButterchurn implements IAudioOutput {
 
 		// Handle window resize
 		window.addEventListener('resize', this.#handleResize)
+		this.#resizeObserver = new ResizeObserver(this.#handleResize)
+		this.#resizeObserver.observe(this.#canvas)
 
 		return this.#canvas
 	}
 
 	async destroyGui(): Promise<void> {
+		this.#resizeObserver?.disconnect()
+		this.#resizeObserver = null
 		this.#stopVisualization()
 		if (this.#canvas) {
 			this.#canvas.remove()
@@ -100,7 +105,8 @@ export default class OutputButterchurn implements IAudioOutput {
 			const butterchurnModule = await import('butterchurn')
 			const presetsModule = await import('butterchurn-presets')
 
-			const butterchurn = butterchurnModule.default || butterchurnModule
+			// The CommonJS build can wrap Butterchurn's default export twice.
+			const butterchurn = butterchurnModule.default?.default || butterchurnModule.default || butterchurnModule
 			const butterchurnPresets = presetsModule.default || presetsModule
 
 			if (!this.#canvas) {
@@ -111,7 +117,7 @@ export default class OutputButterchurn implements IAudioOutput {
 			this.#visualizer = butterchurn.createVisualizer(this.#audioContext, this.#canvas, {
 				width: this.#canvas.width,
 				height: this.#canvas.height,
-				pixelRatio: window.devicePixelRatio,
+				pixelRatio: 1,
 			})
 
 			// Connect the analyser node to visualizer
@@ -137,9 +143,11 @@ export default class OutputButterchurn implements IAudioOutput {
 		if (!this.#canvas || !this.#visualizer) return
 		const rect = this.#canvas.getBoundingClientRect()
 		if (rect.width > 0 && rect.height > 0) {
-			this.#canvas.width = rect.width
-			this.#canvas.height = rect.height
-			this.#visualizer.setRendererSize(rect.width, rect.height, window.devicePixelRatio)
+			this.#canvas.width = Math.round(rect.width * window.devicePixelRatio)
+			this.#canvas.height = Math.round(rect.height * window.devicePixelRatio)
+			// Butterchurn uses these dimensions for the final WebGL viewport.
+			// They must match the drawing buffer; density is already applied above.
+			this.#visualizer.setRendererSize(this.#canvas.width, this.#canvas.height, { pixelRatio: 1 })
 		}
 	}
 

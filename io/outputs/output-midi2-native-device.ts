@@ -1,3 +1,5 @@
+import { MidiOutputRouting } from './midi-output-routing.ts'
+import type { IAudioCommand } from '../../audio-command-interface.ts'
 /**
  * Native MIDI 2.0 Output Device
  * Uses 64-bit UMP (Universal MIDI Packet) format
@@ -9,7 +11,6 @@
  * - Linux: ALSA
  */
 
-import { ALL_MIDI_CHANNELS } from "../../midi/midi-channels.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 import {
 	createNoteOn,
@@ -55,7 +56,7 @@ async function loadNativeMIDI(): Promise<any> {
 }
 
 const DEFAULT_OPTIONS = {
-	channels: ALL_MIDI_CHANNELS
+	channels: -1
 }
 
 /**
@@ -84,6 +85,14 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
 	#deviceIndex: number | null = null
 	#activeNotes: Map<number, { velocity: number; controllers: Map<number, number> }> = new Map()
 	#options: any
+    #routing: MidiOutputRouting
+    #openedDevices = new Set<number>()
+    get options(): Record<string, any> { return this.#options }
+    createGui(): Promise<HTMLElement> { return this.#routing.createGui() }
+    destroyGui(): Promise<void> { return this.#routing.destroyGui() }
+    getNoteKey(command: IAudioCommand): string { return this.#routing.noteKey(command) }
+    sendCommand(command: IAudioCommand): Promise<void> { return this.#routing.sendCommand(command) }
+
 	#devices: NativeDevice[] = []
 	#isConnected: boolean = false
 
@@ -111,6 +120,21 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
 		super()
 		this.#uuid = "Output-MIDI2Native-" + (OutputMIDI2Native.ID++)
 		this.#options = { ...DEFAULT_OPTIONS, ...options }
+        this.#routing = new MidiOutputRouting(this.#options,
+            () => this.#devices.map(device => ({ id: String(device.index), name: device.name })),
+            (id, bytes) => {
+                if (!this.#isConnected || !nativeMIDI) return
+                const index = Number(id)
+                if (!this.#devices.some(device => device.index === index)) return
+                if (!this.#openedDevices.has(index)) {
+                    try { nativeMIDI.openUmpOutput(index) } catch (error: any) { if (error.code !== 'ALREADY_OPEN') throw error }
+                    this.#openedDevices.add(index)
+                }
+                // The addon accepts raw MIDI bytes through its MIDI 1 transport.
+                if (typeof nativeMIDI.sendMidiMessage === 'function') nativeMIDI.sendMidiMessage(index, Uint8Array.from(bytes))
+                else if (bytes.length <= 3) nativeMIDI.sendUmp(index, ((bytes[0] << 24) | ((bytes[1] ?? 0) << 16) | ((bytes[2] ?? 0) << 8)) >>> 0)
+                else throw new Error('This native MIDI addon does not support SysEx; use WebMIDI output')
+            }, () => this.dispatchEvent(new Event('configurationChanged')))
 	}
 
 	/**
@@ -128,6 +152,7 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
 
 		try {
 			this.#devices = nativeMIDI.getUmpOutputs()
+			this.#routing.refresh()
 			console.log('[OutputMIDI2Native] Available MIDI outputs:', this.#devices)
 
 			if (this.#devices.length === 0) {
@@ -137,8 +162,11 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
 			}
 
 			// Use first device by default
-			this.#deviceIndex = 0
-			nativeMIDI.openUmpOutput(this.#deviceIndex)
+			this.#deviceIndex = this.#devices[0].index
+            if (this.#options.selectedDevice == null) this.#options.selectedDevice = String(this.#deviceIndex)
+			try { nativeMIDI.openUmpOutput(this.#deviceIndex) } catch (error: any) { if (error.code !== 'ALREADY_OPEN') throw error }
+            this.#openedDevices.add(this.#deviceIndex)
+            this.#routing.refresh()
 			this.#isConnected = true
 
 			console.info('[OutputMIDI2Native] Connected to device:', this.#devices[this.#deviceIndex])
@@ -152,17 +180,14 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
 	/**
 	 * Disconnect from MIDI device
 	 */
-	async disconnect(): Promise<void> {
-		if (this.#deviceIndex !== null && nativeMIDI) {
-			try {
-				nativeMIDI.closeUmpOutput(this.#deviceIndex)
-			} catch (error) {
-				console.error('[OutputMIDI2Native] Error closing device:', error)
-			}
-		}
-		this.#deviceIndex = null
-		this.#isConnected = false
-	}
+    async disconnect(): Promise<void> {
+        await this.#routing.release()
+        // Native output ports may also be used by other output instances.
+        // Leave their shared OS handles open; the addon owns their lifetime.
+        this.#openedDevices.clear()
+        this.#deviceIndex = null
+        this.#isConnected = false
+    }
 
 	/**
 	 * Get the set of currently active note numbers
@@ -182,7 +207,7 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
 	 * Set the MIDI channel for outgoing messages (1-16)
 	 */
 	setChannel(channel: number | number[]): void {
-		this.#options.channels = channel
+		this.#routing.setChannel(channel)
 	}
 
 	/**
@@ -473,23 +498,12 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
 	/**
 	 * Switch to a different device
 	 */
-	async selectDevice(deviceIndex: number): Promise<void> {
-		if (!nativeMIDI) {
-			throw new Error('[OutputMIDI2Native] Native MIDI module not available')
-		}
+    async selectDevice(deviceIndex: number): Promise<void> {
+        if (!this.#devices.some(device => device.index === deviceIndex)) throw new Error('Device index out of range')
+        this.#routing.setOutput(String(deviceIndex))
+        this.#deviceIndex = deviceIndex
+    }
 
-		if (deviceIndex >= this.#devices.length) {
-			throw new Error('Device index out of range')
-		}
-
-		if (this.#deviceIndex !== null) {
-			nativeMIDI.closeUmpOutput(this.#deviceIndex)
-		}
-
-		this.#deviceIndex = deviceIndex
-		nativeMIDI.openUmpOutput(this.#deviceIndex)
-		console.info('[OutputMIDI2Native] Switched to device:', this.#devices[deviceIndex])
-	}
 
 	hasMidiOutput(): boolean {
 		return true
@@ -521,6 +535,7 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
 	destroy(): void {
 		this.allNotesOff()
 		this.#activeNotes.clear()
-		this.disconnect()
+		void this.disconnect()
+        void this.destroyGui()
 	}
 }
