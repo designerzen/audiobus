@@ -1,17 +1,19 @@
+import type { Transformer } from './transformers/abstract-transformer'
 /**
  * A single stream of data from the inputManager
  * through the transformerManager
  * into the outputManager
  */
-import { compress, decompress, compressToBase64, decompressFromBase64 } from 'lz-string'
+import { compressToBase64, decompressFromBase64 } from 'lz-string'
 
 import InputManager, { EVENT_INPUTS_UPDATED } from "./input-manager"
 import OutputManager, { EVENT_OUTPUTS_UPDATED } from "./output-manager"
-import TransformerManager, { EVENT_TRANSFORMERS_UPDATED } from "./transformer-manager"
+import { EVENT_TRANSFORMERS_UPDATED } from "./transformer-manager"
 import TransformerManagerWorker from "./transformer-manager-worker"
 
 import { INPUT_EVENT, NOTE_OFF, NOTE_ON, OUTPUT_EVENT, PLAYBACK_START, PLAYBACK_STOP, PLAYBACK_TOGGLE, TEMPO_DECREASE, TEMPO_INCREASE, TEMPO_TAP, MIDI_CLOCK, MIDI_CONTINUE, MIDI_START, MIDI_STOP } from '../commands'
 import AudioEvent from "../audio-event"
+import { DVS_CLOCK } from '../commands'
 
 import type { ITimerControl as Timer } from "netronome"
 import type { IAudioCommand } from "../audio-command-interface"
@@ -34,8 +36,14 @@ interface IOChainSerializedData {
 }
 
 interface IOChainOptions {
+    active?: boolean
+    name?: string
     layout?: string | null
+    graphLayout?: 'horizontal' | 'vertical'
+    positions?: Record<string, { x: number; y: number }>
 }
+
+const handledTransport = new WeakMap<object, WeakSet<object>>()
 
 const DEFAULT_OPTIONS: IOChainOptions = {
     layout: null
@@ -60,6 +68,60 @@ export default class IOChain extends EventTarget {
     #options: IOChainOptions = {}
 
     #enabled: boolean = true
+    #destroyed = false
+    #generation = 0
+
+    transportCommand?: (type: string) => void
+
+    setName(name: string): void {
+        const trimmed = name.trim().slice(0, 80)
+        if (!trimmed || trimmed === this.#options.name) return
+        this.#options.name = trimmed
+        this.dispatchEvent(new Event('configurationChanged'))
+    }
+
+    get isActive(): boolean { return this.#options.active !== false }
+
+    setActive(active: boolean): void {
+        if (active === this.isActive) return
+        this.#options.active = active
+        if (!active) {
+            this.clearNoteCommands()
+            this.#audioCommandQueue = []
+            this.#pausedQueue = 0
+        }
+        this.dispatchEvent(new Event('configurationChanged'))
+    }
+
+    get isDestroyed(): boolean { return this.#destroyed }
+
+    exportConfiguration() {
+        const { layout, ...options } = this.#options
+        return { options: structuredClone(options), transformers: this.exportTransformers() }
+    }
+
+    importConfiguration(config: ReturnType<IOChain['exportConfiguration']>): void {
+        if (!config.options || typeof config.options !== 'object' || Array.isArray(config.options)) {
+            throw new Error('Invalid chain options')
+        }
+        if (config.options.graphLayout && !['horizontal', 'vertical'].includes(config.options.graphLayout)) {
+            throw new Error('Invalid graph layout')
+        }
+        if (config.options.positions && Object.values(config.options.positions).some(position =>
+            !position || !Number.isFinite(position.x) || !Number.isFinite(position.y))) {
+            throw new Error('Invalid graph position')
+        }
+        if (config.options.name !== undefined && typeof config.options.name !== 'string') {
+            throw new Error('Invalid chain name')
+        }
+        this.#transformerManager.importConfig(config.transformers)
+        this.#options = structuredClone(config.options)
+    }
+
+    setGraphOptions(options: Partial<IOChainOptions>): void {
+        this.#options = { ...this.#options, ...options }
+        this.dispatchEvent(new Event('configurationChanged'))
+    }
 
     get options(): IOChainOptions {
         return this.#options
@@ -137,15 +199,15 @@ export default class IOChain extends EventTarget {
     }
 
     // Transformers ---------------------------------------
-    appendTransformer(transformer: Transformer) {
+    appendTransformer(transformer: Transformer<any>) {
         this.#transformerManager.appendTransformer(transformer)
     }
 
-    removeTransformer(transformer: Transformer) {
+    removeTransformer(transformer: Transformer<any>) {
         this.#transformerManager.removeTransformer(transformer)
     }
 
-    setTransformers(transformers: Transformer[]) {
+    setTransformers(transformers: Transformer<any>[]) {
         this.#transformerManager.setTransformers(transformers)
     }
 
@@ -156,9 +218,10 @@ export default class IOChain extends EventTarget {
      * @returns 
      */
     transform(audioCommands: IAudioCommand[], timer: Timer) {
+        const generation = this.#generation
         return this.#transformerManager.transform(audioCommands, timer)
             .then((transformedAudioCommands: IAudioCommand[]) => {
-                this.#audioCommandQueue.push(...transformedAudioCommands)
+                if (generation === this.#generation) this.addCommands(transformedAudioCommands)
             })
             .catch((error) => {
                 console.error('Transform failed:', error)
@@ -173,6 +236,7 @@ export default class IOChain extends EventTarget {
      * @param command 
      */
     addCommand(command: IAudioCommand) {
+        if (this.#destroyed || !this.isActive) return
         this.#audioCommandQueue.push(command)
     }
 
@@ -181,6 +245,7 @@ export default class IOChain extends EventTarget {
      * @param commands 
      */
     addCommands(commands: IAudioCommand[]) {
+        if (this.#destroyed || !this.isActive) return
         this.#audioCommandQueue.push(...commands)
     }
 
@@ -191,6 +256,7 @@ export default class IOChain extends EventTarget {
      * cancel any playing sounds
      */
     clearNoteCommands(): void {
+        this.#generation++
         this.#audioCommandQueue = this.#audioCommandQueue.filter(cmd =>
             cmd.type !== NOTE_ON && cmd.type !== NOTE_OFF
         )
@@ -251,6 +317,7 @@ export default class IOChain extends EventTarget {
      * @returns IAudioCommand[]
      */
     updateTimeForCommandQueue(now: number, divisionsElapsed: number, options: {}): IAudioCommand[] {
+        if (!this.isActive) return []
         let activeCommands: IAudioCommand[]
 
         // Always process the queue, with or without quantisation
@@ -293,17 +360,16 @@ export default class IOChain extends EventTarget {
      * @returns 
      */
     async addCommandToQueue(audioCommand: IAudioCommand, transform: boolean = this.#enabled) {
+        if (this.#destroyed || !this.isActive) return audioCommand
+        const generation = this.#generation
         if (transform) {
-            this.transformerManager.transform([audioCommand], this.timer)
+            await this.transformerManager.transform([audioCommand], this.timer)
                 .then((transformedAudioCommands: IAudioCommand[]) => {
-                    this.addCommands(transformedAudioCommands)
+                    if (generation === this.#generation) this.addCommands(transformedAudioCommands)
                 })
                 .catch((error) => {
                     // console.info('Transform failed:', error)
-                    this.addCommand(audioCommand)
-                }).finally(p => {
-                    // now handle this input through the transformerManager
-                    // console.info( "IOChain:onInputEvent", {audioCommand} )
+                    if (generation === this.#generation) this.addCommand(audioCommand)
                 })
         } else {
             this.addCommand(audioCommand)
@@ -342,10 +408,11 @@ export default class IOChain extends EventTarget {
 
     // Inputs -------------------------------------------
     addInput(input: AbstractInput) {
+        if (this.#destroyed) throw new Error('Chain has been deleted')
         this.#inputManager.add(input)
     }
     addInputs(inputs: AbstractInput[]) {
-        inputs.forEach(input => this.#inputManager.add(input))
+        inputs.forEach(input => this.addInput(input))
     }
     removeInput(input: AbstractInput) {
         this.#inputManager.remove(input)
@@ -362,6 +429,7 @@ export default class IOChain extends EventTarget {
 
     // Outputs -------------------------------------------
     addOutput(output: IAudioOutput) {
+        if (this.#destroyed) throw new Error('Chain has been deleted')
         this.#outputManager.add(output)
     }
     addOutputs(outputs: IAudioOutput[]) {
@@ -472,7 +540,7 @@ export default class IOChain extends EventTarget {
      */
     importTransformers(configString: string, options?: Record<string, any>): void {
         try {
-            this.#transformerManager.importData(configString)
+            this.#transformerManager.importConfig(configString)
             // Merge provided options into chain options
             if (options) {
                 this.#options = { ...this.#options, ...options }
@@ -577,7 +645,14 @@ export default class IOChain extends EventTarget {
      * Kill this and clean up
      */
     destroy(): void {
+        if (this.#destroyed) return
+        this.#destroyed = true
+        this.#generation++
+        this.#audioCommandQueue = []
         this.#abortController.abort()
+        this.#inputManager.destroy()
+        this.#outputManager.destroy()
+        this.#transformerManager.destroy()
     }
 
     // EVENTS -----------------------------------------------
@@ -594,10 +669,25 @@ export default class IOChain extends EventTarget {
     onInputEvent(inputEvent: InputAudioEvent) {
 
         inputEvent.preventDefault()
+        if (!this.isActive) return
 
         // extract command and add to queue for consumption later
         const audioCommand: IAudioCommand = inputEvent.command
-        switch (audioCommand.type) {
+        // Channel controllers and system messages must not be interpreted as notes
+        // by pitch transformers, quantised, or swallowed by transport handling.
+        const midiControl = audioCommand.raw?.length && audioCommand.type !== NOTE_ON && audioCommand.type !== NOTE_OFF
+        if (midiControl) void this.#outputManager.triggerAudioCommandsOnOutputs([audioCommand])
+        const origin = inputEvent.origin ?? inputEvent
+        let handled = handledTransport.get(this.timer)
+        if (!handled) handledTransport.set(this.timer, handled = new WeakSet())
+        const handleTransport = !handled.has(origin)
+        handled.add(origin)
+        if (this.transportCommand && [PLAYBACK_TOGGLE, PLAYBACK_START, PLAYBACK_STOP, MIDI_START, MIDI_STOP, MIDI_CONTINUE].includes(audioCommand.type)) {
+            if (handleTransport) this.transportCommand(audioCommand.type)
+            this.dispatchEvent(inputEvent.clone())
+            return
+        }
+        if (handleTransport) switch (audioCommand.type) {
 
             case PLAYBACK_TOGGLE:
                 this.timer.toggle()
@@ -625,11 +715,12 @@ export default class IOChain extends EventTarget {
                 this.timer.BPM--
                 break
 
+            case DVS_CLOCK:
             case MIDI_CLOCK:
                 // MIDI clock signal received - update timing if available in command
-                if ((audioCommand as any).bpm) {
+                if (Number.isFinite(audioCommand.bpm) && audioCommand.bpm! > 0) {
                     // Synchronize to MIDI clock BPM if provided
-                    this.timer.BPM = Math.round((audioCommand as any).bpm)
+                    this.timer.BPM = Math.round(audioCommand.bpm!)
                 }
                 break
 
@@ -640,10 +731,14 @@ export default class IOChain extends EventTarget {
                 }
                 break
         }
+        if (midiControl) {
+            this.dispatchEvent(inputEvent.clone())
+            return
+        }
         // NB. ensure that the timing is set for it to be scheduled
         this.addCommandToQueue(audioCommand).then(t => {
             // redispatch event (do not update UI yet)
-            this.dispatchEvent(inputEvent.clone())
+            if (!this.isDestroyed) this.dispatchEvent(inputEvent.clone())
         })
     }
 

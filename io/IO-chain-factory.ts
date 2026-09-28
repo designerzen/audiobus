@@ -1,3 +1,4 @@
+import { defineDevice, deviceId } from './device-definition'
 /**
  * Factory for creating IOChain instances
  * Handles creation with optional predefined configurations
@@ -126,7 +127,7 @@ export class IOChainFactory {
 		// Inputs
 		const inputKeyboard = await createInputById(INPUT_TYPES.KEYBOARD, createOptions)
 		const inputGamePad = await createInputById(INPUT_TYPES.GAMEPAD, createOptions)
-		const inputSVGKeyboard = new InputOnScreenKeyboard(createOptions)
+		const inputSVGKeyboard = defineDevice(new InputOnScreenKeyboard(createOptions), { factory: 'keyboard-input' })
 
 		const inputs: IAudioInput[] = [inputKeyboard, inputGamePad, inputSVGKeyboard]
 
@@ -173,7 +174,7 @@ export class IOChainFactory {
 		}
 
 		// Outputs
-		const outputOnscreenKeyboard = new OutputOnScreenKeyboard(inputSVGKeyboard.keyboard)
+		const outputOnscreenKeyboard = defineDevice(new OutputOnScreenKeyboard(inputSVGKeyboard.keyboard), { factory: 'keyboard-output', inputId: deviceId(inputSVGKeyboard) })
 		const outputs: IAudioOutput[] = [outputOnscreenKeyboard]
 
 		// Add optional outputs
@@ -183,7 +184,7 @@ export class IOChainFactory {
 
 		// Add synthesizer if audioContext available
 		if (options.audioContext) {
-			const musicalOutput = new PolySynth(options.audioContext)
+			const musicalOutput = defineDevice(new PolySynth(options.audioContext), { factory: 'polyphonic' })
 			musicalOutput.output.connect(options.outputMixer)
 			outputs.push(musicalOutput)
 		}
@@ -201,7 +202,8 @@ export class IOChainFactory {
 
 		try {
 			const outputSpectrum = await createOutputById(OUTPUT_TYPES.SPECTRUM_ANALYSER, {
-				mixer: options.outputMixer
+				mixer: options.outputMixer,
+				audioContext: options.audioContext
 			})
 			outputs.push(outputSpectrum)
 		} catch (e) {
