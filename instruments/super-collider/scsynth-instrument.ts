@@ -1,3 +1,4 @@
+import { velocityToGain } from "../../conversion/velocity-to-gain.ts"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
 import { IAudioOutput } from "../../io/outputs/output-interface.ts"
 
@@ -246,10 +247,10 @@ export default class SCSynthInstrument implements IAudioOutput{
      * @param {Array<Number>} arp - intervals
      * @param {Number} delay - number to pause before playing
      */
-    noteOn(noteNumber:number, velocity:number = 1, arp = null, delay:number = 0) {
+    noteOn(noteNumber:number, velocity:number = 127, arp = null, delay:number = 0) {
         const frequency = noteNumberToFrequency( noteNumber )
         const startTime = this.now + delay
-        const amplitude = velocity * this.options.gain
+        const amplitude = velocityToGain(velocity) * this.options.gain
 
         // Fade in envelope ADSR
         const amplitudeSustain = amplitude * this.options.sustain
