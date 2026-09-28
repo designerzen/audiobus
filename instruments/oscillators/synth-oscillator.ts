@@ -1,3 +1,4 @@
+import { velocityToGain } from "../../conversion/velocity-to-gain.ts"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
 import { loadWaveTable } from "./wave-tables.js"
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
@@ -350,7 +351,7 @@ export default class SynthOscillator implements IAudioOutput{
      * @param {Array<Number>} arp - intervals
      * @param {Number} delay - number to pause before playing
      */
-    noteOn( noteNumber:number, velocity:number=1, arp=null, delay:number=0 ){
+    noteOn( noteNumber:number, velocity:number=127, arp=null, delay:number=0 ){
        
         const frequency = noteNumberToFrequency( noteNumber )
         const startTime = this.now + delay
@@ -358,7 +359,7 @@ export default class SynthOscillator implements IAudioOutput{
         const filterSustain = this.options.filterCutOff + (filterPeak - this.options.filterCutOff) * this.options.filterSustain
          
         // fade in envelope ADsr
-        const amplitude = velocity * this.options.gain
+        const amplitude = velocityToGain(velocity) * this.options.gain
         const amplitudeSustain = amplitude * this.options.sustain
         
         clearInterval(this.timerInterval)
@@ -466,7 +467,7 @@ export default class SynthOscillator implements IAudioOutput{
             // }, (killOscillatorTime - now) * 1000)
         }
 
-        this.timerInterval = setTimeout(()=> this.activeNote = null, this.options.release )
+        this.timerInterval = setTimeout(()=> this.activeNote = null, Math.max(0, stopTime - now) * 1000 )
         this.#startedAt = -1
 
         return this
@@ -486,9 +487,9 @@ export default class SynthOscillator implements IAudioOutput{
      * Stop all notes on this instrument
      */
     allNotesOff(){
-		if ( this.activeNote?.noteNumber )
+		if ( this.activeNote !== null )
 		{
-			this.noteOff( this.activeNote.noteNumber )
+			this.noteOff( this.activeNote )
 		}
     }
 
@@ -498,7 +499,7 @@ export default class SynthOscillator implements IAudioOutput{
 
     setWaveTable(waveTable: never){
         const {real, imag} = waveTable
-        const waveData:PeriodicWave = this.#audioContext.createPeriodicWave(real, imag, { disableNormalization: true })
+        const waveData:PeriodicWave = this.#audioContext.createPeriodicWave(real, imag, { disableNormalization: false })
         // reshape any playing oscillators
         if ( this.oscillator)
         {
