@@ -1,9 +1,5 @@
-// @ts-nocheck
-
-const rotateArray = (a, n) => {
-    n = n % a.length
-    return a.slice(n, a.length).concat(a.slice(0, n))
-}
+import { rotateArray } from "../../utils/array-rearrange"
+import { IONIAN_INTERVALS, MAJOR_CHORD_INTERVALS, MINOR_CHORD_INTERVALS, DIMINISHED_CHORD_INTERVALS, POWER_CHORD_INTERVALS as FIFTHS_CHORD_INTERVALS } from '../intervals.ts'
 
 /**
  * 
@@ -12,8 +8,7 @@ const rotateArray = (a, n) => {
  * @param {Array<Number>} intervalsFormula Array of intervals defining the scale
  * @returns 
  */
-
-export const findRotationFromNote = ( noteNumber, rootNote, intervalsFormula ) => {
+export const findRotationFromNote = ( noteNumber: number, rootNote: number, intervalsFormula: number[] ) => {
 	const A0_MIDI_NOTE_NUMBER = 21 // Min Piano Key
 	const keyNumber = noteNumber - A0_MIDI_NOTE_NUMBER
 	const whichNoteInScale = (keyNumber - rootNote) % 12
@@ -36,7 +31,7 @@ export const findRotationFromNote = ( noteNumber, rootNote, intervalsFormula ) =
  * @param {Boolean} accumulate add to previous index
  * @returns {Array<NoteModel|Number>} Audio Note Numbers
  */
-export const createChord = (notes, intervalsFormula=IONIAN_INTERVALS, offset=0, rotation=0, length=-1, cutOff=true, accumulate=false) => {
+export const createChord = <T>(notes: T[], intervalsFormula=IONIAN_INTERVALS, offset=0, rotation=0, length=-1, cutOff=true, accumulate=false): T[] => {
 
 	const quantityOfNotes = notes.length
 	const quantityOfIntervals = intervalsFormula.length
@@ -83,7 +78,7 @@ export const createChord = (notes, intervalsFormula=IONIAN_INTERVALS, offset=0, 
  * @param {Number} inversion 
  * @returns 
  */
-export const invertChord = (chord, inversion=0) => rotateArray( chord, inversion )
+export const invertChord = <T>(chord: T[], inversion=0) => rotateArray( chord, inversion )
 
 /**
  * Helpers for simplified usage
@@ -93,8 +88,8 @@ export const invertChord = (chord, inversion=0) => rotateArray( chord, inversion
  * @param {Number} length 
  * @returns 
  */
-export const createMajorChord = ( notes, offset=0, rotation=0, length=-1 )=> createChord( notes, MAJOR_CHORD_INTERVALS, offset, rotation, length, true, true )
-export const createMinorChord = ( notes, offset=0, rotation=0, length=-1 )=> createChord( notes, MINOR_CHORD_INTERVALS, offset, rotation, length, true, true )
-export const createDiminishedChord = ( notes, offset=0, rotation=0, length=-1 )=> createChord( notes, DIMINISHED_CHORD_INTERVALS, offset, rotation, length, true, true )
+export const createMajorChord = <T>( notes: T[], offset=0, rotation=0, length=-1 )=> createChord( notes, MAJOR_CHORD_INTERVALS, offset, rotation, length, true, true )
+export const createMinorChord = <T>( notes: T[], offset=0, rotation=0, length=-1 )=> createChord( notes, MINOR_CHORD_INTERVALS, offset, rotation, length, true, true )
+export const createDiminishedChord = <T>( notes: T[], offset=0, rotation=0, length=-1 )=> createChord( notes, DIMINISHED_CHORD_INTERVALS, offset, rotation, length, true, true )
 // export const createJazzChord = ( notes, offset=0, rotation=0, length=-1 )=> createChord( notes, MELODIC_MINOR_SCALE, offset, rotation, length, true, false )
-export const createFifthsChord = ( notes, offset=0, rotation=0, length=-1 )=> createChord( notes, FIFTHS_CHORD_INTERVALS, offset, rotation, length, true, true )
+export const createFifthsChord = <T>( notes: T[], offset=0, rotation=0, length=-1 )=> createChord( notes, FIFTHS_CHORD_INTERVALS, offset, rotation, length, true, true )

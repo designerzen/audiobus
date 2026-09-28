@@ -44,10 +44,6 @@ export const DIMINISHED_SEVENTH = 9
 export const AUGMENTED_SIXTH = 10
 export const AUGMENTED_SEVENTH = 12
 
-// CHORD INTERVALS (root position, semitone distances)
-
-
-export const MUSICAL_MODE_NAME_HARMONIC_MINOR = 'harmonicMinor'
 
 /**
  * Diminished Chord: 1 - b3 - b5
@@ -77,6 +73,10 @@ export const SUSPENDED_2_CHORD_INTERVALS = [0, 2, 7]
  */
 export const SUSPENDED_4_CHORD_INTERVALS = [0, 5, 7]
 
+
+
+
+
 // SEVENTH CHORDS
 /**
  * Major 7th Chord: 1 - 3 - 5 - 7
@@ -85,16 +85,22 @@ export const SUSPENDED_4_CHORD_INTERVALS = [0, 5, 7]
 export const MAJOR_SEVENTH_CHORD_INTERVALS = [0, 4, 7, 11]
 
 /**
+ * Dominant 7th Chord: 1 - 3 - 5 - b7
+ * Intervals in semitones: [0, 4, 7, 10]
+ */
+export const DOMINANT_SEVENTH_CHORD_INTERVALS = [0, 4, 7, 10]
+
+/**
  * Minor 7th Chord: 1 - b3 - 5 - b7
  * Intervals in semitones: [0, 3, 7, 10]
  */
 export const MINOR_SEVENTH_CHORD_INTERVALS = [0, 3, 7, 10]
 
 /**
- * Dominant 7th Chord: 1 - 3 - 5 - b7
- * Intervals in semitones: [0, 4, 7, 10]
+ * Minor-Major 7th Chord: 1 - b3 - 5 - 7
+ * Intervals in semitones: [0, 3, 7, 11]
  */
-export const DOMINANT_SEVENTH_CHORD_INTERVALS = [0, 4, 7, 10]
+export const MINOR_MAJOR_SEVENTH_CHORD_INTERVALS = [0, 3, 7, 11]
 
 /**
  * Half-Diminished 7th Chord: 1 - b3 - b5 - b7
@@ -108,11 +114,11 @@ export const HALF_DIMINISHED_SEVENTH_CHORD_INTERVALS = [0, 3, 6, 10]
  */
 export const DIMINISHED_SEVENTH_CHORD_INTERVALS = [0, 3, 6, 9]
 
-/**
- * Minor-Major 7th Chord: 1 - b3 - 5 - 7
- * Intervals in semitones: [0, 3, 7, 11]
- */
-export const MINOR_MAJOR_SEVENTH_CHORD_INTERVALS = [0, 3, 7, 11]
+
+export const AUGMENTED_MAJOR_SEVENTH_CHORD_INTERVALS = [0, 4, 8, 11]
+
+export const AUGMENTED_SEVENTH_CHORD_INTERVALS = [0, 4, 8, 10]
+
 
 // EXTENDED CHORDS (9th, 11th, 13th)
 /**
@@ -168,6 +174,89 @@ export const MAJOR_PENTATONIC_INTERVALS = [0, 2, 4, 7, 9]
  */
 export const BLUES_SCALE_INTERVALS = [0, 3, 5, 6, 7, 10]
 
+
+// ADDED EXTENSIONS & ALTERATIONS
+/**
+ * Add9 Chord: 1 - 3 - 5 - 9
+ * Intervals in semitones: [0, 4, 7, 14]
+ */
+export const ADD9_CHORD_INTERVALS = [0, 4, 7, 14]
+
+/**
+ * Minor Add9 Chord: 1 - b3 - 5 - 9
+ * Intervals in semitones: [0, 3, 7, 14]
+ */
+export const MINOR_ADD9_CHORD_INTERVALS = [0, 3, 7, 14]
+
+/**
+ * Add11 Chord: 1 - 3 - 5 - 11
+ * Intervals in semitones: [0, 4, 7, 17]
+ */
+export const ADD11_CHORD_INTERVALS = [0, 4, 7, 17]
+
+/**
+ * Add6 Chord: 1 - 3 - 5 - 6
+ * Intervals in semitones: [0, 4, 7, 9]
+ */
+export const ADD6_CHORD_INTERVALS = [0, 4, 7, 9]
+
+/**
+ * Minor Add6 Chord: 1 - b3 - 5 - 6
+ * Intervals in semitones: [0, 3, 7, 9]
+ */
+export const MINOR_ADD6_CHORD_INTERVALS = [0, 3, 7, 9]
+
+/**
+ * 7b5 Chord: 1 - 3 - b5 - b7 (dominant flat 5)
+ * Intervals in semitones: [0, 4, 6, 10]
+ */
+export const DOMINANT_FLAT5_CHORD_INTERVALS = [0, 4, 6, 10]
+
+/**
+ * 7#5 Chord: 1 - 3 - #5 - b7 (dominant sharp 5)
+ * Intervals in semitones: [0, 4, 8, 10]
+ */
+export const DOMINANT_SHARP5_CHORD_INTERVALS = [0, 4, 8, 10]
+
+/**
+ * 7b9 Chord: 1 - 3 - 5 - b7 - b9 (dominant flat 9)
+ * Intervals in semitones: [0, 4, 7, 10, 13]
+ */
+export const DOMINANT_FLAT9_CHORD_INTERVALS = [0, 4, 7, 10, 13]
+
+/**
+ * 7#9 Chord: 1 - 3 - 5 - b7 - #9 (dominant sharp 9, Hendrix chord)
+ * Intervals in semitones: [0, 4, 7, 10, 15]
+ */
+export const DOMINANT_SHARP9_CHORD_INTERVALS = [0, 4, 7, 10, 15]
+
+/**
+ * 7b9b5 Chord: 1 - 3 - b5 - b7 - b9
+ * Intervals in semitones: [0, 4, 6, 10, 13]
+ */
+export const DOMINANT_FLAT9_FLAT5_CHORD_INTERVALS = [0, 4, 6, 10, 13]
+
+/**
+ * Power Chord (same as POWER_CHORD_INTERVALS)
+ * Intervals in semitones: [0, 7]
+ */
+export const POWER5_CHORD_INTERVALS = [0, 7]
+
+/**
+ * Quartal Chord: 1 - 4 - 7 (four-based harmony)
+ * Intervals in semitones: [0, 5, 10]
+ */
+export const QUARTAL_CHORD_INTERVALS = [0, 5, 10]
+
+/**
+ * Quintal Chord: 1 - 5 - 12 (five-based harmony)
+ * Intervals in semitones: [0, 7, 14]
+ */
+export const QUINTAL_CHORD_INTERVALS = [0, 7, 14]
+
+
+
+
 // MODAL SCALES (Modes of the Major Scale)
 
 /**
@@ -183,6 +272,7 @@ export const MAJOR_CHORD_INTERVALS = [0, 4, 7]
  * Intervals in semitones: [0, 3, 7]
  * Softer, sadder sound than major.
  */
+export const MUSICAL_MODE_NAME_HARMONIC_MINOR = 'harmonicMinor'
 export const MUSICAL_MODE_NAME_NATURAL_MINOR = 'naturalMinor'
 export const MUSICAL_MODE_NAME_MELODIC_MINOR = 'melodicMinor'
 export const MINOR_CHORD_INTERVALS = [0, 3, 7]
@@ -381,9 +471,6 @@ INTERVALS_MAP.set(LYDIAN_INTERVALS, MUSICAL_MODE_NAME_LYDIAN)
 INTERVALS_MAP.set(MIXOLYDIAN_INTERVALS, MUSICAL_MODE_NAME_MIXOLYDIAN)
 INTERVALS_MAP.set(AEOLIAN_INTERVALS, MUSICAL_MODE_NAME_AEOLIAN)
 INTERVALS_MAP.set(LOCRIAN_INTERVALS, MUSICAL_MODE_NAME_LOCRIAN)
-
-
-
 
 // Shifted intervals...
 // To go from any specific note to any other specific note
