@@ -1,7 +1,7 @@
 
 import AbstractInput from "./abstract-input.ts"
 import AudioCommand from "../../audio-command.ts"
-import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON } from '../../commands'
+import { NOTE_OFF, NOTE_ON } from '../../commands'
 import SVGKeyboard from "../../ui/keyboard-svg.ts"
 import NoteModel from "../../note-model.ts"
 
@@ -9,7 +9,7 @@ import type { IAudioInput } from "./input-interface.ts"
 
 const keyboardKeys = (new Array(128)).fill("")
 export const ALL_KEYBOARD_NUMBERS = keyboardKeys.map((_, index) => index )
-export const ALL_KEYBOARD_NOTES = keyboardKeys.map((keyboardKeys, index) => new NoteModel(index))
+export const ALL_KEYBOARD_NOTES = keyboardKeys.map((_, index) => new NoteModel(index))
 
 export const ONSCREEN_KEYBOARD_INPUT_ID = "OnscreenKeyboard"
 
@@ -21,6 +21,7 @@ const DEFAULT_OPTIONS = {
 export default class InputOnScreenKeyboard extends AbstractInput implements IAudioInput{
 	
 	#keyboard:SVGKeyboard
+	private guiNotice: HTMLElement | null = null
 	keyboardElement:HTMLElement | null = null
 
 	get name():string {
@@ -56,29 +57,38 @@ export default class InputOnScreenKeyboard extends AbstractInput implements IAud
 	}
 
 	async createGui(): Promise<HTMLElement> {
+		this.keyboardElement = this.#keyboard.asElement
 		if (this.options.container)
 		{
 			// inject into DOM on specified element 
 			const container = document.querySelector(this.options.container)
-			this.keyboardElement = container.appendChild( this.#keyboard.element )
-			return this.keyboardElement
+			if (container) {
+				container.appendChild(this.keyboardElement)
+				// Graph views move the returned GUI into their own card. Keep the piano
+				// in its configured container and give the card a separate element.
+				this.guiNotice ??= document.createElement('p')
+				this.guiNotice.textContent = 'Play using the onscreen keyboard.'
+				return this.guiNotice
+			}
 		}
 
-		return this.#keyboard.element
+		return this.keyboardElement
 	}
 
 	async destroyGui(): Promise<void> {
-		if( this.#keyboard.element !== null ) {
-			this.#keyboard.element.remove()
-		}
-		return Promise.resolve()
+		this.#keyboard.allNotesOff()
+		this.#keyboard.asElement.remove()
+		this.guiNotice?.remove()
+		this.keyboardElement = null
 	}
 	
 	/**
 	 * KILL
 	 */
 	override destroy(): void {
-		this.#keyboard.allNotesOff()
+		this.#keyboard.destroy()
+		this.guiNotice?.remove()
+		this.keyboardElement = null
 		this.setAsDisconnected()
 	}
 
