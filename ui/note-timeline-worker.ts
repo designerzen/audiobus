@@ -76,6 +76,13 @@ globalThis.onmessage = ({ data }) => {
             break
         case 'noteOff': timeline.noteOff(data.note, time); break
         case 'allNotesOff': timeline.allNotesOff(time); break
+        case 'clear':
+            timeline.notes.length = 0
+            timeline.active.clear()
+            origin = undefined
+            offset = 0
+            follow = true
+            break
         case 'resize':
             canvas.width = data.displayWidth
             canvas.height = data.displayHeight
