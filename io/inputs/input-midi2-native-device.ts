@@ -1,411 +1,141 @@
-import { midiToCommand } from '../../midi/midi-command-conversion.ts'
-/**
- * Native MIDI 2.0 Input Device
- * Uses 64-bit UMP (Universal MIDI Packet) format
- * Supports per-note controllers, high-resolution values (0-65535), and native OS APIs
- * 
- * Platform implementations:
- * - Windows: Windows MIDI Services 2.0 (Windows 11+) with WinMM fallback
- * - macOS: CoreMIDI
- * - Linux: ALSA
- */
-
+import AbstractInput from './abstract-input.ts'
+import type { IAudioInput } from './input-interface.ts'
 import { acceptsMidiInput, createMidiInputControls } from './midi-input-controls.ts'
-import AbstractInput from "./abstract-input.ts"
-import type { IAudioInput } from "./input-interface.ts"
-import { ALL_MIDI_CHANNELS } from "../../midi/midi-channels.ts"
+import { ALL_MIDI_CHANNELS } from '../../midi/midi-channels.ts'
+import { getNativeMidiBridge, type NativeMidiBridge, type NativeMidiDevice } from '../../midi/native-midi-bridge.ts'
+import { umpToMidiBytes, umpToCommand } from '../../midi/ump-codec.ts'
 
-export const MIDI2_NATIVE_INPUT_ID = "MIDI 2.0 Native"
-
-interface NativeDevice {
-	index: number
-	name: string
-}
-
-interface PerNoteData {
-	velocity: number // 0-65535 (16-bit)
-	controllers: Map<number, number>
-	timestamp: number
-}
-
-let nativeMIDI: any = null
-
-// Try to load native MIDI module (dynamically loaded in constructor)
-async function loadNativeMIDI(): Promise<any> {
-	if (nativeMIDI !== null) return nativeMIDI
-	
-	try {
-		// Use import() for ES modules compatibility
-		const mod = await import('../../../build/Release/midi2-native.node' as any)
-		nativeMIDI = mod
-		return nativeMIDI
-	} catch (e) {
-		console.warn('[InputMIDI2Native] Native MIDI module not available:', e)
-		return null
-	}
-}
-
-const DEFAULT_OPTIONS = {
-	channels: ALL_MIDI_CHANNELS,
-	devices: []
-}
-
-/**
- * MIDI 2.0 Per-Note Controller types
- */
-enum PerNoteController {
-	VELOCITY = 0x01,
-	NOTE_ON_VELOCITY = 0x02,
-	BRIGHTNESS = 0x03,
-	TIMBRE = 0x04,
-	RELEASE_TENSION = 0x05,
-	ATTACK_TIME = 0x06,
-	DECAY_TIME = 0x07,
-	SUSTAIN_LEVEL = 0x08,
-	RELEASE_TIME = 0x09,
-	VIBRATO_RATE = 0x0A,
-	VIBRATO_DEPTH = 0x0B,
-	VIBRATO_DELAY = 0x0C,
-	BRIGHTNESS_RANGE = 0x0D
-}
-
+export const MIDI2_NATIVE_INPUT_ID = 'MIDI 2.0 Native'
 export default class InputMIDI2Native extends AbstractInput implements IAudioInput {
-	
-	#devices: NativeDevice[] = []
-	#gui?: ReturnType<typeof createMidiInputControls>
-	#activeDevices: Set<number> = new Set()
-	#listeners: Map<number, Function> = new Map()
-	#nativeMIDIEnabled: boolean = false
-	#activeNotes: Map<number, PerNoteData> = new Map()
-
-	get name(): string {
-		return MIDI2_NATIVE_INPUT_ID
-	}
-
-	get description(): string {
-		return "MIDI 2.0 input with per-note controllers via native OS MIDI"
-	}
-
-	get isEnabled(): boolean {
-		return this.#nativeMIDIEnabled
-	}
-
-	get inputDevices(): NativeDevice[] {
-		return [...this.#devices]
-	}
-
-	constructor(options: Record<string, any> = DEFAULT_OPTIONS) {
-		super({ ...DEFAULT_OPTIONS, ...options })
-	}
-
-    async createGui(): Promise<HTMLElement> {
-        if (!this.#gui) this.#gui = createMidiInputControls(this.options,
+    #bridge?: NativeMidiBridge
+    #devices: NativeMidiDevice[] = []
+    #active = new Set<number>()
+    #unsubscribe?: () => void
+    #gui?: ReturnType<typeof createMidiInputControls>
+    #connecting?: Promise<void>
+    #disconnecting?: Promise<void>
+    #notes = new Map<string, { device: number; group: number; channel: number; note: number; velocity: number; controllers: Map<number, number>; timestamp: number }>()
+    #perNote = false
+    #sustained = new Map<string, { device: number; group: number; channel: number }>()
+    get name() { return MIDI2_NATIVE_INPUT_ID }
+    get description() { return 'Native MIDI 2.0 UMP input via Windows MIDI Services or CoreMIDI' }
+    get isEnabled() { return this.isConnected }
+    get inputDevices() { return [...this.#devices] }
+    constructor(options: Record<string, any> = {}) { super({ channels: ALL_MIDI_CHANNELS, devices: [], ...options }) }
+    async createGui() {
+        this.#gui ??= createMidiInputControls(this.options,
             () => this.#devices.map(device => ({ id: String(device.index), name: device.name })),
-            () => this.dispatchEvent(new Event('configurationChanged')))
+            () => { this.#release(); this.dispatchEvent(new Event('configurationChanged')) })
         return this.#gui.element
     }
-
-    async destroyGui(): Promise<void> {
-        this.#gui?.destroy()
-        this.#gui = undefined
+    async destroyGui() { this.#gui?.destroy(); this.#gui = undefined }
+    async connect(): Promise<Function> {
+        if (this.#disconnecting) await this.#disconnecting
+        if (this.isConnected) return () => this.disconnect()
+        if (this.#connecting) { await this.#connecting; return () => this.disconnect() }
+        this.#connecting = (async () => {
+            this.#bridge = getNativeMidiBridge()
+            try {
+                this.#devices = await this.#bridge.getUmpInputs()
+                this.#perNote = (await this.#bridge.getCapabilities()).perNoteCC
+                this.#gui?.refresh()
+                this.#unsubscribe = this.#bridge.onUmpInput((index, words, nativeTimestamp) => this.#receive(index, words, nativeTimestamp))
+                for (const device of this.#devices) await this.enableDevice(device.index)
+                this.setAsConnected()
+            } catch (error) {
+                this.#unsubscribe?.(); this.#unsubscribe = undefined
+                await this.#closePorts()
+                this.setAsDisconnected()
+                throw error
+            }
+        })()
+        try { await this.#connecting; return () => this.disconnect() } finally { this.#connecting = undefined }
     }
-
-	/**
-	 * Initialize and enumerate available MIDI input devices
-	 */
-	async connect(): Promise<void> {
-		if (this.#nativeMIDIEnabled) return
-		// Load native module if not already loaded
-		if (nativeMIDI === null) {
-			await loadNativeMIDI()
-		}
-
-		if (!nativeMIDI) {
-			this.setAsDisconnected()
-			throw new Error('[InputMIDI2Native] Native MIDI module not available')
-		}
-
-		try {
-			this.#devices = nativeMIDI.getUmpInputs()
-			this.#gui?.refresh()
-			console.log('[InputMIDI2Native] Available MIDI inputs:', this.#devices)
-
-			if (this.#devices.length === 0) {
-				console.warn('[InputMIDI2Native] No MIDI input devices found')
-				this.setAsConnected()
-				this.#nativeMIDIEnabled = true
-				return
-			}
-
-			// Listen to all devices by default
-			for (const device of this.#devices) {
-				await this.#listenToDevice(device.index)
-			}
-
-			this.setAsConnected()
-			this.#nativeMIDIEnabled = true
-			console.info('[InputMIDI2Native] Connected to', this.#devices.length, 'MIDI 2.0 input device(s)')
-		} catch (error) {
-			this.setAsDisconnected()
-			console.error('[InputMIDI2Native] Failed to connect:', error)
-			throw error
-		}
-	}
-
-	/**
-	 * Disconnect from all MIDI devices
-	 */
-	async disconnect(): Promise<void> {
-		for (const deviceIndex of this.#activeDevices) {
-			this.#stopListeningToDevice(deviceIndex)
-		}
-		this.#activeDevices.clear()
-		this.#listeners.clear()
-		this.#activeNotes.clear()
-		this.#nativeMIDIEnabled = false
-		this.setAsDisconnected()
-	}
-
-	/**
-	 * Start listening to a specific MIDI device
-	 */
-	async #listenToDevice(deviceIndex: number): Promise<void> {
-		if (!nativeMIDI) return
-
-		const listener = (inDeviceIndex: number, umpPacket: number) => {
-			if (this.#nativeMIDIEnabled && this.#listeners.get(deviceIndex) === listener && inDeviceIndex === deviceIndex) {
-				this.#handleUmpPacket(deviceIndex, umpPacket)
-			}
-		}
-
-		try {
-			this.#listeners.set(deviceIndex, listener)
-			this.#activeDevices.add(deviceIndex)
-			nativeMIDI.onUmpInput(listener)
-			console.info('[InputMIDI2Native] Listening to device', deviceIndex)
-		} catch (error) {
-			console.error('[InputMIDI2Native] Error listening to device:', error)
-		}
-	}
-
-	/**
-	 * Stop listening to a specific MIDI device
-	 */
-	#stopListeningToDevice(deviceIndex: number): void {
-		if (!nativeMIDI) return
-
-		try {
-			this.#listeners.delete(deviceIndex)
-			console.info('[InputMIDI2Native] Stopped listening to device', deviceIndex)
-		} catch (error) {
-			console.error('[InputMIDI2Native] Error stopping listener:', error)
-		}
-	}
-
-	/**
-	 * Handle incoming UMP packet (MIDI 2.0 format)
-	 */
-	#handleUmpPacket(deviceIndex: number, packet: number): void {
-		const status = packet & 0xFF
-		const data1 = (packet >> 8) & 0xFF
-		const data2 = (packet >> 16) & 0xFF
-		const channel = status < 0xf0 ? (status & 0x0F) + 1 : 0
-		if (!acceptsMidiInput(this.options, String(deviceIndex), channel)) return
-
-        const audioCommand = midiToCommand([status, data1, data2], this.now, String(deviceIndex))
-        if (audioCommand) this.dispatch(audioCommand)
-
-		const command = status >> 4
-		const timestamp = performance.now()
-
-		switch (command) {
-			case 0x9: // Note On (MIDI 2.0 - 16-bit velocity)
-				const noteOnVelocity = (data2 << 8) | data1 // Combine for 16-bit velocity
-				this.#activeNotes.set(data1, {
-					velocity: noteOnVelocity,
-					controllers: new Map(),
-					timestamp
-				})
-
-				this.emit('noteon', {
-					note: data1,
-					velocity: noteOnVelocity,
-					velocityMidi1: Math.round((noteOnVelocity / 65535) * 127), // Convert to MIDI 1 for compatibility
-					channel,
-					deviceIndex,
-					timestamp
-				})
-				break
-
-			case 0x8: // Note Off (MIDI 2.0 - 16-bit velocity)
-				const noteData = this.#activeNotes.get(data1)
-				const noteOffVelocity = noteData?.velocity || 0
-
-				this.emit('noteoff', {
-					note: data1,
-					velocity: noteOffVelocity,
-					velocityMidi1: Math.round((noteOffVelocity / 65535) * 127),
-					channel,
-					controllers: noteData?.controllers,
-					deviceIndex,
-					timestamp
-				})
-
-				this.#activeNotes.delete(data1)
-				break
-
-			case 0xB: // Control Change (MIDI 2.0 - 16-bit resolution)
-				const ccValue = (data2 << 8) | data1
-				this.emit('controlchange', {
-					controller: data1,
-					value: ccValue,
-					valueMidi1: Math.round((ccValue / 65535) * 127),
-					channel,
-					deviceIndex,
-					timestamp
-				})
-				break
-
-			case 0xE: // Pitch Bend (MIDI 2.0 - 32-bit precision)
-				const pitchBend = (data2 << 8) | data1
-				// Convert from MIDI 2.0 32-bit (-8192 to +8192 cents) to MIDI 1.0 range
-				const pitchBendMidi1 = Math.round(((pitchBend - 0x80000000) / 0x80000000) * 8192) + 8192
-
-				this.emit('pitchbend', {
-					value: pitchBend,
-					valueMidi1: pitchBendMidi1,
-					cents: ((pitchBend - 0x80000000) / 0x80000000) * 8192,
-					channel,
-					deviceIndex,
-					timestamp
-				})
-				break
-
-			case 0xC: // Program Change
-				this.emit('programchange', {
-					program: data1,
-					bank: data2,
-					channel,
-					deviceIndex,
-					timestamp
-				})
-				break
-
-			case 0xA: // Polyphonic Aftertouch (MIDI 2.0 - 16-bit)
-				const polyPressure = (data2 << 8) | data1
-				this.emit('polyaftertouch', {
-					note: data1,
-					pressure: polyPressure,
-					pressureMidi1: Math.round((polyPressure / 65535) * 127),
-					channel,
-					deviceIndex,
-					timestamp
-				})
-				break
-
-			case 0xD: // Channel Aftertouch (MIDI 2.0 - 16-bit)
-				const channelPressure = (data2 << 8) | data1
-				this.emit('channelaftertouch', {
-					pressure: channelPressure,
-					pressureMidi1: Math.round((channelPressure / 65535) * 127),
-					channel,
-					deviceIndex,
-					timestamp
-				})
-				break
-
-			case 0x0: // Per-Note Controller (MIDI 2.0 exclusive)
-				const controllerType = data1
-				const controllerValue = (data2 << 8) | data1
-				const note = packet & 0xFF // Note is in lower byte
-
-				const notePerNoteData = this.#activeNotes.get(note)
-				if (notePerNoteData) {
-					notePerNoteData.controllers.set(controllerType, controllerValue)
-				}
-
-				this.emit('pernoteccontroller', {
-					note,
-					controllerType,
-					value: controllerValue,
-					channel,
-					deviceIndex,
-					timestamp
-				})
-				break
-		}
-	}
-
-	/**
-	 * Get list of available devices
-	 */
-	getAvailableDevices(): NativeDevice[] {
-		return [...this.#devices]
-	}
-
-	/**
-	 * Get active notes with their MIDI 2.0 per-note controller data
-	 */
-	getActiveNotesWithControllers(): Map<number, PerNoteData> {
-		return new Map(this.#activeNotes)
-	}
-
-	/**
-	 * Enable listening to a specific device
-	 */
-	async enableDevice(deviceIndex: number): Promise<void> {
-		if (!this.#activeDevices.has(deviceIndex)) {
-			await this.#listenToDevice(deviceIndex)
-		}
-	}
-
-	/**
-	 * Disable listening to a specific device
-	 */
-	disableDevice(deviceIndex: number): void {
-		if (this.#activeDevices.has(deviceIndex)) {
-			this.#stopListeningToDevice(deviceIndex)
-			this.#activeDevices.delete(deviceIndex)
-		}
-	}
-
-	/**
-	 * Emit event to listeners
-	 */
-	private emit(eventType: string, detail: any): void {
-		const event = new CustomEvent(eventType, { detail })
-		this.dispatchEvent(event)
-	}
-
-	hasMidiInput(): boolean {
-		return true
-	}
-
-	hasAudioInput(): boolean {
-		return false
-	}
-
-	hasAutomationInput(): boolean {
-		return false
-	}
-
-	hasMpeInput(): boolean {
-		return true // MIDI 2.0 Per-Note Controllers = MPE-like functionality
-	}
-
-	hasOscInput(): boolean {
-		return false
-	}
-
-	hasSysexInput(): boolean {
-		return false
-	}
-
-	/**
-	 * Disconnect and cleanup
-	 */
-	destroy(): void {
-		this.disconnect()
-		void this.destroyGui()
-	}
+    async #closePorts() {
+        const results = await Promise.allSettled([...this.#active].map(index => this.#bridge!.closeUmpInput(index)))
+        this.#active.clear()
+        const failure = results.find(result => result.status === 'rejected')
+        if (failure?.status === 'rejected') throw failure.reason
+    }
+    async disconnect(): Promise<void> {
+        if (this.#disconnecting) return this.#disconnecting
+        this.#disconnecting = (async () => {
+            if (this.#connecting) await this.#connecting
+            this.setAsDisconnected()
+            this.#unsubscribe?.(); this.#unsubscribe = undefined
+            this.#release()
+            await this.#closePorts()
+        })()
+        try { await this.#disconnecting } finally { this.#disconnecting = undefined }
+    }
+    #release(device?: number) {
+        for (const [key, note] of this.#notes) {
+            if (device !== undefined && note.device !== device) continue
+            const command = umpToCommand([0x40800000 | (note.group << 24) | ((note.channel - 1) << 16) | (note.note << 8), 0], this.now, String(note.device))
+            if (command) this.dispatch(command)
+            this.#notes.delete(key)
+        }
+        for (const [key, pedal] of this.#sustained) {
+            if (device !== undefined && pedal.device !== device) continue
+            const command = umpToCommand([0x40b04000 | (pedal.group << 24) | ((pedal.channel - 1) << 16), 0], this.now, String(pedal.device))
+            if (command) this.dispatch(command)
+            this.#sustained.delete(key)
+        }
+    }
+    #receive(device: number, words: number[], nativeTimestamp?: number) {
+        if (!this.isConnected || !this.#active.has(device)) return
+        const bytes = umpToMidiBytes(words)
+        const type = words[0] >>> 28
+        const channel = type === 2 || type === 4 ? ((words[0] >>> 16) & 15) + 1 : 0
+        const group = (words[0] >>> 24) & 15
+        if (!acceptsMidiInput(this.options, String(device), channel)) return
+        const timestamp = this.now
+        const command = umpToCommand(words, timestamp, String(device))
+        if (!command) return
+        this.dispatch(command)
+        this.dispatchEvent(new CustomEvent('ump', { detail: { words: [...words], channel, group, deviceIndex: device, timestamp, nativeTimestamp } }))
+        const key = `${device}:${group}:${channel}:${(words[0] >>> 8) & 127}`
+        const midi2 = words[0] >>> 28 === 4
+        if (midi2 && words.length === 2 && ((words[0] >>> 20) & 15) <= 1) {
+            const controllerType = words[0] & 127
+            this.#notes.get(key)?.controllers.set(controllerType, words[1])
+            this.dispatchEvent(new CustomEvent('pernotecontroller', { detail: { note: (words[0] >>> 8) & 127, controllerType, value: words[1], channel, group, deviceIndex: device, timestamp } }))
+            return
+        }
+        if (!bytes) return
+        const kind = bytes[0] >> 4
+        if (kind === 11 && bytes[1] === 64) {
+            const pedalKey = `${device}:${group}:${channel}`
+            if (bytes[2] >= 64) this.#sustained.set(pedalKey, { device, group, channel })
+            else this.#sustained.delete(pedalKey)
+        }
+        const detail: Record<string, any> = { channel, group, deviceIndex: device, timestamp }
+        let event: string | undefined
+        if (kind === 8 || kind === 9) {
+            const on = kind === 9 && (midi2 || bytes[2] > 0)
+            Object.assign(detail, { note: bytes[1], velocity: midi2 ? words[1] >>> 16 : bytes[2], velocityMidi1: bytes[2] })
+            event = on ? 'noteon' : 'noteoff'
+            if (on) this.#notes.set(key, { device, group, channel, note: bytes[1], velocity: detail.velocity, controllers: new Map(), timestamp })
+            else this.#notes.delete(key)
+        } else if (kind === 11) { event = 'controlchange'; Object.assign(detail, { controller: bytes[1], value: midi2 ? words[1] : bytes[2], valueMidi1: bytes[2] }) }
+        else if (kind === 14) { event = 'pitchbend'; Object.assign(detail, { value: midi2 ? words[1] : bytes[1] | (bytes[2] << 7), valueMidi1: bytes[1] | (bytes[2] << 7) }) }
+        else if (kind === 12) { event = 'programchange'; detail.program = bytes[1] }
+        else if (kind === 10 || kind === 13) { event = kind === 10 ? 'polyaftertouch' : 'channelaftertouch'; Object.assign(detail, { note: kind === 10 ? bytes[1] : undefined, pressure: midi2 ? words[1] : bytes[kind === 10 ? 2 : 1] }) }
+        if (event) this.dispatchEvent(new CustomEvent(event, { detail }))
+    }
+    getAvailableDevices() { return [...this.#devices] }
+    getActiveNotesWithControllers() { return new Map(this.#notes) }
+    async enableDevice(index: number) {
+        if (!this.#bridge || !this.#devices.some(device => device.index === index)) throw new Error('Invalid MIDI input device')
+        if (!this.#active.has(index)) { await this.#bridge.openUmpInput(index); this.#active.add(index) }
+    }
+    async disableDevice(index: number) {
+        if (!this.#active.delete(index)) return
+        this.#release(index)
+        await this.#bridge!.closeUmpInput(index)
+    }
+    hasMidiInput() { return true }
+    hasSysexInput() { return this.#perNote }
+    hasMpeInput() { return this.#perNote }
+    async destroy() { try { await this.disconnect() } finally { await this.destroyGui() } }
 }

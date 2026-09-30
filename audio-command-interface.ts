@@ -31,6 +31,9 @@ export interface IAudioCommand {
 
 	// UNOFFICAl: Uint8Array
 	raw:Uint8Array
+    // Preserve native UMP precision alongside the MIDI 1-compatible command fields.
+    ump?: number[]
+    umpOriginal?: { type: string; number: number; velocity: number; value: number }
 	// UNOFFICIAL: From Device (uuid)
 	from:string
 }

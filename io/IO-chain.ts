@@ -675,7 +675,7 @@ export default class IOChain extends EventTarget {
         const audioCommand: IAudioCommand = inputEvent.command
         // Channel controllers and system messages must not be interpreted as notes
         // by pitch transformers, quantised, or swallowed by transport handling.
-        const midiControl = audioCommand.raw?.length && audioCommand.type !== NOTE_ON && audioCommand.type !== NOTE_OFF
+        const midiControl = (audioCommand.raw?.length || audioCommand.ump?.length) && audioCommand.type !== NOTE_ON && audioCommand.type !== NOTE_OFF
         if (midiControl) void this.#outputManager.triggerAudioCommandsOnOutputs([audioCommand])
         const origin = inputEvent.origin ?? inputEvent
         let handled = handledTransport.get(this.timer)

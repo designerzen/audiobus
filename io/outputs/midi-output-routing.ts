@@ -3,17 +3,19 @@ import { NOTE_OFF, NOTE_ON } from '../../commands'
 import { commandToMidi } from '../../midi/midi-command-conversion.ts'
 import { ALL_MIDI_CHANNELS } from '../../midi/midi-channels.ts'
 import { createMidiInputControls, type MidiInputDeviceOption } from '../inputs/midi-input-controls.ts'
+import { commandToUmp, isUmpPacket } from '../../midi/ump-codec.ts'
 
 export class MidiOutputRouting {
     private gui?: ReturnType<typeof createMidiInputControls>
-    private notes = new Map<string, { device: string; channel: number; note: number }>()
-    private sustained = new Map<string, { device: string; channel: number }>()
+    private notes = new Map<string, { device: string; channel: number; note: number; group?: number }>()
+    private sustained = new Map<string, { device: string; channel: number; group?: number }>()
     private pending: Promise<void> = Promise.resolve()
 
     constructor(readonly options: Record<string, any>,
         private devices: () => MidiInputDeviceOption[],
         private send: (device: string, data: number[]) => void | Promise<void>,
-        private changed: () => void = () => {}) {}
+        private changed: () => void = () => {},
+        private sendUmp?: (device: string, words: number[]) => void | Promise<void>) {}
 
     channels(incoming = 1): number[] {
         const selected = this.options.selectedChannel ?? this.options.channels ?? -1
@@ -30,7 +32,7 @@ export class MidiOutputRouting {
     }
 
     noteKey(command: IAudioCommand): string {
-        return `${this.targets().map(device => device.id).join(',')}:${this.channels(command.channel).join(',')}:${command.number}`
+        return `${this.targets().map(device => device.id).join(',')}:${command.ump ? (command.ump[0] >>> 24) & 15 : 0}:${this.channels(command.channel).join(',')}:${command.number}`
     }
 
     private enqueue(action: () => void | Promise<void>): Promise<void> {
@@ -40,6 +42,7 @@ export class MidiOutputRouting {
     }
 
     sendCommand(command: IAudioCommand): Promise<void> {
+        if (command.ump && this.sendUmp) return this.sendPacket(commandToUmp(command), command.channel)
         const bytes = commandToMidi(command)
         if (!bytes) return Promise.resolve()
         const targets = this.targets()
@@ -49,12 +52,38 @@ export class MidiOutputRouting {
             for (const device of targets) for (const channel of channels) {
                 const data = channel ? [(bytes[0] & 0xf0) | (channel - 1), ...bytes.slice(1)] : [...bytes]
                 await this.send(device.id, data)
-                const key = `${device.id}:${channel}:${data[1]}`
+                const key = `${device.id}:0:${channel}:${data[1]}`
                 if ((data[0] >> 4) === 9 && data[2] > 0) this.notes.set(key, { device: device.id, channel, note: data[1] })
                 else if ((data[0] >> 4) === 8 || ((data[0] >> 4) === 9 && data[2] === 0)) this.notes.delete(key)
                 if ((data[0] >> 4) === 11 && data[1] === 64) {
-                    const pedal = `${device.id}:${channel}`
+                    const pedal = `${device.id}:0:${channel}`
                     if (data[2] >= 64) this.sustained.set(pedal, { device: device.id, channel })
+                    else this.sustained.delete(pedal)
+                }
+            }
+        })
+    }
+
+    sendPacket(words: number[], incomingChannel?: number): Promise<void> {
+        if (!this.sendUmp || !isUmpPacket(words)) return Promise.reject(new Error('Invalid or unsupported UMP packet'))
+        const packet = [...words], targets = this.targets()
+        const type = packet[0] >>> 28
+        const channelVoice = type === 2 || type === 4
+        const channels = channelVoice ? this.channels(incomingChannel ?? ((packet[0] >>> 16) & 15) + 1) : [0]
+        return this.enqueue(async () => {
+            for (const device of targets) for (const channel of channels) {
+                const data = [...packet]
+                if (channelVoice) data[0] = ((data[0] & 0xfff0ffff) | ((channel - 1) << 16)) >>> 0
+                await this.sendUmp!(device.id, data)
+                if (!channelVoice) continue
+                const group = (data[0] >>> 24) & 15, kind = (data[0] >>> 20) & 15, note = (data[0] >>> 8) & 127
+                const key = `${device.id}:${group}:${channel}:${note}`
+                if (kind === 9 && (type === 4 || (data[0] & 127) > 0)) this.notes.set(key, { device: device.id, group, channel, note })
+                else if (kind === 8 || kind === 9) this.notes.delete(key)
+                if (kind === 11 && note === 64) {
+                    const pedal = `${device.id}:${group}:${channel}`
+                    const value = type === 4 ? data[1] >>> 25 : data[0] & 127
+                    if (value >= 64) this.sustained.set(pedal, { device: device.id, group, channel })
                     else this.sustained.delete(pedal)
                 }
             }
@@ -63,8 +92,14 @@ export class MidiOutputRouting {
 
     release(): Promise<void> {
         return this.enqueue(async () => {
-            for (const active of this.notes.values()) await this.send(active.device, [0x80 | (active.channel - 1), active.note, 0])
-            for (const active of this.sustained.values()) await this.send(active.device, [0xb0 | (active.channel - 1), 64, 0])
+            for (const active of this.notes.values()) {
+                if (active.group !== undefined && this.sendUmp) await this.sendUmp(active.device, [0x40800000 | (active.group << 24) | ((active.channel - 1) << 16) | (active.note << 8), 0])
+                else await this.send(active.device, [0x80 | (active.channel - 1), active.note, 0])
+            }
+            for (const active of this.sustained.values()) {
+                if (active.group !== undefined && this.sendUmp) await this.sendUmp(active.device, [0x40b04000 | (active.group << 24) | ((active.channel - 1) << 16), 0])
+                else await this.send(active.device, [0xb0 | (active.channel - 1), 64, 0])
+            }
             this.notes.clear()
             this.sustained.clear()
         })
