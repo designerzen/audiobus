@@ -1,3 +1,4 @@
+import { EVENT_ERROR } from '../../event-constants.ts'
 import InputPromptAI, { PROMPT_AI_INPUT_ID } from "./input-prompt-ai.ts"
 import type { IAudioInput } from "./input-interface.ts"
 
@@ -84,7 +85,7 @@ export default class InputPromptAISpeech extends InputPromptAI implements IAudio
 
 		this.#recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
 			console.error("Speech recognition error:", event.error)
-			this.updateStatus(`Speech error: ${event.error}`, "error")
+			this.updateStatus(`Speech error: ${event.error}`, EVENT_ERROR)
 			this.#isListening = false
 			this.updateListeningState(false)
 		}
@@ -122,11 +123,11 @@ export default class InputPromptAISpeech extends InputPromptAI implements IAudio
 		const stopBtn = this.#promptElement.querySelector("#stop-listening") as HTMLButtonElement
 
 		if (startBtn) {
-			startBtn.addEventListener("click", () => this.startListening())
+			startBtn.addEventListener('click', () => this.startListening())
 		}
 
 		if (stopBtn) {
-			stopBtn.addEventListener("click", () => this.stopListening())
+			stopBtn.addEventListener('click', () => this.stopListening())
 		}
 
 		return this.#promptElement
@@ -134,7 +135,7 @@ export default class InputPromptAISpeech extends InputPromptAI implements IAudio
 
 	private startListening(): void {
 		if (!this.#recognition) {
-			this.updateStatus("Speech Recognition not available", "error")
+			this.updateStatus("Speech Recognition not available", EVENT_ERROR)
 			return
 		}
 

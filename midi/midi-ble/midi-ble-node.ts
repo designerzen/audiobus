@@ -1,3 +1,4 @@
+import { EVENT_ERROR } from '../../event-constants.ts'
 /**
  * Node JS variant of MIDI over BLE using Noble library
  * NB. this allows for use outside of the browser ecosystem
@@ -71,9 +72,9 @@ export const watchForBlueToothLightStateChange = (): void => {
     })
         
     // catch errors
-    noble.on('error', onError)
+    noble.on(EVENT_ERROR, onError)
     // @ts-ignore - accessing private bindings
-    noble._bindings.on('error', onError)
+    noble._bindings.on(EVENT_ERROR, onError)
 }
 
 

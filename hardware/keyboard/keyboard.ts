@@ -1,3 +1,4 @@
+import { EVENT_KEYBOARD_KEY_DOWN, EVENT_KEYBOARD_KEY_UP } from '../../event-constants.ts'
 import * as Commands from '../../commands'
 
 const MAPPING_KEYS_TO_MIDI_NOTES = [
@@ -31,7 +32,7 @@ export const addKeyboardDownEvents = ( callback:Function, midiNoteSequence:numbe
 		const focussedElement = document.activeElement
 
 		// Dispatch visual feedback event for QWERTY keyboard display
-		window.dispatchEvent(new CustomEvent('keyboardKeyDown', { detail: { key: event.key } }))
+		window.dispatchEvent(new CustomEvent(EVENT_KEYBOARD_KEY_DOWN, { detail: { key: event.key } }))
 
 		if ( keysPressed.has(event.key) )
 		{
@@ -311,7 +312,7 @@ export const addKeyboardDownEvents = ( callback:Function, midiNoteSequence:numbe
 	window.addEventListener('keyup', async (event)=>{
 
 		// Dispatch visual feedback event for QWERTY keyboard display
-		window.dispatchEvent(new CustomEvent('keyboardKeyUp', { detail: { key: event.key } }))
+		window.dispatchEvent(new CustomEvent(EVENT_KEYBOARD_KEY_UP, { detail: { key: event.key } }))
 
 		// if ( event.key !== 'Tab' ){
 		// 	event.preventDefault()

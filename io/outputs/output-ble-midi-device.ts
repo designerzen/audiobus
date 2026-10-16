@@ -1,3 +1,4 @@
+import { EVENT_CONFIGURATION_CHANGED } from '../../event-constants.ts'
 import { connectToBLEDevice, disconnectBLEDevice } from '../../midi/midi-ble/ble-connection.ts'
 import type { IAudioCommand } from '../../audio-command-interface.ts'
 import type { IAudioOutput } from './output-interface.ts'
@@ -33,7 +34,7 @@ export default class OutputBLEMIDIDevice extends EventTarget implements IAudioOu
                 for (let offset = 0; offset < payload.length; offset += 18) {
                     await this.characteristic.writeValue(Uint8Array.from([header, low, ...payload.slice(offset, offset + 18)]))
                 }
-            }, () => this.dispatchEvent(new Event('configurationChanged')))
+            }, () => this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED)))
     }
     get name(): string { return BLE_OUTPUT_ID }
     get description(): string { return 'Sends MIDI messages to the selected device and channel' }

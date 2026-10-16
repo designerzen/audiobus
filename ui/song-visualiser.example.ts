@@ -1,3 +1,4 @@
+import { EVENT_NOTE_CLICK } from '../event-constants.ts'
 /**
  * SongVisualiser Usage Examples
  */
@@ -114,7 +115,7 @@ export function example3_LiveNoteInput() {
     k: 72, // C
   }
 
-  document.addEventListener("keydown", (e) => {
+  document.addEventListener('keydown', (e) => {
     const note = keyMap[e.key.toLowerCase()]
     if (note && !notes.has(e.key)) {
       notes.set(e.key, Date.now())
@@ -122,7 +123,7 @@ export function example3_LiveNoteInput() {
     }
   })
 
-  document.addEventListener("keyup", (e) => {
+  document.addEventListener('keyup', (e) => {
     const note = keyMap[e.key.toLowerCase()]
     if (note) {
       notes.delete(e.key)
@@ -201,7 +202,7 @@ export async function example6_EventHandling() {
   document.body.appendChild(visualiser)
 
   // Listen for note bar clicks
-  visualiser.addEventListener("noteClick", (e: Event) => {
+  visualiser.addEventListener(EVENT_NOTE_CLICK, (e: Event) => {
     const event = e as CustomEvent
     const bar = event.detail
     console.log(

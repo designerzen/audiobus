@@ -1,3 +1,5 @@
+import { EVENT_CHAIN_ADDED, EVENT_CHAIN_REMOVED, EVENT_CHAIN_ACTIVE_CHANGED, EVENT_CHAINS_UPDATED, EVENT_TRANSPORT_CHANGED, EVENT_INPUTS_UPDATED, EVENT_OUTPUTS_UPDATED, EVENT_TRANSFORMERS_UPDATED, EVENT_CONFIGURATION_CHANGED } from '../event-constants.ts'
+export { EVENT_CHAIN_ADDED, EVENT_CHAIN_REMOVED, EVENT_CHAIN_ACTIVE_CHANGED, EVENT_CHAINS_UPDATED } from '../event-constants.ts'
 import { compressToBase64, decompressFromBase64 } from 'lz-string'
 import { deviceId, deviceDefinition, defineDevice } from './device-definition'
 import { restoreDevice, UnavailableDevice, type SavedDevice } from './workspace-devices'
@@ -18,10 +20,10 @@ import type { IAudioOutput } from "./outputs/output-interface"
 import type { IAudioCommand } from "audiobus/audio-command-interface"
 import type AudioEvent from "audiobus/audio-event"
 
-export const EVENT_CHAIN_ADDED = "chainAdded"
-export const EVENT_CHAIN_REMOVED = "chainRemoved"
-export const EVENT_CHAIN_ACTIVE_CHANGED = "chainActiveChanged"
-export const EVENT_CHAINS_UPDATED = "chainsUpdated"
+
+
+
+
 
 export interface IOChainManagerOptions {
 	/**
@@ -63,9 +65,11 @@ export class IOChainManager extends EventTarget {
     #transportRunning: boolean | undefined
     transportHandler?: (type: string) => void
     controlChangeHandler?: (command: IAudioCommand) => boolean
+    clockCommandHandler?: (command: IAudioCommand) => boolean
+    externallyControlledTransport = false
     #handledControls = new WeakMap<object, boolean>()
 
-    get transportRunning(): boolean { return this.#transportRunning ?? this.#options.timer.isRunning }
+    get transportRunning(): boolean { return this.externallyControlledTransport ? this.#options.timer.isRunning : this.#transportRunning ?? this.#options.timer.isRunning }
 
     transport(request: 'start' | 'stop' | 'reset' | 'toggle'): Promise<void> {
         const operation = this.#transportQueue.then(async () => {
@@ -83,7 +87,7 @@ export class IOChainManager extends EventTarget {
                 await Promise.all([...new Set(this.chains.flatMap(chain => chain.outputs))].map(output => OutputManager.settled(output)))
                 if (action === 'reset') timer.resetTimer()
             }
-            this.dispatchEvent(new Event('transportChanged'))
+            this.dispatchEvent(new Event(EVENT_TRANSPORT_CHANGED))
         })
         this.#transportQueue = operation.catch(() => {})
         return operation
@@ -354,9 +358,11 @@ export class IOChainManager extends EventTarget {
 
         if (!chain.options.name) chain.setName(`Chain ${chainId.replace(/^chain-/, '')}`)
         chain.inputCommandHandler = event => {
-            if (event.command.type !== CONTROL_CHANGE || !this.controlChangeHandler) return false
+            if (!this.clockCommandHandler && (event.command.type !== CONTROL_CHANGE || !this.controlChangeHandler)) return false
             if (!this.#handledControls.has(event.origin)) {
-                this.#handledControls.set(event.origin, this.controlChangeHandler(event.command))
+                const consumed = this.clockCommandHandler?.(event.command) ||
+                    (event.command.type === CONTROL_CHANGE && this.controlChangeHandler?.(event.command)) || false
+                this.#handledControls.set(event.origin, consumed)
             }
             return this.#handledControls.get(event.origin)!
         }
@@ -368,7 +374,7 @@ export class IOChainManager extends EventTarget {
         if (!this.#restoring) this.syncDevices()
         const controller = new AbortController()
         this.#subscriptions.set(chainId, controller)
-        for (const event of ['EVENT_INPUTS_UPDATED', 'outputsUpdated', 'EVENT_TRANSFORMERS_UPDATED', 'configurationChanged']) {
+        for (const event of [EVENT_INPUTS_UPDATED, EVENT_OUTPUTS_UPDATED, EVENT_TRANSFORMERS_UPDATED, EVENT_CONFIGURATION_CHANGED]) {
             chain.addEventListener(event, this.changed, { signal: controller.signal })
         }
         chain.addEventListener(INPUT_EVENT, (event: any) => {

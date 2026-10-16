@@ -1,3 +1,5 @@
+import { NOTE_ON, NOTE_OFF } from '../commands.ts'
+import { EVENT_RESIZE } from '../event-constants.ts'
 // The original background effect: smear coloured notes across a transparent canvas.
 let canvas: OffscreenCanvas
 let context: OffscreenCanvasRenderingContext2D
@@ -45,7 +47,7 @@ globalThis.onmessage = ({ data }) => {
         return
     }
     switch (data.type) {
-        case 'noteOn':
+        case NOTE_ON:
             if (data.velocity !== 0) {
                 active.set(data.note, { colour: data.colour, count: (active.get(data.note)?.count ?? 0) + 1 })
                 // Preserve notes that begin and end between animation frames.
@@ -53,13 +55,13 @@ globalThis.onmessage = ({ data }) => {
                 break
             }
             // MIDI note-on with zero velocity is a note-off.
-        case 'noteOff': {
+        case NOTE_OFF: {
             const note = active.get(data.note)
             if (note && --note.count === 0) active.delete(data.note)
             break
         }
         case 'allNotesOff': active.clear(); break
-        case 'resize':
+        case EVENT_RESIZE:
             canvas.width = mirror.width = Math.max(1, Math.round(data.displayWidth))
             canvas.height = mirror.height = Math.max(1, Math.round(data.displayHeight))
             break

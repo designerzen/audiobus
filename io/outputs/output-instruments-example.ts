@@ -1,3 +1,4 @@
+import { EVENT_INSTRUMENTCHANGED } from '../../event-constants.ts'
 /**
  * Example usage of InstrumentsOutput
  *
@@ -20,7 +21,7 @@ async function basicExample() {
 	document.body.appendChild(gui);
 
 	// Listen for instrument changes
-	instrumentsOutput.addEventListener("instrumentchanged", (event: any) => {
+	instrumentsOutput.addEventListener(EVENT_INSTRUMENTCHANGED, (event: any) => {
 		console.log(`Switched to: ${event.detail.instrument.name}`);
 	});
 

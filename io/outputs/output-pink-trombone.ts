@@ -1,3 +1,4 @@
+import { EVENT_LOAD, EVENT_CONNECTED } from '../../event-constants.ts'
 import { midiNoteToFrequency } from "../../conversion/note-to-frequency.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 
@@ -91,7 +92,7 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 			this.#pinkTromboneElement = element as HTMLElement
 
 			// Wait for Pink Trombone to load
-			this.#pinkTromboneElement.addEventListener('load', () => {
+			this.#pinkTromboneElement.addEventListener(EVENT_LOAD, () => {
 				this.onPinkTromboneLoaded()
 			})
 
@@ -298,7 +299,7 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 			if (this.#isInitialized) {
 				resolve()
 			} else {
-				this.addEventListener('connected', () => resolve(), { once: true })
+				this.addEventListener(EVENT_CONNECTED, () => resolve(), { once: true })
 			}
 		})
 	}
@@ -445,7 +446,7 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 				this.updateSynthesisParameters()
 
 				this.#isInitialized = true
-				this.dispatchEvent(new CustomEvent('connected'))
+				this.dispatchEvent(new CustomEvent(EVENT_CONNECTED))
 
 				console.debug('[PINK-TROMBONE] Initialized successfully')
 			}).catch((error: Error) => {

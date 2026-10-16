@@ -1,3 +1,4 @@
+import { EVENT_CONFIGURATION_CHANGED } from '../event-constants.ts'
 import type { Transformer } from './transformers/abstract-transformer'
 /**
  * A single stream of data from the inputManager
@@ -78,7 +79,7 @@ export default class IOChain extends EventTarget {
         const trimmed = name.trim().slice(0, 80)
         if (!trimmed || trimmed === this.#options.name) return
         this.#options.name = trimmed
-        this.dispatchEvent(new Event('configurationChanged'))
+        this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
     }
 
     get isActive(): boolean { return this.#options.active !== false }
@@ -91,7 +92,7 @@ export default class IOChain extends EventTarget {
             this.#audioCommandQueue = []
             this.#pausedQueue = 0
         }
-        this.dispatchEvent(new Event('configurationChanged'))
+        this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
     }
 
     get isDestroyed(): boolean { return this.#destroyed }
@@ -121,7 +122,7 @@ export default class IOChain extends EventTarget {
 
     setGraphOptions(options: Partial<IOChainOptions>): void {
         this.#options = { ...this.#options, ...options }
-        this.dispatchEvent(new Event('configurationChanged'))
+        this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
     }
 
     get options(): IOChainOptions {

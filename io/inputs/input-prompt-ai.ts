@@ -1,3 +1,4 @@
+import { EVENT_ERROR } from '../../event-constants.ts'
 import AbstractInput from "./abstract-input.ts"
 import AudioCommand from "../../audio-command.ts"
 import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON } from '../../commands'
@@ -86,8 +87,8 @@ export default class InputPromptAI extends AbstractInput implements IAudioInput 
 		const stopBtn = this.#promptElement.querySelector("#stop-generation") as HTMLButtonElement
 		const promptInput = this.#promptElement.querySelector("#prompt-input") as HTMLTextAreaElement
 
-		generateBtn.addEventListener("click", () => this.generateSequenceFromPrompt(promptInput.value))
-		stopBtn.addEventListener("click", () => this.stopGeneration())
+		generateBtn.addEventListener('click', () => this.generateSequenceFromPrompt(promptInput.value))
+		stopBtn.addEventListener('click', () => this.stopGeneration())
 
 		return this.#promptElement
 	}
@@ -101,12 +102,12 @@ export default class InputPromptAI extends AbstractInput implements IAudioInput 
 
 	private async generateSequenceFromPrompt(prompt: string): Promise<void> {
 		if (!prompt.trim()) {
-			this.updateStatus("Please enter a prompt", "error")
+			this.updateStatus("Please enter a prompt", EVENT_ERROR)
 			return
 		}
 
 		if (!this.#apiKey) {
-			this.updateStatus("API key not configured", "error")
+			this.updateStatus("API key not configured", EVENT_ERROR)
 			return
 		}
 
@@ -120,7 +121,7 @@ export default class InputPromptAI extends AbstractInput implements IAudioInput 
 			this.updateStatus("Sequence generated successfully", "success")
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : "Unknown error"
-			this.updateStatus(`Failed to generate: ${errorMessage}`, "error")
+			this.updateStatus(`Failed to generate: ${errorMessage}`, EVENT_ERROR)
 			console.error("PromptAI generation error:", error)
 		} finally {
 			this.#isGenerating = false

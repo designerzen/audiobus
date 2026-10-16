@@ -1,3 +1,4 @@
+import { EVENT_INSTRUMENTCHANGED } from '../../event-constants.ts'
 import type { IAudioOutput } from "./output-interface.ts";
 import {
 	InstrumentFactory,
@@ -127,7 +128,7 @@ export default class InstrumentsOutput extends EventTarget implements IAudioOutp
 		}
 
 		// Handle selection change
-		select.addEventListener("change", async (event) => {
+		select.addEventListener('change', async (event) => {
 			const instrumentId = (event.target as HTMLSelectElement).value;
 			if (instrumentId) {
 				await this.#switchInstrument(instrumentId);
@@ -156,7 +157,7 @@ export default class InstrumentsOutput extends EventTarget implements IAudioOutp
 		this.#container.appendChild(statusDiv);
 
 		// Listen for instrument changes to update status
-		this.addEventListener("instrumentchanged", () => {
+		this.addEventListener(EVENT_INSTRUMENTCHANGED, () => {
 			updateStatus();
 		});
 
@@ -200,7 +201,7 @@ export default class InstrumentsOutput extends EventTarget implements IAudioOutp
 
 			// Dispatch change event
 			this.dispatchEvent(
-				new CustomEvent("instrumentchanged", {
+				new CustomEvent(EVENT_INSTRUMENTCHANGED, {
 					detail: { instrumentId, instrument: this.#currentInstrument },
 				}),
 			);

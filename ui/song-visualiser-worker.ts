@@ -1,4 +1,6 @@
+import { NOTE_ON, NOTE_OFF } from '../commands.ts'
 // @ts-nocheck
+import { EVENT_RESIZE } from '../event-constants.ts'
 /**
  * Song Visualiser Worker
  * Handles canvas rendering for song timeline visualization
@@ -524,13 +526,13 @@ self.onmessage = (event) => {
       scheduleRender();
       break;
 
-    case "noteOn": {
+    case NOTE_ON: {
       const { note, velocity, colour } = data;
       notesOn.set(note, { time: Date.now(), velocity, colour });
       break;
     }
 
-    case "noteOff": {
+    case NOTE_OFF: {
       const { note } = data;
       const noteOnData = notesOn.get(note);
       if (noteOnData) {
@@ -561,7 +563,7 @@ self.onmessage = (event) => {
       break;
     }
 
-    case "resize": {
+    case EVENT_RESIZE: {
       const { displayWidth: w, displayHeight: h } = data;
       displayWidth = w;
       displayHeight = h;

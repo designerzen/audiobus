@@ -1,10 +1,12 @@
+import { EVENT_OUTPUTS_UPDATED, EVENT_CONFIGURATION_CHANGED } from '../event-constants.ts'
+export { EVENT_OUTPUTS_UPDATED } from '../event-constants.ts'
 import { NOTE_OFF, NOTE_ON } from '../commands'
 import OutputAudioEvent from "./events/output-audio-event.ts"
 
 import type { IAudioCommand } from '../audio-command-interface'
 import type { IAudioOutput } from "./outputs/output-interface.ts"
 
-export const EVENT_OUTPUTS_UPDATED = "outputsUpdated"
+
 
 // Each output receives an ordered stream; overlapping notes are held until all
 // chains release them. The existing output API identifies voices by pitch.
@@ -83,7 +85,7 @@ export default class OutputManager extends EventTarget implements IAudioOutput{
         if (output.sendCommand && output instanceof EventTarget) {
             const changed = () => { owners.delete(output); noteCommands.delete(output) }
             this.#configurationListeners.set(output, changed)
-            output.addEventListener('configurationChanged', changed)
+            output.addEventListener(EVENT_CONFIGURATION_CHANGED, changed)
         }
 		this.dispatchEvent(new CustomEvent(EVENT_OUTPUTS_UPDATED))
 	}
@@ -95,7 +97,7 @@ export default class OutputManager extends EventTarget implements IAudioOutput{
 	remove(output:IAudioOutput){
 		this.release(output)
         const listener = this.#configurationListeners.get(output)
-        if (listener && output instanceof EventTarget) output.removeEventListener('configurationChanged', listener)
+        if (listener && output instanceof EventTarget) output.removeEventListener(EVENT_CONFIGURATION_CHANGED, listener)
         this.#configurationListeners.delete(output)
 		this.#outputs = this.#outputs.filter(i => i !== output)
 		this.dispatchEvent(new CustomEvent(EVENT_OUTPUTS_UPDATED))
@@ -221,7 +223,7 @@ export default class OutputManager extends EventTarget implements IAudioOutput{
 	destroy(): void {
 		this.allNotesOff()
         for (const [output, listener] of this.#configurationListeners) {
-            if (output instanceof EventTarget) output.removeEventListener('configurationChanged', listener)
+            if (output instanceof EventTarget) output.removeEventListener(EVENT_CONFIGURATION_CHANGED, listener)
         }
         this.#configurationListeners.clear()
 		this.#outputs = []

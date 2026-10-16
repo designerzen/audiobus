@@ -1,3 +1,5 @@
+import { EVENT_TRANSFORMERS_UPDATED, EVENT_TRANSFORMERS_ADDED, EVENT_TRANSFORMERS_REMOVED } from '../event-constants.ts'
+export { EVENT_TRANSFORMERS_UPDATED, EVENT_TRANSFORMERS_ADDED, EVENT_TRANSFORMERS_REMOVED } from '../event-constants.ts'
 /**
  * TRANSFORMER -----------------------------------------------
  * GOBOTS IN DISGUISE
@@ -12,9 +14,9 @@ import type { ITimerControl as Timer } from "netronome"
 import type { FieldConfig, ITransformer } from "./transformers/interface-transformer.ts"
 import type { IAudioCommand } from "../audio-command-interface.ts"
 
-export const EVENT_TRANSFORMERS_UPDATED = "EVENT_TRANSFORMERS_UPDATED"
-export const EVENT_TRANSFORMERS_ADDED = "EVENT_TRANSFORMER_ADDED"
-export const EVENT_TRANSFORMERS_REMOVED = "EVENT_TRANSFORMER_REMOVED"
+
+
+
 
 const DEFAULT_TRANSFORMERS = [
     new TransformerHarmoniser()

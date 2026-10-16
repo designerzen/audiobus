@@ -1,3 +1,4 @@
+import { EVENT_PRESET_CHANGED } from '../../event-constants.ts'
 import { NOTE_ON, NOTE_OFF } from '../../commands'
 import type { IAudioOutput } from "./output-interface.ts"
 
@@ -331,7 +332,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 			console.info(`Loaded Yoshimi preset: ${bankName} / ${instrumentFilename}`)
 
 			// Dispatch event for UI updates
-			this.dispatchEvent(new CustomEvent('preset-changed', {
+			this.dispatchEvent(new CustomEvent(EVENT_PRESET_CHANGED, {
 				detail: { bank: bankName, preset: instrumentFilename }
 			}))
 
@@ -541,7 +542,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		this.#guiContainer.appendChild(presetContainer)
 
 		// Event listeners for bank/preset changes
-		bankSelect.addEventListener("change", async () => {
+		bankSelect.addEventListener('change', async () => {
 			const newBank = bankSelect.value
 			
 			// Update preset options
@@ -563,7 +564,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 			}
 		})
 
-		presetSelect.addEventListener("change", async () => {
+		presetSelect.addEventListener('change', async () => {
 			const newPreset = presetSelect.value
 			await this.loadPreset(bankSelect.value, newPreset)
 			
@@ -575,7 +576,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		})
 
 		// Listen for preset changes from other sources
-		this.addEventListener('preset-changed', (event: any) => {
+		this.addEventListener(EVENT_PRESET_CHANGED, (event: any) => {
 			bankSelect.value = event.detail.bank
 			presetSelect.innerHTML = ""
 			const bank = this.#banks.find(b => b.name === event.detail.bank)

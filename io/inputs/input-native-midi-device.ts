@@ -1,3 +1,4 @@
+import { EVENT_CONFIGURATION_CHANGED, EVENT_NOTEON, EVENT_NOTEOFF, EVENT_CONTROLCHANGE, EVENT_PITCHBEND, EVENT_PROGRAMCHANGE, EVENT_POLYAFTERTOUCH, EVENT_CHANNELAFTERTOUCH } from '../../event-constants.ts'
 import { midiToCommand } from '../../midi/midi-command-conversion.ts'
 /**
  * Native OS MIDI Device Input Adapter
@@ -78,7 +79,7 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
     async createGui(): Promise<HTMLElement> {
         if (!this.#gui) this.#gui = createMidiInputControls(this.options,
             () => this.#devices.map(device => ({ id: String(device.index), name: device.name })),
-            () => this.dispatchEvent(new Event('configurationChanged')))
+            () => this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED)))
         return this.#gui.element
     }
 
@@ -195,7 +196,7 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 
 		switch (command) {
 			case 0x9: // Note On
-				this.emit('noteon', {
+				this.emit(EVENT_NOTEON, {
 					note: data1,
 					velocity: data2,
 					channel,
@@ -205,7 +206,7 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 				break
 
 			case 0x8: // Note Off
-				this.emit('noteoff', {
+				this.emit(EVENT_NOTEOFF, {
 					note: data1,
 					velocity: data2,
 					channel,
@@ -215,7 +216,7 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 				break
 
 			case 0xB: // Control Change
-				this.emit('controlchange', {
+				this.emit(EVENT_CONTROLCHANGE, {
 					controller: data1,
 					value: data2,
 					channel,
@@ -225,7 +226,7 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 				break
 
 			case 0xE: // Pitch Bend
-				this.emit('pitchbend', {
+				this.emit(EVENT_PITCHBEND, {
 					value: (data2 << 7) | data1,
 					channel,
 					deviceIndex,
@@ -234,7 +235,7 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 				break
 
 			case 0xC: // Program Change
-				this.emit('programchange', {
+				this.emit(EVENT_PROGRAMCHANGE, {
 					program: data1,
 					channel,
 					deviceIndex,
@@ -243,7 +244,7 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 				break
 
 			case 0xA: // Polyphonic Aftertouch
-				this.emit('polyaftertouch', {
+				this.emit(EVENT_POLYAFTERTOUCH, {
 					note: data1,
 					pressure: data2,
 					channel,
@@ -253,7 +254,7 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 				break
 
 			case 0xD: // Channel Aftertouch
-				this.emit('channelaftertouch', {
+				this.emit(EVENT_CHANNELAFTERTOUCH, {
 					pressure: data1,
 					channel,
 					deviceIndex,

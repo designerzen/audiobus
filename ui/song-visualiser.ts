@@ -1,3 +1,4 @@
+import { EVENT_RESIZE, EVENT_NOTE_CLICK } from '../event-constants.ts'
 /**
  * SongVisualiser - Display an array of AudioCommands as a timeline
  *
@@ -101,7 +102,7 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
 
         if (this.worker) {
             this.worker.postMessage({
-                type: "noteOn",
+                type: NOTE_ON,
                 data: { note: noteNumber, velocity },
             });
         }
@@ -125,7 +126,7 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
 
         if (this.worker) {
             this.worker.postMessage({
-                type: "noteOff",
+                type: NOTE_OFF,
                 data: { note: noteNumber },
             });
         }
@@ -164,7 +165,7 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
             this.worker = null;
         }
         if (this.themeMediaQuery) {
-            this.themeMediaQuery.removeEventListener("change", this.themeChangeHandler);
+            this.themeMediaQuery.removeEventListener('change', this.themeChangeHandler);
         }
     }
 
@@ -194,7 +195,7 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
     private setupThemeListener() {
         // Listen for system theme changes
         this.themeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-        this.themeMediaQuery.addEventListener("change", this.themeChangeHandler);
+        this.themeMediaQuery.addEventListener('change', this.themeChangeHandler);
     }
 
     private render() {
@@ -219,7 +220,7 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
         this.attachShadow({ mode: "open" });
         this.shadowRoot?.appendChild(container);
 
-        this.canvas?.addEventListener("click", (e) => this.handleCanvasClick(e));
+        this.canvas?.addEventListener('click', (e) => this.handleCanvasClick(e));
     }
 
     private initWorker() {
@@ -262,7 +263,7 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
             const rect = this.getBoundingClientRect();
             const dpr = window.devicePixelRatio || 1;
             this.worker.postMessage({
-                type: "resize",
+                type: EVENT_RESIZE,
                 data: {
                     displayWidth: Math.ceil(rect.width * dpr),
                     displayHeight: Math.ceil(rect.height * dpr),
@@ -375,7 +376,7 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
             this.canvas.style.height = `${minHeight}px`;
 
             this.worker.postMessage({
-                type: "resize",
+                type: EVENT_RESIZE,
                 data: {
                     displayWidth: Math.ceil(rect.width * dpr),
                     displayHeight: Math.ceil(minHeight * dpr),
@@ -435,7 +436,7 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
             this.canvas.style.height = "100px";
 
             this.worker.postMessage({
-                type: "resize",
+                type: EVENT_RESIZE,
                 data: {
                     displayWidth: Math.ceil(rect.width * dpr),
                     displayHeight: Math.ceil(100 * dpr),
@@ -479,7 +480,7 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
 
         if (clickedBar) {
             this.dispatchEvent(
-                new CustomEvent("noteClick", {
+                new CustomEvent(EVENT_NOTE_CLICK, {
                     detail: clickedBar,
                     bubbles: true,
                 }),

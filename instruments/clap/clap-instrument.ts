@@ -1,3 +1,4 @@
+import { EVENT_CONNECTED, EVENT_DISCONNECTED, EVENT_PATCH_LOADED } from '../../event-constants.ts'
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
 import type { CLAPPatch } from "./clap-types.ts"
 import { clapRegistry, initializeCLAPRegistry } from "./clap-registry.ts"
@@ -106,7 +107,7 @@ export default class CLAPInstrument implements IAudioOutput {
 			}
 
 			this.#isConnected = true
-			this.dispatchEvent(new CustomEvent("connected"))
+			this.dispatchEvent(new CustomEvent(EVENT_CONNECTED))
 			console.log("[CLAP] Instrument connected and initialized")
 		} catch (error) {
 			console.error("[CLAP] Connection failed:", error)
@@ -120,7 +121,7 @@ export default class CLAPInstrument implements IAudioOutput {
 	async disconnect(): Promise<void> {
 		this.allNotesOff()
 		this.#isConnected = false
-		this.dispatchEvent(new CustomEvent("disconnected"))
+		this.dispatchEvent(new CustomEvent(EVENT_DISCONNECTED))
 	}
 
 	/**
@@ -159,7 +160,7 @@ export default class CLAPInstrument implements IAudioOutput {
 			await this.initializeWasmModule()
 
 			this.dispatchEvent(
-				new CustomEvent("patchLoaded", {
+				new CustomEvent(EVENT_PATCH_LOADED, {
 					detail: { patch }
 				})
 			)
@@ -368,7 +369,7 @@ export default class CLAPInstrument implements IAudioOutput {
 		}
 
 		// Handle patch selection
-		patchSelect.addEventListener("change", async (e) => {
+		patchSelect.addEventListener('change', async (e) => {
 			const selectedId = (e.target as HTMLSelectElement).value
 			if (selectedId && selectedId !== this.#currentPatch?.id) {
 				try {
@@ -415,7 +416,7 @@ export default class CLAPInstrument implements IAudioOutput {
 	async destroyGui(): Promise<void> {
 		const selector = document.getElementById("clap-patch-selector")
 		if (selector) {
-			selector.removeEventListener("change", () => {})
+			selector.removeEventListener('change', () => {})
 		}
 	}
 

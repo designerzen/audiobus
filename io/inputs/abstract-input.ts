@@ -1,3 +1,4 @@
+import { EVENT_CONNECTION_CHANGED } from '../../event-constants.ts'
 /**
  * 
  */
@@ -95,15 +96,19 @@ export default abstract class AbstractInput extends EventTarget implements IAudi
 	}
 
 	setAsConnected():void{
+		if (this.#connected) return
 		this.#connected = true
+		this.dispatchEvent(new Event(EVENT_CONNECTION_CHANGED))
 	}
 	
 	setAsDisconnected():void{
+		if (!this.#connected) return
 		this.#connected = false
+		this.dispatchEvent(new Event(EVENT_CONNECTION_CHANGED))
 	}
 
-	dispatch(command:IAudioCommand):void {
-		const event:InputAudioEvent = new InputAudioEvent( command )
+	dispatch(command:IAudioCommand, origin: object = {}):void {
+		const event:InputAudioEvent = new InputAudioEvent( command, origin )
 		this.dispatchEvent( event )
 	}
 

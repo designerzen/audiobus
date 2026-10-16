@@ -1,3 +1,4 @@
+import { EVENT_DEVICE_LIST_CHANGED, EVENT_CONFIGURATION_CHANGED, EVENT_CONNECTED, EVENT_DISCONNECTED } from '../../event-constants.ts'
 import { WebMidi, type Output } from 'webmidi'
 import type { IAudioCommand } from '../../audio-command-interface.ts'
 import type { IAudioOutput } from './output-interface.ts'
@@ -16,7 +17,7 @@ export default class OutputWebMIDIDevice extends EventTarget implements IAudioOu
     private deviceChanged = () => {
         this.rememberDefault()
         this.routing.refresh()
-        this.dispatchEvent(new Event('deviceListChanged'))
+        this.dispatchEvent(new Event(EVENT_DEVICE_LIST_CHANGED))
     }
 
     constructor(options: Record<string, any> = {}) {
@@ -27,7 +28,7 @@ export default class OutputWebMIDIDevice extends EventTarget implements IAudioOu
             () => this.outputDevices.map(device => ({ id: device.id, name: [device.manufacturer, device.name].filter(Boolean).join(' ') || device.id })),
             (id, bytes) => {
                 if (this.connected) WebMidi.outputs.find(device => device.id === id)?.send(bytes)
-            }, () => this.dispatchEvent(new Event('configurationChanged')))
+            }, () => this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED)))
     }
     get name(): string { return WEBMIDI_OUTPUT_ID }
     get description(): string { return 'Sends MIDI messages to the selected device and channel' }
@@ -45,15 +46,15 @@ export default class OutputWebMIDIDevice extends EventTarget implements IAudioOu
         await WebMidi.enable({ sysex: true })
         this.connected = true
         this.rememberDefault()
-        WebMidi.addListener('connected', this.deviceChanged)
-        WebMidi.addListener('disconnected', this.deviceChanged)
+        WebMidi.addListener(EVENT_CONNECTED, this.deviceChanged)
+        WebMidi.addListener(EVENT_DISCONNECTED, this.deviceChanged)
         this.routing.refresh()
     }
     async disconnect(): Promise<void> {
         await this.routing.release()
         this.connected = false
-        WebMidi.removeListener('connected', this.deviceChanged)
-        WebMidi.removeListener('disconnected', this.deviceChanged)
+        WebMidi.removeListener(EVENT_CONNECTED, this.deviceChanged)
+        WebMidi.removeListener(EVENT_DISCONNECTED, this.deviceChanged)
         this.routing.refresh()
     }
     setOutput(id: string): void { this.routing.setOutput(id) }

@@ -1,3 +1,4 @@
+import { EVENT_CONNECTED, EVENT_DISCONNECTED, EVENT_CONFIGURATION_CHANGED, EVENT_MIDIMESSAGE, EVENT_DEVICE_LIST_CHANGED } from '../../event-constants.ts'
 import { midiToCommand } from '../../midi/midi-command-conversion.ts'
 import AbstractInput from "./abstract-input.ts"
 import { createAudioCommand } from "../../audio-command-factory.ts"
@@ -31,16 +32,16 @@ export default class InputWebMIDIDevice extends AbstractInput implements IAudioI
         if (this.#webMIDIEnabled) return
         await WebMidi.enable({ sysex: true })
         this.#webMIDIEnabled = true
-        WebMidi.addListener('connected', this.#deviceChangeHandler)
-        WebMidi.addListener('disconnected', this.#deviceChangeHandler)
+        WebMidi.addListener(EVENT_CONNECTED, this.#deviceChangeHandler)
+        WebMidi.addListener(EVENT_DISCONNECTED, this.#deviceChangeHandler)
         WebMidi.inputs.forEach((device, index) => this.connectToMIDIDevice(device, index))
         this.setAsConnected()
         this.#gui?.refresh()
     }
 
     async disconnect(): Promise<void> {
-        WebMidi.removeListener('connected', this.#deviceChangeHandler)
-        WebMidi.removeListener('disconnected', this.#deviceChangeHandler)
+        WebMidi.removeListener(EVENT_CONNECTED, this.#deviceChangeHandler)
+        WebMidi.removeListener(EVENT_DISCONNECTED, this.#deviceChangeHandler)
         this.releaseNotes()
         for (const device of this.inputDevices) this.disconnectFromMIDIDevice(device)
         this.#webMIDIEnabled = false
@@ -53,7 +54,7 @@ export default class InputWebMIDIDevice extends AbstractInput implements IAudioI
             () => WebMidi.inputs.map(device => ({ id: device.id, name: [device.manufacturer, device.name].filter(Boolean).join(' ') || device.id })),
             () => {
                 this.releaseNotes()
-                this.dispatchEvent(new Event('configurationChanged'))
+                this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
             })
         return this.#gui.element
     }
@@ -67,8 +68,8 @@ export default class InputWebMIDIDevice extends AbstractInput implements IAudioI
         const existing = this.#subscriptions.get(device)
         if (existing) return existing
         const proxy = (event: any) => this.onMIDIEvent(event, device, device.name, index)
-        device.addListener('midimessage', proxy)
-        const unsubscribe = () => { device.removeListener('midimessage', proxy) }
+        device.addListener(EVENT_MIDIMESSAGE, proxy)
+        const unsubscribe = () => { device.removeListener(EVENT_MIDIMESSAGE, proxy) }
         this.#subscriptions.set(device, unsubscribe)
         return unsubscribe
     }
@@ -94,7 +95,7 @@ export default class InputWebMIDIDevice extends AbstractInput implements IAudioI
                 if (data[2] >= 64) this.#sustain.set(pedal, { deviceId: device.id, channel: command.channel })
                 else this.#sustain.delete(pedal)
             }
-            this.dispatch(command)
+            this.dispatch(command, event.message ?? event)
             return
         }
         const channel = event.message?.channel ?? event.channel
@@ -137,11 +138,11 @@ export default class InputWebMIDIDevice extends AbstractInput implements IAudioI
 
     private onDeviceStateChange(event: any): void {
         if (event.port?.type === 'input') {
-            if (event.type === 'connected') this.connectToMIDIDevice(event.port, WebMidi.inputs.indexOf(event.port))
-            else if (event.type === 'disconnected') this.disconnectFromMIDIDevice(event.port)
+            if (event.type === EVENT_CONNECTED) this.connectToMIDIDevice(event.port, WebMidi.inputs.indexOf(event.port))
+            else if (event.type === EVENT_DISCONNECTED) this.disconnectFromMIDIDevice(event.port)
         }
         this.#gui?.refresh()
-        this.dispatchEvent(new CustomEvent('deviceListChanged', { detail: { inputs: WebMidi.inputs, device: event.port } }))
+        this.dispatchEvent(new CustomEvent(EVENT_DEVICE_LIST_CHANGED, { detail: { inputs: WebMidi.inputs, device: event.port } }))
     }
 
     async destroy(): Promise<void> {

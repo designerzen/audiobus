@@ -1,3 +1,5 @@
+import { EVENT_INPUTS_UPDATED } from '../event-constants.ts'
+export { EVENT_INPUTS_UPDATED } from '../event-constants.ts'
 /**
  * Combine input mechanisms and dispatch
  * directly from this instance. Allows
@@ -9,7 +11,7 @@ import { INPUT_EVENT } from '../commands'
 import AbstractInput from "./inputs/abstract-input"
 import type InputAudioEvent from "./events/input-audio-event"
 
-export const EVENT_INPUTS_UPDATED = "EVENT_INPUTS_UPDATED"
+
 
 export default class InputManager extends AbstractInput {
 	

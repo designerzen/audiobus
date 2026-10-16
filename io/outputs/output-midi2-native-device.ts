@@ -1,3 +1,4 @@
+import { EVENT_CONFIGURATION_CHANGED } from '../../event-constants.ts'
 import { MidiOutputRouting } from './midi-output-routing.ts'
 import type { IAudioCommand } from '../../audio-command-interface.ts'
 import type { IAudioOutput } from './output-interface.ts'
@@ -29,7 +30,7 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
         this.#routing = new MidiOutputRouting(this.options,
             () => this.#devices.map(device => ({ id: String(device.index), name: device.name })),
             (id, bytes) => this.#sendWords(id, midiBytesToUmp(bytes)),
-            () => this.dispatchEvent(new Event('configurationChanged')),
+            () => this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED)),
             (id, words) => this.#sendWords(id, words))
     }
     async #sendWords(id: string, words: number[]) {

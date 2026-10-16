@@ -1,3 +1,4 @@
+import { EVENT_KEYBOARD_KEY_DOWN, EVENT_KEYBOARD_KEY_UP } from '../event-constants.ts'
 import QwertyKeyboard from './keyboard-qwerty.ts'
 
 /**
@@ -28,10 +29,10 @@ export default class KeyboardDisplayManager {
 			this.keyboard.setKeyAsInactive(customEvent.detail.key)
 		}
 
-		window.addEventListener('keyboardKeyDown', this.keyDownListener, {
+		window.addEventListener(EVENT_KEYBOARD_KEY_DOWN, this.keyDownListener, {
 			signal: this.abortController.signal,
 		})
-		window.addEventListener('keyboardKeyUp', this.keyUpListener, {
+		window.addEventListener(EVENT_KEYBOARD_KEY_UP, this.keyUpListener, {
 			signal: this.abortController.signal,
 		})
 	}

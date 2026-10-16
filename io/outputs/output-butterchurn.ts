@@ -1,3 +1,4 @@
+import { EVENT_RESIZE } from '../../event-constants.ts'
 import type { IAudioOutput } from "./output-interface.ts"
 import "./output-butterchurn.css"
 
@@ -75,7 +76,7 @@ export default class OutputButterchurn implements IAudioOutput {
 		}, 30000)
 
 		// Handle window resize
-		window.addEventListener('resize', this.#handleResize)
+		window.addEventListener(EVENT_RESIZE, this.#handleResize)
 		this.#resizeObserver = new ResizeObserver(this.#handleResize)
 		this.#resizeObserver.observe(this.#canvas)
 
@@ -94,7 +95,7 @@ export default class OutputButterchurn implements IAudioOutput {
 			clearInterval(this.#presetChangeTimer)
 			this.#presetChangeTimer = null
 		}
-		window.removeEventListener('resize', this.#handleResize)
+		window.removeEventListener(EVENT_RESIZE, this.#handleResize)
 	}
 
 	async #loadButterchurn(): Promise<void> {

@@ -1,3 +1,4 @@
+import { EVENT_NOTE_CLICK } from '../event-constants.ts'
 /**
  * Song Visualiser UI Wrapper
  * 
@@ -39,7 +40,7 @@ export class SongVisualiserUI extends HTMLElement {
   private setupThemeListener() {
     // Listen for system theme changes
     this.themeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
-    this.themeMediaQuery.addEventListener("change", this.themeChangeHandler)
+    this.themeMediaQuery.addEventListener('change', this.themeChangeHandler)
   }
 
   private updateStyles() {
@@ -51,7 +52,7 @@ export class SongVisualiserUI extends HTMLElement {
 
   disconnectedCallback() {
     if (this.themeMediaQuery) {
-      this.themeMediaQuery.removeEventListener("change", this.themeChangeHandler)
+      this.themeMediaQuery.removeEventListener('change', this.themeChangeHandler)
     }
   }
 
@@ -145,49 +146,49 @@ export class SongVisualiserUI extends HTMLElement {
     const exportBtn = this.shadowRoot?.querySelector(".export-btn") as HTMLButtonElement
 
     if (layoutModeSelect) {
-      layoutModeSelect.addEventListener("change", (e) => {
+      layoutModeSelect.addEventListener('change', (e) => {
         const value = (e.target as HTMLSelectElement).value as "timeline" | "stacked"
         this.visualiser?.setOptions({ layoutMode: value })
       })
     }
 
     if (pixelsPerSecondSlider) {
-      pixelsPerSecondSlider.addEventListener("input", (e) => {
+      pixelsPerSecondSlider.addEventListener('input', (e) => {
         const value = parseInt((e.target as HTMLInputElement).value, 10)
         this.visualiser?.setOptions({ pixelsPerSecond: value })
       })
     }
 
     if (noteHeightSlider) {
-      noteHeightSlider.addEventListener("input", (e) => {
+      noteHeightSlider.addEventListener('input', (e) => {
         const value = parseInt((e.target as HTMLInputElement).value, 10)
         this.visualiser?.setOptions({ noteHeight: value })
       })
     }
 
     if (barHeightSlider) {
-      barHeightSlider.addEventListener("input", (e) => {
+      barHeightSlider.addEventListener('input', (e) => {
         const value = parseInt((e.target as HTMLInputElement).value, 10)
         this.visualiser?.setOptions({ barHeight: value })
       })
     }
 
     if (loadFromOPFSBtn) {
-      loadFromOPFSBtn.addEventListener("click", () => this.loadFromOPFS())
+      loadFromOPFSBtn.addEventListener('click', () => this.loadFromOPFS())
     }
 
     if (clearBtn) {
-      clearBtn.addEventListener("click", () => this.clear())
+      clearBtn.addEventListener('click', () => this.clear())
     }
 
     if (exportBtn) {
-      exportBtn.addEventListener("click", () => this.exportJSON())
+      exportBtn.addEventListener('click', () => this.exportJSON())
     }
 
     // Listen for note clicks
-    this.visualiser?.addEventListener("noteClick", (e: any) => {
+    this.visualiser?.addEventListener(EVENT_NOTE_CLICK, (e: any) => {
       console.log("Note clicked:", e.detail)
-      this.dispatchEvent(new CustomEvent("noteClick", { detail: e.detail }))
+      this.dispatchEvent(new CustomEvent(EVENT_NOTE_CLICK, { detail: e.detail }))
     })
   }
 

@@ -1,3 +1,4 @@
+import { EVENT_CONFIGURATION_CHANGED } from '../../event-constants.ts'
 import { MidiOutputRouting } from './midi-output-routing.ts'
 import type { IAudioCommand } from '../../audio-command-interface.ts'
 /**
@@ -97,7 +98,7 @@ export default class OutputNativeMIDIDevice extends EventTarget implements IAudi
                 if (typeof nativeMIDI.sendMidiMessage === 'function') nativeMIDI.sendMidiMessage(index, Uint8Array.from(bytes))
                 else if (bytes.length <= 3) nativeMIDI.sendUmp(index, ((bytes[0] << 24) | ((bytes[1] ?? 0) << 16) | ((bytes[2] ?? 0) << 8)) >>> 0)
                 else throw new Error('This native MIDI addon does not support SysEx; use WebMIDI output')
-            }, () => this.dispatchEvent(new Event('configurationChanged')))
+            }, () => this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED)))
 	}
 
 	/**

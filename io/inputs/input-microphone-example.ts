@@ -1,3 +1,5 @@
+import { NOTE_ON, NOTE_OFF, PITCH_BEND } from '../../commands.ts'
+import { INPUT_EVENT } from '../../event-constants.ts'
 /**
  * Example: Integrating Microphone Input into HarmonEasy
  * 
@@ -108,21 +110,21 @@ export async function setupHighAccuracyInput(inputManager: InputManager) {
  * Example 6: Monitor microphone events
  */
 export function monitorMicrophoneEvents(inputManager: InputManager) {
-	inputManager.addEventListener("inputEvent", (event: any) => {
+	inputManager.addEventListener(INPUT_EVENT, (event: any) => {
 		const command: IAudioCommand = event.command
 		
 		switch (command.subtype) {
-			case "noteOn":
+			case NOTE_ON:
 				console.log(`🎵 Note On: #${command.noteNumber} Velocity: ${command.velocity}`)
 				// Update UI, trigger synth, etc.
 				break
 				
-			case "noteOff":
+			case NOTE_OFF:
 				console.log(`🔇 Note Off: #${command.noteNumber}`)
 				// Stop synth, update UI, etc.
 				break
 				
-			case "pitchBend":
+			case PITCH_BEND:
 				const cents = ((command.value - 8192) / 8192) * 100
 				console.log(`🎚️  Pitch Bend: ${cents.toFixed(1)} cents`)
 				// Fine-tune pitch in real-time
@@ -172,12 +174,12 @@ export function createMicrophoneController(micInput: InputMicrophoneFormant) {
 	}
 	
 	// Update on note events
-	micInput.addEventListener("inputEvent", (event: any) => {
+	micInput.addEventListener(INPUT_EVENT, (event: any) => {
 		const cmd = event.command
 		const noteDiv = container.querySelector("#last-note") as HTMLElement
 		const confDiv = container.querySelector("#confidence") as HTMLElement
 		
-		if (cmd.subtype === "noteOn") {
+		if (cmd.subtype === NOTE_ON) {
 			noteDiv.textContent = `${cmd.noteNumber}`
 			confDiv.textContent = `${((cmd.velocity / 127) * 100).toFixed(1)}%`
 		}
@@ -210,7 +212,7 @@ export async function setupCompleteExample() {
 		await micInput.connect()
 		
 		// Monitor events
-		inputManager.addEventListener("inputEvent", (event: any) => {
+		inputManager.addEventListener(INPUT_EVENT, (event: any) => {
 			const cmd = event.command
 			console.log(`Input: ${cmd.from} → ${cmd.subtype}`, {
 				note: cmd.noteNumber,

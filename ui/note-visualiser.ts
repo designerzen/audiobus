@@ -1,3 +1,4 @@
+import { NOTE_ON, NOTE_OFF } from '../commands.ts'
 /**
  * Scrolling note on / off visualisation
  */
@@ -85,7 +86,7 @@ export default class NoteVisualiser extends AbstractResizeable implements IAudio
      * @param {number} velocity 
      */
     noteOn( noteNumber:number, velocity=1, colour=convertNoteNumberToColour(noteNumber) ){
-        const payload = { type:"noteOn", note:noteNumber,colour, velocity, time: performance.timeOrigin + performance.now() }
+        const payload = { type:NOTE_ON, note:noteNumber,colour, velocity, time: performance.timeOrigin + performance.now() }
         // console.info("NOTEVIZ noteOn", {note, velocity, payload} )
         this.notesOn++
         this.worker.postMessage(payload)
@@ -98,7 +99,7 @@ export default class NoteVisualiser extends AbstractResizeable implements IAudio
      */
     noteOff( noteNumber:number, velocity=1, colour='#fff' ){
         this.notesOn--
-        this.worker.postMessage({ type:"noteOff",  note:noteNumber, colour, velocity, time: performance.timeOrigin + performance.now() })
+        this.worker.postMessage({ type:NOTE_OFF,  note:noteNumber, colour, velocity, time: performance.timeOrigin + performance.now() })
     }
 
 	/**

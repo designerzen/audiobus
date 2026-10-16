@@ -7,6 +7,8 @@
 	"exports": {
 		".": "./index.ts",
 		"./commands": "./commands.ts",
+		"./effects": "./effects/index.ts",
+		"./effects/*": "./effects/*",
 		"./instruments": "./instruments/index.ts",
 		"./instruments/*": "./instruments/*",
 		"./io": "./io/index.ts",
@@ -29,14 +31,17 @@
 		"./*": "./*"
 	},
 	"scripts": {
+		"check:constants": "node --test scripts/check-shared-constants.test.mjs",
+		"pretest": "node scripts/check-shared-constants.mjs",
 		"test": "vitest",
-		"lint": "oxlint .",
-		"lint:fix": "oxlint --fix .",
+		"lint": "node scripts/check-shared-constants.mjs && oxlint .",
+		"lint:fix": "node scripts/check-shared-constants.mjs && oxlint --fix .",
 		"upgrader": "npx npm-check-updates --interactive -u"
 	},
 	"files": [
 		"*.ts",
 		"*.js",
+		"effects",
 		"instruments",
 		"io",
 		"midi",

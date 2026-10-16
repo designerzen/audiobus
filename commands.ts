@@ -1,3 +1,4 @@
+export { INPUT_EVENT, OUTPUT_EVENT } from './event-constants.ts'
 
 
 // Things that this app can do!
@@ -23,6 +24,3 @@ export const DVS_POSITION = 'dvsPosition'
 export const MIDI_CONTINUE = 'midiContinue'
 export const MIDI_START = 'midiStart'
 export const MIDI_STOP = 'midiStop'
-
-export const INPUT_EVENT = 'inputEvent'
-export const OUTPUT_EVENT = 'outputEvent'

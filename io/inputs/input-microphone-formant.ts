@@ -1,3 +1,4 @@
+import { PITCH_BEND } from '../../commands.ts'
 /**
  * Microphone Input with Formant-based Pitch Detection
  * 
@@ -450,7 +451,7 @@ export default class InputMicrophoneFormant extends AbstractInput implements IAu
 		const pitchBendValue = Math.round(8192 + (cents / 100) * 8192)
 
 		const command: IAudioCommand = createAudioCommand(
-			"pitchBend" as any,
+			PITCH_BEND as any,
 			0,
 			this.now,
 			this.name

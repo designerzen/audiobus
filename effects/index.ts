@@ -3,6 +3,9 @@
  * Reverb, delay, filters, and other signal processors
  */
 
+export { BT_PEQ, BT_BPF, cookBiquadVoxengo, createVoxengoBiquadFilter } from './biquad-voxengo.ts'
+export type { BiquadCoefficients, VoxengoBiquadType, VoxengoBiquadOptions } from './biquad-voxengo.ts'
+
 export {
   Effect,
   AudioEffect,

@@ -1,3 +1,4 @@
+import { EVENT_RESIZE } from '../event-constants.ts'
 /**
  * Maximum canvas size before downscaling
  * Prevents performance issues on very large displays
@@ -67,7 +68,7 @@ export class AbstractResizeable {
 		} else {
 			// dispatch worker message to resize to known size
 			const payload = {
-				type: 'resize',
+				type: EVENT_RESIZE,
 				displayWidth: canvas.width,
 				displayHeight: canvas.height,
 				scaleFactor: 1,
@@ -114,7 +115,7 @@ export class AbstractResizeable {
 			// NB. Make the canvas the same size via OffscreenCanvas
 			//      this.canvas.width  = displayWidth
 			//      this.canvas.height = displayHeight
-			const payload = { type: 'resize', displayWidth, displayHeight, scaleFactor, ...this.optional }
+			const payload = { type: EVENT_RESIZE, displayWidth, displayHeight, scaleFactor, ...this.optional }
 			this.worker.postMessage(payload)
 		}
 

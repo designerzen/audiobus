@@ -1,3 +1,4 @@
+import { EVENT_CONFIGURATION_CHANGED } from '../../event-constants.ts'
 import { midiToCommand } from '../../midi/midi-command-conversion.ts'
 import { BleMidiDecoder } from '../../midi/midi-ble/ble-midi-decoder.ts'
 /**
@@ -58,7 +59,7 @@ export default class InputBLEMIDIDevice extends AbstractInput implements IAudioI
     async createGui(): Promise<HTMLElement> {
         if (!this.#gui) this.#gui = createMidiInputControls(this.options,
             () => this.#bluetoothDevice ? [{ id: this.#bluetoothDevice.id, name: this.#bluetoothDevice.name ?? 'Bluetooth MIDI device' }] : [],
-            () => { this.releaseNotes(); this.dispatchEvent(new Event('configurationChanged')) })
+            () => { this.releaseNotes(); this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED)) })
         return this.#gui.element
     }
 

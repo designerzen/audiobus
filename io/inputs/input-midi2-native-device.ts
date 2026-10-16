@@ -1,3 +1,4 @@
+import { EVENT_CONFIGURATION_CHANGED, EVENT_UMP, EVENT_PERNOTECONTROLLER, EVENT_NOTEON, EVENT_NOTEOFF, EVENT_CONTROLCHANGE, EVENT_PITCHBEND, EVENT_PROGRAMCHANGE, EVENT_POLYAFTERTOUCH, EVENT_CHANNELAFTERTOUCH } from '../../event-constants.ts'
 import AbstractInput from './abstract-input.ts'
 import type { IAudioInput } from './input-interface.ts'
 import { acceptsMidiInput, createMidiInputControls } from './midi-input-controls.ts'
@@ -25,7 +26,7 @@ export default class InputMIDI2Native extends AbstractInput implements IAudioInp
     async createGui() {
         this.#gui ??= createMidiInputControls(this.options,
             () => this.#devices.map(device => ({ id: String(device.index), name: device.name })),
-            () => { this.#release(); this.dispatchEvent(new Event('configurationChanged')) })
+            () => { this.#release(); this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED)) })
         return this.#gui.element
     }
     async destroyGui() { this.#gui?.destroy(); this.#gui = undefined }
@@ -93,13 +94,13 @@ export default class InputMIDI2Native extends AbstractInput implements IAudioInp
         const command = umpToCommand(words, timestamp, String(device))
         if (!command) return
         this.dispatch(command)
-        this.dispatchEvent(new CustomEvent('ump', { detail: { words: [...words], channel, group, deviceIndex: device, timestamp, nativeTimestamp } }))
+        this.dispatchEvent(new CustomEvent(EVENT_UMP, { detail: { words: [...words], channel, group, deviceIndex: device, timestamp, nativeTimestamp } }))
         const key = `${device}:${group}:${channel}:${(words[0] >>> 8) & 127}`
         const midi2 = words[0] >>> 28 === 4
         if (midi2 && words.length === 2 && ((words[0] >>> 20) & 15) <= 1) {
             const controllerType = words[0] & 127
             this.#notes.get(key)?.controllers.set(controllerType, words[1])
-            this.dispatchEvent(new CustomEvent('pernotecontroller', { detail: { note: (words[0] >>> 8) & 127, controllerType, value: words[1], channel, group, deviceIndex: device, timestamp } }))
+            this.dispatchEvent(new CustomEvent(EVENT_PERNOTECONTROLLER, { detail: { note: (words[0] >>> 8) & 127, controllerType, value: words[1], channel, group, deviceIndex: device, timestamp } }))
             return
         }
         if (!bytes) return
@@ -114,13 +115,13 @@ export default class InputMIDI2Native extends AbstractInput implements IAudioInp
         if (kind === 8 || kind === 9) {
             const on = kind === 9 && (midi2 || bytes[2] > 0)
             Object.assign(detail, { note: bytes[1], velocity: midi2 ? words[1] >>> 16 : bytes[2], velocityMidi1: bytes[2] })
-            event = on ? 'noteon' : 'noteoff'
+            event = on ? EVENT_NOTEON : EVENT_NOTEOFF
             if (on) this.#notes.set(key, { device, group, channel, note: bytes[1], velocity: detail.velocity, controllers: new Map(), timestamp })
             else this.#notes.delete(key)
-        } else if (kind === 11) { event = 'controlchange'; Object.assign(detail, { controller: bytes[1], value: midi2 ? words[1] : bytes[2], valueMidi1: bytes[2] }) }
-        else if (kind === 14) { event = 'pitchbend'; Object.assign(detail, { value: midi2 ? words[1] : bytes[1] | (bytes[2] << 7), valueMidi1: bytes[1] | (bytes[2] << 7) }) }
-        else if (kind === 12) { event = 'programchange'; detail.program = bytes[1] }
-        else if (kind === 10 || kind === 13) { event = kind === 10 ? 'polyaftertouch' : 'channelaftertouch'; Object.assign(detail, { note: kind === 10 ? bytes[1] : undefined, pressure: midi2 ? words[1] : bytes[kind === 10 ? 2 : 1] }) }
+        } else if (kind === 11) { event = EVENT_CONTROLCHANGE; Object.assign(detail, { controller: bytes[1], value: midi2 ? words[1] : bytes[2], valueMidi1: bytes[2] }) }
+        else if (kind === 14) { event = EVENT_PITCHBEND; Object.assign(detail, { value: midi2 ? words[1] : bytes[1] | (bytes[2] << 7), valueMidi1: bytes[1] | (bytes[2] << 7) }) }
+        else if (kind === 12) { event = EVENT_PROGRAMCHANGE; detail.program = bytes[1] }
+        else if (kind === 10 || kind === 13) { event = kind === 10 ? EVENT_POLYAFTERTOUCH : EVENT_CHANNELAFTERTOUCH; Object.assign(detail, { note: kind === 10 ? bytes[1] : undefined, pressure: midi2 ? words[1] : bytes[kind === 10 ? 2 : 1] }) }
         if (event) this.dispatchEvent(new CustomEvent(event, { detail }))
     }
     getAvailableDevices() { return [...this.#devices] }

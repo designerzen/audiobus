@@ -1,3 +1,4 @@
+import { EVENT_NOTEOFF, EVENT_NOTEON, EVENT_CONTROLCHANGE, EVENT_PROGRAMCHANGE, EVENT_PITCHBEND } from '../../event-constants.ts'
 // MIDI Status Byte Constants
 
 // Channel Voice Messages
@@ -41,13 +42,13 @@ export const MIDI_RESET = 0xFF
 
 // useful for debugging
 export const MIDI_TYPES: Record<number, string> = {
-    [MIDI_NOTE_OFF]: 'noteoff',
-    [MIDI_NOTE_ON]: 'noteon',
+    [MIDI_NOTE_OFF]: EVENT_NOTEOFF,
+    [MIDI_NOTE_ON]: EVENT_NOTEON,
     [MIDI_POLYPHONIC_KEY_PRESSURE]: 'polyat',
-    [MIDI_CONTROL_CHANGE]: 'controlchange',
-    [MIDI_PROGRAM_CHANGE]: 'programchange',
+    [MIDI_CONTROL_CHANGE]: EVENT_CONTROLCHANGE,
+    [MIDI_PROGRAM_CHANGE]: EVENT_PROGRAMCHANGE,
     [MIDI_CHANNEL_PRESSURE]: 'channelat',
-    [MIDI_PITCH_BEND]: 'pitchbend',
+    [MIDI_PITCH_BEND]: EVENT_PITCHBEND,
     
     [MIDI_SYSTEM_EXCLUSIVE]: 'sysex',
     [MIDI_TIME_CODE_QUARTER_FRAME]: 'timecode',

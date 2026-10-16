@@ -1,3 +1,4 @@
+import { NOTE_ON, NOTE_OFF } from '../../commands.ts'
 import type { IAudioOutput } from "./output-interface.ts"
 import { convertNoteNumberToColour } from "../../conversion/note-to-colour.ts"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
@@ -286,7 +287,7 @@ export default class OutputSpectrumAnalyser extends EventTarget implements IAudi
 		const color = convertNoteNumberToColour(note, 12, velocity)
 
 		this.#worker.postMessage({
-			type: 'noteOn',
+			type: NOTE_ON,
 			note,
 			velocity,
 			frequency,
@@ -299,7 +300,7 @@ export default class OutputSpectrumAnalyser extends EventTarget implements IAudi
 		if (!this.#worker) return
 
 		this.#worker.postMessage({
-			type: 'noteOff',
+			type: NOTE_OFF,
 			note,
 		})
 	}

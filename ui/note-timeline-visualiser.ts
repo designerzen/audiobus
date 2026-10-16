@@ -1,3 +1,5 @@
+import { NOTE_ON, NOTE_OFF } from '../commands.ts'
+import { EVENT_RESIZE } from '../event-constants.ts'
 import TIMELINE_WORKER from './note-timeline-worker.ts?worker'
 import { AbstractResizeable } from './abstract-resizeable-canvas'
 import { convertNoteNumberToColour } from '../conversion/note-to-colour'
@@ -61,17 +63,17 @@ export default class NoteTimelineVisualiser extends AbstractResizeable {
         }, { signal })
         this.observer = new ResizeObserver(entries => {
             const { width, height } = entries[0].contentRect
-            if (width && height) this.worker.postMessage({ type: 'resize', displayWidth: Math.round(width), displayHeight: Math.round(height) })
+            if (width && height) this.worker.postMessage({ type: EVENT_RESIZE, displayWidth: Math.round(width), displayHeight: Math.round(height) })
         })
         this.observer.observe(canvas)
     }
 
     noteOn(note: number, velocity = 1, colour = convertNoteNumberToColour(note)) {
-        this.worker.postMessage({ type: 'noteOn', note, velocity, colour, time: performance.timeOrigin + performance.now() })
+        this.worker.postMessage({ type: NOTE_ON, note, velocity, colour, time: performance.timeOrigin + performance.now() })
     }
 
     noteOff(note: number) {
-        this.worker.postMessage({ type: 'noteOff', note, time: performance.timeOrigin + performance.now() })
+        this.worker.postMessage({ type: NOTE_OFF, note, time: performance.timeOrigin + performance.now() })
     }
 
     allNotesOff() {

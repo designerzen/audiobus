@@ -1,3 +1,5 @@
+import { NOTE_ON, NOTE_OFF } from '../commands.ts'
+import { EVENT_RESIZE } from '../event-constants.ts'
 import { NoteTimeline } from './note-timeline'
 
 const timeline = new NoteTimeline()
@@ -70,11 +72,11 @@ globalThis.onmessage = ({ data }) => {
     }
     const time = data.time === undefined || origin === undefined ? now() : (data.time - origin) / 1000
     switch (data.type) {
-        case 'noteOn':
+        case NOTE_ON:
             if (origin === undefined && data.velocity !== 0) origin = data.time
             timeline.noteOn(data.note, time, data.colour, data.velocity)
             break
-        case 'noteOff': timeline.noteOff(data.note, time); break
+        case NOTE_OFF: timeline.noteOff(data.note, time); break
         case 'allNotesOff': timeline.allNotesOff(time); break
         case 'clear':
             timeline.notes.length = 0
@@ -83,7 +85,7 @@ globalThis.onmessage = ({ data }) => {
             offset = 0
             follow = true
             break
-        case 'resize':
+        case EVENT_RESIZE:
             canvas.width = data.displayWidth
             canvas.height = data.displayHeight
             break

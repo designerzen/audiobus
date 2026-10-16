@@ -1,3 +1,4 @@
+import { NOTE_ON, NOTE_OFF } from '../commands.ts'
 import AudioCommand from "../audio-command.ts"
 
 /**
@@ -25,7 +26,7 @@ export default class MIDICommand extends AudioCommand{
         this.number = noteNumber
         this.velocity = velocity
         this.startAt = timestamp
-        this.type = "noteOn"
+        this.type = NOTE_ON
     }
     
     /**
@@ -36,7 +37,7 @@ export default class MIDICommand extends AudioCommand{
     noteOff( noteNumber, timestamp ){
         this.number = noteNumber
         this.endAt = timestamp
-        this.type = "noteOff"
+        this.type = NOTE_OFF
     }
 
     /**

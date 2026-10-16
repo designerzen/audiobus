@@ -1,3 +1,4 @@
+import { EVENT_READY, EVENT_ERROR, EVENT_LOADING_START, EVENT_LOADING_COMPLETE, EVENT_DEBUG, EVENT_SHUTDOWN, EVENT_DESTROY, EVENT_AUDIOCONTEXT_SUSPENDED, EVENT_AUDIOCONTEXT_RESUMED, EVENT_AUDIOCONTEXT_INTERRUPTED } from '../../event-constants.ts'
 import { SuperSonic } from "supersonic-scsynth-bundle"
 import type { IAudioOutput } from "./output-interface.ts"
 import { midiNoteToFrequency } from "../../conversion/note-to-frequency.ts"
@@ -539,7 +540,7 @@ export default class OutputSuperSonic implements IAudioOutput {
         if (!this.supersonic) return
 
         // Engine ready
-        this.supersonic.on("ready", (info) => {
+        this.supersonic.on(EVENT_READY, (info) => {
             console.info("SuperSonic ready", {
                 sampleRate: info.sampleRate,
                 bootTime: info.bootTimeMs,
@@ -547,44 +548,44 @@ export default class OutputSuperSonic implements IAudioOutput {
         })
 
         // Error handling
-        this.supersonic.on("error", (error) => {
+        this.supersonic.on(EVENT_ERROR, (error) => {
             console.error("SuperSonic error:", error)
         })
 
         // Asset loading progress
-        this.supersonic.on("loading:start", ({ type, name }) => {
+        this.supersonic.on(EVENT_LOADING_START, ({ type, name }) => {
             console.info(`Loading ${type}: ${name}`)
         })
 
-        this.supersonic.on("loading:complete", ({ type, name, size }) => {
+        this.supersonic.on(EVENT_LOADING_COMPLETE, ({ type, name, size }) => {
             console.info(`Loaded ${type}: ${name} (${size} bytes)`)
         })
 
         // Debug output from scsynth
-        this.supersonic.on("debug", ({ text }) => {
+        this.supersonic.on(EVENT_DEBUG, ({ text }) => {
             console.debug("[scsynth]", text)
         })
 
         // Lifecycle events
-        this.supersonic.on("shutdown", () => {
+        this.supersonic.on(EVENT_SHUTDOWN, () => {
             console.info("SuperSonic shutdown")
         })
 
-        this.supersonic.on("destroy", () => {
+        this.supersonic.on(EVENT_DESTROY, () => {
             console.info("SuperSonic destroyed")
             this.supersonic = null
         })
 
         // AudioContext state changes
-        this.supersonic.on("audiocontext:suspended", () => {
+        this.supersonic.on(EVENT_AUDIOCONTEXT_SUSPENDED, () => {
             console.warn("Audio suspended - user interaction needed to resume")
         })
 
-        this.supersonic.on("audiocontext:resumed", () => {
+        this.supersonic.on(EVENT_AUDIOCONTEXT_RESUMED, () => {
             console.info("Audio resumed")
         })
 
-        this.supersonic.on("audiocontext:interrupted", () => {
+        this.supersonic.on(EVENT_AUDIOCONTEXT_INTERRUPTED, () => {
             console.warn("Audio interrupted by system")
         })
 
@@ -596,7 +597,7 @@ export default class OutputSuperSonic implements IAudioOutput {
      */
     private setupGlobalEventListeners(): void {
         // Handle audio context suspension (browser tab backgrounded)
-        document.addEventListener("visibilitychange", async () => {
+        document.addEventListener('visibilitychange', async () => {
             if (!document.hidden && this.supersonic?.initialized) {
                 console.info("Tab became visible, recovering audio...")
                 try {
@@ -608,7 +609,7 @@ export default class OutputSuperSonic implements IAudioOutput {
         })
 
         // Handle page unload
-        window.addEventListener("beforeunload", async () => {
+        window.addEventListener('beforeunload', async () => {
             if (this.supersonic) {
                 await this.shutdown()
             }

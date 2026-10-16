@@ -1,3 +1,4 @@
+import { EVENT_FRAME, EVENT_CONNECT, EVENT_DISCONNECT } from '../../event-constants.ts'
 /**
  * Leap Motion hand tracking input
  * Maps hand positions to MIDI notes and velocities
@@ -49,12 +50,12 @@ export default class InputLeapMotion extends AbstractInput implements IAudioInpu
 
 		try {
 			this.#controller = new (window as any).Leap.Controller()
-			this.#controller.on("frame", this.onLeapFrame)
-			this.#controller.on("connect", () => {
+			this.#controller.on(EVENT_FRAME, this.onLeapFrame)
+			this.#controller.on(EVENT_CONNECT, () => {
 				this.setAsConnected()
 				console.info("Leap Motion connected")
 			})
-			this.#controller.on("disconnect", () => {
+			this.#controller.on(EVENT_DISCONNECT, () => {
 				this.setAsDisconnected()
 				console.info("Leap Motion disconnected")
 			})
@@ -152,7 +153,7 @@ export default class InputLeapMotion extends AbstractInput implements IAudioInpu
 
 	override destroy(): void {
 		if (this.#controller) {
-			this.#controller.off("frame", this.onLeapFrame)
+			this.#controller.off(EVENT_FRAME, this.onLeapFrame)
 			this.#controller.disconnect()
 		}
 

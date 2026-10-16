@@ -3,6 +3,8 @@
  * Event handling and callbacks for audio I/O
  */
 
+export * from '../../event-constants.ts'
+
 export {
   default as InputAudioEvent,
 } from './input-audio-event.ts'
