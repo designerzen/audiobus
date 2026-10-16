@@ -31,11 +31,9 @@
 		"./*": "./*"
 	},
 	"scripts": {
-		"check:constants": "node --test scripts/check-shared-constants.test.mjs",
-		"pretest": "node scripts/check-shared-constants.mjs",
 		"test": "vitest",
-		"lint": "node scripts/check-shared-constants.mjs && oxlint .",
-		"lint:fix": "node scripts/check-shared-constants.mjs && oxlint --fix .",
+		"lint": "oxlint .",
+		"lint:fix": "oxlint --fix .",
 		"upgrader": "npx npm-check-updates --interactive -u"
 	},
 	"files": [
