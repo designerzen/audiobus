@@ -72,6 +72,7 @@ export default class IOChain extends EventTarget {
     #generation = 0
 
     transportCommand?: (type: string) => void
+    inputCommandHandler?: (event: InputAudioEvent) => boolean
 
     setName(name: string): void {
         const trimmed = name.trim().slice(0, 80)
@@ -669,6 +670,7 @@ export default class IOChain extends EventTarget {
     onInputEvent(inputEvent: InputAudioEvent) {
 
         inputEvent.preventDefault()
+        if (this.inputCommandHandler?.(inputEvent)) return
         if (!this.isActive) return
 
         // extract command and add to queue for consumption later

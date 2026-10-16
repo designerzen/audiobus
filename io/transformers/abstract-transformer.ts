@@ -50,8 +50,13 @@ export abstract class Transformer<Config = TransformerConfig> implements ITransf
         return this.#id
     }
 
+    get midiControlId(): string {
+        return (this.config as Record<string, unknown>).midiControlId as string
+    }
+
     constructor(config: Config = DEFAULT_TRANSFORMER_OPTIONS) {
         this.config = {...DEFAULT_TRANSFORMER_OPTIONS, ...config}
+        this.setConfig('midiControlId', (config as Record<string, unknown>).midiControlId ?? crypto.randomUUID())
         this.setFieldDefaults( this.config )
         this.setConfig("available", true)
     }

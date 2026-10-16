@@ -3,7 +3,7 @@ import { deviceId, deviceDefinition, defineDevice } from './device-definition'
 import { restoreDevice, UnavailableDevice, type SavedDevice } from './workspace-devices'
 import OutputManager from './output-manager'
 import AbstractInput from './inputs/abstract-input'
-import { INPUT_EVENT, PLAYBACK_TOGGLE, PLAYBACK_STOP, MIDI_STOP } from '../commands'
+import { INPUT_EVENT, PLAYBACK_TOGGLE, PLAYBACK_STOP, MIDI_STOP, CONTROL_CHANGE } from '../commands'
 
 /**
  * Manager for managing multiple IOChain instances
@@ -62,6 +62,8 @@ export class IOChainManager extends EventTarget {
     #transportQueue: Promise<void> = Promise.resolve()
     #transportRunning: boolean | undefined
     transportHandler?: (type: string) => void
+    controlChangeHandler?: (command: IAudioCommand) => boolean
+    #handledControls = new WeakMap<object, boolean>()
 
     get transportRunning(): boolean { return this.#transportRunning ?? this.#options.timer.isRunning }
 
@@ -351,6 +353,13 @@ export class IOChainManager extends EventTarget {
 		}
 
         if (!chain.options.name) chain.setName(`Chain ${chainId.replace(/^chain-/, '')}`)
+        chain.inputCommandHandler = event => {
+            if (event.command.type !== CONTROL_CHANGE || !this.controlChangeHandler) return false
+            if (!this.#handledControls.has(event.origin)) {
+                this.#handledControls.set(event.origin, this.controlChangeHandler(event.command))
+            }
+            return this.#handledControls.get(event.origin)!
+        }
         chain.transportCommand = type => {
             if (this.transportHandler) this.transportHandler(type)
             else void this.handleTransportCommand(type).catch(error => console.error('Transport failed', error))
