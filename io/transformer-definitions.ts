@@ -20,6 +20,18 @@ export interface TransformerDefinition {
 }
 
 export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
+    identity: {
+        id: 'identity', name: 'Identity', description: 'Passes notes through unchanged',
+        icon: '/icons/transformer-default.svg', category: 'Routing',
+    },
+    Swinger: {
+        id: 'Swinger', name: 'Swinger', description: 'Adds swing to a groove',
+        icon: '/icons/transformer-timing-humaniser.svg', category: 'Timing',
+    },
+    'kill-old': {
+        id: 'kill-old', name: 'Kill Old Transformer', description: 'Removes stale and everlasting notes',
+        icon: '/icons/transformer-note-shortener.svg', category: 'Duration',
+    },
     [TRANSFORMER_TYPE.ID_MAGENTA]: {
         id: TRANSFORMER_TYPE.ID_MAGENTA,
         name: "Magenta Melody",

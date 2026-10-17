@@ -58,10 +58,9 @@ export const TRANSFORMER_TYPE = {
     ID_NOTE_DELAY,
 	ID_QUANTISE,
     ID_RANDOMISER,
+    ID_TIMING_HUMANISER,
+    ID_VIBRATOR,
     ID_TRANSPOSER
 }
-
-// Add the transformers that require certain functionality
-TRANSFORMER_TYPE[ID_VIBRATOR] = ID_VIBRATOR
 
 export const TRANSFORMERS = Object.values(TRANSFORMER_TYPE)
