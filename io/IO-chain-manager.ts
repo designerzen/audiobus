@@ -183,14 +183,18 @@ export class IOChainManager extends EventTarget {
     }
 
     exportWorkspace(): string {
+        return 'workspace:' + compressToBase64(JSON.stringify(this.exportWorkspaceData()))
+    }
+
+    exportWorkspaceData() {
         const devices: SavedDevice[] = this.devices.map(entry => ({
             id: entry.id, direction: entry.direction, definition: deviceDefinition(entry.device)
         }))
-        return 'workspace:' + compressToBase64(JSON.stringify({
+        return {
             version: 2, activeChainId: this.activeChainId, devices,
             chains: this.entries.map(([id, chain]) => ({ id, ...chain.exportConfiguration(),
                 inputs: chain.inputs.map(deviceId), outputs: chain.outputs.map(deviceId) }))
-        }))
+        }
     }
 
     async restoreWorkspace(encoded: string): Promise<void> {
