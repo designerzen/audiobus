@@ -20,6 +20,13 @@ export interface OutputDefinition {
 }
 
 export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
+	[OUTPUT_TYPES.DESCRIBE]: {
+		id: OUTPUT_TYPES.DESCRIBE,
+		name: "Describe",
+		description: "Describes notes, chords, extensions and inversions in musical language",
+		icon: "/icons/output-describe.svg",
+		category: "Visual",
+	},
 	[OUTPUT_TYPES.CONSOLE]: {
 		id: OUTPUT_TYPES.CONSOLE,
 		name: "Console",

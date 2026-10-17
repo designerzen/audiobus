@@ -24,6 +24,8 @@ const loadSupportingLibrary = async (type: string) => {
 	switch (type) {
 		case OUTPUT_TYPES.CONSOLE:
 			return await import("./outputs/output-console.ts")
+		case OUTPUT_TYPES.DESCRIBE:
+			return await import("./outputs/output-describe.ts")
 		case OUTPUT_TYPES.PINK_TROMBONE:
 			return await import("./outputs/output-pink-trombone.ts")
 		case OUTPUT_TYPES.NOTATION:
@@ -139,6 +141,13 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
  */
 export const OUTPUT_FACTORIES: OutputFactory[] = [
 	{
+		id: OUTPUT_TYPES.DESCRIBE,
+		name: "Describe",
+		description: "Describes notes, chords, extensions and inversions in musical language",
+		isAvailable: () => true,
+		create: (options) => createOutput(OUTPUT_TYPES.DESCRIBE, options),
+	},
+	{
 		id: OUTPUT_TYPES.CONSOLE,
 		name: "Console",
 		description: "Logs MIDI events to browser console (dev mode only)",
@@ -169,8 +178,10 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	{
 		id: OUTPUT_TYPES.SPEECH_SYNTHESIS,
 		name: "Speech Synthesis",
-		description: "Uses the Web Speech Synthesis API to sing note names",
-		isAvailable: () => typeof window !== "undefined" && !!window.speechSynthesis,
+		description: "Reads note names with Kokoro, with system voices as a fallback",
+		isAvailable: () => typeof window !== "undefined" && (
+			(typeof Worker !== "undefined" && typeof AudioContext !== "undefined") || !!window.speechSynthesis
+		),
 		create: (options) => createOutput(OUTPUT_TYPES.SPEECH_SYNTHESIS, options),
 	},
 	{

@@ -92,6 +92,7 @@ export default class TransformerManager extends EventTarget implements ITransfor
      * @param transformerToRemove 
      */
     removeTransformer(transformerToRemove: Transformer, dispatchEvents:boolean=true) {
+        transformerToRemove.destroy()
         this.#transformers = this.#transformers.filter(transformer => transformer.uuid !== transformerToRemove.uuid)
         
 		transformerToRemove.index = -1
@@ -115,7 +116,11 @@ export default class TransformerManager extends EventTarget implements ITransfor
      * @param transformers 
      */
     setTransformers(transformers: Array<Transformer>): void {
-        this.clear()
+        for (const transformer of this.#transformers) {
+            if (!transformers.includes(transformer)) transformer.destroy()
+        }
+        this.#transformers = []
+        this.#transformersMap = new Map()
         transformers.forEach( (transformer:Transformer) => this.appendTransformer( transformer, false) )
         this.dispatchEvent( new CustomEvent(EVENT_TRANSFORMERS_UPDATED) )
     }
@@ -211,6 +216,7 @@ export default class TransformerManager extends EventTarget implements ITransfor
 	}
 
     clear(){
+        this.#transformers.forEach(transformer => transformer.destroy())
         this.#transformers = []
         this.#transformersMap = new Map()
     }

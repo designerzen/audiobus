@@ -212,7 +212,7 @@ export class IOChainFactory {
 
 		// Add optional outputs
 		try {
-			if (typeof window !== "undefined" && window.speechSynthesis) {
+			if (typeof window !== "undefined") {
 				const outputSpeech = await createOutputById(OUTPUT_TYPES.SPEECH_SYNTHESIS)
 				outputs.push(outputSpeech)
 			}

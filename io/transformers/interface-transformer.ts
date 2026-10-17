@@ -15,6 +15,7 @@ export interface ITransformer {
 
 export interface FieldConfig {
     name: string
+    label?: string
     type: string
     enabled:boolean
     values: Array<string | number | { name: string; value: string | number }>

@@ -20,6 +20,13 @@ export interface TransformerDefinition {
 }
 
 export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
+    [TRANSFORMER_TYPE.ID_MAGENTA]: {
+        id: TRANSFORMER_TYPE.ID_MAGENTA,
+        name: "Magenta Melody",
+        description: "Adds AI-generated melodies conditioned on your playing and harmony",
+        icon: "/icons/transformer-magenta.svg",
+        category: "Harmony",
+    },
 	[TRANSFORMER_TYPE.ID_ARPEGGIATOR]: {
 		id: TRANSFORMER_TYPE.ID_ARPEGGIATOR,
 		name: "Arpeggiator",

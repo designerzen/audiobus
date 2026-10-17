@@ -4,6 +4,7 @@
  */
 
 export const CONSOLE = "console" as const
+export const DESCRIBE = "describe" as const
 export const PINK_TROMBONE = "pink-trombone" as const
 export const NOTATION = "notation" as const
 export const SPECTRUM_ANALYSER = "spectrum-analyser" as const
@@ -23,6 +24,7 @@ export const BUTTERCHURN = "butterchurn" as const
 
 export type OutputId =
 	| typeof CONSOLE
+	| typeof DESCRIBE
 	| typeof PINK_TROMBONE
 	| typeof NOTATION
 	| typeof SPECTRUM_ANALYSER

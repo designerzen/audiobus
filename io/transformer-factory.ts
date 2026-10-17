@@ -16,9 +16,11 @@ import { ID_VIBRATOR, TransformerVibrator } from "./transformers/transformer-vib
 import { ID_FILTER, TransformerFilter } from "./transformers/transformer-filter.ts"
 import { ID_EMOJI, TransformerEmoji } from "./transformers/transformer-emoji.ts"
 import { ID_MIDI_FILE_PLAYER, TransformerMIDIFilePlayer } from "./transformers/transformer-midi-file-player.ts"
+import { ID_MAGENTA, TransformerMagenta } from "./transformers/transformer-magenta.ts"
 
 export const tranformerFactory = (type: string, config: any={} ) => {
     switch (type) {
+        case ID_MAGENTA: return new TransformerMagenta(config)
         case ID_ARPEGGIATOR: return new TransformerArpeggiator(config)
     case ID_CHANNELER: return new TransformerChanneler(config)
         case ID_CHORDIFIER: return new TransformerChordifier(config)
@@ -41,6 +43,7 @@ export const tranformerFactory = (type: string, config: any={} ) => {
 }
 
 export const TRANSFORMER_TYPE = {
+    ID_MAGENTA,
     ID_ARPEGGIATOR,
     ID_CHANNELER,
     ID_CHORDIFIER,

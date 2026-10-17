@@ -97,14 +97,13 @@ export abstract class Transformer<Config = TransformerConfig> implements ITransf
 	 */
     reset():void{
         // No state to reset for this transformer
-        throw Error("Reset not implemented for Transformer " + this.name)
     }
 
 	/**
 	 * Destroy the transformer and clean up any resources
 	 */
 	destroy():void{
-		throw Error("Destroy not implemented for Transformer " + this.name)
+		// Stateless transformers have no resources to release.
 	}
 }
 

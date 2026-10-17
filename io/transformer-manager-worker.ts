@@ -83,6 +83,7 @@ export default class TransformerManagerWorker extends EventTarget implements ITr
      * Remove a transformer from the pipeline
      */
     removeTransformer(transformerToRemove: Transformer<any>, dispatchEvents: boolean = true) {
+        transformerToRemove.destroy()
         this.#transformers = this.#transformers.filter(transformer => transformer.uuid !== transformerToRemove.uuid)
         transformerToRemove.index = -1
 
@@ -103,7 +104,11 @@ export default class TransformerManagerWorker extends EventTarget implements ITr
      * Overwrite the whole transformers queue stack
      */
     setTransformers(transformers: Array<Transformer<any>>): void {
-        this.clear()
+        for (const transformer of this.#transformers) {
+            if (!transformers.includes(transformer)) transformer.destroy()
+        }
+        this.#transformers = []
+        this.#transformersMap = new Map()
         transformers.forEach((transformer: Transformer<any>) => this.appendTransformer(transformer, false))
         this.dispatchEvent(new CustomEvent(EVENT_TRANSFORMERS_UPDATED))
     }
@@ -247,6 +252,7 @@ export default class TransformerManagerWorker extends EventTarget implements ITr
     }
 
     clear(): void {
+        this.#transformers.forEach(transformer => transformer.destroy())
         this.#transformers = []
         this.#transformersMap = new Map()
     }
