@@ -53,43 +53,83 @@ export class TransformerMagenta extends Transformer<Config> {
     private nextPhraseAt = -Infinity
 
     get name() { return 'Magenta Melody' }
+    get instructions() {
+        return 'Play a few notes while Magenta prepares a melody. When it is ready, play another note to bring in the accompaniment. Your original notes always play through.'
+    }
+    get statusState() {
+        if (!this.config.enabled) return 'disabled'
+        if (this.failed) return 'error'
+        if (this.busy) return 'loading'
+        return this.ready ? 'ready' : 'idle'
+    }
     get description() {
-        return 'Google Magenta generates a supplementary melody from your playing. Once ready, the next played note starts the phrase. Blank chord progression uses the selected key; enter chords such as C, Am, F, G to override it. Set channel to 0 to follow the input.'
+        return 'Add a musical companion that creates a second melody from your playing. Choose a key, set the mood, and play.'
     }
 
     get fields(): FieldConfig[] {
         const labels: Partial<Record<keyof Config, string>> = {
-            model: 'Magenta model', temperature: 'Temperature (0 = deterministic)',
-            steps: 'Phrase length (16th-note steps)', seedNotes: 'Input notes used as seed',
-            root: 'Key', scale: 'Output scale', regenerate: 'Generation mode',
-            playbackRate: 'Playback speed', delayBeats: 'Delay (beats)', gate: 'Note length ratio',
-            transpose: 'Transpose (semitones)', minPitch: 'Lowest MIDI pitch', maxPitch: 'Highest MIDI pitch',
-            velocity: 'Velocity ratio', channel: 'Output MIDI channel',
+            enabled: 'Accompaniment', model: 'Generation model', temperature: 'Creativity',
+            steps: 'Phrase length', seedNotes: 'Notes to learn from',
+            root: 'Key', scale: 'Scale', regenerate: 'Next phrase',
+            playbackRate: 'Speed', delayBeats: 'Start delay', gate: 'Note length',
+            transpose: 'Pitch shift', minPitch: 'Lowest note', maxPitch: 'Highest note',
+            velocity: 'Accompaniment volume', channel: 'MIDI channel',
+        }
+        const groups: Record<keyof Config, string> = {
+            enabled: 'Melody', temperature: 'Melody', steps: 'Melody', regenerate: 'Melody',
+            root: 'Harmony', scale: 'Harmony', chordProgression: 'Harmony',
+            playbackRate: 'Timing & feel', delayBeats: 'Timing & feel', gate: 'Timing & feel', velocity: 'Timing & feel',
+            transpose: 'Pitch & routing', minPitch: 'Pitch & routing', maxPitch: 'Pitch & routing', channel: 'Pitch & routing',
+            model: 'Model settings', seedNotes: 'Model settings',
+        }
+        const help: Partial<Record<keyof Config, string>> = {
+            temperature: 'Lower values stay predictable; higher values explore more unusual ideas.',
+            steps: 'Length at normal speed. One beat is a quarter note.',
+            root: 'The tonal home for the generated melody.',
+            scale: 'Keeps the added notes within this scale. All notes allows every pitch.',
+            regenerate: 'Create fresh ideas or keep returning to a phrase you like.',
+            velocity: 'Relative to your playing: 70% gives the added melody a softer touch.',
+            channel: 'Use a separate channel to send the melody to a different instrument.',
+            model: 'Harmony-aware follows your chords. Melody continuation follows the input; both use the selected output scale.',
+            seedNotes: 'How many of your most recent notes shape the next melody.',
         }
         const select = (name: keyof Config, values: FieldConfig['values']): FieldConfig => ({
-            name, label: labels[name], type: 'select', enabled: true, values, default: this.config?.[name] ?? DEFAULT_OPTIONS[name],
+            name, label: labels[name], group: groups[name], help: help[name], type: 'select', enabled: true, values, default: this.config?.[name] ?? DEFAULT_OPTIONS[name],
         })
+        const percent = (values: number[]) => values.map(value => ({ name: `${Math.round(value * 100)}%`, value }))
+        const pitch = (values: number[]) => values.map(value => ({ name: `${ROOTS[value % 12]}${Math.floor(value / 12) - 1} (MIDI ${value})`, value }))
         return [
             select('enabled', [{ name: 'On', value: 1 }, { name: 'Off', value: 0 }]),
-            select('model', [
-                { name: 'Chord-conditioned improvisation', value: 'chord_pitches_improv' },
-                { name: 'Melody continuation (scale constrained)', value: 'basic_rnn' },
+            select('temperature', [
+                { name: 'Repeatable · 0', value: 0 }, { name: 'Very focused · 0.25', value: 0.25 },
+                { name: 'Focused · 0.5', value: 0.5 }, { name: 'Gentle variation · 0.75', value: 0.75 },
+                { name: 'Balanced · 1', value: 1 }, { name: 'Adventurous · 1.25', value: 1.25 },
+                { name: 'Experimental · 1.5', value: 1.5 }, { name: 'Unpredictable · 2', value: 2 },
             ]),
-            select('temperature', [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2]),
-            select('steps', [8, 16, 32, 64, 128]),
-            select('seedNotes', [1, 2, 4, 8, 16, 32]),
+            select('steps', [8, 16, 32, 64, 128].map(value => ({ name: `${value / 4} beats`, value }))),
+            select('regenerate', [{ name: 'Create a new melody', value: 1 }, { name: 'Repeat this melody', value: 0 }]),
             select('root', ROOTS.map((name, value) => ({ name, value }))),
-            select('scale', Object.keys(SCALES)),
-            { name: 'chordProgression', label: 'Chords (e.g. C, Am, F, G; blank = key)', type: 'text', enabled: true, values: [], default: this.config?.chordProgression ?? '' },
-            select('regenerate', [{ name: 'New melody each phrase', value: 1 }, { name: 'Repeat generated melody', value: 0 }]),
-            select('playbackRate', [0.25, 0.5, 1, 2, 4]),
-            select('delayBeats', [0, 0.25, 0.5, 1, 2, 4, 8]),
-            select('gate', [0.25, 0.5, 0.75, 0.8, 1]),
-            select('transpose', [-24, -12, -7, -5, 0, 5, 7, 12, 24]),
-            select('minPitch', [0, 24, 36, 48, 60, 72, 84, 96]),
-            select('maxPitch', [36, 48, 60, 72, 84, 96, 108, 127]),
-            select('velocity', [0.1, 0.25, 0.5, 0.7, 0.75, 1]),
+            select('scale', [
+                { name: 'Major', value: 'major' }, { name: 'Minor', value: 'minor' },
+                { name: 'Dorian', value: 'dorian' }, { name: 'Mixolydian', value: 'mixolydian' },
+                { name: 'All notes (chromatic)', value: 'chromatic' },
+            ]),
+            { name: 'chordProgression', label: 'Chord progression', group: groups.chordProgression,
+                help: 'Optional: separate chords with commas or spaces. Leave blank to use your key. Used by the harmony-aware model; changes apply when you leave this field.',
+                placeholder: 'e.g. C, Am, F, G', type: 'text', enabled: true, values: [], default: this.config?.chordProgression ?? '' },
+            select('playbackRate', [0.25, 0.5, 1, 2, 4].map(value => ({ name: value === 1 ? 'Normal' : `${value}× speed`, value }))),
+            select('delayBeats', [0, 0.25, 0.5, 1, 2, 4, 8].map(value => ({ name: value === 0 ? 'No delay' : `${value} ${value === 1 ? 'beat' : 'beats'}`, value }))),
+            select('gate', percent([0.25, 0.5, 0.75, 0.8, 1])),
+            select('velocity', percent([0.1, 0.25, 0.5, 0.7, 0.75, 1])),
+            select('transpose', [-24, -12, -7, -5, 0, 5, 7, 12, 24].map(value => ({ name: value === 0 ? 'Original pitch' : `${value > 0 ? '+' : ''}${value} semitones`, value }))),
+            select('minPitch', pitch([0, 24, 36, 48, 60, 72, 84, 96])),
+            select('maxPitch', pitch([36, 48, 60, 72, 84, 96, 108, 127])),
             select('channel', [{ name: 'Follow input', value: 0 }, ...Array.from({ length: 16 }, (_, i) => i + 1)]),
+            select('model', [
+                { name: 'Harmony-aware improvisation', value: 'chord_pitches_improv' },
+                { name: 'Melody continuation', value: 'basic_rnn' },
+            ]),
+            select('seedNotes', [1, 2, 4, 8, 16, 32].map(value => ({ name: `${value} ${value === 1 ? 'note' : 'notes'}`, value }))),
         ]
     }
 
