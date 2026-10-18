@@ -1,3 +1,4 @@
+import type { DeviceClassification } from "./device-classification.ts"
 /**
  * Transformer Definitions
  * 
@@ -11,7 +12,7 @@
 
 import { TRANSFORMER_TYPE } from "./transformer-factory"
 
-export interface TransformerDefinition {
+export interface TransformerDefinition extends DeviceClassification<'transformer'> {
 	id: string
 	name: string
 	description: string
@@ -22,22 +23,22 @@ export interface TransformerDefinition {
 export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
     identity: {
         id: 'identity', name: 'Identity', description: 'Passes notes through unchanged',
-        icon: '/icons/transformer-default.svg', category: 'Routing',
+        icon: '/icons/transformer-default.svg', category: 'Routing', type: "transformer", subtype: "routing",
     },
     Swinger: {
         id: 'Swinger', name: 'Swinger', description: 'Adds swing to a groove',
-        icon: '/icons/transformer-timing-humaniser.svg', category: 'Timing',
+        icon: '/icons/transformer-timing-humaniser.svg', category: 'Timing', type: "transformer", subtype: "timing",
     },
     'kill-old': {
         id: 'kill-old', name: 'Kill Old Transformer', description: 'Removes stale and everlasting notes',
-        icon: '/icons/transformer-note-shortener.svg', category: 'Duration',
+        icon: '/icons/transformer-note-shortener.svg', category: 'Duration', type: "transformer", subtype: "duration",
     },
     [TRANSFORMER_TYPE.ID_MAGENTA]: {
         id: TRANSFORMER_TYPE.ID_MAGENTA,
         name: "Magenta Melody",
         description: "Adds AI-generated melodies conditioned on your playing and harmony",
         icon: "/icons/transformer-magenta.svg",
-        category: "Harmony",
+        category: "Harmony", type: "transformer", subtype: "harmony",
     },
 	[TRANSFORMER_TYPE.ID_ARPEGGIATOR]: {
 		id: TRANSFORMER_TYPE.ID_ARPEGGIATOR,
@@ -45,6 +46,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		description: "Breaks chords into flowing sequences of individual notes",
 		icon: "/icons/transformer-arpeggiator.svg",
 		category: "Pattern",
+		type: "transformer",
+		subtype: "pattern",
 	},
 
 	[TRANSFORMER_TYPE.ID_QUANTISE]: {
@@ -53,6 +56,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		description: "Snaps notes to a grid for rhythmic precision",
 		icon: "/icons/transformer-quantise.svg",
 		category: "Timing",
+		type: "transformer",
+		subtype: "timing",
 	},
 
 	[TRANSFORMER_TYPE.ID_HARMONISER]: {
@@ -61,6 +66,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		description: "Adds harmonic voices above the input note",
 		icon: "/icons/transformer-harmoniser.svg",
 		category: "Harmony",
+		type: "transformer",
+		subtype: "harmony",
 	},
 
 	[TRANSFORMER_TYPE.ID_CHORDIFIER]: {
@@ -69,6 +76,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		description: "Expands single notes into harmonic chords",
 		icon: "/icons/transformer-chordifier.svg",
 		category: "Harmony",
+		type: "transformer",
+		subtype: "harmony",
 	},
 
 	[TRANSFORMER_TYPE.ID_NOTE_SHORTENER]: {
@@ -77,6 +86,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		description: "Reduces the duration of notes for staccato effects",
 		icon: "/icons/transformer-note-shortener.svg",
 		category: "Duration",
+		type: "transformer",
+		subtype: "duration",
 	},
 
 	[TRANSFORMER_TYPE.ID_NOTE_REPEATER]: {
@@ -85,6 +96,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		description: "Repeats notes multiple times for rhythmic textures",
 		icon: "/icons/transformer-note-repeater.svg",
 		category: "Pattern",
+		type: "transformer",
+		subtype: "pattern",
 	},
 
 	[TRANSFORMER_TYPE.ID_RANDOMISER]: {
@@ -93,6 +106,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		description: "Adds controlled randomness to note parameters",
 		icon: "/icons/transformer-randomiser.svg",
 		category: "Variation",
+		type: "transformer",
+		subtype: "variation",
 	},
 
 	[TRANSFORMER_TYPE.ID_NOTE_DELAY]: {
@@ -101,6 +116,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		description: "Delays notes by a specified duration",
 		icon: "/icons/transformer-note-delay.svg",
 		category: "Timing",
+		type: "transformer",
+		subtype: "timing",
 	},
 
 	[TRANSFORMER_TYPE.ID_TRANSPOSER]: {
@@ -109,6 +126,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		description: "Shifts notes up or down by a specified interval",
 		icon: "/icons/transformer-transposer.svg",
 		category: "Pitch",
+		type: "transformer",
+		subtype: "pitch",
 	},
 
 	[TRANSFORMER_TYPE.ID_MICROTONALITY]: {
@@ -117,6 +136,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		description: "Divides musical intervals into microtonal subdivisions",
 		icon: "/icons/transformer-microtonality.svg",
 		category: "Pitch",
+		type: "transformer",
+		subtype: "pitch",
 	},
 
 	[TRANSFORMER_TYPE.ID_CHANNELER]: {
@@ -125,6 +146,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		description: "Routes notes to specific MIDI channels",
 		icon: "/icons/transformer-channeler.svg",
 		category: "Routing",
+		type: "transformer",
+		subtype: "routing",
 	},
 
 	[TRANSFORMER_TYPE.ID_CONSTRICTOR]: {
@@ -133,6 +156,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		description: "Limits notes to a specified range",
 		icon: "/icons/transformer-constrictor.svg",
 		category: "Range",
+		type: "transformer",
+		subtype: "range",
 	},
 
 	[TRANSFORMER_TYPE.ID_TIMING_HUMANISER]: {
@@ -141,6 +166,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		description: "Adds humanlike timing variations to notes",
 		icon: "/icons/transformer-timing-humaniser.svg",
 		category: "Timing",
+		type: "transformer",
+		subtype: "timing",
 	},
 
 	[TRANSFORMER_TYPE.ID_VIBRATOR]: {
@@ -149,6 +176,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		description: "Adds vibrato modulation to note pitch",
 		icon: "/icons/transformer-vibrator.svg",
 		category: "Modulation",
+		type: "transformer",
+		subtype: "modulation",
 	},
 
 	[TRANSFORMER_TYPE.ID_FILTER]: {
@@ -157,6 +186,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		description: "Selectively passes or blocks notes based on criteria",
 		icon: "/icons/transformer-filter.svg",
 		category: "Range",
+		type: "transformer",
+		subtype: "range",
 	},
 
 	[TRANSFORMER_TYPE.ID_EMOJI]: {
@@ -165,6 +196,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		description: "Transforms notes based on emoji input patterns",
 		icon: "/icons/transformer-emoji.svg",
 		category: "Variation",
+		type: "transformer",
+		subtype: "variation",
 	},
 
 	[TRANSFORMER_TYPE.ID_MIDI_FILE_PLAYER]: {
@@ -173,6 +206,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		description: "Plays notes from loaded MIDI files",
 		icon: "/icons/transformer-midi-file-player.svg",
 		category: "Input",
+		type: "transformer",
+		subtype: "input",
 	},
 }
 

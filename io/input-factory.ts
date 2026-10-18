@@ -1,3 +1,5 @@
+import { INPUT_DEFINITIONS } from "./input-definitions.ts"
+import type { DeviceClassification } from "./device-classification.ts"
 import { defineDevice } from './device-definition'
 /**
  * Factory for creating audio input instances
@@ -6,7 +8,7 @@ import { defineDevice } from './device-definition'
 import * as INPUT_TYPES from "./inputs/input-types.ts"
 import type { IAudioInput } from "./inputs/input-interface.ts"
 
-export interface InputFactory {
+export interface InputFactory extends DeviceClassification {
 	id: string
 	name: string
 	description: string
@@ -95,6 +97,8 @@ const createInput = async (type: string, options={} ): Promise<IAudioInput> => {
 export const INPUT_FACTORIES: InputFactory[] = [
 	{
 		id: INPUT_TYPES.KEYBOARD,
+		type: INPUT_DEFINITIONS[INPUT_TYPES.KEYBOARD].type,
+		subtype: INPUT_DEFINITIONS[INPUT_TYPES.KEYBOARD].subtype,
 		name: "Keyboard",
 		description: "QWERTY keyboard input for playing notes",
 		isAvailable: () => true,
@@ -102,6 +106,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 	},
 	{
 		id: INPUT_TYPES.GAMEPAD,
+		type: INPUT_DEFINITIONS[INPUT_TYPES.GAMEPAD].type,
+		subtype: INPUT_DEFINITIONS[INPUT_TYPES.GAMEPAD].subtype,
 		name: "Gamepad",
 		description: "Game controller / joystick input",
 		isAvailable: () => typeof navigator !== "undefined" && !!navigator.getGamepads,
@@ -109,6 +115,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 	},
 	{
 		id: INPUT_TYPES.GAMEPAD_MUSIC,
+		type: INPUT_DEFINITIONS[INPUT_TYPES.GAMEPAD_MUSIC].type,
+		subtype: INPUT_DEFINITIONS[INPUT_TYPES.GAMEPAD_MUSIC].subtype,
 		name: "Gamepad Music Controller",
 		description: "Advanced gamepad input with multiple music modes: Chord, Melodic, Drum, Arpeggiator",
 		isAvailable: () => typeof navigator !== "undefined" && !!navigator.getGamepads,
@@ -116,6 +124,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 	},
 	{
 		id: INPUT_TYPES.WEBMIDI,
+		type: INPUT_DEFINITIONS[INPUT_TYPES.WEBMIDI].type,
+		subtype: INPUT_DEFINITIONS[INPUT_TYPES.WEBMIDI].subtype,
 		name: "WebMIDI Device",
 		description: "MIDI input from external devices via WebMIDI API",
 		isAvailable: () => typeof navigator !== "undefined" && !!(navigator as any).requestMIDIAccess,
@@ -123,6 +133,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 	},
 	{
 		id: INPUT_TYPES.NATIVE_MIDI,
+		type: INPUT_DEFINITIONS[INPUT_TYPES.NATIVE_MIDI].type,
+		subtype: INPUT_DEFINITIONS[INPUT_TYPES.NATIVE_MIDI].subtype,
 		name: "Native MIDI Device",
 		description: "MIDI input from external devices via native OS APIs (Windows/macOS/Linux)",
 		isAvailable: () => true, // Native MIDI available on all platforms
@@ -130,6 +142,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 	},
 	{
 		id: INPUT_TYPES.MIDI2_NATIVE,
+		type: INPUT_DEFINITIONS[INPUT_TYPES.MIDI2_NATIVE].type,
+		subtype: INPUT_DEFINITIONS[INPUT_TYPES.MIDI2_NATIVE].subtype,
 		name: "MIDI 2.0 Native",
 		description: "MIDI 2.0 input with per-note controllers via native OS MIDI (16-bit resolution, Windows/macOS/Linux)",
 		isAvailable: () => true, // Native MIDI available on all platforms
@@ -137,6 +151,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 	},
 	{
 		id: INPUT_TYPES.BLE_MIDI,
+		type: INPUT_DEFINITIONS[INPUT_TYPES.BLE_MIDI].type,
+		subtype: INPUT_DEFINITIONS[INPUT_TYPES.BLE_MIDI].subtype,
 		name: "BLE MIDI",
 		description: "Bluetooth MIDI input",
 		isAvailable: () => typeof navigator !== "undefined" && !!navigator.bluetooth,
@@ -144,6 +160,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 	},
 	{
 		id: INPUT_TYPES.MICROPHONE_FORMANT,
+		type: INPUT_DEFINITIONS[INPUT_TYPES.MICROPHONE_FORMANT].type,
+		subtype: INPUT_DEFINITIONS[INPUT_TYPES.MICROPHONE_FORMANT].subtype,
 		name: "Microphone Formant",
 		description: "Microphone input for formant analysis",
 		isAvailable: () => typeof navigator !== "undefined" && !!navigator.mediaDevices,
@@ -151,6 +169,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 	},
 	{
 		id: INPUT_TYPES.LEAP_MOTION,
+		type: INPUT_DEFINITIONS[INPUT_TYPES.LEAP_MOTION].type,
+		subtype: INPUT_DEFINITIONS[INPUT_TYPES.LEAP_MOTION].subtype,
 		name: "Leap Motion",
 		description: "Hand gesture tracking via Leap Motion device",
 		isAvailable: () => typeof window !== "undefined" && !!(window as any).Leap,
@@ -158,6 +178,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 	},
 	{
 		id: INPUT_TYPES.ONSCREEN_KEYBOARD,
+		type: INPUT_DEFINITIONS[INPUT_TYPES.ONSCREEN_KEYBOARD].type,
+		subtype: INPUT_DEFINITIONS[INPUT_TYPES.ONSCREEN_KEYBOARD].subtype,
 		name: "Onscreen Keyboard",
 		description: "Mouse-based virtual keyboard input",
 		isAvailable: () => true,
@@ -165,6 +187,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 	},
 	{
 		id: INPUT_TYPES.PROMPT_AI,
+		type: INPUT_DEFINITIONS[INPUT_TYPES.PROMPT_AI].type,
+		subtype: INPUT_DEFINITIONS[INPUT_TYPES.PROMPT_AI].subtype,
 		name: "PromptAI Generator",
 		description: "AI-powered prompt input for generating note sequences and combinations",
 		isAvailable: () => true,
@@ -172,6 +196,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 	},
 	{
 		id: INPUT_TYPES.PROMPT_AI_SPEECH,
+		type: INPUT_DEFINITIONS[INPUT_TYPES.PROMPT_AI_SPEECH].type,
+		subtype: INPUT_DEFINITIONS[INPUT_TYPES.PROMPT_AI_SPEECH].subtype,
 		name: "PromptAI Speech",
 		description: "AI-powered input with speech recognition for generating note sequences via voice",
 		isAvailable: () => typeof window !== "undefined" && (!!(window as any).SpeechRecognition || !!(window as any).webkitSpeechRecognition),
@@ -179,6 +205,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 	},
 	{
 		id: INPUT_TYPES.MIDI_TRANSPORT_CLOCK,
+		type: INPUT_DEFINITIONS[INPUT_TYPES.MIDI_TRANSPORT_CLOCK].type,
+		subtype: INPUT_DEFINITIONS[INPUT_TYPES.MIDI_TRANSPORT_CLOCK].subtype,
 		name: "MIDI Transport Clock",
 		description: "MIDI transport clock input for timing synchronization (24 clocks per quarter note)",
 		isAvailable: () => true, // Available on all platforms with MIDI support
@@ -186,6 +214,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 	},
 	{
 		id: INPUT_TYPES.MUSIC_MOUSE,
+		type: INPUT_DEFINITIONS[INPUT_TYPES.MUSIC_MOUSE].type,
+		subtype: INPUT_DEFINITIONS[INPUT_TYPES.MUSIC_MOUSE].subtype,
 		name: "Music Mouse",
 		description: "Cursor-controlled musical instrument inspired by Laurie Spiegel's classic Music Mouse",
 		isAvailable: () => true,
@@ -193,6 +223,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 	},
 	{
 		id: INPUT_TYPES.MICROPHONE_PITCH,
+		type: INPUT_DEFINITIONS[INPUT_TYPES.MICROPHONE_PITCH].type,
+		subtype: INPUT_DEFINITIONS[INPUT_TYPES.MICROPHONE_PITCH].subtype,
 		name: "Microphone Pitch (ML)",
 		description: "Polyphonic pitch detection from microphone using Spotify's Basic Pitch neural network",
 		isAvailable: () => typeof navigator !== "undefined" && !!navigator.mediaDevices,
@@ -200,6 +232,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 	},
 	{
 		id: INPUT_TYPES.DVS_CONTROL_VINYL,
+		type: INPUT_DEFINITIONS[INPUT_TYPES.DVS_CONTROL_VINYL].type,
+		subtype: INPUT_DEFINITIONS[INPUT_TYPES.DVS_CONTROL_VINYL].subtype,
 		name: "DVS Control Vinyl",
 		description: "Control vinyl pilot-tone clock - estimates relative speed and generates DVS_CLOCK or MIDI_CLOCK (no direction or absolute position decoding)",
 		isAvailable: () => typeof navigator !== "undefined" && !!navigator.mediaDevices,

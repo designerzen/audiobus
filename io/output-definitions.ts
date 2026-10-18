@@ -1,3 +1,4 @@
+import type { DeviceClassification } from "./device-classification.ts"
 /**
  * Output Definitions
  *
@@ -11,7 +12,7 @@
 
 import * as OUTPUT_TYPES from "./outputs/output-types.ts"
 
-export interface OutputDefinition {
+export interface OutputDefinition extends DeviceClassification {
 	id: string
 	name: string
 	description: string
@@ -22,6 +23,8 @@ export interface OutputDefinition {
 export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 	[OUTPUT_TYPES.DESCRIBE]: {
 		id: OUTPUT_TYPES.DESCRIBE,
+		type: "visual",
+		subtype: "description",
 		name: "Describe",
 		description: "Describes notes, chords, extensions and inversions in musical language",
 		icon: "/icons/output-describe.svg",
@@ -29,6 +32,8 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 	},
 	[OUTPUT_TYPES.CONSOLE]: {
 		id: OUTPUT_TYPES.CONSOLE,
+		type: "debug",
+		subtype: "console",
 		name: "Console",
 		description: "Logs MIDI events to browser console (dev mode only)",
 		icon: "/icons/output-console.svg",
@@ -37,6 +42,8 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 
 	[OUTPUT_TYPES.PINK_TROMBONE]: {
 		id: OUTPUT_TYPES.PINK_TROMBONE,
+		type: "engine",
+		subtype: "instrument",
 		name: "Pink Trombone",
 		description: "Vocal synthesis engine with speech-like sounds",
 		icon: "/icons/output-pink-trombone.svg",
@@ -45,6 +52,8 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 
 	[OUTPUT_TYPES.NOTATION]: {
 		id: OUTPUT_TYPES.NOTATION,
+		type: "visual",
+		subtype: "notation",
 		name: "Notation",
 		description: "Displays notes on a musical staff",
 		icon: "/icons/output-notation.svg",
@@ -53,6 +62,8 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 
 	[OUTPUT_TYPES.SPECTRUM_ANALYSER]: {
 		id: OUTPUT_TYPES.SPECTRUM_ANALYSER,
+		type: "visual",
+		subtype: "visualiser",
 		name: "Spectrum Analyser",
 		description: "Visualizes audio spectrum using FFT analysis with realtime waveform display",
 		icon: "/icons/output-spectrum-analyser.svg",
@@ -61,6 +72,8 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 
 	[OUTPUT_TYPES.SPEECH_SYNTHESIS]: {
 		id: OUTPUT_TYPES.SPEECH_SYNTHESIS,
+		type: "audio",
+		subtype: "speech",
 		name: "Speech Synthesis",
 		description: "Uses the Web Speech Synthesis API to sing note names",
 		icon: "/icons/output-speech-synthesis.svg",
@@ -69,6 +82,8 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 
 	[OUTPUT_TYPES.VIBRATOR]: {
 		id: OUTPUT_TYPES.VIBRATOR,
+		type: "haptic",
+		subtype: "vibration",
 		name: "Vibrator",
 		description: "Triggers device vibration when a note within a range is played",
 		icon: "/icons/output-vibrator.svg",
@@ -77,6 +92,8 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 
 	[OUTPUT_TYPES.WAM2]: {
 		id: OUTPUT_TYPES.WAM2,
+		type: "engine",
+		subtype: "instrument",
 		name: "WAM2",
 		description: "Manages the WAM2 Audio Engine",
 		icon: "/icons/output-wam2.svg",
@@ -85,6 +102,8 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 
 	[OUTPUT_TYPES.WEBMIDI]: {
 		id: OUTPUT_TYPES.WEBMIDI,
+		type: "midi",
+		subtype: "device",
 		name: "WebMIDI Device",
 		description: "Sends MIDI messages to a connected WebMIDI device",
 		icon: "/icons/output-webmidi.svg",
@@ -93,6 +112,8 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 
 	[OUTPUT_TYPES.NATIVE_MIDI]: {
 		id: OUTPUT_TYPES.NATIVE_MIDI,
+		type: "midi",
+		subtype: "device",
 		name: "Native MIDI Device",
 		description: "Sends MIDI messages to a connected native OS MIDI device (Windows/macOS/Linux)",
 		icon: "/icons/output-native-midi.svg",
@@ -101,6 +122,8 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 
 	[OUTPUT_TYPES.BLE_MIDI]: {
 		id: OUTPUT_TYPES.BLE_MIDI,
+		type: "midi",
+		subtype: "device",
 		name: "BLE MIDI",
 		description: "BLE MIDI",
 		icon: "/icons/output-ble-midi.svg",
@@ -109,6 +132,8 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 
 	[OUTPUT_TYPES.MIDI2]: {
 		id: OUTPUT_TYPES.MIDI2,
+		type: "midi",
+		subtype: "device",
 		name: "MIDI 2.0",
 		description: "MIDI 2.0 device output",
 		icon: "/icons/output-midi2.svg",
@@ -117,6 +142,8 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 
 	[OUTPUT_TYPES.MIDI2_NATIVE]: {
 		id: OUTPUT_TYPES.MIDI2_NATIVE,
+		type: "midi",
+		subtype: "device",
 		name: "MIDI 2.0 Native",
 		description: "MIDI 2.0 output with per-note controllers via native OS MIDI (16-bit resolution, Windows/macOS/Linux)",
 		icon: "/icons/output-midi2-native.svg",
@@ -125,6 +152,8 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 
 	[OUTPUT_TYPES.SUPERSONIC]: {
 		id: OUTPUT_TYPES.SUPERSONIC,
+		type: "engine",
+		subtype: "instrument",
 		name: "Supersonic",
 		description: "SuperCollider-based sound synthesis engine",
 		icon: "/icons/output-supersonic.svg",
@@ -133,6 +162,8 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 
 	[OUTPUT_TYPES.METRONOME]: {
 		id: OUTPUT_TYPES.METRONOME,
+		type: "audio",
+		subtype: "metronome",
 		name: "Metronome",
 		description: "Produces audible clicks in response to MIDI clock signals",
 		icon: "/icons/output-metronome.svg",
@@ -141,12 +172,32 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 
 	[OUTPUT_TYPES.AUDIO_CLICK]: {
 		id: OUTPUT_TYPES.AUDIO_CLICK,
+		type: "audio",
+		subtype: "metronome",
 		name: "Audio Click",
 		description: "Plays audio click sounds from a selected asset library on every bar",
 		icon: "/icons/output-audio-click.svg",
 		category: "Utility",
 	},
-}
+	[OUTPUT_TYPES.BUTTERCHURN]: {
+		id: OUTPUT_TYPES.BUTTERCHURN,
+		type: "visual",
+		subtype: "visualiser",
+		name: "Butterchurn",
+		description: "WebGL music visualiser with animated patterns synced to audio",
+		icon: "/icons/output-butterchurn.svg",
+		category: "Visualizer",
+	},
+	[OUTPUT_TYPES.YOSHIMI]: {
+		id: OUTPUT_TYPES.YOSHIMI,
+		type: "engine",
+		subtype: "instrument",
+		name: "Yoshimi",
+		description: "Software synthesizer with instrument presets",
+		icon: "/icons/output-yoshimi.svg",
+		category: "Synthesis",
+	},
+} satisfies Record<OUTPUT_TYPES.OutputId, OutputDefinition>
 
 /**
  * Get output definition by ID

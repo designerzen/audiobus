@@ -1,0 +1,25 @@
+export const DEVICE_SUBTYPES = {
+    controller: ['keyboard', 'gamepad', 'gesture', 'pointer'],
+    midi: ['device'],
+    audio: ['pitch', 'formant', 'speech', 'metronome'],
+    generator: ['ai'],
+    sync: ['clock', 'vinyl'],
+    visual: ['visualiser', 'notation', 'description'],
+    engine: ['instrument'],
+    haptic: ['vibration'],
+    debug: ['console'],
+    transformer: ['routing', 'timing', 'duration', 'harmony', 'pattern', 'variation', 'pitch', 'range', 'modulation', 'input'],
+} as const
+
+export type DeviceType = keyof typeof DEVICE_SUBTYPES
+export type DeviceSubtype<T extends DeviceType = DeviceType> = typeof DEVICE_SUBTYPES[T][number]
+
+export interface DeviceClassification<T extends DeviceType = DeviceType> {
+    type: T
+    subtype: DeviceSubtype<T>
+}
+
+export const INSTRUMENT_CLASSIFICATION = {
+    type: 'engine',
+    subtype: 'instrument',
+} as const satisfies DeviceClassification<'engine'>

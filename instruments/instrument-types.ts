@@ -1,3 +1,4 @@
+import { INSTRUMENT_CLASSIFICATION, type DeviceClassification } from "../io/device-classification.ts"
 /**
  * Instrument Type Constants
  */
@@ -36,7 +37,7 @@ export const EXTERNAL_DATA_KEY_SAMPLE_URLS = "sampleUrls"
 /**
  * Instrument metadata for lazy loading
  */
-export interface InstrumentMetadata {
+export interface InstrumentMetadata extends DeviceClassification<'engine'> {
 	id: string
 	name: string
 	description: string
@@ -53,6 +54,7 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 		INSTRUMENT_TYPE_SYNTH_OSCILLATOR,
 		{
 			id: INSTRUMENT_TYPE_SYNTH_OSCILLATOR,
+			...INSTRUMENT_CLASSIFICATION,
 			name: "Synth Oscillator",
 			description: "Customizable oscillator with ADSR envelope and filter",
 			category: INSTRUMENT_CATEGORY_OSCILLATOR,
@@ -63,6 +65,7 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 		INSTRUMENT_TYPE_TONE_SYNTH,
 		{
 			id: INSTRUMENT_TYPE_TONE_SYNTH,
+			...INSTRUMENT_CLASSIFICATION,
 			name: "Tone Synth",
 			description: "Polyphonic synthesizer using Tone.js",
 			category: INSTRUMENT_CATEGORY_SYNTHESIS,
@@ -73,6 +76,7 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 		INSTRUMENT_TYPE_TONE_MONO_SYNTH,
 		{
 			id: INSTRUMENT_TYPE_TONE_MONO_SYNTH,
+			...INSTRUMENT_CLASSIFICATION,
 			name: "Tone Mono Synth",
 			description: "Monophonic synthesizer with portamento using Tone.js",
 			category: INSTRUMENT_CATEGORY_SYNTHESIS,
@@ -83,6 +87,7 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 		INSTRUMENT_TYPE_TONE_FM_SYNTH,
 		{
 			id: INSTRUMENT_TYPE_TONE_FM_SYNTH,
+			...INSTRUMENT_CLASSIFICATION,
 			name: "Tone FM Synth",
 			description: "Frequency modulation synthesizer using Tone.js",
 			category: INSTRUMENT_CATEGORY_FM,
@@ -93,6 +98,7 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 		INSTRUMENT_TYPE_TONE_PLUCK_STRING,
 		{
 			id: INSTRUMENT_TYPE_TONE_PLUCK_STRING,
+			...INSTRUMENT_CLASSIFICATION,
 			name: "Tone Pluck String",
 			description: "Plucked string synthesizer using Karplus-Strong algorithm",
 			category: INSTRUMENT_CATEGORY_PHYSICAL,
@@ -103,6 +109,7 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 		INSTRUMENT_TYPE_TONE_SAMPLER,
 		{
 			id: INSTRUMENT_TYPE_TONE_SAMPLER,
+			...INSTRUMENT_CLASSIFICATION,
 			name: "Tone Sampler",
 			description: "Sample-based synthesizer with pitch shifting",
 			category: INSTRUMENT_CATEGORY_SAMPLING,
@@ -114,6 +121,7 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 		INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT,
 		{
 			id: INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT,
+			...INSTRUMENT_CLASSIFICATION,
 			name: "SuperCollider Synth",
 			description: "SuperCollider synthesizer via scsynth",
 			category: INSTRUMENT_CATEGORY_SUPERCOLLIDER,
@@ -125,6 +133,7 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 		INSTRUMENT_TYPE_CLAP,
 		{
 			id: INSTRUMENT_TYPE_CLAP,
+			...INSTRUMENT_CLASSIFICATION,
 			name: "CLAP Instrument",
 			description: "Web CLAP plugin synthesizer with automatic patch loading",
 			category: "synthesis",
@@ -135,6 +144,7 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 		INSTRUMENT_TYPE_FAUST,
 		{
 			id: INSTRUMENT_TYPE_FAUST,
+			...INSTRUMENT_CLASSIFICATION,
 			name: "FAUST Synthesizer",
 			description: "Functional DSP synthesizer using FAUST compiled to WebAssembly",
 			category: INSTRUMENT_CATEGORY_FAUST,
@@ -145,6 +155,7 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 		INSTRUMENT_TYPE_OPENDAW_PLAYFIELD,
 		{
 			id: INSTRUMENT_TYPE_OPENDAW_PLAYFIELD,
+			...INSTRUMENT_CLASSIFICATION,
 			name: "openDAW Playfield",
 			description: "Playfield instrument using openDAW framework",
 			category: INSTRUMENT_CATEGORY_SYNTHESIS,
@@ -155,6 +166,7 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 		INSTRUMENT_TYPE_OPENDAW_NANO,
 		{
 			id: INSTRUMENT_TYPE_OPENDAW_NANO,
+			...INSTRUMENT_CLASSIFICATION,
 			name: "openDAW Nano",
 			description: "Nano synthesizer using openDAW framework",
 			category: INSTRUMENT_CATEGORY_SYNTHESIS,
@@ -165,6 +177,7 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 		INSTRUMENT_TYPE_OPENDAW_TAPE,
 		{
 			id: INSTRUMENT_TYPE_OPENDAW_TAPE,
+			...INSTRUMENT_CLASSIFICATION,
 			name: "openDAW Tape",
 			description: "Tape synthesizer using openDAW framework",
 			category: INSTRUMENT_CATEGORY_SYNTHESIS,
@@ -175,6 +188,7 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 		INSTRUMENT_TYPE_OPENDAW_SOUNDFONT,
 		{
 			id: INSTRUMENT_TYPE_OPENDAW_SOUNDFONT,
+			...INSTRUMENT_CLASSIFICATION,
 			name: "openDAW SoundFont",
 			description: "SoundFont sampler using openDAW framework",
 			category: INSTRUMENT_CATEGORY_SAMPLING,
@@ -185,6 +199,7 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 		INSTRUMENT_TYPE_OPENDAW_VAPORISATEUR,
 		{
 			id: INSTRUMENT_TYPE_OPENDAW_VAPORISATEUR,
+			...INSTRUMENT_CLASSIFICATION,
 			name: "openDAW Vaporisateur",
 			description: "Vaporisateur instrument using openDAW framework",
 			category: INSTRUMENT_CATEGORY_SYNTHESIS,

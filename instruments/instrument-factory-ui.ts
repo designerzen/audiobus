@@ -1,3 +1,4 @@
+import type { DeviceClassification } from "../io/device-classification.ts"
 import { defineDevice } from '../io/device-definition'
 /**
  * Factory interface for creating instrument UI factories
@@ -12,7 +13,7 @@ import {
 	EXTERNAL_DATA_KEY_SAMPLE_URLS
 } from "./instrument-factory.ts"
 
-export interface InstrumentUIFactory {
+export interface InstrumentUIFactory extends DeviceClassification<'engine'> {
 	id: string
 	name: string
 	description: string
@@ -57,6 +58,8 @@ const createInstrument = async (
  */
 const metadataToUIFactory = (metadata: InstrumentMetadata): InstrumentUIFactory => ({
 	id: metadata.id,
+	type: metadata.type,
+	subtype: metadata.subtype,
 	name: metadata.name,
 	description: metadata.description,
 	category: metadata.category,

@@ -1,3 +1,5 @@
+import { OUTPUT_DEFINITIONS } from "./output-definitions.ts"
+import type { DeviceClassification } from "./device-classification.ts"
 import { defineDevice } from './device-definition'
 /**
  * Factory for creating audio output instances
@@ -6,7 +8,7 @@ import { defineDevice } from './device-definition'
 import * as OUTPUT_TYPES from "./outputs/output-types.ts"
 import type { IAudioOutput } from "./outputs/output-interface.ts"
 
-export interface OutputFactory {
+export interface OutputFactory extends DeviceClassification {
 	id: string
 	name: string
 	description: string
@@ -142,6 +144,8 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
 export const OUTPUT_FACTORIES: OutputFactory[] = [
 	{
 		id: OUTPUT_TYPES.DESCRIBE,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.DESCRIBE].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.DESCRIBE].subtype,
 		name: "Describe",
 		description: "Describes notes, chords, extensions and inversions in musical language",
 		isAvailable: () => true,
@@ -149,6 +153,8 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	},
 	{
 		id: OUTPUT_TYPES.CONSOLE,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.CONSOLE].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.CONSOLE].subtype,
 		name: "Console",
 		description: "Logs MIDI events to browser console (dev mode only)",
 		isAvailable: () => import.meta.env.DEV,
@@ -156,6 +162,8 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	},
 	{
 		id: OUTPUT_TYPES.PINK_TROMBONE,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.PINK_TROMBONE].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.PINK_TROMBONE].subtype,
 		name: "Pink Trombone",
 		description: "Vocal synthesis engine with speech-like sounds",
 		isAvailable: () => true,
@@ -163,6 +171,8 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	},
 	{
 		id: OUTPUT_TYPES.NOTATION,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.NOTATION].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.NOTATION].subtype,
 		name: "Notation",
 		description: "Displays notes on a musical staff",
 		isAvailable: () => true,
@@ -170,6 +180,8 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	},
 	{
 		id: OUTPUT_TYPES.SPECTRUM_ANALYSER,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.SPECTRUM_ANALYSER].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.SPECTRUM_ANALYSER].subtype,
 		name: "Spectrum Analyser",
 		description: "Visualizes audio spectrum using FFT analysis with realtime waveform display",
 		isAvailable: () => true,
@@ -177,6 +189,8 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	},
 	{
 		id: OUTPUT_TYPES.SPEECH_SYNTHESIS,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.SPEECH_SYNTHESIS].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.SPEECH_SYNTHESIS].subtype,
 		name: "Speech Synthesis",
 		description: "Reads note names with Kokoro, with system voices as a fallback",
 		isAvailable: () => typeof window !== "undefined" && (
@@ -186,6 +200,8 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	},
 	{
 		id: OUTPUT_TYPES.VIBRATOR,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.VIBRATOR].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.VIBRATOR].subtype,
 		name: "Vibrator",
 		description: "Triggers device vibration when a note within a range is played",
 		isAvailable: () => true, // Available on all platforms - supports mobile vibration API and gamepad vibration
@@ -193,6 +209,8 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	},
 	{
 		id: OUTPUT_TYPES.WEBMIDI,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.WEBMIDI].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.WEBMIDI].subtype,
 		name: "WebMIDI Device",
 		description: "Sends MIDI messages to a connected WebMIDI device",
 		isAvailable: () => typeof navigator !== "undefined" && !!(navigator as any).requestMIDIAccess,
@@ -200,6 +218,8 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	},
 	{
 		id: OUTPUT_TYPES.NATIVE_MIDI,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.NATIVE_MIDI].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.NATIVE_MIDI].subtype,
 		name: "Native MIDI Device",
 		description: "Sends MIDI messages to a connected native OS MIDI device (Windows/macOS/Linux)",
 		isAvailable: () => typeof (globalThis as any).process !== "undefined" && (globalThis as any).process.type === "renderer", // Only available in Electron
@@ -207,6 +227,8 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	},
 	{
 		id: OUTPUT_TYPES.BLE_MIDI,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.BLE_MIDI].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.BLE_MIDI].subtype,
 		name: "BLE MIDI",
 		description: "BLE MIDI",
 		isAvailable: () => typeof navigator !== "undefined" && !!navigator?.bluetooth && !!navigator?.bluetooth?.requestDevice,
@@ -214,6 +236,8 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	},
 	{
 		id: OUTPUT_TYPES.MIDI2,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.MIDI2].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.MIDI2].subtype,
 		name: "MIDI 2.0",
 		description: "MIDI 2.0 device output",
 		isAvailable: () => typeof navigator !== "undefined" && !!(navigator as any).requestMIDIAccess,
@@ -221,6 +245,8 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	},
 	{
 		id: OUTPUT_TYPES.MIDI2_NATIVE,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.MIDI2_NATIVE].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.MIDI2_NATIVE].subtype,
 		name: "MIDI 2.0 Native",
 		description: "MIDI 2.0 output with per-note controllers via native OS MIDI (16-bit resolution, Windows/macOS/Linux)",
 		isAvailable: () => typeof (globalThis as any).process !== "undefined" && (globalThis as any).process.type === "renderer", // Only available in Electron
@@ -228,6 +254,8 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	},
 	{
 		id: OUTPUT_TYPES.SUPERSONIC,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.SUPERSONIC].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.SUPERSONIC].subtype,
 		name: "Supersonic",
 		description: "SuperCollider-based sound synthesis engine",
 		isAvailable: () => typeof AudioWorklet !== "undefined",
@@ -235,6 +263,8 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	},
 	{
 		id: OUTPUT_TYPES.WAM2,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.WAM2].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.WAM2].subtype,
 		name: "WAM2",
 		description: "Manages the WAM2 Audio Engine",
 		isAvailable: () => typeof AudioWorklet !== "undefined",
@@ -242,6 +272,8 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	},
 	{
 		id: OUTPUT_TYPES.YOSHIMI,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.YOSHIMI].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.YOSHIMI].subtype,
 		name: "Yoshimi",
 		description: "Free and open source high quality software synthesizer with 700+ presets",
 		isAvailable: () => typeof AudioWorklet !== "undefined",
@@ -249,6 +281,8 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	},
 	{
 		id: OUTPUT_TYPES.METRONOME,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.METRONOME].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.METRONOME].subtype,
 		name: "Metronome",
 		description: "Produces audible clicks in response to MIDI clock signals",
 		isAvailable: () => typeof AudioContext !== "undefined" || typeof (window as any).webkitAudioContext !== "undefined",
@@ -256,6 +290,8 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	},
 	{
 		id: OUTPUT_TYPES.AUDIO_CLICK,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.AUDIO_CLICK].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.AUDIO_CLICK].subtype,
 		name: "Audio Click",
 		description: "Plays audio click sounds from a selected asset library on every bar",
 		isAvailable: () => typeof AudioContext !== "undefined" || typeof (window as any).webkitAudioContext !== "undefined",
@@ -263,6 +299,8 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	},
 	{
 		id: OUTPUT_TYPES.BUTTERCHURN,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.BUTTERCHURN].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.BUTTERCHURN].subtype,
 		name: "Butterchurn",
 		description: "WebGL music visualizer with animated psychedelic patterns synced to audio",
 		isAvailable: () => typeof WebGL2RenderingContext !== "undefined",

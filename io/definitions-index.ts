@@ -5,6 +5,9 @@
  * Provides unified access to metadata for inputs, outputs, and transformers
  */
 
+import type { DeviceClassification } from './device-classification.ts'
+export * from './device-classification.ts'
+
 // Input definitions
 export {
 	INPUT_DEFINITIONS,
@@ -35,19 +38,19 @@ export {
 /**
  * Combined definition type for use in UI contexts that handle multiple device types
  */
-export interface DeviceDefinition {
+export interface DeviceDefinition extends DeviceClassification {
 	id: string
 	name: string
 	description: string
 	icon: string
 	category: string
-	type: "input" | "output" | "transformer"
+	kind: "input" | "output" | "transformer"
 }
 
 /**
  * Get all device definitions combined
  */
-export function getAllDeviceDefinitions(): DeviceDefinition[] {
+export async function getAllDeviceDefinitions(): Promise<DeviceDefinition[]> {
 	const { INPUT_DEFINITIONS } = await import("./input-definitions.ts")
 	const { OUTPUT_DEFINITIONS } = await import("./output-definitions.ts")
 	const { TRANSFORMER_DEFINITIONS } = await import("./transformer-definitions.ts")
@@ -55,15 +58,15 @@ export function getAllDeviceDefinitions(): DeviceDefinition[] {
 	const devices: DeviceDefinition[] = []
 
 	Object.values(INPUT_DEFINITIONS).forEach((def) => {
-		devices.push({ ...def, type: "input" })
+		devices.push({ ...def, kind: "input" })
 	})
 
 	Object.values(OUTPUT_DEFINITIONS).forEach((def) => {
-		devices.push({ ...def, type: "output" })
+		devices.push({ ...def, kind: "output" })
 	})
 
 	Object.values(TRANSFORMER_DEFINITIONS).forEach((def) => {
-		devices.push({ ...def, type: "transformer" })
+		devices.push({ ...def, kind: "transformer" })
 	})
 
 	return devices
