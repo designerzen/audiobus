@@ -1,4 +1,4 @@
-import { EVENT_KEYBOARD_KEY_DOWN, EVENT_KEYBOARD_KEY_UP } from '../../event-constants.ts'
+import { EVENT_KEYBOARD_KEY_DOWN, EVENT_KEYBOARD_KEY_UP, EVENT_KEY_DOWN, EVENT_KEY_UP } from '../../event-constants.ts'
 import * as Commands from '../../commands'
 
 const MAPPING_KEYS_TO_MIDI_NOTES = [
@@ -10,7 +10,7 @@ const MAPPING_KEYS_TO_MIDI_NOTES = [
 /**
  *  Add Keyboard listeners and tie in commands
  */
-export const addKeyboardDownEvents = ( callback:Function, midiNoteSequence:number[]=MAPPING_KEYS_TO_MIDI_NOTES ) => {
+export const addKeyboardDownEvents = ( callback:Function, midiNoteSequence:string[]=MAPPING_KEYS_TO_MIDI_NOTES ) => {
 	
 	// For typing longer numbers
 	let numberSequence = ""
@@ -27,7 +27,7 @@ export const addKeyboardDownEvents = ( callback:Function, midiNoteSequence:numbe
 
 	midiNoteSequence.forEach( (midiNote, index) => keyboardMap.set( midiNote, index+octaveOffset ) )
 
-	window.addEventListener('keydown', async (event)=>{
+	window.addEventListener(EVENT_KEY_DOWN, async (event)=>{
 		const isNumber = !isNaN( parseInt(event.key) )
 		const focussedElement = document.activeElement
 
@@ -101,6 +101,7 @@ export const addKeyboardDownEvents = ( callback:Function, midiNoteSequence:numbe
 			case 'Enter':
 				commandType = Commands.PLAYBACK_TOGGLE
 				break;
+			case ' ':
 			case 'Space':
 				commandType = Commands.TEMPO_TAP
 				break;
@@ -309,7 +310,7 @@ export const addKeyboardDownEvents = ( callback:Function, midiNoteSequence:numbe
 	}, { signal: abortController.signal })
 
 	// depress notes held
-	window.addEventListener('keyup', async (event)=>{
+	window.addEventListener(EVENT_KEY_UP, async (event)=>{
 
 		// Dispatch visual feedback event for QWERTY keyboard display
 		window.dispatchEvent(new CustomEvent(EVENT_KEYBOARD_KEY_UP, { detail: { key: event.key } }))
@@ -326,7 +327,7 @@ export const addKeyboardDownEvents = ( callback:Function, midiNoteSequence:numbe
 			keysPressed.delete(event.key)
 			callback( Commands.NOTE_OFF, event.key, noteNumber, event )
 		}else{
-			console.log("Key up but no key down found", event.key, keyboardMap )
+			keysPressed.delete(event.key)
 		}
 
 	}, { signal: abortController.signal })

@@ -1,4 +1,15 @@
 import AbstractInteractive from './abstract-interactive.ts'
+import {
+	EVENT_KEY_DOWN, EVENT_KEY_UP, EVENT_POINTER_DOWN, EVENT_POINTER_UP,
+	EVENT_POINTER_CANCEL, EVENT_LOST_POINTER_CAPTURE, EVENT_BLUR, EVENT_VISIBILITY_CHANGE,
+} from '../event-constants.ts'
+
+const KEY_CODES: Record<string, string> = {
+	' ': 'Space', '`': 'Backquote', '-': 'Minus', '=': 'Equal',
+	'[': 'BracketLeft', ']': 'BracketRight', '\\': 'Backslash',
+	';': 'Semicolon', "'": 'Quote', ',': 'Comma', '.': 'Period', '/': 'Slash',
+	Shift: 'ShiftLeft', Control: 'ControlLeft', Alt: 'AltLeft',
+}
 
 interface QwertyKeyInfo {
 	keyCode: string
@@ -87,6 +98,8 @@ export default class QwertyKeyboard extends AbstractInteractive {
 	htmlElement!: DocumentFragment
 	svgString!: string
 	keyElements: Element[] = []
+	private controller = new AbortController()
+	private releasePointers = () => {}
 
 	get svg(): string {
 		return this.svgString
@@ -106,13 +119,13 @@ export default class QwertyKeyboard extends AbstractInteractive {
 
 	constructor() {
 		super()
-		const unique = `qwerty-keyboard-${QwertyKeyboard.uniqueID++}`
 		const { svg } = this.createKeyboard()
 
 		this.htmlElement = document.createDocumentFragment()
 		const keyboardElement = this.htmlElement.appendChild(document.createElement('div'))
 		keyboardElement.className = 'qwerty-keyboard'
 		keyboardElement.setAttribute('data-keyboard', 'qwerty')
+		keyboardElement.tabIndex = -1
 		keyboardElement.innerHTML = svg
 		this.keyElements = Array.from(keyboardElement.querySelectorAll('.qwerty-key'))
 
@@ -120,11 +133,60 @@ export default class QwertyKeyboard extends AbstractInteractive {
 		this.keyElements.forEach((value) => {
 			const keyCode = value.getAttribute('data-key-code')
 			if (keyCode) {
-				this.keyMap.set(keyCode, value)
+				this.keyMap.set(this.normalizeKeyCode(keyCode), value)
 			}
 		})
 
 		this.svgString = svg
+		this.attachPointerListeners(keyboardElement)
+	}
+
+	private attachPointerListeners(root: HTMLElement): void {
+		const options = { signal: this.controller.signal }
+		const pointers = new Map<number, string>()
+		const dispatch = (type: string, key: string) => {
+			const held = new Set(pointers.values())
+			window.dispatchEvent(new KeyboardEvent(type, {
+				key, code: KEY_CODES[key] ?? (/^[a-z]$/.test(key) ? `Key${key.toUpperCase()}` : /^[0-9]$/.test(key) ? `Digit${key}` : key),
+				bubbles: true, cancelable: true,
+				shiftKey: held.has('Shift'), ctrlKey: held.has('Control'), altKey: held.has('Alt'),
+			}))
+		}
+		const release = (id: number) => {
+			const key = pointers.get(id)
+			if (key === undefined) return
+			pointers.delete(id)
+			if (!Array.from(pointers.values()).includes(key)) {
+				this.setKeyAsInactive(key)
+				dispatch(EVENT_KEY_UP, key)
+			}
+			if (root.hasPointerCapture?.(id)) root.releasePointerCapture(id)
+		}
+		this.releasePointers = () => {
+			for (const id of Array.from(pointers.keys())) release(id)
+		}
+		root.addEventListener(EVENT_POINTER_DOWN, (event: PointerEvent) => {
+			const keyElement = event.target instanceof Element ? event.target.closest('.qwerty-key-group') : null
+			const key = keyElement?.getAttribute('data-key-code')
+			if (key == null || event.button !== 0 || pointers.has(event.pointerId)) return
+			event.preventDefault()
+			root.focus({ preventScroll: true })
+			const alreadyHeld = Array.from(pointers.values()).includes(key)
+			pointers.set(event.pointerId, key)
+			root.setPointerCapture?.(event.pointerId)
+			if (!alreadyHeld) {
+				this.setKeyAsActive(key)
+				dispatch(EVENT_KEY_DOWN, key)
+			}
+		}, options)
+		const endPointer = (event: PointerEvent) => release(event.pointerId)
+		document.addEventListener(EVENT_POINTER_UP, endPointer, options)
+		document.addEventListener(EVENT_POINTER_CANCEL, endPointer, options)
+		root.addEventListener(EVENT_LOST_POINTER_CAPTURE, endPointer, options)
+		window.addEventListener(EVENT_BLUR, this.releasePointers, options)
+		document.addEventListener(EVENT_VISIBILITY_CHANGE, () => {
+			if (document.hidden) this.releasePointers()
+		}, options)
 	}
 
 	private createKeyboard(keySize: number = 40, keySpacing: number = 2, rowSpacing: number = 8): { svg: string } {
@@ -156,10 +218,7 @@ export default class QwertyKeyboard extends AbstractInteractive {
 			const y = 10 + key.row * (keySize + rowSpacing)
 			const width = (key.width || 1) * keySize + (key.width ? (key.width - 1) * keySpacing : 0)
 
-			const isSpecial = key.special || false
-			const normalizedKeyCode = this.normalizeKeyCode(key.keyCode)
-
-			keyElements.push(this.createKey(key, x, y, width, keySize, normalizedKeyCode))
+			keyElements.push(this.createKey(key, x, y, width, keySize))
 		})
 
 		const svg = `<svg 
@@ -167,12 +226,6 @@ export default class QwertyKeyboard extends AbstractInteractive {
 					class="qwerty-keys" 
 					viewBox="0 0 ${totalWidth} ${totalHeight}" 
 					draggable="false">
-					<defs>
-						<style>
-							.qwerty-key { transition: fill 0.05s, box-shadow 0.05s; }
-							.qwerty-key.active { fill: #4CAF50; }
-						</style>
-					</defs>
 					${keyElements.join('')}
 				</svg>`
 
@@ -189,7 +242,7 @@ export default class QwertyKeyboard extends AbstractInteractive {
 		return lowerCode
 	}
 
-	private createKey(key: QwertyKeyInfo, x: number, y: number, width: number, height: number, normalizedKeyCode: string): string {
+	private createKey(key: QwertyKeyInfo, x: number, y: number, width: number, height: number): string {
 		const isSpecial = key.special || false
 		const fillColor = isSpecial ? '#555' : '#ccc'
 		const textColor = isSpecial ? '#fff' : '#000'
@@ -228,13 +281,8 @@ export default class QwertyKeyboard extends AbstractInteractive {
 	 */
 	setKeyAsActive(keyCode: string): void {
 		const normalizedKeyCode = this.normalizeKeyCode(keyCode)
-		const key = this.keyMap.get(normalizedKeyCode)
-
-		if (key) {
-			const rect = key instanceof SVGElement ? key : (key as any).querySelector('.qwerty-key')
-			if (rect && rect instanceof Element) {
-				rect.classList.add('active')
-			}
+		for (const key of this.keyElements.filter(element => this.normalizeKeyCode(element.getAttribute('data-key-code')!) === normalizedKeyCode)) {
+			key.classList.add('active')
 		}
 	}
 
@@ -244,13 +292,8 @@ export default class QwertyKeyboard extends AbstractInteractive {
 	 */
 	setKeyAsInactive(keyCode: string): void {
 		const normalizedKeyCode = this.normalizeKeyCode(keyCode)
-		const key = this.keyMap.get(normalizedKeyCode)
-
-		if (key) {
-			const rect = key instanceof SVGElement ? key : (key as any).querySelector('.qwerty-key')
-			if (rect && rect instanceof Element) {
-				rect.classList.remove('active')
-			}
+		for (const key of this.keyElements.filter(element => this.normalizeKeyCode(element.getAttribute('data-key-code')!) === normalizedKeyCode)) {
+			key.classList.remove('active')
 		}
 	}
 
@@ -267,6 +310,9 @@ export default class QwertyKeyboard extends AbstractInteractive {
 	}
 
 	destroy(): void {
+		this.releasePointers()
+		this.controller.abort()
+		super.destroy()
 		this.keyElements = []
 		this.keyMap.clear()
 	}
