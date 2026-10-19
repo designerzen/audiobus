@@ -11,6 +11,8 @@ export const SPECTRUM_ANALYSER = "spectrum-analyser" as const
 export const SPEECH_SYNTHESIS = "speech-synthesis" as const
 export const VIBRATOR = "vibrator" as const
 export const WAM2 = "wam2" as const
+export const MOOG = "moog" as const
+export const WAM = "wam" as const
 export const YOSHIMI = "yoshimi" as const
 export const WEBMIDI = "webmidi" as const
 export const NATIVE_MIDI = "native-midi" as const
@@ -21,8 +23,11 @@ export const SUPERSONIC = "supersonic" as const
 export const METRONOME = "metronome" as const
 export const AUDIO_CLICK = "audio-click" as const
 export const BUTTERCHURN = "butterchurn" as const
+export const WEBCLAP_PREFIX = 'webclap:' as const
+export const webclapOutputId = (pluginId: string): `webclap:${string}` => `${WEBCLAP_PREFIX}${pluginId}`
 
 export type OutputId =
+	| `webclap:${string}`
 	| typeof CONSOLE
 	| typeof DESCRIBE
 	| typeof PINK_TROMBONE
@@ -31,6 +36,8 @@ export type OutputId =
 	| typeof SPEECH_SYNTHESIS
 	| typeof VIBRATOR
 	| typeof WAM2
+	| typeof MOOG
+	| typeof WAM
 	| typeof YOSHIMI
 	| typeof WEBMIDI
 	| typeof NATIVE_MIDI

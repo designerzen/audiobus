@@ -7,6 +7,9 @@
  * Registry source: https://www.webaudiomodules.com/community/plugins.json
  */
 
+import communityPlugins from './community-plugins.json'
+import additionalPlugins from './additional-plugins.json'
+
 export interface WAM2PluginDescriptor {
 	identifier: string
 	name: string
@@ -23,11 +26,16 @@ export interface WAM2PluginDescriptor {
 	path: string // path to index.js on webaudiomodules.com
 }
 
+// Expose every published instrument directly in the output picker, even offline.
+const bundledPlugins: WAM2PluginDescriptor[] = [...communityPlugins, ...additionalPlugins]
+export const WAM2_INSTRUMENTS = bundledPlugins.filter(plugin => plugin.category?.includes('Instrument'))
+export const wam2OutputId = (plugin: WAM2PluginDescriptor) => `wam2:${plugin.identifier}`
+
 export class WAM2Registry {
 	private static readonly REGISTRY_URL = "https://www.webaudiomodules.com/community/plugins.json"
-	private static readonly BASE_URL = "https://www.webaudiomodules.com/community/"
+	private static readonly BASE_URL = "https://www.webaudiomodules.com/community/plugins/"
 	private static instance: WAM2Registry
-	private plugins: WAM2PluginDescriptor[] = []
+	private plugins: WAM2PluginDescriptor[] = [...bundledPlugins]
 	private initialized: boolean = false
 	private initPromise: Promise<void> | null = null
 
@@ -48,24 +56,32 @@ export class WAM2Registry {
 		if (this.initPromise) return this.initPromise
 
 		this.initPromise = this.fetchRegistry()
-		await this.initPromise
-		this.initialized = true
+			.then(() => { this.initialized = true })
+			.catch(() => { /* Bundled entries remain available; retry discovery next time. */ })
+			.finally(() => { this.initPromise = null })
+		return this.initPromise
 	}
 
 	private async fetchRegistry(): Promise<void> {
 		try {
-			const response = await fetch(WAM2Registry.REGISTRY_URL)
+			const response = await fetch(WAM2Registry.REGISTRY_URL, { signal: AbortSignal.timeout(10000) })
 			if (!response.ok) {
 				throw new Error(`Failed to fetch WAM2 registry: ${response.statusText}`)
 			}
 
 			const data = await response.json()
-			this.plugins = Array.isArray(data) ? data : data.plugins || []
+			const plugins = Array.isArray(data) ? data : data.plugins
+			if (!Array.isArray(plugins) || !plugins.length) throw new Error('Empty WAM2 registry')
+			this.plugins = [...new Map([...bundledPlugins, ...plugins].filter(p =>
+				typeof p.identifier === 'string' && typeof p.path === 'string' && typeof p.name === 'string'
+			).map(p => [p.identifier, { ...p, vendor: p.vendor ?? '', description: p.description ?? '',
+				category: Array.isArray(p.category) ? p.category : [], keywords: Array.isArray(p.keywords) ? p.keywords : [] }])).values()]
 			
 			console.info(`Loaded ${this.plugins.length} WAM2 plugins from registry`)
 		} catch (error) {
 			console.error("Failed to fetch WAM2 registry:", error)
-			this.plugins = []
+			// Keep bundled entries usable offline; allow a later initialization to retry.
+			this.plugins = [...bundledPlugins]
 			throw error
 		}
 	}
@@ -131,7 +147,7 @@ export class WAM2Registry {
 	 * Get the full URL for a plugin's index.js
 	 */
 	getPluginUrl(plugin: WAM2PluginDescriptor): string {
-		return `${WAM2Registry.BASE_URL}${plugin.path}`
+		return new URL(plugin.path, WAM2Registry.BASE_URL).href
 	}
 
 	/**
@@ -139,7 +155,7 @@ export class WAM2Registry {
 	 */
 	getThumbnailUrl(plugin: WAM2PluginDescriptor): string | null {
 		if (!plugin.thumbnail) return null
-		return `${WAM2Registry.BASE_URL}${plugin.thumbnail}`
+		return new URL(plugin.thumbnail, WAM2Registry.BASE_URL).href
 	}
 
 	/**

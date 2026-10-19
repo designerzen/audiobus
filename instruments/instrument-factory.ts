@@ -127,7 +127,8 @@ export class InstrumentFactory {
 				// CLAP instrument with optional default patch ID
 				instance = new InstrumentClass(
 					audioContext,
-					options.defaultPatchId || null
+					options.defaultPatchId || null,
+					options
 				)
 				// Auto-connect CLAP to initialize and load default patch
 				await (instance as any).connect()

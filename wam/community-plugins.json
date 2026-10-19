@@ -1,0 +1,1206 @@
+[
+  {
+    "identifier": "com.sequencerParty.audioInput",
+    "name": "Audio Input",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Provides audio from external sound card input or microphone.",
+    "keywords": [
+      "utility",
+      "input"
+    ],
+    "category": [
+      "Effect",
+      "Utility"
+    ],
+    "thumbnail": "burns-audio/audio_input/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 642,
+      "height": 482
+    },
+    "path": "burns-audio/audio_input/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.simpleDistortion",
+    "name": "Simple Distortion",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Simple waveshaper-based distortion with variable curve and gain",
+    "keywords": [
+      "effect",
+      "distortion"
+    ],
+    "category": [
+      "Effect",
+      "Distortion"
+    ],
+    "thumbnail": "burns-audio/distortion/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 316,
+      "height": 260
+    },
+    "path": "burns-audio/distortion/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.envmod",
+    "name": "Envelope Follower",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Modulate a destination parameter with an audio signal.",
+    "keywords": [
+      "modulator",
+      "envelope",
+      "follower"
+    ],
+    "category": [
+      "Modulation",
+      "Modulator"
+    ],
+    "thumbnail": "burns-audio/envmod/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 580,
+      "height": 202
+    },
+    "path": "burns-audio/envmod/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.functionSeq",
+    "name": "Function Sequencer",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Collaborative live-coding javascript sequencer.",
+    "keywords": [
+      "sequencer",
+      "javascript",
+      "midi"
+    ],
+    "category": [
+      "MIDI",
+      "Sequencer"
+    ],
+    "thumbnail": "burns-audio/functionseq/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 1870,
+      "height": 586
+    },
+    "path": "burns-audio/functionseq/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.microkorg",
+    "name": "Microkorg Editor",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Patch editor and controller for the Korg Microkorg",
+    "keywords": [
+      "midi",
+      "external instrument",
+      "korg",
+      "microkorg"
+    ],
+    "category": [
+      "MIDI",
+      "External Device"
+    ],
+    "thumbnail": "burns-audio/microkorg_editor/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 2054,
+      "height": 1146
+    },
+    "path": "burns-audio/microkorg_editor/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.jx3p",
+    "name": "Roland JX-3p Editor",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Patch editor and controller for the Roland JX-3p with the third-party MIDI Mod installed",
+    "keywords": [
+      "midi",
+      "external instrument",
+      "roland",
+      "jx-3p",
+      "organix"
+    ],
+    "category": [
+      "MIDI",
+      "External Device"
+    ],
+    "thumbnail": "burns-audio/jx3p_editor/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 2080,
+      "height": 774
+    },
+    "path": "burns-audio/jx3p_editor/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.ob6",
+    "name": "DSI OB-6 Editor",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Patch editor and controller for the Dave Smith OB-6 synthesizer",
+    "keywords": [
+      "midi",
+      "external instrument",
+      "dsi",
+      "oberheim",
+      "ob6"
+    ],
+    "category": [
+      "MIDI",
+      "External Device"
+    ],
+    "thumbnail": "burns-audio/ob6_editor/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 2552,
+      "height": 970
+    },
+    "path": "burns-audio/ob6_editor/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.midiOut",
+    "name": "MIDI Output",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "WebMIDI Output.  Requires browser support for WebMIDI.",
+    "keywords": [
+      "utility",
+      "midi"
+    ],
+    "category": [
+      "MIDI",
+      "Utility"
+    ],
+    "thumbnail": "burns-audio/midi_output/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 512,
+      "height": 380
+    },
+    "path": "burns-audio/midi_output/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.randomizer",
+    "name": "Randomizer",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Randomizer.  Connect to an automation port, click the dice, and all target parameters will be randomized.",
+    "keywords": [
+      "random",
+      "modulator"
+    ],
+    "category": [
+      "Modulation",
+      "Modulator"
+    ],
+    "thumbnail": "burns-audio/randomizer/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 784,
+      "height": 324
+    },
+    "path": "burns-audio/randomizer/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.soundfont",
+    "name": "Soundfont Player",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Soundfont polyphonic instrument player.  Plays SF2 files converted to a web format.",
+    "keywords": [
+      "synth"
+    ],
+    "category": [
+      "Instrument",
+      "Sampler"
+    ],
+    "thumbnail": "burns-audio/soundfont/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 472,
+      "height": 140
+    },
+    "path": "burns-audio/soundfont/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.butterChurn",
+    "name": "ButterChurn",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Wrapper for Butterchurn visualizer, a rewrite of the classic WinAMP Milkdrop plugin.",
+    "keywords": [
+      "video",
+      "visualizer"
+    ],
+    "category": [
+      "Video",
+      "Generator"
+    ],
+    "thumbnail": "burns-audio/video_butterchurn/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 1814,
+      "height": 1284
+    },
+    "path": "burns-audio/video_butterchurn/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.audioTrack",
+    "name": "Audio Track",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Audio file recorder, player, and looper",
+    "keywords": [
+      "audio",
+      "utility",
+      "editor",
+      "looper"
+    ],
+    "category": [
+      "Instrument",
+      "Audio Player"
+    ],
+    "thumbnail": "burns-audio/audio_track/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 1530,
+      "height": 552
+    },
+    "path": "burns-audio/audio_track/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.drumComputer",
+    "name": "DRM-16 DrumComputer",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "16-pad MIDI drum sampler",
+    "keywords": [
+      "drum-machine",
+      "sampler"
+    ],
+    "category": [
+      "Instrument",
+      "Sampler"
+    ],
+    "thumbnail": "burns-audio/drumsampler/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 1248,
+      "height": 600
+    },
+    "path": "burns-audio/drumsampler/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.midiDebug",
+    "name": "MIDI Debugger",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "MIDI Debug tool.  Log, generate, and replay MIDI messages",
+    "keywords": [
+      "utility",
+      "midi"
+    ],
+    "category": [
+      "MIDI",
+      "Utility"
+    ],
+    "thumbnail": "burns-audio/midi_debug/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 1422,
+      "height": 748
+    },
+    "path": "burns-audio/midi_debug/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.modal",
+    "name": "Spectrum: Modal",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Port of a popular eurorack modal synthesizer.  It is a full-blown synthesis voice based on modal synthesis - an under-appreciated flavour of physical modelling synthesis with a strange and abstract feel.",
+    "keywords": [
+      "synthesizer",
+      "modal",
+      "instrument"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "thumbnail": "burns-audio/modal/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 818,
+      "height": 592
+    },
+    "path": "burns-audio/modal/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.microverb",
+    "name": "Microverb",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Convolution Reverb featuring IRs from some vintage cult-classic hardware units.",
+    "keywords": [
+      "effect",
+      "reverb"
+    ],
+    "category": [
+      "Effect",
+      "Reverb"
+    ],
+    "thumbnail": "burns-audio/reverb/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 396,
+      "height": 240
+    },
+    "path": "burns-audio/reverb/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.stepmod",
+    "name": "Step Sequencer",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Automation step sequencer with variable steps, speed, and slew.",
+    "keywords": [
+      "sequencer",
+      "modulator"
+    ],
+    "category": [
+      "Modulation",
+      "Sequencer"
+    ],
+    "thumbnail": "burns-audio/stepmod/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 1020,
+      "height": 538
+    },
+    "path": "burns-audio/stepmod/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.simpleDelay",
+    "name": "Simple Delay",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Simple stereo filtered delay",
+    "keywords": [
+      "effect",
+      "delay"
+    ],
+    "category": [
+      "Effect",
+      "Delay"
+    ],
+    "thumbnail": "burns-audio/delay/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 294,
+      "height": 410
+    },
+    "path": "burns-audio/delay/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.MIDIIn",
+    "name": "MIDI Input",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "WebMIDI Input.  Requires browser support for WebMIDI.",
+    "keywords": [
+      "utility",
+      "midi"
+    ],
+    "category": [
+      "MIDI",
+      "Utility"
+    ],
+    "thumbnail": "burns-audio/midi_input/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 514,
+      "height": 384
+    },
+    "path": "burns-audio/midi_input/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.pianoRoll",
+    "name": "Piano Roll",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Piano Roll.  Supports variable length clips.",
+    "keywords": [
+      "sequencer",
+      "midi"
+    ],
+    "category": [
+      "MIDI",
+      "Sequencer"
+    ],
+    "thumbnail": "burns-audio/pianoroll/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 2046,
+      "height": 1360
+    },
+    "path": "burns-audio/pianoroll/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.simpleEQ",
+    "name": "Simple EQ",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Simple three-band equalizer",
+    "keywords": [
+      "effect",
+      "eq"
+    ],
+    "category": [
+      "Effect",
+      "Equalizer & Filter"
+    ],
+    "thumbnail": "burns-audio/simpleEQ/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 350,
+      "height": 410
+    },
+    "path": "burns-audio/simpleEQ/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.synth101",
+    "name": "Synth-101",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Software clone of a simple monophonic synthesizer classic, the Roland SH-101",
+    "keywords": [
+      "synth"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "thumbnail": "burns-audio/synth101/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 1680,
+      "height": 328
+    },
+    "path": "burns-audio/synth101/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.isfVideo",
+    "name": "ISF Video Shader",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "ISF (Interactive Shader Format) Plugin.  Import or write video generators and effects in the ISF (https://isf.video) format.",
+    "keywords": [
+      "video",
+      "effect",
+      "shader",
+      "isf",
+      "2d"
+    ],
+    "category": [
+      "Video",
+      "Effect"
+    ],
+    "thumbnail": "burns-audio/video_isf/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 1814,
+      "height": 1312
+    },
+    "path": "burns-audio/video_isf/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.videoInput",
+    "name": "Video Input",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Video Input plugin.  Use to bring your external webcam, camera, or video capture device into the session.",
+    "keywords": [
+      "video",
+      "utility",
+      "input"
+    ],
+    "category": [
+      "Video",
+      "Generator"
+    ],
+    "thumbnail": "burns-audio/video_input/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 1152,
+      "height": 730
+    },
+    "path": "burns-audio/video_input/index.js"
+  },
+  {
+    "identifier": "com.sequencerParty.threejs",
+    "name": "ThreeJS Video Generator",
+    "vendor": "Sequencer Party",
+    "website": "https://sequencer.party",
+    "description": "Livecode 3d video scenes using three.js",
+    "keywords": [
+      "video",
+      "generator"
+    ],
+    "category": [
+      "Video",
+      "Generator"
+    ],
+    "thumbnail": "burns-audio/video_threejs/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 1716,
+      "height": 1088
+    },
+    "path": "burns-audio/video_threejs/index.js"
+  },
+  {
+    "identifier": "com.wimmics.bigmuff",
+    "name": "Big Muff",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "A reproduction of the BigMuff original Fuzz pedal. Original code from Guitarix project. WAM by Michel Buffa.",
+    "keywords": [
+      "fuzz"
+    ],
+    "category": [
+      "Effect",
+      "Distortion"
+    ],
+    "thumbnail": "wimmics/BigMuff/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 200,
+      "height": 262
+    },
+    "path": "wimmics/BigMuff/index.js"
+  },
+  {
+    "identifier": "com.wimmics.blipper",
+    "name": "Blipper",
+    "vendor": "Wimmics",
+    "website": "Original web site with faust code by O.Larkin : https://www.rebeltech.org/patch-library/patch/Blipper",
+    "description": "Blipper is an Envelope Follower which controls the pitch of a triangle oscillator. It is a rough emulation of some of the features of the BOSS PC-2 Percussion Synthesiser. Arthur Russell used something like this to create interesting percussion parts on his records e.g. <https://www.youtube.com/watch?v=LEZevPziZhY>. It works nicely with drums. Authors: Michel Buffa for making it a WAM, Q. Beauchet for GUI improvements, original Faust Code : Oli Larkin",
+    "keywords": [
+      "blipper"
+    ],
+    "category": [
+      "Effect",
+      "Equalizer & Filter"
+    ],
+    "thumbnail": "wimmics/blipper/default.png",
+    "thumbnailDimensions": {
+      "width": 204,
+      "height": 302
+    },
+    "path": "wimmics/blipper/index.js"
+  },
+  {
+    "identifier": "com.wimmics.csoundpitchshifter",
+    "name": "Csound Pitch Shifter",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "A pitch shifter written by Steven Yi, csound code compiled to wasm.",
+    "keywords": [
+      "PitchShifter"
+    ],
+    "category": [
+      "Effect",
+      "Pitch"
+    ],
+    "thumbnail": "wimmics/csoundPitchShifter/dist/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 120,
+      "height": 180
+    },
+    "path": "wimmics/csoundPitchShifter/dist/index.js"
+  },
+  {
+    "identifier": "com.wimmics.deathgate",
+    "name": "DeathGate",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "This plugin is a multiband noise gate, works pretty well with distorded guitars, drums, bass, etc. Authors: Michel Buffa for making it a WAM, Quentin Beauchet for improving the GUI, Oleg Kapitonov for the original FAUST code",
+    "keywords": [
+      "noisegate"
+    ],
+    "category": [
+      "Effect",
+      "Utility"
+    ],
+    "thumbnail": "wimmics/deathgate/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 400,
+      "height": 538
+    },
+    "path": "wimmics/deathgate/index.js"
+  },
+  {
+    "identifier": "com.wimmics.distomachine",
+    "name": "DistoMachine",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "DistoMachine is a tube guitar amp sim, inspired by the Marshall JCM 800 circuitry. Authors: Michel Buffa and Jerome Lebrun",
+    "keywords": [
+      "guitarSimAmplifier"
+    ],
+    "category": [
+      "Effect",
+      "Amp Simulator"
+    ],
+    "thumbnail": "wimmics/disto_machine/src/default.png",
+    "thumbnailDimensions": {
+      "width": 603,
+      "height": 201
+    },
+    "path": "wimmics/disto_machine/src/index.js"
+  },
+  {
+    "identifier": "com.wimmics.dualpitchshifter",
+    "name": "DualPitchShifter",
+    "vendor": "Wimmics",
+    "website": "Original web site with faust code by O.Larkin : https://www.rebeltech.org/patch-library/patch/DualPitchShifter. Authors: Michel Buffa for making it a WAM, Q. Beauchet for GUI improvements, original Faust Code : Oli Larkin",
+    "description": "Dual Pitch Shifter is a dual channel pitch shifter, based on Faust’s pitch_shifter.dsp by Grame. Pitch shifting is (intentionally) extremely basic and introduces significant delay based on window size.",
+    "keywords": [
+      "blipper"
+    ],
+    "category": [
+      "Effect",
+      "Pitch"
+    ],
+    "thumbnail": "wimmics/DualPitchShifter/default.png",
+    "thumbnailDimensions": {
+      "width": 133,
+      "height": 204
+    },
+    "path": "wimmics/DualPitchShifter/index.js"
+  },
+  {
+    "identifier": "com.wimmics.graphicequalizer",
+    "name": "GraphicEqualizer",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "A graphic equalizer proposing a bank of filters. Drag control points. Use shift+drag for peaking filters to adjust the curve. Author: Michel Buffa.",
+    "keywords": [
+      "GraphicEqualizer"
+    ],
+    "category": [
+      "Effect",
+      "Equalizer & Filter"
+    ],
+    "thumbnail": "wimmics/graphicEqualizer/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 480,
+      "height": 350
+    },
+    "path": "wimmics/graphicEqualizer/index.js"
+  },
+  {
+    "identifier": "com.wimmics.greyhole",
+    "name": "Grey Hole",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "A reverb insoired by the famous Eventinde/Blackhole effect. Authors: Michel Buffa for making it a WAM, Quentin Beauchet for improving the GUI, original faust code Julian Parker, bug fixes by Till Bovermann.",
+    "keywords": [
+      "Reverb"
+    ],
+    "category": [
+      "Effect",
+      "Reverb"
+    ],
+    "thumbnail": "wimmics/greyhole/default.png",
+    "thumbnailDimensions": {
+      "width": 337,
+      "height": 340
+    },
+    "path": "wimmics/greyhole/index.js"
+  },
+  {
+    "identifier": "com.wimmics.guitarampsim60s",
+    "name": "Vox Amp 30",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "GuitarAmpSIm60s is a tube guitar amp sim, inspired by old Vox AC30 amps. Authors: Michel Buffa for making it a wam. Original code by the Guitarix team.",
+    "keywords": [
+      "guitarSimAmplifier"
+    ],
+    "category": [
+      "Effect",
+      "Amp Simulator"
+    ],
+    "thumbnail": "wimmics/GuitarAmpSim60s/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 510,
+      "height": 222
+    },
+    "path": "wimmics/GuitarAmpSim60s/index.js"
+  },
+  {
+    "identifier": "com.wimmics.kbverb",
+    "name": "KBVerb",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "A reverb inspired by https://valhalladsp.com/2010/08/25/rip-keith-barr/ Authors: Michel Buffa for making it a WAM, Quentin Beauchet for improving the GUI, original faust code originated from Stephane Letz.",
+    "keywords": [
+      "Reverb"
+    ],
+    "category": [
+      "Effect",
+      "Reverb"
+    ],
+    "thumbnail": "wimmics/kbverb/default.png",
+    "thumbnailDimensions": {
+      "width": 226,
+      "height": 340
+    },
+    "path": "wimmics/kbverb/index.js"
+  },
+  {
+    "identifier": "com.wimmics.kppfuzz",
+    "name": "KppFuzz",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "This plugin is a vintage fuzz pedal emulator. Authors: Michel Buffa for making it a WAM, Quentin Beauchet for improving the GUI, Oleg Kapitonov for the original FAUST code.",
+    "keywords": [
+      "fuzz"
+    ],
+    "category": [
+      "Effect",
+      "Distortion"
+    ],
+    "thumbnail": "wimmics/Kpp_fuzz/default.png",
+    "thumbnailDimensions": {
+      "width": 396,
+      "height": 598
+    },
+    "path": "wimmics/Kpp_fuzz/index.js"
+  },
+  {
+    "identifier": "com.wimmics.kppdistorder",
+    "name": "KppDistorder",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "This plugin is a distortion pedal emulator with equalizer. Authors: Michel Buffa for making it a WAM, Quentin Beauchet for improving the GUI, Oleg Kapitonov for the original FAUST code",
+    "keywords": [
+      "distorstion"
+    ],
+    "category": [
+      "Effect",
+      "Distortion"
+    ],
+    "thumbnail": "wimmics/kppdistorder/default.png",
+    "thumbnailDimensions": {
+      "width": 301,
+      "height": 351
+    },
+    "path": "wimmics/kppdistorder/index.js"
+  },
+  {
+    "identifier": "com.wimmics.livegain",
+    "name": "LiveGain",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "TypeScript/React LiveGain WebAudioModule. Author: Shihong Ren",
+    "keywords": [
+      "gain",
+      "visualization"
+    ],
+    "category": [
+      "Effect",
+      "Visualization"
+    ],
+    "thumbnail": "wimmics/SRVisualizers/dist/livegain/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 210,
+      "height": 90
+    },
+    "path": "wimmics/SRVisualizers/dist/livegain/index.js"
+  },
+  {
+    "identifier": "com.wimmics.oscilloscope",
+    "name": "Oscilloscope",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "TypeScript/React Oscilloscope WebAudioModule. Author: Shihong Ren.",
+    "keywords": [
+      "oscilloscope",
+      "visualization"
+    ],
+    "category": [
+      "Effect",
+      "Visualization"
+    ],
+    "thumbnail": "wimmics/SRVisualizers/dist/oscilloscope/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 640,
+      "height": 360
+    },
+    "path": "wimmics/SRVisualizers/dist/oscilloscope/index.js"
+  },
+  {
+    "identifier": "com.wimmics.spectrogram",
+    "name": "Spectrogram",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "TypeScript/React Spectrogram WebAudioModule. Author: Shihong Ren.",
+    "keywords": [
+      "spectrogram",
+      "visualization"
+    ],
+    "category": [
+      "Effect",
+      "Visualization"
+    ],
+    "thumbnail": "wimmics/SRVisualizers/dist/spectrogram/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 640,
+      "height": 360
+    },
+    "path": "wimmics/SRVisualizers/dist/spectrogram/index.js"
+  },
+  {
+    "identifier": "com.wimmics.spectroscope",
+    "name": "Spectroscope",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "TypeScript/React Spectroscope WebAudioModule. Author: Shihong Ren.",
+    "keywords": [
+      "spectroscope",
+      "visualization"
+    ],
+    "category": [
+      "Effect",
+      "Visualization"
+    ],
+    "thumbnail": "wimmics/SRVisualizers/dist/spectroscope/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 640,
+      "height": 360
+    },
+    "path": "wimmics/SRVisualizers/dist/spectroscope/index.js"
+  },
+  {
+    "identifier": "com.wimmics.osctube",
+    "name": "OSCTube",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "Tube fuzz effect with vibrato, resonance and fuzz controls. Authors: Michel Buffa for making it a WAM, Quentin Beauchet for improving the GUI, Guitarix Team for the original FAUST code",
+    "keywords": [
+      "distortion"
+    ],
+    "category": [
+      "Effect",
+      "Distortion"
+    ],
+    "thumbnail": "wimmics/OscTube/default.png",
+    "thumbnailDimensions": {
+      "width": 157,
+      "height": 303
+    },
+    "path": "wimmics/OscTube/index.js"
+  },
+  {
+    "identifier": "com.wimmics.overdriverix",
+    "name": "Overdriverix",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "Overdrive effect implemented in Faust. Authors: Michel Buffa for making it a WAM, Quentin Beauchet for improving the GUI, Guitarix Team for the original FAUST code",
+    "keywords": [
+      "overdrive"
+    ],
+    "category": [
+      "Effect",
+      "Distortion"
+    ],
+    "thumbnail": "wimmics/OverdriveRix/default.png",
+    "thumbnailDimensions": {
+      "width": 396,
+      "height": 496
+    },
+    "path": "wimmics/OverdriveRix/index.js"
+  },
+  {
+    "identifier": "com.wimmics.owldirty",
+    "name": "OwlDirty",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "A stereo ambient reverberation with a distortion stage on the reverb tail. Authors: Michel Buffa for making it a WAM, Quentin Beauchet for improving the GUI, original faust code by Xavier (https://www.rebeltech.org/patch-library/patch/Owlgazer_Dirty_Reverb/)",
+    "keywords": [
+      "Reverb"
+    ],
+    "category": [
+      "Effect",
+      "Reverb"
+    ],
+    "thumbnail": "wimmics/OwlDirty/default.png",
+    "thumbnailDimensions": {
+      "width": 396,
+      "height": 598
+    },
+    "path": "wimmics/OwlDirty/index.js"
+  },
+  {
+    "identifier": "com.wimmics.owlshimmer",
+    "name": "OWLShimmer",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "A stereo ambient reverberation with a shimmer effect. Authors: Michel Buffa for making it a WAM, Quentin Beauchet for improving the GUI, original faust code by Xavier (https://www.rebeltech.org/patch-library/patch/Owlgazer_Dirty_Reverb/)",
+    "keywords": [
+      "Reverb"
+    ],
+    "category": [
+      "Effect",
+      "Reverb"
+    ],
+    "thumbnail": "wimmics/OwlShimmer/default.png",
+    "thumbnailDimensions": {
+      "width": 406,
+      "height": 600
+    },
+    "path": "wimmics/OwlShimmer/index.js"
+  },
+  {
+    "identifier": "com.wimmics.reactpedalboard",
+    "name": "React Pedalboard",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "A WAM plugin written using React, that acts as a host for assembling other WAM plugins in effect chains. Author: Dorian Chapoulié.",
+    "keywords": [
+      "pedalboard"
+    ],
+    "category": [
+      "Effect",
+      "Pedalboard"
+    ],
+    "thumbnail": "wimmics/pedalboard/dist/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 700,
+      "height": 300
+    },
+    "path": "wimmics/pedalboard/dist/index.js"
+  },
+  {
+    "identifier": "com.wimmics.pedalboardwac2022",
+    "name": "Pedalboard WAC2022",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "A WAM plugin that acts as a host for assembling other WAM plugins in effect chains. Authors: Quentin Beauchet, Kouyoumdjian Pierre, Michael Marynowicz, Yann Forner.",
+    "keywords": [
+      "pedalboard"
+    ],
+    "category": [
+      "Effect",
+      "Pedalboard"
+    ],
+    "thumbnail": "wimmics/PedalBoard-WAC2022/src/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 502,
+      "height": 341
+    },
+    "path": "wimmics/PedalBoard-WAC2022/src/index.js"
+  },
+  {
+    "identifier": "com.wimmics.pingpongdelay",
+    "name": "PingPongDelay",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "A classic Ping Pong Delay written using WebAudio standard nodes. Authors: Michel Buffa, Q. Beauchet for GUI improvements.",
+    "keywords": [
+      "delay"
+    ],
+    "category": [
+      "Effect",
+      "Delay"
+    ],
+    "thumbnail": "wimmics/pingpongdelay/dist/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 200,
+      "height": 300
+    },
+    "path": "wimmics/pingpongdelay/dist/index.js"
+  },
+  {
+    "identifier": "com.wimmics.quadrafuzz",
+    "name": "QuadraFuzz",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "A multiband fuzz effect inspired by the Quadrafuzz VST. Authors: Michel Buffa, Q. Beauchet for GUI improvements",
+    "keywords": [
+      "fuzz"
+    ],
+    "category": [
+      "Effect",
+      "Distortion"
+    ],
+    "thumbnail": "wimmics/quadrafuzz/dist/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 120,
+      "height": 180
+    },
+    "path": "wimmics/quadrafuzz/dist/index.js"
+  },
+  {
+    "identifier": "com.wimmics.smoothdelay",
+    "name": "SmoothDelay",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "Delay that does't click or transpose when the delay time is changed, in Faust. Author: Yann Orlarey.",
+    "keywords": [
+      "delay"
+    ],
+    "category": [
+      "Effect",
+      "Delay"
+    ],
+    "thumbnail": "wimmics/SmoothDelay/default.png",
+    "thumbnailDimensions": {
+      "width": 253,
+      "height": 274
+    },
+    "path": "wimmics/SmoothDelay/index.js"
+  },
+  {
+    "identifier": "com.wimmics.stereofreqshifter",
+    "name": "StereoFreqShifter",
+    "vendor": "Wimmics",
+    "website": "Original web site with faust code by O.Larkin : https://www.rebeltech.org/patch-library/patch/StereoFreqShifter",
+    "description": "Stereo Frequency Shifter is a twin frequency shifter with linked control of frequency shift for each channel, that can be slightly offset for lush stereo phasing. Authors: Michel Buffa for making it a WAM, Q. Beauchet for GUI improvements, original Faust Code : Oli Larkin",
+    "keywords": [
+      "blipper"
+    ],
+    "category": [
+      "Effect",
+      "Pitch"
+    ],
+    "thumbnail": "wimmics/StereoFreqShifter/default.png",
+    "thumbnailDimensions": {
+      "width": 202,
+      "height": 306
+    },
+    "path": "wimmics/StereoFreqShifter/index.js"
+  },
+  {
+    "identifier": "com.wimmics.stonephaser",
+    "name": "StonePhaser",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "This is an analog phaser with similarity to the Small Stone. It has a color switch, which makes the phasing stronger when on, and adds some feedback controls. Authors: Michel Buffa for making it a WAM, Q. Beauchet for GUI improvements, original faust Code by jpcima https://github.com/jpcima/stone-phaser",
+    "keywords": [
+      "phaser"
+    ],
+    "category": [
+      "Effect",
+      "Modulation"
+    ],
+    "thumbnail": "wimmics/stonephaser/default.png",
+    "thumbnailDimensions": {
+      "width": 201,
+      "height": 301
+    },
+    "path": "wimmics/stonephaser/index.js"
+  },
+  {
+    "identifier": "com.wimmics.sweetwah",
+    "name": "SweetWah",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "An autowah effect with modulation. Authors: Michel Buffa for making it a WAM, Q. Beauchet for GUI improvements, original faust code https://github.com/pingdynasty/OwlPatches/blob/master/Faust/SweepWah.dsp",
+    "keywords": [
+      "wahwah"
+    ],
+    "category": [
+      "Effect",
+      "Equalizer & Filter"
+    ],
+    "thumbnail": "wimmics/sweetWah/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 204,
+      "height": 305
+    },
+    "path": "wimmics/sweetWah/index.js"
+  },
+  {
+    "identifier": "com.wimmics.temper",
+    "name": "Temper",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "Modern digital distortion. It builds upon traditional waveshaping techniques using modulated filter coefficients to produce a unique phase distortion. Authors: Michel Buffa for making it a WAM, Q. Beauchet for GUI improvements, original code Nick Thomson (https://github.com/creativeintent/temper)",
+    "keywords": [
+      "distortion"
+    ],
+    "category": [
+      "Effect",
+      "Distortion"
+    ],
+    "thumbnail": "wimmics/temper/default.png",
+    "thumbnailDimensions": {
+      "width": 1008,
+      "height": 600
+    },
+    "path": "wimmics/temper/index.js"
+  },
+  {
+    "identifier": "com.wimmics.thruzeroflanger",
+    "name": "ThruZeroFlanger",
+    "vendor": "Wimmics",
+    "website": "Original web site with faust code by O.Larkin : https://www.rebeltech.org/patch-library/patch/Thru_zero_flanger",
+    "description": "Thru-zero flanger that models a pair of tape delays with rate/depth/feedback/synchronization modes controls. Authors: Michel Buffa for making it a WAM, Q. Beauchet for GUI improvements, original Faust Code : Oli Larkin",
+    "keywords": [
+      "flanger"
+    ],
+    "category": [
+      "Effect",
+      "Modulation"
+    ],
+    "thumbnail": "wimmics/ThruZeroFlanger/default.png",
+    "thumbnailDimensions": {
+      "width": 200,
+      "height": 302
+    },
+    "path": "wimmics/ThruZeroFlanger/index.js"
+  },
+  {
+    "identifier": "com.wimmics.ts9overdrive",
+    "name": "TS9 Overdrive",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "A recreation of the classic TS9 overdrive pedal effect. Authors: Michel Buffa for making it a WAM, Q. Beauchet for GUI improvements, original Faust code by the guitarix team",
+    "keywords": [
+      "overdrive"
+    ],
+    "category": [
+      "Effect",
+      "Distortion"
+    ],
+    "thumbnail": "wimmics/TS9_Overdrive/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 199,
+      "height": 278
+    },
+    "path": "wimmics/TS9_Overdrive/index.js"
+  },
+  {
+    "identifier": "com.wimmics.weirdphaser",
+    "name": "WeirdPhaser",
+    "vendor": "Wimmics",
+    "website": "Original web site with faust code by O.Larkin : https://www.rebeltech.org/patch-library/patch/WeirdPhaser",
+    "description": "Weird Phaser is a stereo phase shifter based on SSB (single side band) modulation. Unlike Stereo Frequency Shifter, Weird Phaser uses a single LFO which has a fixed phase offset for the right hand channel, causing some interesting between the ears spatial effects at its maximum settting. Weird Phaser also has feedback for a more pronounced effect. Authors: Michel Buffa for making it a WAM, Q. Beauchet for GUI improvements, original Faust Code : Oli Larkin",
+    "keywords": [
+      "phaser"
+    ],
+    "category": [
+      "Effect",
+      "Modulation"
+    ],
+    "thumbnail": "wimmics/WeirdPhaser/default.png",
+    "thumbnailDimensions": {
+      "width": 203,
+      "height": 299
+    },
+    "path": "wimmics/WeirdPhaser/index.js"
+  },
+  {
+    "identifier": "com.wimmics.stereoenhancer",
+    "name": "Stereo Enhancer",
+    "vendor": "Wimmics",
+    "website": "",
+    "description": "Stereo Width/Enhancer effect using the Blumlein Shuffler technique. Author: Michel Buffa.",
+    "keywords": [
+      "stereo ennhancer"
+    ],
+    "category": [
+      "Effect",
+      "Modulation"
+    ],
+    "thumbnail": "wimmics/StereoEnhancer/screenshot.png",
+    "thumbnailDimensions": {
+      "width": 354,
+      "height": 458
+    },
+    "path": "wimmics/StereoEnhancer/index.js"
+  }
+]

@@ -3,26 +3,9 @@
  * WAM2 plugin support and host functionality
  */
 
-export {
-  WAM2Host,
-  WAM2HostConfig,
-} from './wam2-host.ts'
-
-export {
-  WAMPlugin,
-  WAMPluginConfig,
-} from './wam-plugin.ts'
-
-export {
-  OutputWAM2,
-  WAM2Output,
-} from './output-wam2.ts'
-
-export {
-  WAMRegistry,
-  PluginMetadata,
-} from './wam-registry.ts'
-
-export {
-  PluginManager,
-} from './plugin-manager.ts'
+export { default as OutputWAM2 } from '../io/outputs/output-wam2'
+export { default as OutputMoog } from '../io/outputs/output-moog'
+export { default as OutputWAM } from '../io/outputs/output-wam'
+export { WAM2Registry, WAM2_INSTRUMENTS, wam2OutputId } from './registry'
+export type { WAM2PluginDescriptor } from './registry'
+export { initializeHost, WAM_MIDI_EVENT, WAM_AUTOMATION_EVENT } from './host'

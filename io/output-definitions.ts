@@ -1,4 +1,4 @@
-import type { DeviceClassification } from "./device-classification.ts"
+import type { DeviceClassification, DeviceAttribution } from "./device-classification.ts"
 /**
  * Output Definitions
  *
@@ -11,6 +11,8 @@ import type { DeviceClassification } from "./device-classification.ts"
  */
 
 import * as OUTPUT_TYPES from "./outputs/output-types.ts"
+import { CLAP_PATCHES } from '../instruments/clap/clap-catalog'
+import { WAM2_INSTRUMENTS, wam2OutputId } from '../wam/registry'
 
 export interface OutputDefinition extends DeviceClassification {
 	id: string
@@ -18,9 +20,36 @@ export interface OutputDefinition extends DeviceClassification {
 	description: string
 	icon: string
 	category: string
+	title?: string
+	attribution?: DeviceAttribution
 }
 
 export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
+	[OUTPUT_TYPES.MOOG]: {
+		id: OUTPUT_TYPES.MOOG,
+		type: "engine",
+		subtype: "instrument",
+		name: "Moog",
+		description: "Photosynth MoogFF ladder synthesizer with MIDI and WAM2 controls",
+		icon: "/icons/output-wam2.svg",
+		category: "Synthesis",
+	},
+	...Object.fromEntries(CLAP_PATCHES.map(patch => [OUTPUT_TYPES.webclapOutputId(patch.id), {
+		id: OUTPUT_TYPES.webclapOutputId(patch.id),
+		type: patch.type ?? (patch.features?.includes('instrument') ? 'engine' : 'audio'),
+		subtype: patch.subtype ?? (patch.features?.includes('instrument') ? 'instrument' : 'effect'),
+		name: `WebCLAP: ${patch.name}`,
+		title: patch.title,
+		description: patch.description ?? `WebCLAP plugin by ${patch.author}`,
+		attribution: patch.attribution,
+		icon: '/icons/output-webclap.svg',
+		category: patch.category ?? 'WebCLAP',
+	} satisfies OutputDefinition])),
+	...Object.fromEntries(WAM2_INSTRUMENTS.map(plugin => [wam2OutputId(plugin), {
+		id: wam2OutputId(plugin), type: 'engine', subtype: 'instrument',
+		name: `${plugin.name} (WAM2)`, description: plugin.description,
+		icon: '/icons/output-wam2.svg', category: 'Audio',
+	}])),
 	[OUTPUT_TYPES.DESCRIBE]: {
 		id: OUTPUT_TYPES.DESCRIBE,
 		type: "visual",
@@ -96,6 +125,15 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		subtype: "instrument",
 		name: "WAM2",
 		description: "Manages the WAM2 Audio Engine",
+		icon: "/icons/output-wam2.svg",
+		category: "Audio",
+	},
+	[OUTPUT_TYPES.WAM]: {
+		id: OUTPUT_TYPES.WAM,
+		type: "engine",
+		subtype: "instrument",
+		name: "WAM",
+		description: "Legacy Web Audio Modules: Yoshimi and webDX7",
 		icon: "/icons/output-wam2.svg",
 		category: "Audio",
 	},

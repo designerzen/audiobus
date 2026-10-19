@@ -1,0 +1,53 @@
+[
+  {
+    "identifier": "com.webaudiomodules.wam-examples.tinysynth",
+    "name": "TinySynth (no GUI)",
+    "vendor": "WebAudioModule",
+    "description": "TinySynth GM synthesizer without GUI",
+    "keywords": [],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://mainline.i3s.unice.fr/wam2/packages/tinySynth/src/index.js"
+  },
+  {
+    "identifier": "com.webaudiomodules.wam-examples.wam-example",
+    "name": "WamExample",
+    "vendor": "WebAudioModule",
+    "description": "Simple example using WebAudioModule, WamNode, and WamProcessor classes.",
+    "keywords": [],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://mainline.i3s.unice.fr/wam2/packages/WamExample/src/index.js"
+  },
+  {
+    "identifier": "org.webaudiomodules.obxd",
+    "name": "OBXD",
+    "vendor": "Jari Kleimola 2017-2020 (jari@webaudiomodules.org)",
+    "description": "Virtual analog polyphonic synthesizer",
+    "keywords": [],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://mainline.i3s.unice.fr/wam2/packages/obxd/index.js"
+  },
+  {
+    "identifier": "com.webaudiomodules.wam-examples.faust-flute",
+    "name": "Faust Flute MIDI",
+    "vendor": "Grame",
+    "description": "Faust MIDI flute instrument",
+    "keywords": [
+      "flute",
+      "faust"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://mainline.i3s.unice.fr/wam2/packages/faustFlute/index.js"
+  }
+]

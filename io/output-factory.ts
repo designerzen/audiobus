@@ -1,6 +1,7 @@
 import { OUTPUT_DEFINITIONS } from "./output-definitions.ts"
-import type { DeviceClassification } from "./device-classification.ts"
+import type { DeviceClassification, DeviceAttribution } from "./device-classification.ts"
 import { defineDevice } from './device-definition'
+import wam2Registry, { WAM2_INSTRUMENTS, wam2OutputId } from '../wam/registry'
 /**
  * Factory for creating audio output instances
  * Handles instantiation of available output types
@@ -12,6 +13,9 @@ export interface OutputFactory extends DeviceClassification {
 	id: string
 	name: string
 	description: string
+	title?: string
+	category?: string
+	attribution?: DeviceAttribution
 	isAvailable: () => boolean
 	create: (options?: Record<string, any>) => IAudioOutput | Promise<IAudioOutput>
 }
@@ -40,6 +44,10 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./outputs/output-vibrator.ts")
 		case OUTPUT_TYPES.WAM2:
 			return await import("./outputs/output-wam2.ts")
+		case OUTPUT_TYPES.MOOG:
+			return await import("./outputs/output-moog.ts")
+		case OUTPUT_TYPES.WAM:
+			return await import("./outputs/output-wam.ts")
 		case OUTPUT_TYPES.YOSHIMI:
 			return await import("./outputs/output-yoshimi.ts")
 		case OUTPUT_TYPES.WEBMIDI:
@@ -72,7 +80,7 @@ const loadSupportingLibrary = async (type: string) => {
  * @returns Constructor class for the requested output type
  * @throws Error if the output type is unknown
  */
-const loadedLibraries = new Map<string, OUTPUT_TYPES.OutputId>()
+const loadedLibraries = new Map<string, new (...args: any[]) => any>()
 const loadSupportingLibraries = async (type: string): Promise<any> => {
 	// Check if already loaded
 	if (loadedLibraries.has(type)) {
@@ -112,16 +120,19 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
 			throw new Error('BUTTERCHURN output requires audioContext in options')
 		}
 		return new Class(options.mixer, options.audioContext)
-	} else if (type === OUTPUT_TYPES.WAM2) {
+	} else if (type === OUTPUT_TYPES.WAM2 || type === OUTPUT_TYPES.WAM) {
 		if (!options?.audioContext) {
 			throw new Error('WAM2 output requires audioContext in options')
 		}
-		return new Class(options.audioContext, "")
+		return new Class(options.audioContext, options.pluginUrl, options.name, options.mixer)
+	} else if (type === OUTPUT_TYPES.MOOG) {
+		if (!options?.audioContext) throw new Error('MOOG output requires audioContext in options')
+		return new Class(options.audioContext, options.mixer)
 	} else if (type === OUTPUT_TYPES.YOSHIMI) {
 		if (!options?.audioContext) {
 			throw new Error('YOSHIMI output requires audioContext in options')
 		}
-		return new Class(options.audioContext)
+		return new Class(options.audioContext, options.name, options.mixer)
 	} else if (type === OUTPUT_TYPES.SUPERSONIC) {
 		const output = new Class()
 		output.connect()
@@ -142,6 +153,29 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
  * Uses lazy loading for better performance
  */
 export const OUTPUT_FACTORIES: OutputFactory[] = [
+	{
+		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.MOOG],
+		isAvailable: () => typeof AudioWorklet !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.MOOG, options),
+	},
+	...Object.values(OUTPUT_DEFINITIONS).filter(definition => definition.id.startsWith(OUTPUT_TYPES.WEBCLAP_PREFIX)).map(definition => ({
+		...definition,
+		isAvailable: () => typeof AudioWorkletNode !== 'undefined' && typeof WebAssembly !== 'undefined',
+		create: async (options?: Record<string, any>) => {
+			if (!options?.audioContext) throw new Error('WebCLAP requires audioContext in options')
+			const { default: Instrument } = await import('../instruments/clap/clap-instrument')
+			const output = new Instrument(options.audioContext, options.defaultPatchId ?? definition.id.slice(OUTPUT_TYPES.WEBCLAP_PREFIX.length), { ...options, routeAudio: true })
+			try { await output.connect(); return output }
+			catch (error) { await output.disconnect(); output.output.disconnect(); throw error }
+		}
+	})),
+	...WAM2_INSTRUMENTS.map(plugin => ({
+		...OUTPUT_DEFINITIONS[wam2OutputId(plugin)],
+		isAvailable: () => typeof AudioWorkletNode !== 'undefined',
+		create: (options?: Record<string, any>) => createOutput(OUTPUT_TYPES.WAM2, {
+			...options, pluginUrl: options?.pluginUrl ?? wam2Registry.getPluginUrl(plugin), name: plugin.name,
+		}),
+	})),
 	{
 		id: OUTPUT_TYPES.DESCRIBE,
 		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.DESCRIBE].type,
@@ -267,8 +301,17 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.WAM2].subtype,
 		name: "WAM2",
 		description: "Manages the WAM2 Audio Engine",
-		isAvailable: () => typeof AudioWorklet !== "undefined",
+		isAvailable: () => typeof AudioWorkletNode !== "undefined",
 		create: (options) => createOutput(OUTPUT_TYPES.WAM2, options),
+	},
+	{
+		id: OUTPUT_TYPES.WAM,
+		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.WAM].type,
+		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.WAM].subtype,
+		name: "WAM",
+		description: OUTPUT_DEFINITIONS[OUTPUT_TYPES.WAM].description,
+		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.WAM, options),
 	},
 	{
 		id: OUTPUT_TYPES.YOSHIMI,
@@ -276,7 +319,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.YOSHIMI].subtype,
 		name: "Yoshimi",
 		description: "Free and open source high quality software synthesizer with 700+ presets",
-		isAvailable: () => typeof AudioWorklet !== "undefined",
+		isAvailable: () => typeof AudioWorkletNode !== "undefined",
 		create: (options) => createOutput(OUTPUT_TYPES.YOSHIMI, options),
 	},
 	{
@@ -329,3 +372,4 @@ export async function createOutputById(id: string, options?: Record<string, any>
 	}
 	return defineDevice(await factory.create(options), { factory: 'output', type: id, options })
 }
+

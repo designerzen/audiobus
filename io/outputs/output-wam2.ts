@@ -1,535 +1,231 @@
-import { NOTE_ON } from '../../commands'
-import wam2Registry from "../../wam/registry.ts"
-
-import type { IAudioOutput } from "./output-interface.ts"
-import type { WAM2PluginDescriptor } from "../../wam/registry.ts"
-
-/**
- * Web Audio Modules 2 (WAM2) Audio Output
- * 
- * Enables integration with WAM2 audio plugins as synthesizers and instruments.
- * WAM2 plugins are Web Audio API nodes that can be connected to the audio graph
- * and controlled via MIDI-like messages (noteOn, noteOff).
- * 
- * Features:
- * - Load WAM2 plugins from online registry
- * - GUI for plugin selection and discovery
- * - Real-time plugin switching
- * - WAM2 parameter automation via createGui
- * 
- * @example
- * const wam = new OutputWAM2(audioContext)
- * await wam.initialize()
- * await wam.createGui() // Shows plugin selector UI
- * wam.noteOn(note, 127)
- * wam.noteOff(note)
- */
-export default class OutputWAM2 implements IAudioOutput {
-	
-	static ID :number= 0
-
-	#uuid: string = "Output-WAM2-"+(OutputWAM2.ID++)
-	#name: string = "WAM2 Output"
-	#audioContext: AudioContext
-	#pluginUrl: string | null = null
-	#pluginNode: any = null
-	#isConnected: boolean = false
-	#activeNotes: Map<number, number> = new Map()
-	#pluginInfo: any = null
-	#guiContainer: HTMLElement | null = null
-	#pluginDescriptor: WAM2PluginDescriptor | null = null
-	#registryInitialized: boolean = false
-
-	get uuid():string{
-		return this.#uuid
-	}
-
-	get name(): string {
-		return this.#name
-	}
-
-	get description(): string {
-		return "Manages the WAM2 Audio Engine"
-	}
-
-	get isConnected(): boolean {
-		return this.#isConnected
-	}
-
-	get isHidden(): boolean {
-		return false
-	}
-
-	get pluginNode(): any {
-		return this.#pluginNode
-	}
-
-	get output(): AudioNode {
-		return this.#pluginNode || this.#audioContext.createGain()
-	}
-
-	/**
-	 * Create a new WAM2 output
-	 * @param audioContext - The Web Audio API context
-	 * @param pluginUrl - Optional URL to a specific WAM2 plugin (can be set later)
-	 * @param name - Optional display name for this output
-	 */
-	constructor(audioContext: AudioContext, pluginUrl?: string, name?: string) {
-		this.#audioContext = audioContext
-		this.#pluginUrl = pluginUrl || null
-		
-		if (name) {
-			this.#name = name
-		}
-	}
-
-	hasMidiOutput(): boolean {
-		return false
-	}
-	hasAudioOutput(): boolean {
-		return true
-	}
-	hasAutomationOutput(): boolean {
-		return false
-	}
-	hasMpeOutput(): boolean {
-		return false
-	}
-	hasOscOutput(): boolean {
-		return false
-	}
-	hasSysexOutput(): boolean {
-		return false
-	}
-
-	/**
-	 * Initialize the WAM2 plugin
-	 * Must be called before using noteOn/noteOff
-	 */
-	async connect(): Promise<void> {
-		try {
-			// Load WAM2 plugin using the standardized API
-			if (!(globalThis as any).WAM) {
-				throw new Error("WAM2 host not available. Ensure WAM2 polyfill is loaded.")
-			}
-
-			const { default: plugin } = await import(this.#pluginUrl)
-			
-			if (!plugin || typeof plugin.createInstance !== "function") {
-				throw new Error("Invalid WAM2 plugin: missing createInstance method")
-			}
-
-			// Create plugin instance
-			this.#pluginNode = await plugin.createInstance(this.#audioContext, {
-				moduleId: this.#pluginUrl,
-			})
-
-			// Store plugin metadata
-			this.#pluginInfo = {
-				name: plugin.name || "Unknown WAM2 Plugin",
-				version: plugin.version || "1.0.0",
-				vendor: plugin.vendor || "Unknown Vendor",
-			}
-
-			// Update display name with plugin info
-			this.#name = `${this.#pluginInfo.name} (WAM2)`
-
-			this.#isConnected = true
-			console.info(`WAM2 plugin initialized: ${this.#name}`)
-		} catch (error) {
-			console.error("Failed to initialize WAM2 plugin:", error)
-			throw new Error(
-				`WAM2 initialization failed for ${this.#pluginUrl}: ${error instanceof Error ? error.message : String(error)}`
-			)
-		}
-	}
-
-	/**
-	 * Play a note on the WAM2 instrument
-	 * @param noteNumber - The note to play
-	 * @param velocity - MIDI velocity (0-127)
-	 */
-	noteOn(noteNumber: number, velocity: number = 127): void {
-		if (!this.#isConnected || !this.#pluginNode) {
-			console.warn("WAM2 output not initialized")
-			return
-		}
-
-		// Clamp velocity to 0-127 range
-		const midiVelocity = Math.max(0, Math.min(127, Math.round(velocity * 127)))
-		const midiNote = Math.round(noteNumber)
-
-		try {
-			// Send MIDI note on message to the WAM2 plugin
-			// Standard WAM2 API uses processMidi or midiBuffer interface
-			if (typeof this.#pluginNode.processMidi === "function") {
-				// Message format: [status, data1, data2]
-				// 0x90 = Note On, data1 = note number, data2 = velocity
-				this.#pluginNode.processMidi([NOTE_ON, midiNote, midiVelocity])
-			} else if (this.#pluginNode.midiBuffer) {
-				// Alternative: use midiBuffer (for some WAM2 implementations)
-				this.#pluginNode.midiBuffer.push([NOTE_ON, midiNote, midiVelocity])
-			} else {
-				console.warn("WAM2 plugin does not support MIDI input")
-			}
-
-			// Track active note
-			this.#activeNotes.set(midiNote, noteNumber)
-		} catch (error) {
-			console.error("WAM2 noteOn failed:", error)
-		}
-	}
-
-	/**
-	 * Stop playing a note on the WAM2 instrument
-	 * @param note - The note to stop
-	 */
-	noteOff(noteNumber:number): void {
-		if (!this.#isConnected || !this.#pluginNode) {
-			console.warn("WAM2 output not initialized")
-			return
-		}
-
-		const midiNote = Math.round(noteNumber)
-
-		try {
-			// Send MIDI note off message
-			// 0x80 = Note Off, data1 = note number, data2 = velocity (usually 0)
-			if (typeof this.#pluginNode.processMidi === "function") {
-				this.#pluginNode.processMidi([0x80, midiNote, 0])
-			} else if (this.#pluginNode.midiBuffer) {
-				this.#pluginNode.midiBuffer.push([0x80, midiNote, 0])
-			}
-
-			// Untrack note
-			this.#activeNotes.delete(midiNote)
-		} catch (error) {
-			console.error("WAM2 noteOff failed:", error)
-		}
-	}
-
-	/**
-	 * Stop all notes currently playing on the WAM2 instrument
-	 */
-	allNotesOff(): void {
-		if (!this.#isConnected || !this.#pluginNode) {
-			return
-		}
-
-		try {
-			// Send all notes off control change message
-			// CC 123 = All Notes Off
-			if (typeof this.#pluginNode.processMidi === "function") {
-				this.#pluginNode.processMidi([0xb0, 123, 0])
-			} else if (this.#pluginNode.midiBuffer) {
-				this.#pluginNode.midiBuffer.push([0xb0, 123, 0])
-			}
-
-			this.#activeNotes.clear()
-		} catch (error) {
-			console.error("WAM2 allNotesOff failed:", error)
-		}
-	}
-
-	/**
-	 * Send a generic MIDI message to the WAM2 plugin
-	 * @param midiMessage - Array of [status, data1, data2] bytes
-	 */
-	processMidi(midiMessage: [number, number, number]): void {
-		if (!this.#isConnected || !this.#pluginNode) {
-			console.warn("WAM2 output not initialized")
-			return
-		}
-
-		try {
-			if (typeof this.#pluginNode.processMidi === "function") {
-				this.#pluginNode.processMidi(midiMessage)
-			} else if (this.#pluginNode.midiBuffer) {
-				this.#pluginNode.midiBuffer.push(midiMessage)
-			}
-		} catch (error) {
-			console.error("WAM2 processMidi failed:", error)
-		}
-	}
-
-	/**
-	 * Send a CC (Control Change) message to the plugin
-	 * @param controller - CC number (0-127)
-	 * @param value - CC value (0-127)
-	 * @param channel - MIDI channel (0-15)
-	 */
-	sendControlChange(controller: number, value: number, channel: number = 0): void {
-		const status = 0xb0 + channel // 0xBn = CC message
-		const ccValue = Math.max(0, Math.min(127, Math.round(value)))
-		this.processMidi([status, controller, ccValue])
-	}
-
-	/**
-	 * Get the number of active notes
-	 */
-	getActiveNoteCount(): number {
-		return this.#activeNotes.size
-	}
-
-	/**
-	 * Get plugin information
-	 */
-	getPluginInfo(): any {
-		return this.#pluginInfo
-	}
-
-	/**
-	 * Cleanup and disconnect the WAM2 plugin
-	 */
-	async disconnect(): Promise<void> {
-		try {
-			this.allNotesOff()
-			
-			if (this.#pluginNode && typeof this.#pluginNode.disconnect === "function") {
-				await this.#pluginNode.disconnect()
-			}
-
-			this.#pluginNode = null
-			this.#isConnected = false
-			console.info("WAM2 plugin disconnected")
-		} catch (error) {
-			console.error("Error disconnecting WAM2 plugin:", error)
-		}
-	}
-
-	/**
-	 * Load a plugin by its registry descriptor
-	 */
-	async loadPlugin(descriptor: WAM2PluginDescriptor): Promise<void> {
-		this.#pluginDescriptor = descriptor
-		this.#pluginUrl = wam2Registry.getPluginUrl(descriptor)
-		
-		// Disconnect existing plugin if any
-		if (this.#isConnected) {
-			await this.disconnect()
-		}
-
-		// Connect new plugin
-		await this.connect()
-	}
-
-	/**
-	 * Create GUI for plugin selection and display
-	 */
-	async createGui(): Promise<HTMLElement> {
-		// Initialize registry if not done yet
-		if (!this.#registryInitialized) {
-			try {
-				await wam2Registry.initialize()
-				this.#registryInitialized = true
-			} catch (error) {
-				console.error("Failed to initialize WAM2 registry:", error)
-			}
-		}
-
-		this.#guiContainer = document.createElement("div")
-		this.#guiContainer.id = this.#uuid
-		this.#guiContainer.style.padding = "12px"
-		this.#guiContainer.style.borderRadius = "4px"
-		this.#guiContainer.style.backgroundColor = "#1e1e1e"
-		this.#guiContainer.style.color = "#e0e0e0"
-		this.#guiContainer.style.fontFamily = "system-ui, -apple-system, sans-serif"
-		this.#guiContainer.style.fontSize = "13px"
-		this.#guiContainer.style.minWidth = "300px"
-		this.#guiContainer.style.display = "flex"
-		this.#guiContainer.style.flexDirection = "column"
-		this.#guiContainer.style.gap = "12px"
-
-		// Title
-		const title = document.createElement("h3")
-		title.textContent = "WAM2 Plugin Selector"
-		title.style.margin = "0 0 8px 0"
-		title.style.fontSize = "14px"
-		title.style.fontWeight = "600"
-		title.style.color = "#fff"
-		this.#guiContainer.appendChild(title)
-
-		// Current plugin display
-		const currentDisplay = document.createElement("div")
-		currentDisplay.style.padding = "8px"
-		currentDisplay.style.backgroundColor = "rgba(255,255,255,0.05)"
-		currentDisplay.style.borderRadius = "3px"
-		currentDisplay.style.fontSize = "12px"
-		currentDisplay.style.minHeight = "40px"
-		
-		if (this.#pluginDescriptor) {
-			currentDisplay.innerHTML = `
-				<div style="font-weight: 600; color: #4fc3f7;">${this.#pluginDescriptor.name}</div>
-				<div style="color: #999; margin-top: 2px;">${this.#pluginDescriptor.vendor}</div>
-				<div style="color: #666; margin-top: 4px; font-size: 11px; line-height: 1.4;">${this.#pluginDescriptor.description}</div>
-			`
-		} else {
-			currentDisplay.textContent = "No plugin loaded. Browse and select one below."
-			currentDisplay.style.color = "#999"
-		}
-		this.#guiContainer.appendChild(currentDisplay)
-
-		// Search box
-		const searchContainer = document.createElement("div")
-		searchContainer.style.display = "flex"
-		searchContainer.style.gap = "6px"
-		searchContainer.style.alignItems = "stretch"
-
-		const searchInput = document.createElement("input")
-		searchInput.type = "search"
-		searchInput.placeholder = "Search plugins..."
-		searchInput.style.flex = "1"
-		searchInput.style.padding = "6px 8px"
-		searchInput.style.backgroundColor = "rgba(255,255,255,0.1)"
-		searchInput.style.border = "1px solid rgba(255,255,255,0.2)"
-		searchInput.style.borderRadius = "3px"
-		searchInput.style.color = "#e0e0e0"
-		searchInput.style.fontSize = "12px"
-
-		const categorySelect = document.createElement("select")
-		categorySelect.style.padding = "6px 8px"
-		categorySelect.style.backgroundColor = "rgba(255,255,255,0.1)"
-		categorySelect.style.border = "1px solid rgba(255,255,255,0.2)"
-		categorySelect.style.borderRadius = "3px"
-		categorySelect.style.color = "#e0e0e0"
-		categorySelect.style.fontSize = "12px"
-		categorySelect.style.minWidth = "150px"
-
-		const allOption = document.createElement("option")
-		allOption.value = ""
-		allOption.textContent = "All Categories"
-		categorySelect.appendChild(allOption)
-
-		// Add category options
-		const grouped = wam2Registry.getGroupedByCategory()
-		const sortedCategories = Array.from(grouped.keys()).sort()
-		sortedCategories.forEach(category => {
-			const option = document.createElement("option")
-			option.value = category
-			option.textContent = category
-			categorySelect.appendChild(option)
-		})
-
-		searchContainer.appendChild(searchInput)
-		searchContainer.appendChild(categorySelect)
-		this.#guiContainer.appendChild(searchContainer)
-
-		// Plugin list
-		const pluginListContainer = document.createElement("div")
-		pluginListContainer.style.display = "flex"
-		pluginListContainer.style.flexDirection = "column"
-		pluginListContainer.style.gap = "6px"
-		pluginListContainer.style.maxHeight = "400px"
-		pluginListContainer.style.overflowY = "auto"
-		pluginListContainer.style.paddingRight = "4px"
-
-		const updatePluginList = () => {
-			pluginListContainer.innerHTML = ""
-			
-			let plugins = wam2Registry.getAll()
-			const searchTerm = searchInput.value
-			const selectedCategory = categorySelect.value
-
-			if (searchTerm) {
-				plugins = plugins.filter(p =>
-					p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-					p.vendor.toLowerCase().includes(searchTerm.toLowerCase()) ||
-					p.keywords.some(k => k.toLowerCase().includes(searchTerm.toLowerCase()))
-				)
-			}
-
-			if (selectedCategory) {
-				plugins = plugins.filter(p => p.category.includes(selectedCategory))
-			}
-
-			if (plugins.length === 0) {
-				const empty = document.createElement("div")
-				empty.textContent = "No plugins found"
-				empty.style.color = "#666"
-				empty.style.padding = "12px 8px"
-				pluginListContainer.appendChild(empty)
-				return
-			}
-
-			plugins.forEach(plugin => {
-				const item = document.createElement("button")
-				item.type = "button"
-				item.style.padding = "8px"
-				item.style.backgroundColor = this.#pluginDescriptor?.identifier === plugin.identifier 
-					? "rgba(79, 195, 247, 0.2)"
-					: "rgba(255,255,255,0.05)"
-				item.style.border = this.#pluginDescriptor?.identifier === plugin.identifier
-					? "1px solid #4fc3f7"
-					: "1px solid rgba(255,255,255,0.1)"
-				item.style.borderRadius = "3px"
-				item.style.color = "#e0e0e0"
-				item.style.cursor = "pointer"
-				item.style.textAlign = "left"
-				item.style.transition = "all 0.2s ease"
-				item.style.fontSize = "12px"
-
-				item.innerHTML = `
-					<div style="font-weight: 600; color: #4fc3f7;">${plugin.name}</div>
-					<div style="color: #999; font-size: 11px; margin-top: 2px;">${plugin.vendor} • ${plugin.category.join(", ")}</div>
-				`
-
-				item.addEventListener("mouseenter", () => {
-					item.style.backgroundColor = "rgba(255,255,255,0.1)"
-				})
-
-				item.addEventListener("mouseleave", () => {
-					item.style.backgroundColor = this.#pluginDescriptor?.identifier === plugin.identifier 
-						? "rgba(79, 195, 247, 0.2)"
-						: "rgba(255,255,255,0.05)"
-				})
-
-				item.addEventListener("click", async () => {
-					try {
-						await this.loadPlugin(plugin)
-						currentDisplay.innerHTML = `
-							<div style="font-weight: 600; color: #4fc3f7;">${plugin.name}</div>
-							<div style="color: #999; margin-top: 2px;">${plugin.vendor}</div>
-							<div style="color: #666; margin-top: 4px; font-size: 11px; line-height: 1.4;">${plugin.description}</div>
-						`
-						updatePluginList()
-					} catch (error) {
-						console.error("Failed to load plugin:", error)
-						const errorMsg = document.createElement("div")
-						errorMsg.textContent = `Failed to load: ${error instanceof Error ? error.message : String(error)}`
-						errorMsg.style.color = "#ff6b6b"
-						errorMsg.style.padding = "8px"
-						errorMsg.style.backgroundColor = "rgba(255, 107, 107, 0.1)"
-						errorMsg.style.borderRadius = "3px"
-						currentDisplay.appendChild(errorMsg)
-					}
-				})
-
-				pluginListContainer.appendChild(item)
-			})
-		}
-
-		searchInput.addEventListener("input", updatePluginList)
-		categorySelect.addEventListener("change", updatePluginList)
-
-		this.#guiContainer.appendChild(pluginListContainer)
-
-		// Initial list population
-		updatePluginList()
-
-		return this.#guiContainer
-	}
-
-	/**
-	 * Destroy GUI
-	 */
-	async destroyGui(): Promise<void> {
-		if (this.#guiContainer && this.#guiContainer.parentElement) {
-			this.#guiContainer.parentElement.removeChild(this.#guiContainer)
-		}
-		this.#guiContainer = null
-	}
+import { EVENT_CONFIGURATION_CHANGED } from '../../event-constants'
+import { commandToMidi } from '../../midi/midi-command-conversion'
+import { initializeHost, WAM_MIDI_EVENT } from '../../wam/host'
+import wam2Registry, { type WAM2PluginDescriptor } from '../../wam/registry'
+import type { IAudioCommand } from '../../audio-command-interface'
+import type { IAudioOutput } from './output-interface'
+
+export default class OutputWAM2 extends EventTarget implements IAudioOutput {
+    static ID = 0
+    readonly uuid = `Output-WAM-${OutputWAM2.ID++}`
+    protected context: AudioContext
+    protected label = 'WAM2'
+    protected acceptsPluginUrl = true
+    #output: GainNode
+    #plugin: any = null
+    #url: string
+    #name: string
+    #connecting: Promise<void> | null = null
+    #container: HTMLElement | null = null
+    #pluginGui: HTMLElement | null = null
+    #guiHost: HTMLElement | null = null
+    #silentSource: ConstantSourceNode | null = null
+    #silentInput: GainNode | null = null
+    #activeNotes = new Set<string>()
+
+    constructor(context: AudioContext, pluginUrl = '', name = 'WAM2', destination?: AudioNode) {
+        super()
+        this.context = context
+        this.#url = pluginUrl
+        this.#name = name
+        this.#output = context.createGain()
+        this.#output.connect(destination ?? context.destination)
+    }
+    get name() { return this.#name }
+    get description() { return `${this.label} instrument output` }
+    get isConnected() { return this.#plugin !== null }
+    get isHidden() { return false }
+    get output() { return this.#output }
+    get pluginNode() { return this.#plugin?.audioNode ?? null }
+    get options() { return { pluginUrl: this.#url } }
+    hasMidiOutput() { return false }
+    hasAudioOutput() { return true }
+    hasAutomationOutput() { return false }
+    hasMpeOutput() { return false }
+    hasOscOutput() { return false }
+    hasSysexOutput() { return false }
+
+    protected async availablePlugins() {
+        await wam2Registry.initialize()
+        return wam2Registry.getInstruments()
+    }
+    protected async createPlugin(url: string): Promise<any> {
+        const groupId = await initializeHost(this.context)
+        const { default: Plugin } = await import(/* @vite-ignore */ url)
+        return Plugin.createInstance(groupId, this.context)
+    }
+    async connect(): Promise<void> {
+        if (this.isConnected) return
+        if (this.#connecting) return this.#connecting
+        this.#connecting = (async () => {
+            if (!this.#url) {
+                const plugins = await this.availablePlugins()
+                const plugin = plugins.find(p => p.path.includes('synth101')) ?? plugins[0]
+                if (!plugin) throw new Error('No WAM instruments are available')
+                this.#url = wam2Registry.getPluginUrl(plugin)
+            }
+            const plugin = await this.createPlugin(this.#url)
+            try {
+                if (!plugin.audioNode) throw new Error('WAM plugin has no audio node')
+                // Some synth/effect combinations only process MIDI when a stereo input exists.
+                if (plugin.audioNode.numberOfInputs > 0) {
+                    this.#silentSource = this.context.createConstantSource()
+                    this.#silentSource.offset.value = 0
+                    this.#silentInput = this.context.createGain()
+                    this.#silentInput.channelCount = 2
+                    this.#silentInput.channelCountMode = 'explicit'
+                    this.#silentSource.connect(this.#silentInput)
+                    this.#silentInput.connect(plugin.audioNode)
+                    this.#silentSource.start()
+                }
+                plugin.audioNode.connect(this.#output)
+            } catch (error) {
+                this.clearSilentInput()
+                await plugin.audioNode?.destroy?.()
+                throw error
+            }
+            this.#plugin = plugin
+            this.#name = `${plugin.descriptor?.name ?? this.label} (${this.label})`
+            this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
+            await this.showPluginGui()
+        })()
+        try { await this.#connecting } finally { this.#connecting = null }
+    }
+    processMidi(bytes: number[]): void {
+        if (!this.isConnected) return
+        this.pluginNode.scheduleEvents({ type: WAM_MIDI_EVENT, time: this.context.currentTime, data: { bytes } })
+        const kind = bytes[0] & 0xf0
+        const key = `${bytes[0] & 15}:${bytes[1]}`
+        if (kind === 0x90 && bytes[2]) this.#activeNotes.add(key)
+        if (kind === 0x80 || (kind === 0x90 && !bytes[2])) this.#activeNotes.delete(key)
+    }
+    noteOn(note: number, velocity = 127) { this.processMidi([0x90, this.byte(note), this.byte(velocity)]) }
+    noteOff(note: number) { this.processMidi([0x80, this.byte(note), 0]) }
+    private byte(value: number) { return Math.max(0, Math.min(127, Math.round(value))) }
+    sendControlChange(controller: number, value: number, channel = 0) {
+        this.processMidi([0xb0 | Math.max(0, Math.min(15, channel)), this.byte(controller), this.byte(value)])
+    }
+    sendCommand(command: IAudioCommand) {
+        const bytes = commandToMidi(command)
+        if (bytes) this.processMidi(bytes)
+    }
+    getNoteKey(command: IAudioCommand) { return `${command.channel || 1}:${command.number}` }
+    getActiveNoteCount() { return this.#activeNotes.size }
+    getPluginInfo() { return this.#plugin?.descriptor ?? null }
+    allNotesOff() {
+        for (let channel = 0; channel < 16; channel++) {
+            this.processMidi([0xb0 | channel, 64, 0])
+            this.processMidi([0xb0 | channel, 123, 0])
+            this.processMidi([0xb0 | channel, 120, 0])
+        }
+        this.#activeNotes.clear()
+    }
+    async disconnect(): Promise<void> {
+        if (this.#connecting) await this.#connecting.catch(() => {})
+        this.allNotesOff()
+        await this.destroyPluginGui()
+        const plugin = this.#plugin
+        this.#plugin = null
+        this.clearSilentInput()
+        try { plugin?.audioNode.disconnect() } finally { await plugin?.audioNode.destroy?.() }
+        this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
+    }
+    private clearSilentInput() {
+        try { this.#silentSource?.stop() } catch { /* A failed connection may not have started it. */ }
+        this.#silentSource?.disconnect()
+        this.#silentInput?.disconnect()
+        this.#silentSource = null
+        this.#silentInput = null
+    }
+    async destroy() { await this.disconnect(); this.#output.disconnect(); await this.destroyGui() }
+    async loadPlugin(descriptor: WAM2PluginDescriptor): Promise<void> {
+        await this.disconnect()
+        this.#url = wam2Registry.getPluginUrl(descriptor)
+        await this.connect()
+    }
+    private async destroyPluginGui() {
+        if (this.#pluginGui) {
+            await this.#plugin?.destroyGui?.(this.#pluginGui)
+            this.#pluginGui.remove()
+            this.#pluginGui = null
+        }
+    }
+    private async showPluginGui() {
+        await this.destroyPluginGui()
+        if (this.#guiHost && this.#plugin?.createGui) {
+            this.#pluginGui = await this.#plugin.createGui()
+            if (this.#pluginGui) this.#guiHost.append(this.#pluginGui)
+        }
+    }
+    async createGui(): Promise<HTMLElement> {
+        if (this.#container) return this.#container
+        const container = document.createElement('div')
+        const search = document.createElement('input')
+        search.type = 'search'
+        search.placeholder = `Search ${this.label} instruments`
+        search.setAttribute('aria-label', search.placeholder)
+        const select = document.createElement('select')
+        select.setAttribute('aria-label', `${this.label} instrument`)
+        const load = document.createElement('button')
+        load.type = 'button'
+        load.textContent = 'Load instrument'
+        const status = document.createElement('p')
+        status.setAttribute('role', 'status')
+        this.#guiHost = document.createElement('div')
+        container.append(search, select, load, status, this.#guiHost)
+        if (this.acceptsPluginUrl) {
+            const url = document.createElement('input')
+            url.type = 'url'
+            url.placeholder = 'WAM2 plugin URL'
+            url.setAttribute('aria-label', url.placeholder)
+            const customLoad = document.createElement('button')
+            customLoad.type = 'button'
+            customLoad.textContent = 'Load plugin URL'
+            customLoad.addEventListener('click', async () => {
+                if (!url.reportValidity() || !url.value.trim()) return
+                customLoad.disabled = load.disabled = true
+                try {
+                    const path = new URL(url.value.trim()).href
+                    await this.loadPlugin({ identifier: path, name: 'Custom WAM2', vendor: '', description: '', keywords: [], category: ['Instrument'], path })
+                    status.textContent = `${this.name} ready`
+                } catch (error) { status.textContent = `Unable to load plugin: ${error instanceof Error ? error.message : error}` }
+                finally { customLoad.disabled = load.disabled = false }
+            })
+            container.append(url, customLoad)
+        }
+        const plugins = await this.availablePlugins()
+        const render = () => {
+            select.replaceChildren()
+            for (const plugin of plugins.filter(p => `${p.name} ${p.vendor} ${p.description}`.toLowerCase().includes(search.value.toLowerCase()))) {
+                const option = document.createElement('option')
+                option.value = plugin.identifier
+                option.textContent = `${plugin.name} — ${plugin.vendor}`
+                option.selected = wam2Registry.getPluginUrl(plugin) === this.#url
+                select.append(option)
+            }
+            load.disabled = select.options.length === 0
+        }
+        search.addEventListener('input', render)
+        load.addEventListener('click', async () => {
+            const plugin = plugins.find(p => p.identifier === select.value)
+            if (!plugin) return
+            load.disabled = true
+            status.textContent = `Loading ${plugin.name}…`
+            try {
+                await this.loadPlugin(plugin)
+                status.textContent = `${plugin.name} ready`
+            } catch (error) { status.textContent = `Unable to load ${plugin.name}: ${error instanceof Error ? error.message : error}` }
+            finally { load.disabled = false }
+        })
+        render()
+        this.#container = container
+        await this.showPluginGui()
+        return container
+    }
+    async destroyGui(): Promise<void> {
+        await this.destroyPluginGui()
+        this.#container?.remove()
+        this.#container = null
+        this.#guiHost = null
+    }
 }
-
-
-
-

@@ -1,5 +1,7 @@
+import { loadYoshimi, yoshimiAsset } from '../../wam/yoshimi-assets'
+import { commandToMidi } from '../../midi/midi-command-conversion'
+import type { IAudioCommand } from '../../audio-command-interface'
 import { EVENT_PRESET_CHANGED } from '../../event-constants.ts'
-import { NOTE_ON, NOTE_OFF } from '../../commands'
 import type { IAudioOutput } from "./output-interface.ts"
 
 export interface YoshimiBank {
@@ -37,12 +39,15 @@ export interface YoshimiPreset {
  * yoshimi.noteOff(60)
  */
 export default class OutputYoshimi extends EventTarget implements IAudioOutput {
-	
+
 	static ID: number = 0
 
 	#uuid: string = "Output-Yoshimi-" + (OutputYoshimi.ID++)
 	#name: string = "Yoshimi"
 	#audioContext: AudioContext
+	#output: GainNode
+	#connecting: Promise<void> | null = null
+	#guiEvents: AbortController | null = null
 	#isConnected: boolean = false
 	#activeNotes: Map<number, number> = new Map()
 	#yoshimiInstance: any = null
@@ -51,7 +56,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 	#banks: YoshimiBank[] = []
 	#guiContainer: HTMLElement | null = null
 	#presetsLoaded: boolean = false
-	#yoshimiLoaded: boolean = false
+
 
 	get uuid(): string {
 		return this.#uuid
@@ -73,15 +78,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		return false
 	}
 
-	get output(): AudioNode {
-		if (!this.#yoshimiInstance) {
-			return this.#audioContext.createGain()
-		}
-		
-		// Yoshimi WAM outputs to destination, return a dummy gain node
-		// The actual output is connected in connect()
-		return this.#audioContext.createGain()
-	}
+	get output(): AudioNode { return this.#output }
 
 	get currentBank(): string {
 		return this.#currentBank
@@ -95,10 +92,12 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		return this.#banks
 	}
 
-	constructor(audioContext: AudioContext, name?: string) {
+	constructor(audioContext: AudioContext, name?: string, destination?: AudioNode | null) {
 		super()
 		this.#audioContext = audioContext
-		
+		this.#output = audioContext.createGain()
+		if (destination !== null) this.#output.connect(destination ?? audioContext.destination)
+
 		if (name) {
 			this.#name = name
 		}
@@ -133,73 +132,31 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 	 * Loads the WAM scripts and creates the synthesizer instance
 	 */
 	async connect(): Promise<void> {
-		try {
-			console.info("Initializing Yoshimi...")
-
-			// Check if WAM is available
-			if (!(globalThis as any).WAM || !(globalThis as any).WAM.YOSHIMI) {
-				await this.loadYoshimiScripts()
-			}
-
-			// Import scripts in correct order
-			if (!this.#yoshimiLoaded) {
-				const AWPF = (globalThis as any).AWPF
-				const actx = this.#audioContext
-
-				// Polyfill for AudioWorklet support
-				if (AWPF && typeof AWPF.polyfill === 'function') {
-					await AWPF.polyfill(actx)
-				}
-
-				// Load WAM controller and yoshimi
-				if (!(globalThis as any).WAMController) {
-					await this.loadScript("libs/wam-controller.js")
-				}
-
-				// Import Yoshimi scripts
-				const origin = this.getYoshimiOrigin()
-				const WAM = (globalThis as any).WAM
-				
-				if (WAM.YOSHIMI && typeof WAM.YOSHIMI.importScripts === 'function') {
-					await WAM.YOSHIMI.importScripts(actx, origin)
-				}
-
-				this.#yoshimiLoaded = true
-			}
-
-			// Create Yoshimi instance
-			const WAM = (globalThis as any).WAM
-			if (!WAM || !WAM.YOSHIMI) {
-				throw new Error("Yoshimi WAM not available")
-			}
-
-			const defaultState = {}
-			this.#yoshimiInstance = new WAM.YOSHIMI(this.#audioContext, defaultState)
-
-			// Connect to audio context destination
-			this.#yoshimiInstance.connect(this.#audioContext.destination)
-
-			// Load presets
-			if (!this.#presetsLoaded) {
-				await this.loadBanksList()
-				this.#presetsLoaded = true
-			}
-
-			// Load initial preset
-			if (this.#banks.length > 0) {
-				await this.loadPreset(this.#currentBank, this.#currentPreset)
-			}
-
-			this.#isConnected = true
-			console.info("Yoshimi initialized successfully")
-
-		} catch (error) {
-			console.error("Failed to initialize Yoshimi:", error)
-			throw new Error(
-				`Yoshimi initialization failed: ${error instanceof Error ? error.message : String(error)}`
-			)
-		}
-	}
+        if (this.#isConnected) return
+        if (this.#connecting) return this.#connecting
+        this.#connecting = (async () => {
+            const processorOptions = await loadYoshimi(this.#audioContext)
+            const node = new AudioWorkletNode(this.#audioContext, 'YOSHIMI', {
+                numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2], processorOptions,
+            })
+            this.#yoshimiInstance = node
+            this.#yoshimiInstance.onMidi = (data: number[]) => node.port.postMessage({ type: 'midi', data })
+            this.#yoshimiInstance.sendMessage = (verb: string, prop: string, data: string) => node.port.postMessage({ type: 'msg', verb, prop, data })
+            node.connect(this.#output)
+            this.#isConnected = true
+            if (!this.#presetsLoaded) {
+                await this.loadBanksList()
+                this.#presetsLoaded = true
+            }
+            const bank = this.#banks.find(bank => bank.name === this.#currentBank) ?? this.#banks[0]
+            if (bank) {
+                this.#currentBank = bank.name
+                if (!bank.instruments.includes(this.#currentPreset)) this.#currentPreset = bank.instruments[0]
+                await this.loadPreset(this.#currentBank, this.#currentPreset)
+            }
+        })()
+        try { await this.#connecting } finally { this.#connecting = null }
+    }
 
 	/**
 	 * Play a note on the Yoshimi synthesizer
@@ -262,7 +219,10 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		try {
 			// Send all notes off (CC 123)
 			if (typeof this.#yoshimiInstance.onMidi === 'function') {
-				this.#yoshimiInstance.onMidi([0xb0, 123, 0])
+				for (let channel = 0; channel < 16; channel++) {
+					this.#yoshimiInstance.onMidi([0xb0 | channel, 64, 0])
+					this.#yoshimiInstance.onMidi([0xb0 | channel, 123, 0])
+				}
 			}
 
 			this.#activeNotes.clear()
@@ -275,7 +235,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 	 * Send a generic MIDI message to Yoshimi
 	 * @param midiMessage - Array of [status, data1, data2] bytes
 	 */
-	processMidi(midiMessage: [number, number, number]): void {
+	processMidi(midiMessage: number[]): void {
 		if (!this.#isConnected || !this.#yoshimiInstance) {
 			console.warn("Yoshimi output not initialized")
 			return
@@ -289,6 +249,11 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 			console.error("Yoshimi processMidi failed:", error)
 		}
 	}
+	sendCommand(command: IAudioCommand): void {
+		const bytes = commandToMidi(command)
+		if (bytes) this.processMidi(bytes)
+	}
+	getNoteKey(command: IAudioCommand): string { return `${command.channel || 1}:${command.number}` }
 
 	/**
 	 * Load a preset (instrument) from a bank
@@ -303,24 +268,14 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 
 		try {
 			const filename = `banks/${bankName}/${instrumentFilename}`
-			const origin = this.getYoshimiOrigin()
-			const url = new URL(filename, origin).href
+			const url = yoshimiAsset(filename)
 
-			let data: string
-
-			try {
-				// Try to fetch as binary (gzipped)
-				const resp = await fetch(url)
-				const arrayBuffer = await resp.arrayBuffer()
-				const gzip = new (globalThis as any).Zlib.Gunzip(new Uint8Array(arrayBuffer))
-				const utf8 = gzip.decompress()
-				data = new TextDecoder("utf-8").decode(utf8)
-			} catch {
-				// Fallback to plain text
-				const resp = await fetch(url)
-				data = await resp.text()
-			}
-
+			const resp = await fetch(url)
+            if (!resp.ok) throw new Error(`Unable to load preset: ${resp.status}`)
+            const bytes = new Uint8Array(await resp.arrayBuffer())
+            const data = bytes[0] === 0x1f && bytes[1] === 0x8b
+                ? await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text()
+                : new TextDecoder().decode(bytes)
 			// Send preset data to Yoshimi
 			if (typeof this.#yoshimiInstance.sendMessage === 'function') {
 				this.#yoshimiInstance.sendMessage("set", "patch", data)
@@ -346,8 +301,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 	 */
 	private async loadBanksList(): Promise<void> {
 		try {
-			const origin = this.getYoshimiOrigin()
-			const url = new URL("banks/root.json", origin).href
+			const url = yoshimiAsset("banks/root.json")
 			const resp = await fetch(url)
 			const json = await resp.text()
 			this.#banks = JSON.parse(json)
@@ -357,66 +311,18 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		}
 	}
 
-	/**
-	 * Get the Yoshimi origin URL
-	 */
-	private getYoshimiOrigin(): string {
-		// First check if AWPF has a predefined origin
-		const AWPF = (globalThis as any).AWPF
-		if (AWPF && AWPF.origin) {
-			return AWPF.origin
-		}
-
-		// Use local path for development
-		return "/packages/audiobus/wam/yoshimi/"
-	}
-
-	/**
-	 * Load a script dynamically
-	 */
-	private async loadScript(scriptPath: string): Promise<void> {
-		return new Promise((resolve, reject) => {
-			const script = document.createElement("script")
-			script.src = scriptPath
-			script.onload = () => resolve()
-			script.onerror = () => reject(new Error(`Failed to load script: ${scriptPath}`))
-			document.head.appendChild(script)
-		})
-	}
-
-	/**
-	 * Load required Yoshimi scripts
-	 */
-	private async loadYoshimiScripts(): Promise<void> {
-		try {
-			// Load Zlib for gzip decompression
-			if (!(globalThis as any).Zlib) {
-				await this.loadScript("/packages/audiobus/wam/yoshimi/libs/gunzip.js")
-			}
-
-			// Load AudioWorklet polyfill
-			if (!(globalThis as any).AWPF) {
-				await this.loadScript("/packages/audiobus/wam/yoshimi/libs/audioworklet.js")
-			}
-
-			// Load QWERTY keyboard library (optional)
-			if (!(globalThis as any).QwertyHancock) {
-				await this.loadScript("/packages/audiobus/wam/yoshimi/libs/keys.js")
-			}
-		} catch (error) {
-			console.warn("Some optional Yoshimi libraries failed to load:", error)
-		}
-	}
 
 	/**
 	 * Disconnect and cleanup Yoshimi
 	 */
 	async disconnect(): Promise<void> {
+		if (this.#connecting) await this.#connecting.catch(() => {})
 		try {
 			this.allNotesOff()
 
 			if (this.#yoshimiInstance && typeof this.#yoshimiInstance.disconnect === 'function') {
 				await this.#yoshimiInstance.disconnect()
+				this.#yoshimiInstance.port.close()
 			}
 
 			this.#yoshimiInstance = null
@@ -431,6 +337,9 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 	 * Create GUI for preset selection and browsing
 	 */
 	async createGui(): Promise<HTMLElement> {
+		if (this.#guiContainer) return this.#guiContainer
+		await this.connect()
+		this.#guiEvents = new AbortController()
 		this.#guiContainer = document.createElement("div")
 		this.#guiContainer.id = this.#uuid
 		this.#guiContainer.style.padding = "12px"
@@ -460,7 +369,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		currentDisplay.style.borderRadius = "3px"
 		currentDisplay.style.fontSize = "12px"
 		currentDisplay.style.minHeight = "40px"
-		
+
 		currentDisplay.innerHTML = `
 			<div style="font-weight: 600; color: #4fc3f7;">${this.#currentBank}</div>
 			<div style="color: #999; margin-top: 4px;">${this.#currentPreset}</div>
@@ -544,7 +453,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		// Event listeners for bank/preset changes
 		bankSelect.addEventListener('change', async () => {
 			const newBank = bankSelect.value
-			
+
 			// Update preset options
 			presetSelect.innerHTML = ""
 			const bank = this.#banks.find(b => b.name === newBank)
@@ -567,7 +476,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		presetSelect.addEventListener('change', async () => {
 			const newPreset = presetSelect.value
 			await this.loadPreset(bankSelect.value, newPreset)
-			
+
 			// Update current display
 			currentDisplay.innerHTML = `
 				<div style="font-weight: 600; color: #4fc3f7;">${bankSelect.value}</div>
@@ -595,7 +504,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 				<div style="font-weight: 600; color: #4fc3f7;">${event.detail.bank}</div>
 				<div style="color: #999; margin-top: 4px;">${event.detail.preset}</div>
 			`
-		})
+		}, { signal: this.#guiEvents.signal })
 
 		return this.#guiContainer
 	}
@@ -604,9 +513,16 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 	 * Destroy GUI
 	 */
 	async destroyGui(): Promise<void> {
+		this.#guiEvents?.abort()
+		this.#guiEvents = null
 		if (this.#guiContainer && this.#guiContainer.parentElement) {
 			this.#guiContainer.parentElement.removeChild(this.#guiContainer)
 		}
 		this.#guiContainer = null
+	}
+	async destroy(): Promise<void> {
+		await this.disconnect()
+		await this.destroyGui()
+		this.#output.disconnect()
 	}
 }

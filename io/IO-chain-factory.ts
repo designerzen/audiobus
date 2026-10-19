@@ -312,8 +312,8 @@ export class IOChainFactory {
 						mixer: options.outputMixer,
 						audioContext: options.audioContext 
 					})
-				} else if (outputId === OUTPUT_TYPES.PINK_TROMBONE || outputId === OUTPUT_TYPES.WAM2) {
-					output = await createOutputById(outputId, { audioContext: options.audioContext })
+				} else if ([OUTPUT_TYPES.PINK_TROMBONE, OUTPUT_TYPES.WAM, OUTPUT_TYPES.WAM2, OUTPUT_TYPES.MOOG, OUTPUT_TYPES.YOSHIMI].includes(outputId as any) || outputId.startsWith('wam2:')) {
+					output = await createOutputById(outputId, { audioContext: options.audioContext, mixer: options.outputMixer })
 				} else {
 					output = await createOutputById(outputId)
 				}

@@ -1,7 +1,7 @@
 export const DEVICE_SUBTYPES = {
     controller: ['keyboard', 'gamepad', 'gesture', 'pointer'],
     midi: ['device'],
-    audio: ['pitch', 'formant', 'speech', 'metronome'],
+    audio: ['pitch', 'formant', 'speech', 'metronome', 'effect', 'modulation', 'dynamics', 'equalizer', 'delay', 'reverb', 'distortion', 'utility'],
     generator: ['ai'],
     sync: ['clock', 'vinyl'],
     visual: ['visualiser', 'notation', 'description'],
@@ -17,6 +17,13 @@ export type DeviceSubtype<T extends DeviceType = DeviceType> = typeof DEVICE_SUB
 export interface DeviceClassification<T extends DeviceType = DeviceType> {
     type: T
     subtype: DeviceSubtype<T>
+}
+
+export interface DeviceAttribution {
+    author: string
+    sourceUrl: string
+    license: string
+    licenseUrls: string[]
 }
 
 export const INSTRUMENT_CLASSIFICATION = {
