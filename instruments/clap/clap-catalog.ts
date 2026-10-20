@@ -659,5 +659,155 @@ export const CLAP_PATCHES: CLAPPatch[] = [
                 "/webclap/plinken-wclap-LICENSE.txt"
             ]
         }
+    },
+    {
+        "id": "org.surge-synth-team.OB-Xf",
+        "name": "OB-Xf",
+        "author": "Surge Synth Team",
+        "description": "Virtual analog synthesizer inspired by the Oberheim OB-X, continuing OB-Xd.",
+        "url": "/webclap/plugins/open-webclap-obxf.wclap.tar.gz",
+        "factory": "org.surge-synth-team.OB-Xf",
+        "features": [
+            "instrument",
+            "synthesizer",
+            "stereo"
+        ],
+        "category": "Synthesizers",
+        "title": "OB-Xf — Surge Synth Team WebCLAP",
+        "type": "engine",
+        "subtype": "instrument",
+        "attribution": {
+            "author": "Surge Synth Team",
+            "sourceUrl": "https://github.com/andremichelle/open-webclap/tree/main/ports/obxf",
+            "license": "AGPL-3.0 (JUCE bundle)",
+            "licenseUrls": [
+                "/webclap/plugins/open-webclap-obxf-LICENSE.txt"
+            ]
+        }
+    },
+    {
+        "id": "org.baconpaul.six-sines",
+        "name": "Six Sines",
+        "author": "BaconPaul",
+        "description": "Phase-modulation synthesizer with six sine operators and a modulation matrix.",
+        "url": "/webclap/plugins/open-webclap-six-sines.wclap.tar.gz",
+        "factory": "org.baconpaul.six-sines",
+        "features": [
+            "instrument",
+            "synthesizer",
+            "stereo"
+        ],
+        "category": "Synthesizers",
+        "title": "Six Sines — BaconPaul WebCLAP",
+        "type": "engine",
+        "subtype": "instrument",
+        "attribution": {
+            "author": "BaconPaul",
+            "sourceUrl": "https://github.com/andremichelle/open-webclap/tree/main/ports/six-sines",
+            "license": "AGPL-3.0 (JUCE bundle)",
+            "licenseUrls": [
+                "/webclap/plugins/open-webclap-six-sines-LICENSE.txt"
+            ]
+        }
+    },
+    {
+        "id": "com.tilr.ripplerx",
+        "name": "RipplerX",
+        "author": "TiagoLr",
+        "description": "Physically modeled percussion with mallet and noise exciters feeding coupled resonators.",
+        "url": "/webclap/plugins/open-webclap-ripplerx.wclap.tar.gz",
+        "factory": "com.tilr.ripplerx",
+        "features": [
+            "instrument",
+            "synthesizer",
+            "stereo"
+        ],
+        "category": "Drums",
+        "title": "RipplerX — TiagoLr WebCLAP",
+        "type": "engine",
+        "subtype": "instrument",
+        "attribution": {
+            "author": "TiagoLr",
+            "sourceUrl": "https://github.com/andremichelle/open-webclap/tree/main/ports/ripplerx",
+            "license": "AGPL-3.0 (JUCE bundle)",
+            "licenseUrls": [
+                "/webclap/plugins/open-webclap-ripplerx-LICENSE.txt"
+            ]
+        }
+    },
+    {
+        "id": "com.thewavewarden.odin2",
+        "name": "Odin 2",
+        "author": "TheWaveWarden",
+        "description": "Polyphonic semi-modular synthesizer with three oscillators, two filters, a modulation matrix and effects.",
+        "url": "/webclap/plugins/open-webclap-odin2.wclap.tar.gz",
+        "factory": "com.thewavewarden.odin2",
+        "features": [
+            "instrument",
+            "synthesizer",
+            "stereo"
+        ],
+        "category": "Synthesizers",
+        "title": "Odin 2 — TheWaveWarden WebCLAP",
+        "type": "engine",
+        "subtype": "instrument",
+        "attribution": {
+            "author": "TheWaveWarden",
+            "sourceUrl": "https://github.com/andremichelle/open-webclap/tree/main/ports/odin2",
+            "license": "AGPL-3.0 (JUCE bundle)",
+            "licenseUrls": [
+                "/webclap/plugins/open-webclap-odin2-LICENSE.txt"
+            ]
+        }
+    },
+    {
+        "id": "org.surge-synth-team.surge-xt",
+        "name": "Surge XT",
+        "author": "Surge Synth Team",
+        "description": "Hybrid synthesizer with a wide selection of oscillators, filters, effects and modulation.",
+        "url": "/webclap/plugins/open-webclap-surge-xt.wclap.tar.gz",
+        "factory": "org.surge-synth-team.surge-xt",
+        "features": [
+            "instrument",
+            "synthesizer",
+            "stereo"
+        ],
+        "category": "Synthesizers",
+        "title": "Surge XT — Surge Synth Team WebCLAP",
+        "type": "engine",
+        "subtype": "instrument",
+        "attribution": {
+            "author": "Surge Synth Team",
+            "sourceUrl": "https://github.com/andremichelle/open-webclap/tree/main/ports/surge-xt",
+            "license": "AGPL-3.0 (JUCE bundle)",
+            "licenseUrls": [
+                "/webclap/plugins/open-webclap-surge-xt-LICENSE.txt"
+            ]
+        }
+    },
+    {
+        "id": "de.polarity-music.polarity-sc-dark",
+        "name": "Polarity SC Dark",
+        "author": "Polarity",
+        "description": "Spectral compressor with upward and downward compression for the audio mix.",
+        "url": "/webclap/plugins/open-webclap-sc-dark.wclap.tar.gz",
+        "factory": "de.polarity-music.polarity-sc-dark",
+        "features": [
+            "audio-effect",
+            "compressor",
+            "stereo"
+        ],
+        "category": "Dynamics",
+        "title": "Polarity SC Dark — Polarity WebCLAP",
+        "type": "audio",
+        "subtype": "dynamics",
+        "attribution": {
+            "author": "Polarity",
+            "sourceUrl": "https://github.com/andremichelle/open-webclap/tree/main/ports/sc-dark",
+            "license": "GPL-3.0-or-later",
+            "licenseUrls": [
+                "/webclap/plugins/open-webclap-sc-dark-LICENSE.txt"
+            ]
+        }
     }
 ]

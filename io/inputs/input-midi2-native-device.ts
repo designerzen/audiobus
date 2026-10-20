@@ -5,6 +5,7 @@ import { acceptsMidiInput, createMidiInputControls } from './midi-input-controls
 import { ALL_MIDI_CHANNELS } from '../../midi/midi-channels.ts'
 import { getNativeMidiBridge, type NativeMidiBridge, type NativeMidiDevice } from '../../midi/native-midi-bridge.ts'
 import { umpToMidiBytes, umpToCommand } from '../../midi/ump-codec.ts'
+import { isMidiProfilePortClaimed } from '../../midi/device-profiles'
 
 export const MIDI2_NATIVE_INPUT_ID = 'MIDI 2.0 Native'
 export default class InputMIDI2Native extends AbstractInput implements IAudioInput {
@@ -85,6 +86,10 @@ export default class InputMIDI2Native extends AbstractInput implements IAudioInp
     }
     #receive(device: number, words: number[], nativeTimestamp?: number) {
         if (!this.isConnected || !this.#active.has(device)) return
+        if (!this.options.profileId && isMidiProfilePortClaimed('midi2-native', String(device))) {
+            this.#release(device)
+            return
+        }
         const bytes = umpToMidiBytes(words)
         const type = words[0] >>> 28
         const channel = type === 2 || type === 4 ? ((words[0] >>> 16) & 15) + 1 : 0

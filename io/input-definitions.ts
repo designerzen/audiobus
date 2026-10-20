@@ -11,6 +11,7 @@ import type { DeviceClassification } from "./device-classification.ts"
  */
 
 import * as INPUT_TYPES from "./inputs/input-types.ts"
+import { MIDI_DEVICE_PROFILES, onMidiDeviceProfilesChanged } from '../midi/device-profiles'
 
 export interface InputDefinition extends DeviceClassification {
 	id: string
@@ -21,6 +22,10 @@ export interface InputDefinition extends DeviceClassification {
 }
 
 export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
+    ...Object.fromEntries(Object.entries(MIDI_DEVICE_PROFILES).map(([id, profile]) => [id, {
+        id, name: profile.name, description: profile.description,
+        type: 'midi', subtype: 'device', category: 'MIDI', icon: profile.icon ?? '/icons/input-webmidi.svg'
+    }])),
 	[INPUT_TYPES.KEYBOARD]: {
 		id: INPUT_TYPES.KEYBOARD,
 		type: "controller",
@@ -180,6 +185,11 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		category: "Sync",
 	},
 } satisfies Record<INPUT_TYPES.InputId, InputDefinition>
+onMidiDeviceProfilesChanged(() => {
+    for (const [id, profile] of Object.entries(MIDI_DEVICE_PROFILES)) INPUT_DEFINITIONS[id] = {
+        id, name: profile.name, description: profile.description, type: 'midi', subtype: 'device', category: 'MIDI', icon: profile.icon ?? '/icons/input-webmidi.svg'
+    }
+})
 
 /**
  * Get input definition by ID

@@ -28,7 +28,7 @@ export default abstract class AbstractInput extends EventTarget implements IAudi
 		return `input-${name}-${ String(AbstractInput.ID++) }`
     }
 
-	#uuid: string = AbstractInput.getUniqueID( this.name )
+    #uuid: string
 	#options:Record<string, any>
 	#connected:boolean = false
 
@@ -63,6 +63,7 @@ export default abstract class AbstractInput extends EventTarget implements IAudi
 	constructor(options:Record<string, any> = DEFAULT_OPTIONS) {
 		super()
 		this.#options = {...DEFAULT_OPTIONS, ...options}
+        this.#uuid = AbstractInput.getUniqueID(this.name)
 	}
 
 	// createGui?(): Promise<HTMLElement> {

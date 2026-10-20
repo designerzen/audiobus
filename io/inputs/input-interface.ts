@@ -7,7 +7,7 @@ export interface IAudioInput{
 	get isHidden():boolean
 	
 	// optional
-	connect?():Promise<Function>|Function
+	connect?():Promise<void | Function>|Function
 	disconnect?():Promise<void>|Function
 	createGui?():Promise<HTMLElement>
 	destroyGui?():Promise<void>

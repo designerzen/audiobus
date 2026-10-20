@@ -16,6 +16,7 @@ export default class InputMIDITransportClock extends AbstractInput {
     get description() { return 'MIDI transport and clock (24 pulses per quarter note)' }
     get isEnabled() { return this.isConnected }
     get inputDevices() { return this.#input.inputDevices }
+    get midiInput() { return this.#input }
     get options(): Record<string, any> { return this.#input?.options ?? super.options }
     get clockStats() { return { ...this.#stats } }
     get calculatedBPM() { return this.#stats.calculatedBPM }
@@ -53,7 +54,7 @@ export default class InputMIDITransportClock extends AbstractInput {
         this.dispatch(command, event.origin)
         this.dispatchEvent(new CustomEvent(EVENT_TRANSPORT_COMMAND, { detail: command }))
     }
-    async connect(): Promise<void> { await this.#input.connect(); this.setAsConnected() }
+    async connect(): Promise<void> { await this.#input.connect(); if (this.#input.isConnected) this.setAsConnected(); else this.setAsDisconnected() }
     async disconnect(): Promise<void> { await this.#input.disconnect(); this.setAsDisconnected() }
     createGui(): Promise<HTMLElement> { return this.#input.createGui() }
     destroyGui(): Promise<void> { return this.#input.destroyGui() }

@@ -71,6 +71,7 @@ export default class IOChain extends EventTarget {
     #enabled: boolean = true
     #destroyed = false
     #generation = 0
+    #midiMessages = new WeakMap<object, Set<string>>()
 
     transportCommand?: (type: string) => void
     inputCommandHandler?: (event: InputAudioEvent) => boolean
@@ -671,6 +672,14 @@ export default class IOChain extends EventTarget {
     onInputEvent(inputEvent: InputAudioEvent) {
 
         inputEvent.preventDefault()
+        if (inputEvent.command.raw?.length && inputEvent.origin) {
+            const command = inputEvent.command
+            const signature = JSON.stringify([command.type, command.from, command.channel, command.number, command.value])
+            const seen = this.#midiMessages.get(inputEvent.origin) ?? new Set<string>()
+            if (seen.has(signature)) return
+            seen.add(signature)
+            this.#midiMessages.set(inputEvent.origin, seen)
+        }
         if (this.inputCommandHandler?.(inputEvent)) return
         if (!this.isActive) return
 

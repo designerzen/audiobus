@@ -3,6 +3,7 @@ export { EVENT_CHAIN_ADDED, EVENT_CHAIN_REMOVED, EVENT_CHAIN_ACTIVE_CHANGED, EVE
 import { compressToBase64, decompressFromBase64 } from 'lz-string'
 import { deviceId, deviceDefinition, defineDevice } from './device-definition'
 import { restoreDevice, UnavailableDevice, type SavedDevice } from './workspace-devices'
+import { EVENT_DESTROYED } from '../event-constants'
 import OutputManager from './output-manager'
 import AbstractInput from './inputs/abstract-input'
 import { INPUT_EVENT, PLAYBACK_TOGGLE, PLAYBACK_STOP, MIDI_STOP, CONTROL_CHANGE } from '../commands'
@@ -598,6 +599,7 @@ export class IOChainManager extends EventTarget {
 	 * Stop all chains and clear them
 	 */
 	destroy(): void {
+		this.dispatchEvent(new Event(EVENT_DESTROYED))
 		this.#subscriptions.forEach(controller => controller.abort())
 		this.#subscriptions.clear()
 		this.#chains.forEach(chain => chain.destroy())

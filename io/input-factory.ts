@@ -1,6 +1,7 @@
 import { INPUT_DEFINITIONS } from "./input-definitions.ts"
 import type { DeviceClassification } from "./device-classification.ts"
 import { defineDevice } from './device-definition'
+import { MIDI_DEVICE_PROFILES, ensureMidiDeviceProfile, onMidiDeviceProfilesChanged } from '../midi/device-profiles'
 /**
  * Factory for creating audio input instances
  * Handles instantiation of available input types
@@ -17,6 +18,7 @@ export interface InputFactory extends DeviceClassification {
 }
 
 const loadSupportingLibrary = async (type: string) => {
+    if (Object.hasOwn(MIDI_DEVICE_PROFILES, type)) return await import('./inputs/input-profiled-midi-device')
 	// Create and return instance based on type
 	switch (type) {
 		case INPUT_TYPES.KEYBOARD:
@@ -63,7 +65,7 @@ const loadSupportingLibrary = async (type: string) => {
  * @returns A new instance of the requested input type
  * @throws Error if the input type is unknown
  */
-const loadedLibraries = new Map<string, INPUT_TYPES.InputId>()
+const loadedLibraries = new Map<string, any>()
 const loadSupportingLibraries = async (type: string): Promise<any> => {
 
 	if (loadedLibraries.has(type)) {
@@ -85,7 +87,7 @@ const loadSupportingLibraries = async (type: string): Promise<any> => {
  */
 const createInput = async (type: string, options={} ): Promise<IAudioInput> => {
 	const Class = await loadSupportingLibraries(type)
-	return new Class(options)
+	return new Class(Object.hasOwn(MIDI_DEVICE_PROFILES, type) ? { ...options, profileId: type } : options)
 }
 
 /**
@@ -95,6 +97,11 @@ const createInput = async (type: string, options={} ): Promise<IAudioInput> => {
  * then uses the loaded imports in future requests
  */
 export const INPUT_FACTORIES: InputFactory[] = [
+    ...Object.entries(MIDI_DEVICE_PROFILES).map(([id, profile]): InputFactory => ({
+        id, name: profile.name, description: profile.description, type: 'midi', subtype: 'device',
+        isAvailable: () => typeof navigator !== 'undefined' && (!!(navigator as any).requestMIDIAccess || !!(globalThis as any).window?.electronAPI?.midi2),
+        create: options => createInput(id, options)
+    })),
 	{
 		id: INPUT_TYPES.KEYBOARD,
 		type: INPUT_DEFINITIONS[INPUT_TYPES.KEYBOARD].type,
@@ -240,6 +247,14 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		create: (options) => createInput(INPUT_TYPES.DVS_CONTROL_VINYL, options),
 	},
 ]
+onMidiDeviceProfilesChanged(() => {
+    for (const [id, profile] of Object.entries(MIDI_DEVICE_PROFILES)) {
+        if (INPUT_FACTORIES.some(factory => factory.id === id)) continue
+        INPUT_FACTORIES.push({ id, name: profile.name, description: profile.description, type: 'midi', subtype: 'device',
+            isAvailable: () => typeof navigator !== 'undefined' && (!!(navigator as any).requestMIDIAccess || !!(globalThis as any).window?.electronAPI?.midi2),
+            create: options => createInput(id, options) })
+    }
+})
 
 /**
  * Get all available input factories
@@ -252,6 +267,7 @@ export function getAvailableInputFactories(): InputFactory[] {
  * Create an input instance by factory ID
  */
 export async function createInputById(id: string, options?: Record<string, any>): Promise<IAudioInput> {
+    if (!INPUT_FACTORIES.some(factory => factory.id === id)) await ensureMidiDeviceProfile(id)
 	const factory = INPUT_FACTORIES.find((f) => f.id === id)
 	if (!factory) {
 		throw new Error(`Input factory not found: ${id}`)

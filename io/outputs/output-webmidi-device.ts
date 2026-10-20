@@ -1,5 +1,6 @@
-import { EVENT_DEVICE_LIST_CHANGED, EVENT_CONFIGURATION_CHANGED, EVENT_CONNECTED, EVENT_DISCONNECTED } from '../../event-constants.ts'
-import { WebMidi, type Output } from 'webmidi'
+import { EVENT_DEVICE_LIST_CHANGED, EVENT_CONFIGURATION_CHANGED } from '../../event-constants.ts'
+import type { Output } from 'webmidi'
+import { sharedWebMidi } from '../../midi/shared-webmidi'
 import type { IAudioCommand } from '../../audio-command-interface.ts'
 import type { IAudioOutput } from './output-interface.ts'
 import { MidiOutputRouting } from './midi-output-routing.ts'
@@ -13,6 +14,8 @@ export default class OutputWebMIDIDevice extends EventTarget implements IAudioOu
     readonly uuid = `Output-WebMIDI-${OutputWebMIDIDevice.ID++}`
     readonly options: Record<string, any>
     private connected = false
+    private releaseAccess?: () => void
+    private connecting?: Promise<void>
     private routing: MidiOutputRouting
     private deviceChanged = () => {
         this.rememberDefault()
@@ -27,34 +30,38 @@ export default class OutputWebMIDIDevice extends EventTarget implements IAudioOu
         this.routing = new MidiOutputRouting(this.options,
             () => this.outputDevices.map(device => ({ id: device.id, name: [device.manufacturer, device.name].filter(Boolean).join(' ') || device.id })),
             (id, bytes) => {
-                if (this.connected) WebMidi.outputs.find(device => device.id === id)?.send(bytes)
+                if (this.connected) sharedWebMidi.outputs.find(device => device.id === id)?.send(bytes)
             }, () => this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED)))
     }
     get name(): string { return WEBMIDI_OUTPUT_ID }
     get description(): string { return 'Sends MIDI messages to the selected device and channel' }
     get isConnected(): boolean { return this.connected }
     get isHidden(): boolean { return false }
-    get outputDevices(): Output[] { return this.connected ? [...WebMidi.outputs] : [] }
+    get outputDevices(): Output[] { return this.connected ? sharedWebMidi.outputs : [] }
     get output(): Output | undefined { return this.outputDevices.find(device => device.id === this.routing.targets()[0]?.id) }
     get sendToAllDevices(): boolean { return this.options.sendToAllDevices === true || this.options.selectedDevice === '' }
 
     private rememberDefault(): void {
-        if (this.options.selectedDevice == null && !this.options.sendToAllDevices && WebMidi.outputs[0]) this.options.selectedDevice = WebMidi.outputs[0].id
+        if (this.options.selectedDevice == null && !this.options.sendToAllDevices && sharedWebMidi.outputs[0]) this.options.selectedDevice = sharedWebMidi.outputs[0].id
     }
     async connect(): Promise<void> {
         if (this.connected) return
-        await WebMidi.enable({ sysex: true })
-        this.connected = true
-        this.rememberDefault()
-        WebMidi.addListener(EVENT_CONNECTED, this.deviceChanged)
-        WebMidi.addListener(EVENT_DISCONNECTED, this.deviceChanged)
-        this.routing.refresh()
+        if (this.connecting) return this.connecting
+        this.connecting = (async () => {
+            this.releaseAccess = await sharedWebMidi.acquire()
+            this.connected = true
+            this.rememberDefault()
+            sharedWebMidi.addEventListener(EVENT_DEVICE_LIST_CHANGED, this.deviceChanged)
+            this.routing.refresh()
+        })()
+        try { await this.connecting } finally { this.connecting = undefined }
     }
     async disconnect(): Promise<void> {
+        if (this.connecting) await this.connecting.catch(() => {})
         await this.routing.release()
         this.connected = false
-        WebMidi.removeListener(EVENT_CONNECTED, this.deviceChanged)
-        WebMidi.removeListener(EVENT_DISCONNECTED, this.deviceChanged)
+        sharedWebMidi.removeEventListener(EVENT_DEVICE_LIST_CHANGED, this.deviceChanged)
+        this.releaseAccess?.(); this.releaseAccess = undefined
         this.routing.refresh()
     }
     setOutput(id: string): void { this.routing.setOutput(id) }

@@ -20,7 +20,7 @@ export const MUSIC_MOUSE = "music-mouse" as const
 export const MICROPHONE_PITCH = "microphone-pitch" as const
 export const DVS_CONTROL_VINYL = "dvs-control-vinyl" as const
 
-export type InputId =
+export type InputId = (string & {})
 	| typeof KEYBOARD
 	| typeof GAMEPAD
 	| typeof GAMEPAD_MUSIC

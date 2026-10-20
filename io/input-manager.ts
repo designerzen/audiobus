@@ -1,4 +1,4 @@
-import { EVENT_INPUTS_UPDATED } from '../event-constants.ts'
+import { EVENT_INPUTS_UPDATED, EVENT_CONFIGURATION_CHANGED, EVENT_CONNECTION_CHANGED, EVENT_DEVICE_LIST_CHANGED } from '../event-constants.ts'
 export { EVENT_INPUTS_UPDATED } from '../event-constants.ts'
 /**
  * Combine input mechanisms and dispatch
@@ -10,12 +10,14 @@ export { EVENT_INPUTS_UPDATED } from '../event-constants.ts'
 import { INPUT_EVENT } from '../commands'
 import AbstractInput from "./inputs/abstract-input"
 import type InputAudioEvent from "./events/input-audio-event"
+import { refreshMidiDeviceProfiles } from '../midi/device-profiles'
 
 
 
 export default class InputManager extends AbstractInput {
 	
     async getAvailableFactories() {
+        await refreshMidiDeviceProfiles()
         const { getAvailableInputFactories } = await import('./input-factory')
         return getAvailableInputFactories()
     }
@@ -23,6 +25,7 @@ export default class InputManager extends AbstractInput {
 	#inputs:AbstractInput[] = []
 	#inputMap:Map = new Map()
 	#abortController:AbortController
+    #inputChanged = () => this.dispatchEvent(new Event(EVENT_INPUTS_UPDATED))
 
 	get inputs():AbstractInput[] {
 		return this.#inputs
@@ -44,6 +47,9 @@ export default class InputManager extends AbstractInput {
 		this.#inputs.push(input)
 		this.#inputMap.set(input.name, input)
 		input.addEventListener(INPUT_EVENT, this.onAudioInputEvent, { signal:this.#abortController.signal } )
+        for (const type of [EVENT_CONFIGURATION_CHANGED, EVENT_CONNECTION_CHANGED, EVENT_DEVICE_LIST_CHANGED]) {
+            input.addEventListener(type, this.#inputChanged, { signal: this.#abortController.signal })
+        }
 
 		this.dispatchEvent(new Event(EVENT_INPUTS_UPDATED))
 	}
@@ -56,6 +62,7 @@ export default class InputManager extends AbstractInput {
 		this.#inputs = this.#inputs.filter(i => i !== input)
 		this.#inputMap.delete(input.name)
 		input.removeEventListener(INPUT_EVENT, this.onAudioInputEvent )
+        for (const type of [EVENT_CONFIGURATION_CHANGED, EVENT_CONNECTION_CHANGED, EVENT_DEVICE_LIST_CHANGED]) input.removeEventListener(type, this.#inputChanged)
 		this.dispatchEvent(new Event(EVENT_INPUTS_UPDATED))
 	}
 

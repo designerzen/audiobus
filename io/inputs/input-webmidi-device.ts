@@ -1,59 +1,84 @@
-import { EVENT_CONNECTED, EVENT_DISCONNECTED, EVENT_CONFIGURATION_CHANGED, EVENT_MIDIMESSAGE, EVENT_DEVICE_LIST_CHANGED } from '../../event-constants.ts'
+import { EVENT_CONFIGURATION_CHANGED, EVENT_MIDIMESSAGE, EVENT_DEVICE_LIST_CHANGED, EVENT_MIDI_CHANNELS_CHANGED } from '../../event-constants.ts'
 import { midiToCommand } from '../../midi/midi-command-conversion.ts'
 import AbstractInput from "./abstract-input.ts"
 import { createAudioCommand } from "../../audio-command-factory.ts"
-import { WebMidi, type Input } from "webmidi"
+import type { Input } from "webmidi"
+import { sharedWebMidi, type WebMidiDeviceChange } from '../../midi/shared-webmidi'
 import { NOTE_OFF, NOTE_ON } from '../../commands'
 import { ALL_MIDI_CHANNELS } from "../../midi/midi-channels.ts"
-import { acceptsMidiInput, createMidiInputControls } from './midi-input-controls.ts'
+import { acceptsMidiInput, createMidiInputControls, selectedMidiDevice } from './midi-input-controls.ts'
 import type { IAudioInput } from "./input-interface.ts"
 
 export const WEBMIDI_INPUT_ID = "WebMIDI"
 
 export default class InputWebMIDIDevice extends AbstractInput implements IAudioInput {
-    #subscriptions = new Map<Input, () => void>()
+    #release?: () => void
+    #connecting?: Promise<void>
+    #destroyed = false
+    #abort = new AbortController()
+    #unregister: () => void
     #webMIDIEnabled = false
     #gui?: ReturnType<typeof createMidiInputControls>
     #sustain = new Map<string, { deviceId: string; channel: number }>()
     #activeNotes = new Map<string, { note: number; channel: number; deviceId: string }>()
-    #deviceChangeHandler = (event: any) => this.onDeviceStateChange(event)
 
-    get name(): string { return WEBMIDI_INPUT_ID }
+    get name(): string { return this.options?.deviceName ?? WEBMIDI_INPUT_ID }
     get description(): string { return 'WebMIDI' }
     get isEnabled(): boolean { return this.#webMIDIEnabled }
-    get inputDevices(): Input[] { return [...this.#subscriptions.keys()] }
+    get inputDevices(): Input[] { return sharedWebMidi.inputs.filter(device => acceptsMidiInput(this.options, device.id, 0)) }
+    get midiInput() { return this }
     hasMidiInput(): boolean { return true }
 
     constructor(options: Record<string, any> = {}) {
         super({ channels: ALL_MIDI_CHANNELS, devices: [], ...options })
+        const selected = selectedMidiDevice(this.options)
+        this.options.selectedDevice = selected ?? ''
+        this.options.listenToAllDevices = selected === null
+        this.options.devices = selected === null ? [] : [selected]
+        this.options.selectedChannel ??= Array.isArray(this.options.channels) ? (this.options.channels.length === 1 ? this.options.channels[0] : 0) : this.options.channels ?? 0
+        this.#unregister = sharedWebMidi.registerInput(this, id => acceptsMidiInput(this.options, id, 0), () => this.#webMIDIEnabled && this.isConnected)
+        sharedWebMidi.addEventListener(EVENT_MIDIMESSAGE, ((event: CustomEvent) => {
+            this.onMIDIEvent(event.detail.event, event.detail.device, event.detail.device.name, 0)
+        }) as EventListener, { signal: this.#abort.signal })
+        sharedWebMidi.addEventListener(EVENT_DEVICE_LIST_CHANGED, ((event: CustomEvent<WebMidiDeviceChange>) => {
+            const detail = event.detail
+            if (detail.disconnected && detail.device?.type === 'input') this.releaseNotes(detail.device.id, event)
+            this.syncConnection()
+            this.#gui?.refresh()
+            this.dispatchEvent(new CustomEvent(EVENT_DEVICE_LIST_CHANGED, { detail }))
+        }) as EventListener, { signal: this.#abort.signal })
+        sharedWebMidi.addEventListener(EVENT_MIDI_CHANNELS_CHANGED, () => this.#gui?.refresh(), { signal: this.#abort.signal })
     }
 
     async connect(): Promise<void> {
         if (this.#webMIDIEnabled) return
-        await WebMidi.enable({ sysex: true })
-        this.#webMIDIEnabled = true
-        WebMidi.addListener(EVENT_CONNECTED, this.#deviceChangeHandler)
-        WebMidi.addListener(EVENT_DISCONNECTED, this.#deviceChangeHandler)
-        WebMidi.inputs.forEach((device, index) => this.connectToMIDIDevice(device, index))
-        this.setAsConnected()
-        this.#gui?.refresh()
+        if (this.#connecting) return this.#connecting
+        this.#connecting = (async () => {
+            const release = await sharedWebMidi.acquire()
+            if (this.#destroyed) { release(); return }
+            this.#release = release
+            this.#webMIDIEnabled = true
+            this.syncConnection()
+            this.#gui?.refresh()
+        })()
+        try { await this.#connecting } finally { this.#connecting = undefined }
     }
 
     async disconnect(): Promise<void> {
-        WebMidi.removeListener(EVENT_CONNECTED, this.#deviceChangeHandler)
-        WebMidi.removeListener(EVENT_DISCONNECTED, this.#deviceChangeHandler)
+        if (this.#connecting) await this.#connecting.catch(() => {})
         this.releaseNotes()
-        for (const device of this.inputDevices) this.disconnectFromMIDIDevice(device)
         this.#webMIDIEnabled = false
         this.setAsDisconnected()
+        this.#release?.(); this.#release = undefined
         this.#gui?.refresh()
     }
 
     async createGui(): Promise<HTMLElement> {
         if (!this.#gui) this.#gui = createMidiInputControls(this.options,
-            () => WebMidi.inputs.map(device => ({ id: device.id, name: [device.manufacturer, device.name].filter(Boolean).join(' ') || device.id })),
+            () => sharedWebMidi.inputs.map(device => ({ id: device.id, name: [device.manufacturer, device.name].filter(Boolean).join(' ') || device.id, activeChannels: sharedWebMidi.observedChannels(device.id) })),
             () => {
                 this.releaseNotes()
+                this.syncConnection()
                 this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
             })
         return this.#gui.element
@@ -64,21 +89,9 @@ export default class InputWebMIDIDevice extends AbstractInput implements IAudioI
         this.#gui = undefined
     }
 
-    connectToMIDIDevice(device: Input, index: number): () => void {
-        const existing = this.#subscriptions.get(device)
-        if (existing) return existing
-        const proxy = (event: any) => this.onMIDIEvent(event, device, device.name, index)
-        device.addListener(EVENT_MIDIMESSAGE, proxy)
-        const unsubscribe = () => { device.removeListener(EVENT_MIDIMESSAGE, proxy) }
-        this.#subscriptions.set(device, unsubscribe)
-        return unsubscribe
-    }
-
-    disconnectFromMIDIDevice(device: Input): void {
-        this.releaseNotes(device.id)
-        this.#subscriptions.get(device)?.()
-        this.#subscriptions.delete(device)
-        // WebMidi ports are shared by every input instance. Only remove our listener.
+    private syncConnection() {
+        if (this.#webMIDIEnabled && (selectedMidiDevice(this.options) === null || this.inputDevices.length > 0)) this.setAsConnected()
+        else this.setAsDisconnected()
     }
 
     onMIDIEvent(event: any, device: Input, _deviceName: string, _index: number): void {
@@ -105,15 +118,20 @@ export default class InputWebMIDIDevice extends AbstractInput implements IAudioI
             event.rawVelocity ?? event.rawValue ?? Math.round((event.velocity ?? event.value ?? 0) * 127)] }, device, _deviceName, _index)
     }
 
-    private releaseNotes(deviceId?: string): void {
+    private releaseNotes(deviceId?: string, origin?: object): void {
+        const release = (data: number[], source: string) => {
+            const command = midiToCommand(data, this.now, source)!
+            if (origin) this.dispatch(command, origin)
+            else this.dispatch(command)
+        }
         for (const [key, active] of this.#sustain) {
             if (deviceId !== undefined && active.deviceId !== deviceId) continue
-            this.dispatch(midiToCommand([0xb0 | (active.channel - 1), 64, 0], this.now, active.deviceId)!)
+            release([0xb0 | (active.channel - 1), 64, 0], active.deviceId)
             this.#sustain.delete(key)
         }
         for (const [key, active] of this.#activeNotes) {
             if (deviceId !== undefined && active.deviceId !== deviceId) continue
-            this.onNoteOff(active.note, active.channel)
+            release([0x80 | (active.channel - 1), active.note, 0], active.deviceId)
             this.#activeNotes.delete(key)
         }
     }
@@ -136,17 +154,10 @@ export default class InputWebMIDIDevice extends AbstractInput implements IAudioI
         // CC command conversion is not yet supported by this adapter.
     }
 
-    private onDeviceStateChange(event: any): void {
-        if (event.port?.type === 'input') {
-            if (event.type === EVENT_CONNECTED) this.connectToMIDIDevice(event.port, WebMidi.inputs.indexOf(event.port))
-            else if (event.type === EVENT_DISCONNECTED) this.disconnectFromMIDIDevice(event.port)
-        }
-        this.#gui?.refresh()
-        this.dispatchEvent(new CustomEvent(EVENT_DEVICE_LIST_CHANGED, { detail: { inputs: WebMidi.inputs, device: event.port } }))
-    }
-
     async destroy(): Promise<void> {
+        this.#destroyed = true
         await this.disconnect()
+        this.#abort.abort(); this.#unregister()
         await this.destroyGui()
     }
 }
