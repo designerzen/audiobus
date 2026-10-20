@@ -34,7 +34,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		icon: "/icons/output-wam2.svg",
 		category: "Synthesis",
 	},
-	...Object.fromEntries(CLAP_PATCHES.map(patch => [OUTPUT_TYPES.webclapOutputId(patch.id), {
+	...Object.fromEntries(CLAP_PATCHES.filter(patch => patch.features?.includes('instrument')).map(patch => [OUTPUT_TYPES.webclapOutputId(patch.id), {
 		id: OUTPUT_TYPES.webclapOutputId(patch.id),
 		type: patch.type ?? (patch.features?.includes('instrument') ? 'engine' : 'audio'),
 		subtype: patch.subtype ?? (patch.features?.includes('instrument') ? 'instrument' : 'effect'),

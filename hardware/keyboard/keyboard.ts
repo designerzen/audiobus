@@ -1,4 +1,4 @@
-import { EVENT_KEYBOARD_KEY_DOWN, EVENT_KEYBOARD_KEY_UP, EVENT_KEY_DOWN, EVENT_KEY_UP } from '../../event-constants.ts'
+import { EVENT_KEYBOARD_KEY_DOWN, EVENT_KEYBOARD_KEY_UP, EVENT_KEY_DOWN, EVENT_KEY_UP, EVENT_BLUR, EVENT_VISIBILITY_CHANGE } from '../../event-constants.ts'
 import * as Commands from '../../commands'
 
 const MAPPING_KEYS_TO_MIDI_NOTES = [
@@ -18,11 +18,26 @@ export const addKeyboardDownEvents = ( callback:Function, midiNoteSequence:strin
 
 	const keysPressed = new Map()
 	const keyboardMap = new Map()
+	// Keep the original character and pitch even if modifiers change before keyup.
+	const heldNotes = new Map<string, { key: string, noteNumber: number }>()
+	const keyId = (event: KeyboardEvent) => event.code || event.key.toLowerCase()
+	const releaseNote = (id: string, event?: KeyboardEvent) => {
+		const note = heldNotes.get(id)
+		if (!note) return
+		heldNotes.delete(id)
+		keysPressed.delete(note.key)
+		window.dispatchEvent(new CustomEvent(EVENT_KEYBOARD_KEY_UP, { detail: { key: note.key } }))
+		callback(Commands.NOTE_OFF, note.key, note.noteNumber, event)
+	}
+	const releaseAll = () => {
+		for (const id of Array.from(heldNotes.keys())) releaseNote(id)
+		keysPressed.clear()
+	}
 
 	const abortController = new AbortController()
 	const quit = () =>{
 		abortController.abort()
-		keysPressed.clear()
+		releaseAll()
 	}
 
 	midiNoteSequence.forEach( (midiNote, index) => keyboardMap.set( midiNote, index+octaveOffset ) )
@@ -34,7 +49,7 @@ export const addKeyboardDownEvents = ( callback:Function, midiNoteSequence:strin
 		// Dispatch visual feedback event for QWERTY keyboard display
 		window.dispatchEvent(new CustomEvent(EVENT_KEYBOARD_KEY_DOWN, { detail: { key: event.key } }))
 
-		if ( keysPressed.has(event.key) )
+		if ( keysPressed.has(event.key) || heldNotes.has(keyId(event)) )
 		{
 			// already pressed so ignore
 			return quit
@@ -71,6 +86,7 @@ export const addKeyboardDownEvents = ( callback:Function, midiNoteSequence:strin
 		{
 			const noteNumber = keyboardMap.get(event.key)
 			keysPressed.set(event.key, noteNumber)
+			heldNotes.set(keyId(event), { key: event.key, noteNumber })
 			//console.log("Key already down", Commands.NOTE_ON, event.key, noteNumber )
 			callback( Commands.NOTE_ON, event.key, noteNumber, event )
 			return quit
@@ -313,23 +329,22 @@ export const addKeyboardDownEvents = ( callback:Function, midiNoteSequence:strin
 	window.addEventListener(EVENT_KEY_UP, async (event)=>{
 
 		// Dispatch visual feedback event for QWERTY keyboard display
-		window.dispatchEvent(new CustomEvent(EVENT_KEYBOARD_KEY_UP, { detail: { key: event.key } }))
+		if (!heldNotes.has(keyId(event))) {
+			window.dispatchEvent(new CustomEvent(EVENT_KEYBOARD_KEY_UP, { detail: { key: event.key } }))
+		}
 
 		// if ( event.key !== 'Tab' ){
 		// 	event.preventDefault()
 		// }
 
-		if (keyboardMap.has(event.key))
-		{
-			// note was pressed, so send note off
-			const noteNumber = keysPressed.get(event.key)
-			//console.log("Key up", Commands.NOTE_OFF, event.key, noteNumber )
-			keysPressed.delete(event.key)
-			callback( Commands.NOTE_OFF, event.key, noteNumber, event )
-		}else{
-			keysPressed.delete(event.key)
-		}
+		releaseNote(keyId(event), event)
+		keysPressed.delete(event.key)
 
+	}, { signal: abortController.signal, capture: true })
+
+	window.addEventListener(EVENT_BLUR, releaseAll, { signal: abortController.signal })
+	document.addEventListener(EVENT_VISIBILITY_CHANGE, () => {
+		if (document.hidden) releaseAll()
 	}, { signal: abortController.signal })
 
 	// send out cancel event listening

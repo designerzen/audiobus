@@ -44,7 +44,7 @@ export default class CLAPInstrument extends EventTarget implements IAudioOutput 
         this.connecting = (async () => {
             await initializeCLAPRegistry()
             if (generation !== this.generation) return
-            this.patches = clapRegistry.getPatches()
+            this.patches = clapRegistry.getPatches().filter(patch => patch.features?.includes('instrument'))
             const patch = this.options.defaultPatchId ? clapRegistry.getPatch(this.options.defaultPatchId) : clapRegistry.getPatch('com.plinken.piano') ?? this.patches.find(item => item.features?.includes('instrument'))
             if (!patch) throw new Error(`WebCLAP plugin not found: ${this.options.defaultPatchId ?? 'default'}`)
             await this.loadPatchFromUrl(patch)
