@@ -26,7 +26,7 @@ export default class InputMIDI2Native extends AbstractInput implements IAudioInp
     constructor(options: Record<string, any> = {}) { super({ channels: ALL_MIDI_CHANNELS, devices: [], ...options }) }
     async createGui() {
         this.#gui ??= createMidiInputControls(this.options,
-            () => this.#devices.map(device => ({ id: String(device.index), name: device.name })),
+            () => this.#devices.map(device => ({ id: String(device.index), registryId: device.id, name: device.name })),
             () => { this.#release(); this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED)) })
         return this.#gui.element
     }

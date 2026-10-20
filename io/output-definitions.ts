@@ -25,6 +25,15 @@ export interface OutputDefinition extends DeviceClassification {
 }
 
 export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
+	[OUTPUT_TYPES.DRUM_ACCOMPANIMENT]: {
+		id: OUTPUT_TYPES.DRUM_ACCOMPANIMENT,
+		type: 'engine',
+		subtype: 'instrument',
+		name: 'Drum Accompaniment',
+		description: 'Adds drum grooves to incoming notes with genre, swing, dynamics and fill controls',
+		icon: '/icons/device-drums.svg',
+		category: 'Synthesis',
+	},
 	[OUTPUT_TYPES.MOOG]: {
 		id: OUTPUT_TYPES.MOOG,
 		type: "engine",

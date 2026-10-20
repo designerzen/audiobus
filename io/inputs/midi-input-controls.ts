@@ -1,6 +1,13 @@
+import { loadMidiProfilesForPorts, matchMidiDeviceProfile, MIDI_DEVICE_PROFILES, onMidiDeviceProfilesChanged } from '../../midi/hardware/device-profiles'
+import { createMidiDevicePreview } from '../../midi/hardware/device-preview'
+import type { MidiDeviceProfile } from '../../midi/hardware/device-profile-schema'
+
 export interface MidiInputDeviceOption {
     id: string
     name: string
+    portName?: string
+    manufacturer?: string
+    registryId?: string
     activeChannels?: number[]
 }
 
@@ -55,7 +62,15 @@ export function createMidiInputControls(
     channel.value = String(Array.isArray(channels) ? (channels.length === 1 ? channels[0] : 0) : channels ?? (direction === 'output' ? -1 : 0))
     const status = document.createElement('small')
     element.append(status)
+    const preview = document.createElement('div')
+    preview.className = 'midi-selected-device-preview'
+    preview.hidden = true
+    element.append(preview)
+    let destroyed = false
+    let displayedProfile: MidiDeviceProfile | undefined
+    let requestedIdentity = ''
     const refresh = () => {
+        if (destroyed) return
         const channels = options.selectedChannel ?? options.channels
         channel.value = String(Array.isArray(channels) ? (channels.length === 1 ? channels[0] : 0) : channels ?? (direction === 'output' ? -1 : 0))
         const devices = getDevices()
@@ -79,6 +94,22 @@ export function createMidiInputControls(
         status.textContent = missing && direction === 'input' ? 'The selected MIDI device is disconnected. Reconnect it or choose another device.'
             : !devices.length ? `No MIDI ${direction} devices available. Connect a device to select it.`
             : direction === 'input' ? `Channels 1–16 available.${observed.length ? ` Activity detected on: ${observed.join(', ')}.` : ' No channel activity detected yet.'}` : ''
+        const selectedPort = selected ? devices.find(item => item.id === selected) : undefined
+        const identity = selectedPort ? { id: selectedPort.registryId ?? selectedPort.id,
+            name: selectedPort.portName ?? selectedPort.name, manufacturer: selectedPort.manufacturer } : undefined
+        const profileId = identity ? matchMidiDeviceProfile(identity) : undefined
+        const profile = profileId ? MIDI_DEVICE_PROFILES[profileId] : undefined
+        if (displayedProfile !== profile) {
+            preview.replaceChildren(...(profile ? [createMidiDevicePreview(profile)] : []))
+            displayedProfile = profile
+        }
+        preview.hidden = !profile
+        const key = identity ? JSON.stringify(identity) : ''
+        if (key !== requestedIdentity) {
+            requestedIdentity = key
+            if (identity && !profile) void loadMidiProfilesForPorts([identity]).then(refresh)
+                .catch(error => console.debug('MIDI device preview unavailable', error))
+        }
     }
     device.onchange = () => {
         if (device.value === UNAVAILABLE_MIDI_DEVICE) return
@@ -86,14 +117,18 @@ export function createMidiInputControls(
         options[direction === 'output' ? 'sendToAllDevices' : 'listenToAllDevices'] = device.value === ''
         options.devices = device.value ? [device.value] : []
         onChange()
+        refresh()
     }
     channel.onchange = () => {
         options.selectedChannel = Number(channel.value)
         options.channels = channel.value === '0' ? Array.from({ length: 16 }, (_, i) => i + 1) : [Number(channel.value)]
         onChange()
     }
+    const unsubscribeProfiles = onMidiDeviceProfilesChanged(refresh)
     refresh()
     return { element, refresh, destroy: () => {
+        destroyed = true
+        unsubscribeProfiles()
         device.onchange = null
         channel.onchange = null
         element.remove()

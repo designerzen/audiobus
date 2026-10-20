@@ -73,6 +73,7 @@
 		"netronome": "workspace:^",
 		"pitfalls": "workspace:^",
 		"standardized-audio-context": "^25.3.77",
+		"supersonic-scsynth": "0.64.0",
 		"supersonic-scsynth-bundle": "^0.64.0",
 		"tone": "^15.1.22",
 		"uWebSockets.js": "github:uNetworking/uWebSockets.js",

@@ -162,6 +162,25 @@ export class IOChainManager extends EventTarget {
         else chain.addOutput(device)
     }
 
+    replaceDevice(chain: IOChain, previous: any, device: any, direction: 'input' | 'output'): void {
+        const present = direction === 'input' ? chain.inputs.includes(previous) : chain.outputs.includes(previous)
+        if (!present || chain.isDestroyed || !this.chains.includes(chain)) {
+            void this.disposeDevice(deviceId(device), device)
+            throw new Error('The device or chain was removed while its replacement was loading')
+        }
+        if (previous === device) return
+        const enabled = direction === 'input' ? chain.inputManager.isEnabled(previous) : chain.outputManager.isEnabled(previous)
+        this.addDevice(chain, device, direction)
+        if (direction === 'input') {
+            chain.setInputEnabled(device, enabled)
+            chain.clearNoteCommands()
+            chain.removeInput(previous)
+        } else {
+            chain.outputManager.setEnabled(device, enabled)
+            chain.removeOutput(previous)
+        }
+    }
+
     cloneChain(chainId: string): string {
         const source = this.#chains.get(chainId)
         if (!source) throw new Error(`Unknown chain: ${chainId}`)

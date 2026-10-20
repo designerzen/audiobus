@@ -22,6 +22,7 @@ export const MIDI2_NATIVE = "midi2-native" as const
 export const SUPERSONIC = "supersonic" as const
 export const METRONOME = "metronome" as const
 export const AUDIO_CLICK = "audio-click" as const
+export const DRUM_ACCOMPANIMENT = 'drum-accompaniment' as const
 export const BUTTERCHURN = "butterchurn" as const
 export const WEBCLAP_PREFIX = 'webclap:' as const
 export const webclapOutputId = (pluginId: string): `webclap:${string}` => `${WEBCLAP_PREFIX}${pluginId}`
@@ -47,4 +48,5 @@ export type OutputId =
 	| typeof SUPERSONIC
 	| typeof METRONOME
 	| typeof AUDIO_CLICK
+	| typeof DRUM_ACCOMPANIMENT
 	| typeof BUTTERCHURN

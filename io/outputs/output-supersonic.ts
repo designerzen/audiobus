@@ -1,5 +1,5 @@
 import { EVENT_READY, EVENT_ERROR, EVENT_LOADING_START, EVENT_LOADING_COMPLETE, EVENT_DEBUG, EVENT_SHUTDOWN, EVENT_DESTROY, EVENT_AUDIOCONTEXT_SUSPENDED, EVENT_AUDIOCONTEXT_RESUMED, EVENT_AUDIOCONTEXT_INTERRUPTED } from '../../event-constants.ts'
-import { SuperSonic } from "supersonic-scsynth-bundle"
+import { SuperSonic } from "supersonic-scsynth"
 import type { IAudioOutput } from "./output-interface.ts"
 import { midiNoteToFrequency } from "../../conversion/note-to-frequency.ts"
 
@@ -166,7 +166,10 @@ export default class OutputSuperSonic implements IAudioOutput {
         try {
             // Create SuperSonic instance with base URL for assets
             this.supersonic = new SuperSonic({
-                baseURL: "/supersonic/",
+                baseURL: new URL(`${import.meta.env.BASE_URL}supersonic/`, document.baseURI).href,
+                audioContextOptions: {
+                    latencyHint: "playback",
+                },
                 scsynthOptions: {
                     numBuffers: 4096,
                 },
@@ -176,11 +179,7 @@ export default class OutputSuperSonic implements IAudioOutput {
             this.setupAudioEngineListeners()
 
             // Initialize the engine
-            await this.supersonic.init({
-                audioContextOptions: {
-                    latencyHint: "playback",
-                },
-            })
+            await this.supersonic.init()
 
             this.#connected = true
             return this.supersonic

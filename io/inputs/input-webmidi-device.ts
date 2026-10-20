@@ -86,7 +86,8 @@ export default class InputWebMIDIDevice extends AbstractInput implements IAudioI
 
     async createGui(): Promise<HTMLElement> {
         if (!this.#gui) this.#gui = createMidiInputControls(this.options,
-            () => sharedWebMidi.inputs.map(device => ({ id: device.id, name: [device.manufacturer, device.name].filter(Boolean).join(' ') || device.id, activeChannels: sharedWebMidi.observedChannels(device.id) })),
+            () => sharedWebMidi.inputs.map(device => ({ id: device.id, portName: device.name, manufacturer: device.manufacturer,
+                name: [device.manufacturer, device.name].filter(Boolean).join(' ') || device.id, activeChannels: sharedWebMidi.observedChannels(device.id) })),
             () => {
                 this.releaseNotes()
                 this.syncConnection()

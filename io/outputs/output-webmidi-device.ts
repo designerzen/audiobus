@@ -31,7 +31,8 @@ export default class OutputWebMIDIDevice extends EventTarget implements IAudioOu
         this.options = { ...options }
         if (options.midiOutput?.id && this.options.selectedDevice == null) this.options.selectedDevice = options.midiOutput.id
         this.routing = new MidiOutputRouting(this.options,
-            () => this.outputDevices.map(device => ({ id: device.id, name: [device.manufacturer, device.name].filter(Boolean).join(' ') || device.id })),
+            () => this.outputDevices.map(device => ({ id: device.id, portName: device.name, manufacturer: device.manufacturer,
+                name: [device.manufacturer, device.name].filter(Boolean).join(' ') || device.id })),
             (id, bytes) => {
                 if (this.connected) sharedWebMidi.outputs.find(device => device.id === id)?.send(bytes)
             }, () => this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED)))
@@ -43,7 +44,7 @@ export default class OutputWebMIDIDevice extends EventTarget implements IAudioOu
         sharedWebMidi.addEventListener(EVENT_READY, followSharedAccess, { signal: this.abort.signal })
         followSharedAccess()
     }
-    get name(): string { return WEBMIDI_OUTPUT_ID }
+    get name(): string { return this.options.deviceName ?? WEBMIDI_OUTPUT_ID }
     get description(): string { return 'Sends MIDI messages to the selected device and channel' }
     get isConnected(): boolean { return this.connected }
     get isHidden(): boolean { return false }

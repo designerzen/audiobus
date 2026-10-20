@@ -15,6 +15,8 @@ export interface IAudioOutput{
 	// Full MIDI commands retain channel, controller, pressure, and system data.
 	sendCommand?(command: IAudioCommand): void | Promise<void>
 	getNoteKey?(command: IAudioCommand): string
+	/** Set false when control changes preserve the identity of held notes. */
+	readonly configurationAffectsNoteRouting?: boolean
 
 	// optional
 	readonly requiresConnectionControl?: boolean

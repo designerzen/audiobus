@@ -28,7 +28,7 @@ export default class OutputMIDI2Native extends EventTarget implements IAudioOutp
         super()
         this.options = { channels: -1, ...options }
         this.#routing = new MidiOutputRouting(this.options,
-            () => this.#devices.map(device => ({ id: String(device.index), name: device.name })),
+            () => this.#devices.map(device => ({ id: String(device.index), registryId: device.id, name: device.name })),
             (id, bytes) => this.#sendWords(id, midiBytesToUmp(bytes)),
             () => this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED)),
             (id, words) => this.#sendWords(id, words))
