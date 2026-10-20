@@ -2,6 +2,7 @@ import { noteNumberToName } from "../../conversion/note-to-name.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 import { KokoroSpeech } from './kokoro-speech.ts'
 import { chordSpeechName } from './speech-vocabulary.ts'
+import { getAudioDestination } from '../../audio-destination'
 
 interface Config {
 	enabled: number // 1 for on, 0 for off
@@ -61,8 +62,9 @@ export default class OutputSpeechSynthesis extends EventTarget implements IAudio
 		return false
 	}
 
-	constructor(config: Partial<Config> = DEFAULT_OPTIONS) {
+	constructor(config: Partial<Config> = DEFAULT_OPTIONS, private sharedContext?: AudioContext, private destination?: AudioNode) {
 		super()
+		this.context = sharedContext ?? null
 		this.config = { ...DEFAULT_OPTIONS, ...config }
 		this.initialise()
 		if (this.config.enabled && typeof Worker !== 'undefined' && typeof AudioContext !== 'undefined') {
@@ -132,7 +134,7 @@ export default class OutputSpeechSynthesis extends EventTarget implements IAudio
 				buffer.copyToChannel(new Float32Array(audio.audio), 0)
 				this.gain ??= this.context.createGain()
 				this.gain.disconnect()
-				this.gain.connect(this.context.destination)
+				this.gain.connect(this.destination ?? getAudioDestination(this.context))
 				this.gain.gain.value = this.config.volume
 				const source = this.context.createBufferSource()
 				source.buffer = buffer
@@ -237,6 +239,6 @@ export default class OutputSpeechSynthesis extends EventTarget implements IAudio
 		this.cancelSpeech()
 		this.neural.dispose()
 		this.gain?.disconnect()
-		await this.context?.close()
+		if (!this.sharedContext) await this.context?.close()
 	}
 }

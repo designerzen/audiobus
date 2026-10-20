@@ -1,4 +1,5 @@
 import { OUTPUT_DEFINITIONS } from "./output-definitions.ts"
+import { getAudioDestination } from '../audio-destination'
 import type { DeviceClassification, DeviceAttribution } from "./device-classification.ts"
 import { defineDevice } from './device-definition'
 import wam2Registry, { WAM2_INSTRUMENTS, wam2OutputId } from '../wam/registry'
@@ -136,9 +137,11 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
 		}
 		return new Class(options.audioContext, options.name, options.mixer)
 	} else if (type === OUTPUT_TYPES.SUPERSONIC) {
-		const output = new Class()
+		const output = new Class(options?.audioContext ? getAudioDestination(options.audioContext) : undefined)
 		output.connect()
 		return output
+	} else if (type === OUTPUT_TYPES.SPEECH_SYNTHESIS) {
+		return new Class(options, options?.audioContext)
 	} else if (type === OUTPUT_TYPES.METRONOME || type === OUTPUT_TYPES.AUDIO_CLICK) {
 		if (!options?.audioContext) {
 			throw new Error(`${type} output requires audioContext in options`)

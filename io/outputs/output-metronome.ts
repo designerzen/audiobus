@@ -1,4 +1,5 @@
 import type { IAudioOutput } from "./output-interface.ts"
+import { getAudioDestination } from '../../audio-destination'
 
 export default class OutputMetronome extends EventTarget implements IAudioOutput {
 
@@ -51,7 +52,7 @@ export default class OutputMetronome extends EventTarget implements IAudioOutput
 	createGainNode(): void {
 		if (!this.#audioContext) return
 		this.#gainNode = this.#audioContext.createGain()
-		this.#gainNode.connect(this.#audioContext.destination)
+		this.#gainNode.connect(getAudioDestination(this.#audioContext))
 		this.#gainNode.gain.value = 0.3
 	}
 

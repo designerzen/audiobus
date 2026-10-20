@@ -1,4 +1,5 @@
 import type { IAudioOutput } from "./output-interface.ts"
+import { getAudioDestination } from '../../audio-destination'
 
 export interface AudioAsset {
 	id: string
@@ -159,7 +160,7 @@ export default class OutputAudioClick extends EventTarget implements IAudioOutpu
 			gainNode.gain.value = this.#volume
 
 			source.connect(gainNode)
-			gainNode.connect(this.#audioContext.destination)
+			gainNode.connect(getAudioDestination(this.#audioContext))
 
 			source.start(this.#audioContext.currentTime)
 		} catch (error) {

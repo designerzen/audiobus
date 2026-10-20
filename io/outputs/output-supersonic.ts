@@ -61,6 +61,7 @@ export default class OutputSuperSonic implements IAudioOutput {
     private currentPreset: SynthPreset = BUILT_IN_PRESETS[0]
     private activeNotes: Map<number, number> = new Map() // noteNumber -> nodeId
     private nodeIdCounter: number = 1000
+    private bridge: MediaStreamAudioSourceNode | null = null
 
     #uuid: string = "Output-SuperSonic-" + (OutputSuperSonic.ID++)
     #connected: boolean = false
@@ -110,7 +111,7 @@ export default class OutputSuperSonic implements IAudioOutput {
         return this.#connected
     }
 
-    constructor() {
+    constructor(private destination?: AudioNode) {
         
     }
 
@@ -180,11 +181,25 @@ export default class OutputSuperSonic implements IAudioOutput {
 
             // Initialize the engine
             await this.supersonic.init()
+            if (this.destination) {
+                // SuperSonic closes its context on shutdown, so keep ownership
+                // separate and bridge its stream into the application's final mix.
+                const context = this.supersonic.audioContext!
+                const stream = context.createMediaStreamDestination()
+                this.supersonic.node.disconnect()
+                this.supersonic.node.connect(stream)
+                this.bridge?.disconnect()
+                this.bridge = (this.destination.context as AudioContext).createMediaStreamSource(stream.stream)
+                this.bridge.connect(this.destination)
+            }
 
             this.#connected = true
             return this.supersonic
         } catch (error) {
             console.error("Failed to initialize SuperSonic:", error)
+            this.bridge?.disconnect()
+            this.bridge = null
+            await this.supersonic?.destroy()
             this.supersonic = null
             this.#connected = false
             throw error
@@ -499,6 +514,8 @@ export default class OutputSuperSonic implements IAudioOutput {
      * Shutdown the audio engine (preserves listeners, can reinit)
      */
     async shutdown(): Promise<void> {
+        this.bridge?.disconnect()
+        this.bridge = null
         if (this.supersonic) {
             this.allNotesOff()
             await this.supersonic.shutdown()
@@ -510,6 +527,8 @@ export default class OutputSuperSonic implements IAudioOutput {
      * Permanently destroy the audio engine
      */
     async destroy(): Promise<void> {
+        this.bridge?.disconnect()
+        this.bridge = null
         if (this.supersonic) {
             this.allNotesOff()
             await this.supersonic.destroy()

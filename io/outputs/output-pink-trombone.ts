@@ -1,4 +1,5 @@
 import { EVENT_LOAD, EVENT_CONNECTED } from '../../event-constants.ts'
+import { getAudioDestination } from '../../audio-destination'
 import { midiNoteToFrequency } from "../../conversion/note-to-frequency.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 
@@ -440,7 +441,7 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 			// Set the audio context
 			Promise.resolve(element.setAudioContext(this.#audioContext)).then(() => {
 				// Connect to audio destination
-				element.connect(this.#audioContext!.destination)
+				element.connect(getAudioDestination(this.#audioContext!))
 
 				// Set initial parameters
 				this.updateSynthesisParameters()
