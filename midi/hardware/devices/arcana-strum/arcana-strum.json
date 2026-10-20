@@ -1,0 +1,72 @@
+{
+  "name": "Arcana Strum",
+  "manufacturer": "Arcana Instruments",
+  "description": "Adaptive guitar controller with a strum handle and five-key or three-key playing.",
+  "ids": [
+    "arcana-strum"
+  ],
+  "portNames": [
+    "Arcana Strum"
+  ],
+  "icon": "icon.svg",
+  "documentation": [
+    {
+      "title": "Arcana support and playing guides",
+      "url": "https://arcanainstruments.com/support/"
+    },
+    {
+      "title": "Advanced features",
+      "url": "https://arcanainstruments.com/wp-content/uploads/Advanced-features.pdf"
+    }
+  ],
+  "abilities": [
+    "Strumming",
+    "Melody and harmony",
+    "Septachords",
+    "Transpose",
+    "Dynamics",
+    "Three-key and five-key layouts"
+  ],
+  "hardwareControls": [
+    "Melody / harmony",
+    "Septachords",
+    "Transpose down / up",
+    "Note duration",
+    "Dynamics",
+    "Skill 1 / 2",
+    "Left-handed playing",
+    "Three-key / five-key layout"
+  ],
+  "notice": "The published Arcana guides do not specify CC or SysEx assignments. Use the instrument's physical controls to change its settings; incoming MIDI is passed through unchanged.",
+  "controls": [],
+  "modes": [],
+  "schemaVersion": 1,
+  "gui": {
+    "type": "column",
+    "gap": "0.65rem",
+    "children": [
+      {
+        "type": "status"
+      },
+      {
+        "type": "image",
+        "alt": "Arcana Strum instrument controls",
+        "src": "panel.svg"
+      },
+      {
+        "type": "notes"
+      },
+      {
+        "type": "channel"
+      },
+      {
+        "type": "guide",
+        "label": "Instrument controls and guide"
+      }
+    ]
+  },
+  "$schema": "../profile.schema.json",
+  "id": "arcana-strum",
+  "manufacturerUrl": "https://arcanainstruments.com/",
+  "productUrl": "https://arcanainstruments.com/product/arcana-instrument/"
+}

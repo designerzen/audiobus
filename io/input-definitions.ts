@@ -11,7 +11,7 @@ import type { DeviceClassification } from "./device-classification.ts"
  */
 
 import * as INPUT_TYPES from "./inputs/input-types.ts"
-import { MIDI_DEVICE_PROFILES, onMidiDeviceProfilesChanged } from '../midi/device-profiles'
+import { MIDI_DEVICE_PROFILES, onMidiDeviceProfilesChanged } from '../midi/hardware/device-profiles'
 
 export interface InputDefinition extends DeviceClassification {
 	id: string

@@ -11,6 +11,7 @@ export default class OutputWAM2 extends EventTarget implements IAudioOutput {
     protected context: AudioContext
     protected label = 'WAM2'
     protected acceptsPluginUrl = true
+    protected showPluginBrowser = true
     #output: GainNode
     #plugin: any = null
     #url: string
@@ -160,6 +161,12 @@ export default class OutputWAM2 extends EventTarget implements IAudioOutput {
     async createGui(): Promise<HTMLElement> {
         if (this.#container) return this.#container
         const container = document.createElement('div')
+        if (!this.showPluginBrowser) {
+            this.#container = container
+            this.#guiHost = container
+            await this.showPluginGui()
+            return container
+        }
         const search = document.createElement('input')
         search.type = 'search'
         search.placeholder = `Search ${this.label} instruments`

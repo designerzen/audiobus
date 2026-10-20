@@ -6,6 +6,8 @@ import { MOOG_DESCRIPTOR, MOOG_URL } from '../../wam/moog/parameters'
 export default class OutputMoog extends OutputWAM2 {
     protected label = 'Moog'
     protected acceptsPluginUrl = false
+    protected showPluginBrowser = false
+    readonly requiresConnectionControl = false
     constructor(context: AudioContext, destination?: AudioNode) {
         super(context, MOOG_URL, 'Moog', destination)
     }

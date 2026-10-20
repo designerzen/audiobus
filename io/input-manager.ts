@@ -10,7 +10,7 @@ export { EVENT_INPUTS_UPDATED } from '../event-constants.ts'
 import { INPUT_EVENT } from '../commands'
 import AbstractInput from "./inputs/abstract-input"
 import type InputAudioEvent from "./events/input-audio-event"
-import { refreshMidiDeviceProfiles } from '../midi/device-profiles'
+import { refreshMidiDeviceProfiles } from '../midi/hardware/device-profiles'
 
 
 
@@ -23,6 +23,16 @@ export default class InputManager extends AbstractInput {
     }
 
 	#inputs:AbstractInput[] = []
+    #disabled = new Set<AbstractInput>()
+
+    isEnabled(input: AbstractInput): boolean { return !this.#disabled.has(input) }
+
+    setEnabled(input: AbstractInput, enabled: boolean): void {
+        if (!this.#inputs.includes(input) || enabled === this.isEnabled(input)) return
+        if (enabled) this.#disabled.delete(input)
+        else this.#disabled.add(input)
+        this.dispatchEvent(new Event(EVENT_INPUTS_UPDATED))
+    }
 	#inputMap:Map = new Map()
 	#abortController:AbortController
     #inputChanged = () => this.dispatchEvent(new Event(EVENT_INPUTS_UPDATED))
@@ -59,6 +69,7 @@ export default class InputManager extends AbstractInput {
 	 * @param input 
 	 */
 	remove(input:AbstractInput){
+        this.#disabled.delete(input)
 		this.#inputs = this.#inputs.filter(i => i !== input)
 		this.#inputMap.delete(input.name)
 		input.removeEventListener(INPUT_EVENT, this.onAudioInputEvent )
@@ -74,6 +85,7 @@ export default class InputManager extends AbstractInput {
 	 * Kill all input devices
 	 */
 	destroy(): void {
+		this.#disabled.clear()
 		this.#abortController.abort()
 		this.#inputMap.clear()
 		this.#inputs = []
@@ -86,6 +98,7 @@ export default class InputManager extends AbstractInput {
 	 * @param event 
 	 */
 	onAudioInputEvent(event:InputAudioEvent):void{
+        if (this.#disabled.has(event.target as AbstractInput)) return
 		//console.info("InputManager::onAudioInputEvent", event)
 		// kill existing event
 		event.preventDefault()

@@ -1,4 +1,4 @@
-import { EVENT_DEVICE_LIST_CHANGED, EVENT_CONFIGURATION_CHANGED } from '../../event-constants.ts'
+import { EVENT_DEVICE_LIST_CHANGED, EVENT_CONFIGURATION_CHANGED, EVENT_CONNECTION_CHANGED, EVENT_READY } from '../../event-constants.ts'
 import type { Output } from 'webmidi'
 import { sharedWebMidi } from '../../midi/shared-webmidi'
 import type { IAudioCommand } from '../../audio-command-interface.ts'
@@ -13,6 +13,9 @@ export default class OutputWebMIDIDevice extends EventTarget implements IAudioOu
     static ID = 0
     readonly uuid = `Output-WebMIDI-${OutputWebMIDIDevice.ID++}`
     readonly options: Record<string, any>
+    readonly requiresConnectionControl = false
+    private destroyed = false
+    private abort = new AbortController()
     private connected = false
     private releaseAccess?: () => void
     private connecting?: Promise<void>
@@ -32,6 +35,13 @@ export default class OutputWebMIDIDevice extends EventTarget implements IAudioOu
             (id, bytes) => {
                 if (this.connected) sharedWebMidi.outputs.find(device => device.id === id)?.send(bytes)
             }, () => this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED)))
+        const followSharedAccess = () => {
+            if (this.options.autoConnect && !this.destroyed && sharedWebMidi.isReady) {
+                void this.connect().catch(error => console.warn('MIDI output connection failed', error))
+            }
+        }
+        sharedWebMidi.addEventListener(EVENT_READY, followSharedAccess, { signal: this.abort.signal })
+        followSharedAccess()
     }
     get name(): string { return WEBMIDI_OUTPUT_ID }
     get description(): string { return 'Sends MIDI messages to the selected device and channel' }
@@ -45,24 +55,30 @@ export default class OutputWebMIDIDevice extends EventTarget implements IAudioOu
         if (this.options.selectedDevice == null && !this.options.sendToAllDevices && sharedWebMidi.outputs[0]) this.options.selectedDevice = sharedWebMidi.outputs[0].id
     }
     async connect(): Promise<void> {
-        if (this.connected) return
+        if (this.connected || this.destroyed) return
         if (this.connecting) return this.connecting
         this.connecting = (async () => {
-            this.releaseAccess = await sharedWebMidi.acquire()
+            const release = await sharedWebMidi.acquire()
+            if (this.destroyed) { release(); return }
+            this.releaseAccess = release
             this.connected = true
             this.rememberDefault()
             sharedWebMidi.addEventListener(EVENT_DEVICE_LIST_CHANGED, this.deviceChanged)
             this.routing.refresh()
+            this.dispatchEvent(new Event(EVENT_CONNECTION_CHANGED))
         })()
         try { await this.connecting } finally { this.connecting = undefined }
     }
     async disconnect(): Promise<void> {
+        this.options.autoConnect = false
         if (this.connecting) await this.connecting.catch(() => {})
         await this.routing.release()
+        const wasConnected = this.connected
         this.connected = false
         sharedWebMidi.removeEventListener(EVENT_DEVICE_LIST_CHANGED, this.deviceChanged)
         this.releaseAccess?.(); this.releaseAccess = undefined
         this.routing.refresh()
+        if (wasConnected) this.dispatchEvent(new Event(EVENT_CONNECTION_CHANGED))
     }
     setOutput(id: string): void { this.routing.setOutput(id) }
     setSendToAllDevices(all: boolean): void { this.setOutput(all ? '' : this.outputDevices[0]?.id ?? 'unavailable') }
@@ -90,5 +106,10 @@ export default class OutputWebMIDIDevice extends EventTarget implements IAudioOu
     hasMpeOutput(): boolean { return true }
     hasOscOutput(): boolean { return false }
     hasSysexOutput(): boolean { return true }
-    async destroy(): Promise<void> { await this.disconnect(); await this.destroyGui() }
+    async destroy(): Promise<void> {
+        this.destroyed = true
+        this.abort.abort()
+        await this.disconnect()
+        await this.destroyGui()
+    }
 }

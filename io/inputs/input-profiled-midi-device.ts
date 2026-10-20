@@ -1,11 +1,11 @@
 import AbstractInput from './abstract-input'
 import type InputAudioEvent from '../events/input-audio-event'
 import { INPUT_EVENT, EVENT_CONFIGURATION_CHANGED, EVENT_CONNECTION_CHANGED, EVENT_DEVICE_LIST_CHANGED } from '../../event-constants'
-import { MIDI_DEVICE_PROFILES, claimMidiProfilePort, matchMidiDeviceProfile, type MidiProfileTransport } from '../../midi/device-profiles'
+import { MIDI_DEVICE_PROFILES, claimMidiProfilePort, matchMidiDeviceProfile, type MidiProfileTransport } from '../../midi/hardware/device-profiles'
 import { getNativeMidiBridge } from '../../midi/native-midi-bridge'
 import { midiToCommand } from '../../midi/midi-command-conversion'
-import { createProfiledMidiGui } from './profiled-midi-gui'
-import { profileMessageBytes } from '../../midi/device-profile-schema'
+import { createProfiledMidiGui } from '../../midi/hardware/profiled-midi-gui'
+import { profileMessageBytes } from '../../midi/hardware/device-profile-schema'
 import { sharedWebMidi } from '../../midi/shared-webmidi'
 
 export default class InputProfiledMidiDevice extends AbstractInput {

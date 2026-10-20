@@ -1,14 +1,14 @@
-import type IOChainManager from './IO-chain-manager'
-import type IOChain from './IO-chain'
-import InputProfiledMidiDevice from './inputs/input-profiled-midi-device'
-import InputWebMIDIDevice from './inputs/input-webmidi-device'
-import { selectedMidiDevice } from './inputs/midi-input-controls'
-import { deviceDefinition, configurationData } from './device-definition'
-import { restoreDevice, type SavedDevice } from './workspace-devices'
-import { matchMidiDeviceProfile, loadMidiProfilesForPorts, type MidiProfileTransport } from '../midi/device-profiles'
-import { sharedWebMidi, type WebMidiDeviceChange } from '../midi/shared-webmidi'
-import { getNativeMidiBridge } from '../midi/native-midi-bridge'
-import { EVENT_DEVICE_LIST_CHANGED, EVENT_CHAINS_UPDATED, EVENT_DESTROYED } from '../event-constants'
+import type IOChainManager from '../../io/IO-chain-manager'
+import type IOChain from '../../io/IO-chain'
+import InputProfiledMidiDevice from '../../io/inputs/input-profiled-midi-device'
+import InputWebMIDIDevice from '../../io/inputs/input-webmidi-device'
+import { selectedMidiDevice } from '../../io/inputs/midi-input-controls'
+import { deviceDefinition, configurationData } from '../../io/device-definition'
+import { restoreDevice, type SavedDevice } from '../../io/workspace-devices'
+import { matchMidiDeviceProfile, loadMidiProfilesForPorts, type MidiProfileTransport } from './device-profiles'
+import { sharedWebMidi, type WebMidiDeviceChange } from '../shared-webmidi'
+import { getNativeMidiBridge } from '../native-midi-bridge'
+import { EVENT_DEVICE_LIST_CHANGED, EVENT_CHAINS_UPDATED, EVENT_DESTROYED } from '../../event-constants'
 
 interface KnownPort { id: string; routingId: string; name: string; profileId?: string; transport: MidiProfileTransport }
 interface DetachedInput { saved: SavedDevice; chains: string[]; reconnect: boolean }
@@ -138,7 +138,7 @@ export async function startKnownMidiInputs(manager: IOChainManager, options: Dis
             if (!input) {
                 const chain = manager.activeChain
                 if (!chain) continue
-                const { createInputById } = await import('./input-factory')
+                const { createInputById } = await import('../../io/input-factory')
                 input = await createInputById(port.profileId ?? 'webmidi', { ...manager.deviceOptions,
                     autoManagedMidi: true, transport: port.transport, deviceId: port.id, selectedDevice: port.id,
                     listenToAllDevices: false, deviceName: port.name })

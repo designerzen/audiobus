@@ -1,7 +1,7 @@
 import { INPUT_DEFINITIONS } from "./input-definitions.ts"
 import type { DeviceClassification } from "./device-classification.ts"
 import { defineDevice } from './device-definition'
-import { MIDI_DEVICE_PROFILES, ensureMidiDeviceProfile, onMidiDeviceProfilesChanged } from '../midi/device-profiles'
+import { MIDI_DEVICE_PROFILES, ensureMidiDeviceProfile, onMidiDeviceProfilesChanged } from '../midi/hardware/device-profiles'
 /**
  * Factory for creating audio input instances
  * Handles instantiation of available input types

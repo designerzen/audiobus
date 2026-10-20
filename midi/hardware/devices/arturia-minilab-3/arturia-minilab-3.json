@@ -1,0 +1,112 @@
+{
+  "$schema": "../profile.schema.json",
+  "schemaVersion": 1,
+  "id": "arturia-minilab-3",
+  "name": "Arturia MiniLab 3",
+  "manufacturer": "Arturia",
+  "manufacturerUrl": "https://www.arturia.com/",
+  "productUrl": "https://www.arturia.com/products/hybrid-synths/minilab-3/overview",
+  "portNames": [
+    "MiniLab 3",
+    "MiniLab3",
+    "MiniLab 3 MIDI"
+  ],
+  "description": "Compact MIDI keyboard with pads, encoders, faders and touch strips.",
+  "documentation": [
+    {
+      "title": "MiniLab 3 user manual: touch strips, section 4.3",
+      "url": "https://downloads.arturia.net/products/minilab-3/manual/minilab-3_Manual_1_0_5_EN.pdf"
+    },
+    {
+      "title": "MiniLab 3 MIDI Control Center manual: pedal modes, sections 4.3.5–4.3.7",
+      "url": "https://downloads.arturia.net/products/minilab-3/manual/minilab-3-mcc_Manual_1_14_0_EN.pdf"
+    }
+  ],
+  "abilities": [
+    "Velocity-sensitive keys and pads",
+    "Pitch bend",
+    "Modulation",
+    "Sustain or expression pedal"
+  ],
+  "hardwareControls": [
+    "25 keys",
+    "Eight encoders",
+    "Four faders",
+    "Eight pads",
+    "Pitch and modulation strips"
+  ],
+  "notice": "Modulation defaults to CC1 but is reassignable. The pedal sends CC64 in Sustain mode or CC11 in Expression mode; these are alternative pedal settings. Encoder, fader and pad assignments vary with the program. GUI controls send MIDI into this chain, not hardware configuration.",
+  "controls": [
+    {
+      "id": "pitch-bend",
+      "label": "Pitch bend",
+      "message": {
+        "type": "pitchBend"
+      },
+      "widget": "slider",
+      "default": 8192
+    },
+    {
+      "id": "modulation",
+      "label": "Modulation (default CC1)",
+      "cc": 1,
+      "widget": "slider"
+    },
+    {
+      "id": "sustain",
+      "label": "Sustain pedal (CC64)",
+      "cc": 64,
+      "widget": "toggle"
+    },
+    {
+      "id": "expression",
+      "label": "Pedal in Expression mode (CC11)",
+      "cc": 11,
+      "widget": "slider"
+    }
+  ],
+  "ids": [
+    "arturia-minilab-3"
+  ],
+  "icon": "icon.svg",
+  "modes": [],
+  "gui": {
+    "type": "column",
+    "gap": "0.65rem",
+    "children": [
+      {
+        "type": "status"
+      },
+      {
+        "type": "image",
+        "src": "panel.svg",
+        "alt": "Arturia MiniLab 3 layout illustration"
+      },
+      {
+        "type": "notes"
+      },
+      {
+        "type": "channel"
+      },
+      {
+        "type": "section",
+        "label": "Documented MIDI controls",
+        "children": [
+          {
+            "type": "grid",
+            "columns": 2,
+            "children": [
+              {
+                "type": "controls"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "guide",
+        "label": "Hardware and MIDI documentation"
+      }
+    ]
+  }
+}

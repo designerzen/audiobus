@@ -5,7 +5,7 @@ import { acceptsMidiInput, createMidiInputControls } from './midi-input-controls
 import { ALL_MIDI_CHANNELS } from '../../midi/midi-channels.ts'
 import { getNativeMidiBridge, type NativeMidiBridge, type NativeMidiDevice } from '../../midi/native-midi-bridge.ts'
 import { umpToMidiBytes, umpToCommand } from '../../midi/ump-codec.ts'
-import { isMidiProfilePortClaimed } from '../../midi/device-profiles'
+import { isMidiProfilePortClaimed } from '../../midi/hardware/device-profiles'
 
 export const MIDI2_NATIVE_INPUT_ID = 'MIDI 2.0 Native'
 export default class InputMIDI2Native extends AbstractInput implements IAudioInput {

@@ -1,0 +1,98 @@
+{
+  "$schema": "../profile.schema.json",
+  "schemaVersion": 1,
+  "id": "akai-mpk-mini-mk3",
+  "name": "Akai MPK mini mk3",
+  "manufacturer": "Akai Professional",
+  "manufacturerUrl": "https://www.akaipro.com/",
+  "productUrl": "https://www.akaipro.com/mpk-mini-mk3/",
+  "portNames": [
+    "MPK mini 3",
+    "MPK mini mk3",
+    "MPK mini MK3"
+  ],
+  "description": "Compact keyboard and pad controller with an assignable joystick.",
+  "documentation": [
+    {
+      "title": "MPK mini mk3 manufacturer FAQ: joystick, pads and preset configuration",
+      "url": "https://support.akaipro.com/en/support/solutions/articles/69000798861-akai-pro-mpk-mini-mk3-frequently-asked-questions"
+    }
+  ],
+  "abilities": [
+    "Keyboard notes",
+    "Pad notes and programmable CC",
+    "Pitch bend",
+    "Program changes"
+  ],
+  "hardwareControls": [
+    "Keyboard",
+    "Eight pads",
+    "Eight assignable knobs",
+    "Joystick",
+    "Arpeggiator and note repeat"
+  ],
+  "notice": "Joystick pitch control applies when its axis is configured for Pitch Bend. Pad, knob and joystick CC assignments depend on the selected preset; no fixed CC numbers are assumed. These controls perform MIDI into the chain; they do not edit the hardware preset.",
+  "controls": [
+    {
+      "id": "pitch-bend",
+      "label": "Pitch bend",
+      "message": {
+        "type": "pitchBend"
+      },
+      "widget": "slider",
+      "default": 8192
+    },
+    {
+      "id": "program",
+      "label": "Program change (0–127)",
+      "message": {
+        "type": "programChange"
+      },
+      "widget": "slider"
+    }
+  ],
+  "ids": [
+    "akai-mpk-mini-mk3"
+  ],
+  "icon": "icon.svg",
+  "modes": [],
+  "gui": {
+    "type": "column",
+    "gap": "0.65rem",
+    "children": [
+      {
+        "type": "status"
+      },
+      {
+        "type": "image",
+        "src": "panel.svg",
+        "alt": "Akai MPK mini mk3 layout illustration"
+      },
+      {
+        "type": "notes"
+      },
+      {
+        "type": "channel"
+      },
+      {
+        "type": "section",
+        "label": "Documented MIDI controls",
+        "children": [
+          {
+            "type": "grid",
+            "columns": 2,
+            "children": [
+              {
+                "type": "controls"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "guide",
+        "label": "Hardware and MIDI documentation"
+      }
+    ]
+  }
+}

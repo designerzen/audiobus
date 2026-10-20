@@ -1,0 +1,89 @@
+{
+  "$schema": "../profile.schema.json",
+  "schemaVersion": 1,
+  "id": "novation-launchkey-mini-mk3",
+  "name": "Novation Launchkey Mini MK3",
+  "manufacturer": "Novation",
+  "manufacturerUrl": "https://novationmusic.com/",
+  "productUrl": "https://novationmusic.com/products/launchkey-mini-mk3",
+  "portNames": [
+    "Launchkey Mini MK3",
+    "Launchkey Mini MK3 MIDI",
+    "Launchkey Mini MK3 MIDI 1"
+  ],
+  "description": "Portable keyboard and pad controller with customizable performance mappings.",
+  "documentation": [
+    {
+      "title": "Launchkey Mini MK3 Components guide: custom pads, pots and sustain pedal",
+      "url": "https://support.novationmusic.com/hc/en-gb/articles/360009345719-Launchkey-Mini-MK3-Components-Guide"
+    },
+    {
+      "title": "Launchkey Mini MK3 official user-guide downloads",
+      "url": "https://downloads.novationmusic.com/novation/launchkey-mk3/launchkey-mini-mk3"
+    }
+  ],
+  "abilities": [
+    "Keyboard and pad notes",
+    "Custom note and CC mappings",
+    "Sustain pedal"
+  ],
+  "hardwareControls": [
+    "Mini keyboard",
+    "RGB pads",
+    "Eight rotary controls",
+    "Pitch and modulation strips"
+  ],
+  "notice": "The sustain pedal defaults to CC64 and can be reassigned in Components. Custom pad and pot CC numbers depend on the hardware template; no fixed assignments are assumed. Use the musical MIDI port rather than a dedicated DAW port. The GUI performs MIDI into the chain.",
+  "controls": [
+    {
+      "id": "sustain",
+      "label": "Sustain pedal (CC64)",
+      "cc": 64,
+      "widget": "toggle"
+    }
+  ],
+  "ids": [
+    "novation-launchkey-mini-mk3"
+  ],
+  "icon": "icon.svg",
+  "modes": [],
+  "gui": {
+    "type": "column",
+    "gap": "0.65rem",
+    "children": [
+      {
+        "type": "status"
+      },
+      {
+        "type": "image",
+        "src": "panel.svg",
+        "alt": "Novation Launchkey Mini MK3 layout illustration"
+      },
+      {
+        "type": "notes"
+      },
+      {
+        "type": "channel"
+      },
+      {
+        "type": "section",
+        "label": "Documented MIDI controls",
+        "children": [
+          {
+            "type": "grid",
+            "columns": 2,
+            "children": [
+              {
+                "type": "controls"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "guide",
+        "label": "Hardware and MIDI documentation"
+      }
+    ]
+  }
+}

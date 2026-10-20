@@ -1,7 +1,7 @@
 import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON, PITCH_BEND, PROGRAM_CHANGE } from '../../commands'
-import { CHANNEL_PRESSURE } from '../../midi/midi-command-conversion'
+import { CHANNEL_PRESSURE } from '../midi-command-conversion'
 import type { IAudioCommand } from '../../audio-command-interface'
-import { controlMessage, controlRange, type MidiDeviceProfile, type MidiGuiNode, type MidiProfileControl, type MidiProfileMessage } from '../../midi/device-profile-schema'
+import { controlMessage, controlRange, type MidiDeviceProfile, type MidiGuiNode, type MidiProfileControl, type MidiProfileMessage } from './device-profile-schema'
 import { EVENT_INPUT, EVENT_CHANGE, EVENT_CLICK, EVENT_POINTER_DOWN, EVENT_POINTER_UP, EVENT_POINTER_CANCEL, EVENT_LOST_POINTER_CAPTURE, EVENT_POINTER_MOVE, EVENT_KEY_DOWN, EVENT_KEY_UP, EVENT_BLUR } from '../../event-constants'
 
 export function createProfiledMidiGui(profile: MidiDeviceProfile, options: Record<string, any>,

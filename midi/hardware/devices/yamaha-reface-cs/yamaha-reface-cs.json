@@ -1,0 +1,160 @@
+{
+  "$schema": "../profile.schema.json",
+  "schemaVersion": 1,
+  "id": "yamaha-reface-cs",
+  "name": "Yamaha reface CS",
+  "manufacturer": "Yamaha",
+  "manufacturerUrl": "https://www.yamaha.com/",
+  "productUrl": "https://usa.yamaha.com/products/music_production/synthesizers/reface/reface_cs.html",
+  "portNames": [
+    "reface CS",
+    "reface CS MIDI",
+    "reface CS-1"
+  ],
+  "description": "Compact synthesizer with MIDI-controlled oscillator, filter, envelope and effects.",
+  "documentation": [
+    {
+      "title": "reface Data List: CS MIDI control-change table, page 4",
+      "url": "https://usa.yamaha.com/files/download/other_assets/7/794817/reface_en_dl_b0.pdf#page=4"
+    }
+  ],
+  "abilities": [
+    "Keyboard notes",
+    "Oscillator CC",
+    "Filter CC",
+    "Envelope CC",
+    "Effects CC"
+  ],
+  "hardwareControls": [
+    "37 keys",
+    "Oscillator sliders",
+    "Filter sliders",
+    "Envelope sliders",
+    "Effect sliders"
+  ],
+  "notice": "This profile is for reface CS, not DX, CP or YC. Enable MIDI Control on the instrument for these panel CC messages. GUI controls perform MIDI into the chain; select a MIDI output to send them to the hardware.",
+  "controls": [
+    {
+      "id": "cutoff",
+      "label": "Filter cutoff",
+      "cc": 74,
+      "widget": "slider"
+    },
+    {
+      "id": "resonance",
+      "label": "Filter resonance",
+      "cc": 71,
+      "widget": "slider"
+    },
+    {
+      "id": "texture",
+      "label": "Oscillator texture",
+      "cc": 81,
+      "widget": "slider"
+    },
+    {
+      "id": "osc-mod",
+      "label": "Oscillator modulation",
+      "cc": 82,
+      "widget": "slider"
+    },
+    {
+      "id": "lfo-depth",
+      "label": "LFO depth",
+      "cc": 77,
+      "widget": "slider"
+    },
+    {
+      "id": "lfo-speed",
+      "label": "LFO speed",
+      "cc": 76,
+      "widget": "slider"
+    },
+    {
+      "id": "eg-balance",
+      "label": "Filter/amp envelope balance",
+      "cc": 83,
+      "widget": "slider"
+    },
+    {
+      "id": "attack",
+      "label": "Attack",
+      "cc": 73,
+      "widget": "slider"
+    },
+    {
+      "id": "decay",
+      "label": "Decay",
+      "cc": 75,
+      "widget": "slider"
+    },
+    {
+      "id": "sustain-level",
+      "label": "Sustain level",
+      "cc": 79,
+      "widget": "slider"
+    },
+    {
+      "id": "release",
+      "label": "Release",
+      "cc": 72,
+      "widget": "slider"
+    },
+    {
+      "id": "effect-depth",
+      "label": "Effect depth",
+      "cc": 18,
+      "widget": "slider"
+    },
+    {
+      "id": "effect-rate",
+      "label": "Effect rate",
+      "cc": 19,
+      "widget": "slider"
+    }
+  ],
+  "ids": [
+    "yamaha-reface-cs"
+  ],
+  "icon": "icon.svg",
+  "modes": [],
+  "gui": {
+    "type": "column",
+    "gap": "0.65rem",
+    "children": [
+      {
+        "type": "status"
+      },
+      {
+        "type": "image",
+        "src": "panel.svg",
+        "alt": "Yamaha reface CS layout illustration"
+      },
+      {
+        "type": "notes"
+      },
+      {
+        "type": "channel"
+      },
+      {
+        "type": "section",
+        "label": "Documented MIDI controls",
+        "children": [
+          {
+            "type": "grid",
+            "columns": 2,
+            "children": [
+              {
+                "type": "controls"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "guide",
+        "label": "Hardware and MIDI documentation"
+      }
+    ]
+  }
+}

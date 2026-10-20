@@ -36,6 +36,19 @@ export default class OutputManager extends EventTarget implements IAudioOutput{
 	static ID:number = 0
 
 	#outputs:IAudioOutput[] = []
+    #disabled = new Set<IAudioOutput>()
+
+    isEnabled(output: IAudioOutput): boolean { return !this.#disabled.has(output) }
+
+    setEnabled(output: IAudioOutput, enabled: boolean): void {
+        if (!this.#outputs.includes(output) || enabled === this.isEnabled(output)) return
+        if (enabled) this.#disabled.delete(output)
+        else {
+            this.#disabled.add(output)
+            this.release(output)
+        }
+        this.dispatchEvent(new Event(EVENT_OUTPUTS_UPDATED))
+    }
     #configurationListeners = new Map<IAudioOutput, () => void>()
 
 	get uuid():string{
@@ -95,6 +108,7 @@ export default class OutputManager extends EventTarget implements IAudioOutput{
 	 * @param output 
 	 */
 	remove(output:IAudioOutput){
+		this.#disabled.delete(output)
 		this.release(output)
         const listener = this.#configurationListeners.get(output)
         if (listener && output instanceof EventTarget) output.removeEventListener(EVENT_CONFIGURATION_CHANGED, listener)
@@ -150,7 +164,7 @@ export default class OutputManager extends EventTarget implements IAudioOutput{
 	 * @returns 
 	 */
 	async triggerAudioCommandOnDevice(command:IAudioCommand, output:IAudioOutput):Promise<IAudioCommand>{
-        if (!this.#outputs.includes(output)) return command
+        if (!this.#outputs.includes(output) || !this.isEnabled(output)) return command
         if (command.type !== NOTE_ON && command.type !== NOTE_OFF) {
             if (output.sendCommand) await enqueue(output, () => output.sendCommand!(command))
             return command
@@ -222,6 +236,7 @@ export default class OutputManager extends EventTarget implements IAudioOutput{
 	 */
 	destroy(): void {
 		this.allNotesOff()
+        this.#disabled.clear()
         for (const [output, listener] of this.#configurationListeners) {
             if (output instanceof EventTarget) output.removeEventListener(EVENT_CONFIGURATION_CHANGED, listener)
         }

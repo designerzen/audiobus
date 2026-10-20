@@ -421,6 +421,12 @@ export default class IOChain extends EventTarget {
         this.#inputManager.remove(input)
     }
 
+    setInputEnabled(input: AbstractInput, enabled: boolean): void {
+        if (!this.inputs.includes(input) || enabled === this.#inputManager.isEnabled(input)) return
+        if (!enabled) this.clearNoteCommands()
+        this.#inputManager.setEnabled(input, enabled)
+    }
+
     /**
      * Fetch a specific input by ID
      * @param name 

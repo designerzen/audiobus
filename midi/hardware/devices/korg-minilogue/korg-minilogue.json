@@ -1,0 +1,135 @@
+{
+  "$schema": "../profile.schema.json",
+  "schemaVersion": 1,
+  "id": "korg-minilogue",
+  "name": "Korg minilogue",
+  "manufacturer": "Korg",
+  "manufacturerUrl": "https://www.korg.com/",
+  "productUrl": "https://www.korg.com/us/products/synthesizers/minilogue/",
+  "portNames": [
+    "minilogue",
+    "minilogue KBD/KNOB",
+    "minilogue SOUND"
+  ],
+  "description": "Four-voice analog synthesizer with MIDI panel control.",
+  "documentation": [
+    {
+      "title": "minilogue owner’s manual: MIDI implementation chart, page 63",
+      "url": "https://cdn.korg.com/us/support/download/files/23be1d77cac2c42e6f6c586cf0f75ffb.pdf#page=63"
+    }
+  ],
+  "abilities": [
+    "Velocity-sensitive keyboard",
+    "Filter CC",
+    "Envelope CC",
+    "LFO CC"
+  ],
+  "hardwareControls": [
+    "37 keys",
+    "Filter knobs",
+    "Envelope knobs",
+    "LFO controls",
+    "Assignable slider"
+  ],
+  "notice": "Original minilogue only; minilogue xd uses a different implementation. Enable MIDI Tx CC on the hardware to send panel movements and MIDI Rx CC to receive them. GUI controls perform MIDI into this chain; route the chain to a MIDI output to control the synth.",
+  "controls": [
+    {
+      "id": "cutoff",
+      "label": "Filter cutoff",
+      "cc": 43,
+      "widget": "slider"
+    },
+    {
+      "id": "resonance",
+      "label": "Filter resonance",
+      "cc": 44,
+      "widget": "slider"
+    },
+    {
+      "id": "filter-eg",
+      "label": "Filter envelope amount",
+      "cc": 45,
+      "widget": "slider"
+    },
+    {
+      "id": "amp-attack",
+      "label": "Amp attack",
+      "cc": 16,
+      "widget": "slider"
+    },
+    {
+      "id": "amp-decay",
+      "label": "Amp decay",
+      "cc": 17,
+      "widget": "slider"
+    },
+    {
+      "id": "amp-sustain",
+      "label": "Amp sustain",
+      "cc": 18,
+      "widget": "slider"
+    },
+    {
+      "id": "amp-release",
+      "label": "Amp release",
+      "cc": 19,
+      "widget": "slider"
+    },
+    {
+      "id": "lfo-rate",
+      "label": "LFO rate",
+      "cc": 24,
+      "widget": "slider"
+    },
+    {
+      "id": "lfo-depth",
+      "label": "LFO depth",
+      "cc": 26,
+      "widget": "slider"
+    }
+  ],
+  "ids": [
+    "korg-minilogue"
+  ],
+  "icon": "icon.svg",
+  "modes": [],
+  "gui": {
+    "type": "column",
+    "gap": "0.65rem",
+    "children": [
+      {
+        "type": "status"
+      },
+      {
+        "type": "image",
+        "src": "panel.svg",
+        "alt": "Korg minilogue layout illustration"
+      },
+      {
+        "type": "notes"
+      },
+      {
+        "type": "channel"
+      },
+      {
+        "type": "section",
+        "label": "Documented MIDI controls",
+        "children": [
+          {
+            "type": "grid",
+            "columns": 2,
+            "children": [
+              {
+                "type": "controls"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "guide",
+        "label": "Hardware and MIDI documentation"
+      }
+    ]
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "$schema": "../profile.schema.json",
+  "schemaVersion": 1,
+  "id": "roland-a-49",
+  "name": "Roland A-49",
+  "manufacturer": "Roland",
+  "manufacturerUrl": "https://www.roland.com/",
+  "productUrl": "https://www.roland.com/uk/products/a-49/",
+  "portNames": [
+    "A-49",
+    "A-49 MIDI"
+  ],
+  "description": "MIDI keyboard with expressive lever, assignable knobs and pedal inputs.",
+  "documentation": [
+    {
+      "title": "A-49 owner’s manual: factory assignments, pages 24–32; MIDI chart, page 39",
+      "url": "https://static.roland.com/assets/media/pdf/A-49_eng09_W.pdf"
+    }
+  ],
+  "abilities": [
+    "Keyboard notes",
+    "Pitch bend and modulation",
+    "Channel pressure",
+    "Program change",
+    "Pedal expression"
+  ],
+  "hardwareControls": [
+    "49 keys",
+    "C1 and C2 knobs",
+    "Pitch/modulation lever",
+    "D-BEAM",
+    "Hold and expression pedal inputs"
+  ],
+  "notice": "CC values reflect factory assignments. Reassigned knobs, pedals and D-BEAM settings may differ. Pressure represents the assignable aftertouch function, not key aftertouch. The GUI performs MIDI into this chain and does not configure the A-49.",
+  "controls": [
+    {
+      "id": "pitch-bend",
+      "label": "Pitch bend",
+      "message": {
+        "type": "pitchBend"
+      },
+      "widget": "slider",
+      "default": 8192
+    },
+    {
+      "id": "modulation",
+      "label": "Modulation lever",
+      "cc": 1,
+      "widget": "slider"
+    },
+    {
+      "id": "cutoff",
+      "label": "C1 cutoff",
+      "cc": 74,
+      "widget": "slider"
+    },
+    {
+      "id": "resonance",
+      "label": "C2 resonance",
+      "cc": 71,
+      "widget": "slider"
+    },
+    {
+      "id": "sustain",
+      "label": "Sustain pedal (CC64)",
+      "cc": 64,
+      "widget": "toggle"
+    },
+    {
+      "id": "expression",
+      "label": "Expression pedal",
+      "cc": 11,
+      "widget": "slider"
+    },
+    {
+      "id": "pressure",
+      "label": "Assignable channel pressure",
+      "message": {
+        "type": "channelPressure"
+      },
+      "widget": "slider"
+    },
+    {
+      "id": "program",
+      "label": "Program change (0–127)",
+      "message": {
+        "type": "programChange"
+      },
+      "widget": "slider"
+    }
+  ],
+  "ids": [
+    "roland-a-49"
+  ],
+  "icon": "icon.svg",
+  "modes": [],
+  "gui": {
+    "type": "column",
+    "gap": "0.65rem",
+    "children": [
+      {
+        "type": "status"
+      },
+      {
+        "type": "image",
+        "src": "panel.svg",
+        "alt": "Roland A-49 layout illustration"
+      },
+      {
+        "type": "notes"
+      },
+      {
+        "type": "channel"
+      },
+      {
+        "type": "section",
+        "label": "Documented MIDI controls",
+        "children": [
+          {
+            "type": "grid",
+            "columns": 2,
+            "children": [
+              {
+                "type": "controls"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "guide",
+        "label": "Hardware and MIDI documentation"
+      }
+    ]
+  }
+}

@@ -144,7 +144,7 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
 		return new Class(options.audioContext)
 	}
 	
-	return new Class(options)
+	return new Class(type === OUTPUT_TYPES.WEBMIDI ? { autoConnect: true, ...options } : options)
 }
 
 /**

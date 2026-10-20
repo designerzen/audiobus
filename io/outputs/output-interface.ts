@@ -17,6 +17,7 @@ export interface IAudioOutput{
 	getNoteKey?(command: IAudioCommand): string
 
 	// optional
+	readonly requiresConnectionControl?: boolean
 	readonly output?: AudioNode
 	connect?():Promise<void|Function>|Function
 	disconnect?():Promise<void|Function>|Function

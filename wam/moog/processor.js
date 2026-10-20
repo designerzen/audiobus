@@ -1,9 +1,14 @@
 /**
- * Photosynth MoogFF port. Original Java: Federico Fontana, August 2007.
- * SuperCollider C++: Dan Stowell. AudioWorklet adaptation: @designerzen,
- * based on mohayonao's timbre.js MoogFF implementation.
- * "Preserving the Digital Structure of the Moog VCF", ICMC 2007.
+ * Fontana Moog VCF model, adapted from the Photosynth AudioWorklet.
+ * Original Java: Federico Fontana, August 2007.
+ * SuperCollider C++: Dan Stowell. Photosynth AudioWorklet: @designerzen.
+ * Fontana, "Preserving the Structure of the Moog VCF in the Digital Domain",
+ * ICMC 2007, pp. 291-294.
+ * https://quod.lib.umich.edu/i/icmc/bbp2372.2007.062
+ * Author-derived reference: SuperCollider server/plugins/FilterUGens.cpp, MoogFF.
  * https://doc.sccode.org/Classes/MoogFF.html
+ * Preserve the four-section, delay-free feedback equations. The timbre.js
+ * output gain/clipping and its omitted second-stage input update are excluded.
  * This function is injected into the worklet and must remain self-contained.
  */
 export default function registerMoogProcessor(moduleId, definitions) {
@@ -18,6 +23,35 @@ export default function registerMoogProcessor(moduleId, definitions) {
         }
         _generateWamParameterInfo() {
             return Object.fromEntries(Object.entries(definitions).map(([id, config]) => [id, new WamParameterInfo(id, config)]))
+        }
+        _filterCoefficients(frequency) {
+            // Bilinear transform with cutoff prewarping. Restrict only to the
+            // valid digital frequency domain (strictly below Nyquist).
+            const cutoff = Math.max(0, Math.min(rate * (0.5 - 1e-6), frequency))
+            if (cutoff === this.filterCutoff) return
+            const T = 1 / rate
+            const wcD = (2 / T) * Math.tan(T * Math.PI * cutoff)
+            const TwcD = T * wcD
+            this.filterCutoff = cutoff
+            this.b0 = TwcD / (TwcD + 2)
+            this.a1 = (TwcD - 2) / (TwcD + 2)
+        }
+        _filterSample(input, state, b0, a1, k) {
+            // Four cascaded sections H1(z) = b0(1 + z^-1)/(1 + a1 z^-1).
+            // With y = b0^4 u + s and u = input - k*y, solve the
+            // current-sample feedback loop explicitly; do not delay y.
+            const s = state.s4 + b0 * (state.s3 + b0 * (state.s2 + b0 * state.s1))
+            const b = b0 ** 4
+            const output = (b * input + s) / (1 + k * b)
+            const u = input - k * output
+            const y1 = b0 * u + state.s1
+            const y2 = b0 * y1 + state.s2
+            const y3 = b0 * y2 + state.s3
+            state.s1 = b0 * u - a1 * y1
+            state.s2 = b0 * y1 - a1 * y2
+            state.s3 = b0 * y2 - a1 * y3
+            state.s4 = b0 * y3 - a1 * output
+            return output
         }
         _onMidi({ bytes }) {
             const [status, note, velocity] = bytes
@@ -66,11 +100,8 @@ export default function registerMoogProcessor(moduleId, definitions) {
                 return 0
             }
             for (let i = start; i < end; i++) {
-                const cutoff = Math.max(20, Math.min(rate * 0.45, value('frequency', i)))
-                const warped = Math.tan(Math.PI * cutoff / rate)
-                const b0 = warped / (warped + 1)
-                const a1 = (warped - 1) / (warped + 1)
-                const b4 = b0 ** 4
+                this._filterCoefficients(value('frequency', i))
+                const b0 = this.b0, a1 = this.a1
                 const resonance = Math.max(0, Math.min(4, value('gain', i)))
                 const waveform = Math.round(value('waveform', i))
                 const attack = 1 / (Math.max(0.001, value('attack', i)) * rate)
@@ -87,19 +118,10 @@ export default function registerMoogProcessor(moduleId, definitions) {
                     v.phase = (phase + step) % 1
                     v.envelope = v.released ? v.envelope * release : Math.min(1, v.envelope + attack)
                     const input = oscillator * v.velocity * v.envelope
-                    const loop = v.s4 + b0 * (v.s3 + b0 * (v.s2 + b0 * v.s1))
-                    const output = (b4 * input + loop) / (1 + b4 * resonance)
-                    const u = input - resonance * output
-                    const y1 = b0 * u + v.s1
-                    const y2 = b0 * y1 + v.s2
-                    const y3 = b0 * y2 + v.s3
-                    v.s1 = b0 * u - a1 * y1
-                    v.s2 = b0 * y1 - a1 * y2
-                    v.s3 = b0 * y2 - a1 * y3
-                    v.s4 = b0 * y3 - a1 * output
-                    mixed += output
+                    mixed += this._filterSample(input, v, b0, a1, resonance)
                 }
-                const sample = Math.tanh(mixed * value('volume', i))
+                // Fontana's model is linear: no extra saturator or clipping.
+                const sample = mixed * value('volume', i)
                 for (const channel of channels) channel[i] = sample
             }
             this.voices = this.voices.filter(v => !v.released || v.envelope > 0.00001)
