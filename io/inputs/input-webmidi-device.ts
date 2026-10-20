@@ -1,4 +1,4 @@
-import { EVENT_CONFIGURATION_CHANGED, EVENT_MIDIMESSAGE, EVENT_DEVICE_LIST_CHANGED, EVENT_MIDI_CHANNELS_CHANGED } from '../../event-constants.ts'
+import { EVENT_CONFIGURATION_CHANGED, EVENT_MIDIMESSAGE, EVENT_DEVICE_LIST_CHANGED, EVENT_MIDI_CHANNELS_CHANGED, EVENT_READY } from '../../event-constants.ts'
 import { midiToCommand } from '../../midi/midi-command-conversion.ts'
 import AbstractInput from "./abstract-input.ts"
 import { createAudioCommand } from "../../audio-command-factory.ts"
@@ -27,6 +27,7 @@ export default class InputWebMIDIDevice extends AbstractInput implements IAudioI
     get isEnabled(): boolean { return this.#webMIDIEnabled }
     get inputDevices(): Input[] { return sharedWebMidi.inputs.filter(device => acceptsMidiInput(this.options, device.id, 0)) }
     get midiInput() { return this }
+    readonly requiresConnectionControl = false
     hasMidiInput(): boolean { return true }
 
     constructor(options: Record<string, any> = {}) {
@@ -48,6 +49,15 @@ export default class InputWebMIDIDevice extends AbstractInput implements IAudioI
             this.dispatchEvent(new CustomEvent(EVENT_DEVICE_LIST_CHANGED, { detail }))
         }) as EventListener, { signal: this.#abort.signal })
         sharedWebMidi.addEventListener(EVENT_MIDI_CHANNELS_CHANGED, () => this.#gui?.refresh(), { signal: this.#abort.signal })
+        // Follow access granted by the global user gesture; creating an Input
+        // must never request MIDI permission on its own.
+        const followSharedAccess = () => {
+            if (this.options.autoConnect && !this.#destroyed && sharedWebMidi.isReady) {
+                void this.connect().catch(error => console.warn('MIDI input connection failed', error))
+            }
+        }
+        sharedWebMidi.addEventListener(EVENT_READY, followSharedAccess, { signal: this.#abort.signal })
+        followSharedAccess()
     }
 
     async connect(): Promise<void> {
@@ -65,6 +75,7 @@ export default class InputWebMIDIDevice extends AbstractInput implements IAudioI
     }
 
     async disconnect(): Promise<void> {
+        this.options.autoConnect = false
         if (this.#connecting) await this.#connecting.catch(() => {})
         this.releaseNotes()
         this.#webMIDIEnabled = false

@@ -1,5 +1,5 @@
 import { WebMidi, type Input, type Output } from 'webmidi'
-import { EVENT_CONNECTED, EVENT_DISCONNECTED, EVENT_MIDIMESSAGE, EVENT_DEVICE_LIST_CHANGED, EVENT_MIDI_CHANNELS_CHANGED } from '../event-constants'
+import { EVENT_CONNECTED, EVENT_DISCONNECTED, EVENT_MIDIMESSAGE, EVENT_DEVICE_LIST_CHANGED, EVENT_MIDI_CHANNELS_CHANGED, EVENT_READY } from '../event-constants'
 
 export interface WebMidiDeviceChange {
     inputs: Input[]
@@ -19,6 +19,7 @@ export class SharedWebMidi extends EventTarget {
     #consumers = new Map<object, { matches: (id: string) => boolean; active: () => boolean }>()
     #starting?: Promise<void>
     #running = false
+    get isReady(): boolean { return this.#running }
     get inputs(): Input[] { return [...this.#inputs.values()].map(item => item.port) }
     get outputs(): Output[] { return [...this.#outputs] }
     observedChannels(id: string): number[] { return [...this.#channels.get(id) ?? []].sort((a, b) => a - b) }
@@ -37,6 +38,7 @@ export class SharedWebMidi extends EventTarget {
                     WebMidi.addListener(EVENT_DISCONNECTED, this.#deviceChanged)
                     this.#running = true
                     this.#sync()
+                    this.dispatchEvent(new Event(EVENT_READY))
                 })().finally(() => { this.#starting = undefined })
                 await this.#starting
             }

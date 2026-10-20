@@ -87,7 +87,8 @@ const loadSupportingLibraries = async (type: string): Promise<any> => {
  */
 const createInput = async (type: string, options={} ): Promise<IAudioInput> => {
 	const Class = await loadSupportingLibraries(type)
-	return new Class(Object.hasOwn(MIDI_DEVICE_PROFILES, type) ? { ...options, profileId: type } : options)
+	return new Class(Object.hasOwn(MIDI_DEVICE_PROFILES, type) ? { ...options, profileId: type }
+        : type === INPUT_TYPES.WEBMIDI ? { autoConnect: true, ...options } : options)
 }
 
 /**
