@@ -11,6 +11,7 @@ import { insertCLAPEffect } from './clap-mixer'
 
 export default class CLAPInstrument extends EventTarget implements IAudioOutput {
     readonly uuid = `CLAP-Instrument-${crypto.randomUUID()}`
+    readonly requiresConnectionControl = false
     readonly output: GainNode
     readonly options: { defaultPatchId?: string; parameters?: Record<string, number>; mixer?: GainNode; routeAudio?: boolean }
     private node?: CLAPNode
@@ -140,7 +141,7 @@ export default class CLAPInstrument extends EventTarget implements IAudioOutput 
         if (this.gui) return this.gui
         this.gui = document.createElement('div')
         this.gui.className = 'webclap-gui nodrag nopan nowheel'
-        this.gui.style.cssText = 'width:560px;max-width:100%;min-width:260px;overflow:auto;padding:12px;'
+        this.gui.style.cssText = 'display:flex;flex-direction:column;flex:1;min-width:0;width:100%;padding:0;'
         try { await this.connect(); if (!this.gui.childElementCount) await this.renderGui() }
         catch (error) { this.gui.textContent = `WebCLAP could not load: ${String(error)}` }
         return this.gui
@@ -152,14 +153,6 @@ export default class CLAPInstrument extends EventTarget implements IAudioOutput 
         gui.replaceChildren()
         const patch = this.patch
         if (patch) {
-            const heading = document.createElement('h3')
-            heading.textContent = patch.title ?? patch.name
-            const description = document.createElement('p')
-            description.textContent = patch.description ?? this.description
-            const classification = document.createElement('p')
-            classification.setAttribute('aria-label', 'Plugin classification')
-            classification.textContent = [`Category: ${patch.category ?? 'WebCLAP'}`, `Type: ${patch.type ?? 'audio'}`, `Subtype: ${patch.subtype ?? 'effect'}`].join(' · ')
-            gui.append(heading, description, classification)
             if (patch.attribution) {
                 const credits = document.createElement('details')
                 credits.className = 'webclap-attribution'
@@ -182,37 +175,14 @@ export default class CLAPInstrument extends EventTarget implements IAudioOutput 
                 gui.append(credits)
             }
         }
-        const label = document.createElement('label')
-        label.textContent = 'WebCLAP plugin '
-        const select = document.createElement('select')
-        select.setAttribute('aria-label', 'WebCLAP plugin')
-        for (const patch of this.patches) {
-            const option = document.createElement('option')
-            option.textContent = `${patch.author ?? 'WebCLAP'} — ${patch.name}`
-            option.value = patch.id
-            option.selected = patch.id === this.patch?.id
-            select.append(option)
-        }
-        select.value = this.patch?.id ?? ''
-        const status = document.createElement('p')
-        status.setAttribute('role', 'status')
-        status.textContent = this.patch?.id === 'com.plinken.pulze' ? 'Load a sample into a pad to play Pulze. MIDI → drum pads → mixer'
-            : node.descriptor.features.includes('instrument') ? 'MIDI → instrument → mixer' : 'Mix → WebCLAP effect → master output'
-        select.addEventListener('change', async () => {
-            select.disabled = true
-            try { await this.loadPatch(select.value) }
-            catch (error) { status.textContent = `Could not load plugin: ${String(error)}`; select.value = this.patch?.id ?? '' }
-            finally { select.disabled = false }
-        })
-        label.append(select)
-        gui.append(label, status)
         const controls = document.createElement('details')
+        controls.className = 'webclap-parameters'
         controls.open = !node.openInterface
         controls.append(Object.assign(document.createElement('summary'), { textContent: 'Parameters' }))
         const parameters = document.createElement('div')
         parameters.dataset.clapParameters = ''
         controls.append(parameters)
-        gui.append(controls)
+        gui.prepend(controls)
         await this.refreshParameters()
         if (this.gui !== gui || this.node !== node) return
         if (node.openInterface) {
@@ -220,8 +190,15 @@ export default class CLAPInstrument extends EventTarget implements IAudioOutput 
                 const ui = await openCLAPInterface(node)
                 if (this.node !== node || this.gui !== gui) { ui.close(); return }
                 this.closeInterface = ui.close
-                gui.insertBefore(ui.frame, controls)
-            } catch (error) { controls.open = true; status.textContent = `Plugin interface unavailable; use parameters. ${String(error)}` }
+                ui.frame.classList.add('webclap-editor')
+                gui.prepend(ui.frame)
+            } catch (error) {
+                controls.open = true
+                const status = document.createElement('p')
+                status.setAttribute('role', 'status')
+                status.textContent = `Plugin interface unavailable; use parameters. ${String(error)}`
+                gui.prepend(status)
+            }
         }
     }
     private async refreshParameters(): Promise<void> {

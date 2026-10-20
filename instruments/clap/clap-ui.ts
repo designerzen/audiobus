@@ -37,7 +37,7 @@ export async function openCLAPInterface(node: CLAPNode): Promise<{ frame: HTMLIF
         const prefix = new URL(webclapUrl(`ui/${id}/`), document.baseURI).href
         const frame = node.openInterface({ filePrefix: prefix + 'file', resourcePrefix: prefix + 'resource' })
         frame.title = `${node.descriptor.name} plugin controls`
-        frame.style.cssText = 'display:block;width:100%;height:480px;min-height:280px;border:0;background:white;color-scheme:normal;'
+        frame.style.cssText = 'display:block;width:100%;flex:1 0 480px;min-height:480px;border:0;background:white;color-scheme:normal;'
         return { frame, close: () => { node.closeInterface?.(); frame.remove(); providers.delete(id) } }
     } catch (error) { providers.delete(id); throw error }
 }
