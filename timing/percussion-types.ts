@@ -16,6 +16,7 @@ export interface PercussionHit {
 	triggerAt: number
 	open?: boolean
 	lengthScale?: number
+	tuningNote?: number
 }
 
 export interface IPercussionOutput {

@@ -1,5 +1,6 @@
 import type { DeviceClassification } from "../io/device-classification.ts"
 import { defineDevice } from '../io/device-definition'
+import { OUTPUT_PREVIEWS } from '../io/output-previews'
 /**
  * Factory interface for creating instrument UI factories
  * Bridges InstrumentFactory with the UI layer
@@ -18,6 +19,7 @@ export interface InstrumentUIFactory extends DeviceClassification<'engine'> {
 	name: string
 	description: string
 	category: string
+	preview?: string
 	isAvailable: () => boolean
 	create: (audioContext: BaseAudioContext | AudioContext, options?: Record<string, any>) => IAudioOutput | Promise<IAudioOutput>
 }
@@ -63,6 +65,7 @@ const metadataToUIFactory = (metadata: InstrumentMetadata): InstrumentUIFactory 
 	name: metadata.name,
 	description: metadata.description,
 	category: metadata.category,
+	preview: OUTPUT_PREVIEWS[`instrument:${metadata.id}`],
 	isAvailable: () => {
 		// Check if required external data is available
 		const requiredData = metadata.requiresExternalData ?? []

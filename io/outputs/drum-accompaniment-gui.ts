@@ -4,7 +4,6 @@ import {
 	type DrumAccompanimentSettings,
 	type DrumGenre,
 } from './drum-accompaniment-settings.ts'
-import { DRUM_PERFORMANCE_PRESETS } from '../../timing/drum-arranger.ts'
 import { DRUM_COMPRESSOR_PARAMETERS } from '../../effects/drum-compressor.ts'
 import {
 	EVENT_CHANGE,
@@ -32,7 +31,8 @@ export function createDrumAccompanimentGui(device: OutputDrumAccompaniment): Dru
 	heading.textContent = 'Drum accompaniment'
 	heading.style.margin = '0'
 	const info = document.createElement('p')
-	info.textContent = 'Plays while notes are held. Add alongside your instrument output.'
+	info.textContent =
+		'Follows the global transport and tempo. Note activity adds subtle variations.'
 	Object.assign(info.style, { margin: '0', fontSize: '0.85em', opacity: '0.75' })
 	element.append(heading, info)
 	const advanced = document.createElement('details')
@@ -66,7 +66,7 @@ export function createDrumAccompanimentGui(device: OutputDrumAccompaniment): Dru
 		return row
 	}
 	const select = (
-		key: 'genre' | 'groove' | 'performancePreset',
+		key: 'genre' | 'groove',
 		name: string,
 		entries: readonly (readonly [string, string])[],
 	) => {
@@ -77,14 +77,9 @@ export function createDrumAccompanimentGui(device: OutputDrumAccompaniment): Dru
 		control.addEventListener(EVENT_CHANGE, () => {
 			if (key === 'genre') device.configure({ genre: control.value as DrumGenre })
 			else if (key === 'groove') device.configure({ groove: control.value })
-			else
-				device.configure({
-					performancePreset:
-						control.value as DrumAccompanimentSettings['performancePreset'],
-				})
 		})
 		controls.set(key, control)
-		label(name, control, key === 'performancePreset' ? advanced : element)
+		label(name, control)
 		return control
 	}
 	select(
@@ -93,17 +88,26 @@ export function createDrumAccompanimentGui(device: OutputDrumAccompaniment): Dru
 		Object.entries(DRUM_GENRES).map(([id, genre]) => [id, genre.title]),
 	)
 	const groove = select('groove', 'Groove', [])
-	select('performancePreset', 'Performance', [
-		['auto', 'Automatic'],
-		...Object.values(DRUM_PERFORMANCE_PRESETS).map(
-			(preset) => [preset.id, preset.title] as const,
-		),
-	])
+	const tuning = document.createElement('select')
+	tuning.name = 'tuningNote'
+	tuning.setAttribute('aria-label', 'Tuning note')
+	const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B']
+	for (let note = 0; note < 128; note++)
+		tuning.add(
+			option(
+				NOTE_NAMES[note % 12] + (Math.floor(note / 12) - 1) + ' (' + note + ')',
+				String(note),
+			),
+		)
+	tuning.addEventListener(EVENT_CHANGE, () =>
+		device.configure({ tuningNote: Number(tuning.value) }),
+	)
+	controls.set('tuningNote', tuning)
+	label('Tuning note', tuning)
 
 	for (const [key, name, min, max, step] of [
-		['bpm', 'Tempo (BPM)', 30, 300, 1],
 		['volume', 'Volume', 0, 1, 0.01],
-		['swing', 'Swing', 0, 0.9, 0.01],
+		['activityResponse', 'Activity variations', 0, 1, 0.01],
 		['energy', 'Energy', 0, 1, 0.01],
 		['density', 'Density', 0, 1, 0.01],
 		['tension', 'Tension', 0, 1, 0.01],
@@ -113,23 +117,18 @@ export function createDrumAccompanimentGui(device: OutputDrumAccompaniment): Dru
 		const input = document.createElement('input')
 		input.name = key
 		input.setAttribute('aria-label', name)
-		input.type = key === 'bpm' ? 'number' : 'range'
+		input.type = 'range'
 		input.min = String(min)
 		input.max = String(max)
 		input.step = String(step)
 		input.addEventListener(EVENT_INPUT, () => device.configure({ [key]: input.valueAsNumber }))
-		const row = label(
-			name,
-			input,
-			['bpm', 'volume', 'swing'].includes(key) ? element : advanced,
-		)
+		const row = label(name, input, key === 'volume' ? element : advanced)
 		const output = document.createElement('output')
 		row.append(output)
 		controls.set(key, input)
 		values.set(key, output)
 	}
 	for (const [key, name] of [
-		['followDynamics', 'Follow input velocity'],
 		['rapidPercussion', 'Rapid fills & tuplets'],
 		['muteKick', 'Mute kick'],
 		['muteSnare', 'Mute snare'],
@@ -182,21 +181,11 @@ export function createDrumAccompanimentGui(device: OutputDrumAccompaniment): Dru
 	}
 	const actions = document.createElement('div')
 	Object.assign(actions.style, { display: 'flex', gap: '0.5rem' })
-	const preview = document.createElement('button')
-	preview.type = 'button'
-	preview.addEventListener(EVENT_CLICK, async () => {
-		try {
-			await device.togglePreview()
-			info.textContent = 'Plays while notes are held. Add alongside your instrument output.'
-		} catch {
-			info.textContent = 'Audio could not start. Enable audio and try again.'
-		}
-	})
 	const fill = document.createElement('button')
 	fill.type = 'button'
 	fill.textContent = 'Request fill'
 	fill.addEventListener(EVENT_CLICK, () => device.requestFill())
-	actions.append(preview, fill)
+	actions.append(fill)
 	element.append(advanced, compressor, actions)
 
 	let lastGenre: DrumGenre | undefined
@@ -227,12 +216,8 @@ export function createDrumAccompanimentGui(device: OutputDrumAccompaniment): Dru
 				control.disabled = !settings.compressorEnabled
 				if (output)
 					output.textContent = `${Number((Number(value) * parameter.scale).toFixed(1))}${parameter.unit === ':1' ? '' : ' '}${parameter.unit}`
-			} else if (output)
-				output.textContent =
-					key === 'bpm' ? String(value) : `${Math.round(Number(value) * 100)}%`
+			} else if (output) output.textContent = `${Math.round(Number(value) * 100)}%`
 		}
-		preview.textContent = device.isPreviewing ? 'Stop preview' : 'Preview groove'
-		preview.setAttribute('aria-pressed', String(device.isPreviewing))
 	}
 	device.addEventListener(EVENT_CONFIGURATION_CHANGED, sync)
 	sync()

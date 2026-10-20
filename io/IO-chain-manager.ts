@@ -18,6 +18,7 @@ import IOChainFactory, { type IOChainPreset } from "./IO-chain-factory"
 import type { ITimerControl as Timer } from "netronome"
 import type { IAudioInput } from "./inputs/input-interface"
 import type { IAudioOutput } from "./outputs/output-interface"
+import type { AudioClockTick } from '../timing/audio-clock-tick.ts'
 import type { IAudioCommand } from "audiobus/audio-command-interface"
 import type AudioEvent from "audiobus/audio-event"
 
@@ -69,6 +70,7 @@ export class IOChainManager extends EventTarget {
     clockCommandHandler?: (command: IAudioCommand) => boolean
     externallyControlledTransport = false
     #handledControls = new WeakMap<object, boolean>()
+    #clockOutputs = new Set<IAudioOutput>()
 
     get transportRunning(): boolean { return this.externallyControlledTransport ? this.#options.timer.isRunning : this.#transportRunning ?? this.#options.timer.isRunning }
 
@@ -84,6 +86,7 @@ export class IOChainManager extends EventTarget {
             } else {
                 await timer.stop()
                 this.#transportRunning = false
+                this.stopClock()
                 this.chains.forEach(chain => chain.clearNoteCommands())
                 await Promise.all([...new Set(this.chains.flatMap(chain => chain.outputs))].map(output => OutputManager.settled(output)))
                 if (action === 'reset') timer.resetTimer()
@@ -133,6 +136,24 @@ export class IOChainManager extends EventTarget {
         const removed = [...this.#devices].filter(([id, entry]) => next.get(id)?.device !== entry.device)
         this.#devices = next
         removed.forEach(([id, entry]) => { void this.disposeDevice(id, entry.device) })
+        this.syncClockOutputs()
+    }
+
+    private syncClockOutputs(): void {
+        const next = new Set(this.chains.filter(chain => chain.isActive && !chain.isDestroyed).flatMap(chain =>
+            chain.outputs.filter(output => output.onClockTick && chain.outputManager.isEnabled(output))))
+        for (const output of this.#clockOutputs) if (!next.has(output)) output.stopClock?.()
+        this.#clockOutputs = next
+    }
+
+    updateClock(tick: Readonly<AudioClockTick>): void {
+        if (!this.transportRunning) { this.stopClock(); return }
+        this.syncClockOutputs()
+        for (const output of this.#clockOutputs) output.onClockTick?.(tick)
+    }
+
+    stopClock(): void {
+        for (const output of this.#clockOutputs) output.stopClock?.()
     }
 
     private async disposeDevice(id: string, device: any): Promise<void> {

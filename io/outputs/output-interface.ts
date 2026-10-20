@@ -1,4 +1,5 @@
 import type { IAudioCommand } from '../../audio-command-interface.ts'
+import type { AudioClockTick } from '../../timing/audio-clock-tick.ts'
 
 export interface IAudioOutput{
 	get uuid(): string
@@ -17,6 +18,8 @@ export interface IAudioOutput{
 	getNoteKey?(command: IAudioCommand): string
 	/** Set false when control changes preserve the identity of held notes. */
 	readonly configurationAffectsNoteRouting?: boolean
+	onClockTick?(tick: Readonly<AudioClockTick>): void
+	stopClock?(): void
 
 	// optional
 	readonly requiresConnectionControl?: boolean

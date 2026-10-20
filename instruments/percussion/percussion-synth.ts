@@ -1,5 +1,6 @@
 import { GENERAL_MIDI_PERCUSSION_NOTES } from '../../timing/percussion-note-map.ts'
 import type { IPercussionOutput, PercussionHit } from '../../timing/percussion-types.ts'
+import { noteNumberToFrequency } from '../../conversion/note-to-frequency.ts'
 import {
 	DEFAULT_DRUM_COMPRESSOR_SETTINGS,
 	type DrumCompressorSettings,
@@ -77,6 +78,8 @@ export class PercussionSynth implements IPercussionOutput {
 		const at = Math.max(this.context.currentTime, hit.triggerAt)
 		const velocity = Math.min(1, hit.velocity)
 		const scale = hit.lengthScale ?? 1
+		const pitchScale =
+			hit.tuningNote === undefined ? 1 : noteNumberToFrequency(hit.tuningNote) / 42
 		if (part === 'hatClosed' || part === 'hatPedal') {
 			for (const voice of this.voices) {
 				if (voice.part === 'hatOpen' && voice.startAt <= at && voice.stopAt > at) {
@@ -86,7 +89,15 @@ export class PercussionSynth implements IPercussionOutput {
 			}
 		}
 		if (note === 35 || note === 36) {
-			this.tone(part, at, velocity * 0.9, 145, 42, 0.32 * scale, 'sine')
+			this.tone(
+				part,
+				at,
+				velocity * 0.9,
+				145 * pitchScale,
+				42 * pitchScale,
+				0.32 * scale,
+				'sine',
+			)
 		} else if (note === 38 || note === 40 || note === 39) {
 			this.noiseHit(
 				part,
@@ -98,7 +109,15 @@ export class PercussionSynth implements IPercussionOutput {
 				scale,
 			)
 			if (note !== 39)
-				this.tone(part, at, velocity * 0.22, 190, 115, 0.09 * scale, 'triangle')
+				this.tone(
+					part,
+					at,
+					velocity * 0.22,
+					190 * pitchScale,
+					115 * pitchScale,
+					0.09 * scale,
+					'triangle',
+				)
 		} else if ([42, 44, 46, 49, 51, 52, 53, 55, 57, 59, 69, 70, 54, 82, 83].includes(note)) {
 			const duration =
 				part === 'hatOpen' ? 0.24 : part.startsWith('hat') ? 0.045 : note >= 69 ? 0.08 : 0.5
@@ -112,7 +131,7 @@ export class PercussionSynth implements IPercussionOutput {
 				scale,
 			)
 		} else {
-			const frequency = 80 * 2 ** ((note - 41) / 16)
+			const frequency = 80 * 2 ** ((note - 41) / 16) * pitchScale
 			this.tone(
 				part,
 				at,

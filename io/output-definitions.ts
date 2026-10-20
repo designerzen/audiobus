@@ -13,12 +13,14 @@ import type { DeviceClassification, DeviceAttribution } from "./device-classific
 import * as OUTPUT_TYPES from "./outputs/output-types.ts"
 import { CLAP_PATCHES } from '../instruments/clap/clap-catalog'
 import { WAM2_INSTRUMENTS, wam2OutputId } from '../wam/registry'
+import { OUTPUT_PREVIEWS } from './output-previews'
 
 export interface OutputDefinition extends DeviceClassification {
 	id: string
 	name: string
 	description: string
 	icon: string
+	preview?: string
 	category: string
 	title?: string
 	attribution?: DeviceAttribution
@@ -30,7 +32,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		type: 'engine',
 		subtype: 'instrument',
 		name: 'Drum Accompaniment',
-		description: 'Adds drum grooves to incoming notes with genre, swing, dynamics and fill controls',
+		description: 'Plays a steady break on the global clock with note activity variations, tuning and compression',
 		icon: '/icons/device-drums.svg',
 		category: 'Synthesis',
 	},
@@ -245,6 +247,10 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		category: "Synthesis",
 	},
 } satisfies Record<OUTPUT_TYPES.OutputId, OutputDefinition>
+
+for (const definition of Object.values(OUTPUT_DEFINITIONS)) {
+	definition.preview = OUTPUT_PREVIEWS[`output:${definition.id}`]
+}
 
 /**
  * Get output definition by ID

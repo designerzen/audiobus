@@ -1,4 +1,3 @@
-import type { DrumPerformancePreset } from '../../timing/percussion-types.ts'
 import {
 	DEFAULT_DRUM_COMPRESSOR_SETTINGS,
 	type DrumCompressorSettings,
@@ -81,17 +80,15 @@ export type DrumGenre = keyof typeof DRUM_GENRES
 export interface DrumAccompanimentSettings extends DrumCompressorSettings {
 	genre: DrumGenre
 	groove: string
-	bpm: number
+	tuningNote: number
 	volume: number
-	swing: number
+	activityResponse: number
 	energy: number
 	density: number
 	tension: number
 	fillChance: number
 	chaos: number
 	rapidPercussion: boolean
-	followDynamics: boolean
-	performancePreset: DrumPerformancePreset
 	muteKick: boolean
 	muteSnare: boolean
 	muteHat: boolean
@@ -102,17 +99,15 @@ export const DEFAULT_DRUM_ACCOMPANIMENT_SETTINGS: Readonly<DrumAccompanimentSett
 	...DEFAULT_DRUM_COMPRESSOR_SETTINGS,
 	genre: 'funk',
 	groove: 'funky-drummer',
-	bpm: 120,
+	tuningNote: 36,
 	volume: 0.55,
-	swing: 0,
+	activityResponse: 0.35,
 	energy: 0.6,
 	density: 0.5,
 	tension: 0.2,
 	fillChance: 0.3,
 	chaos: 0.1,
 	rapidPercussion: false,
-	followDynamics: false,
-	performancePreset: 'steady',
 	muteKick: false,
 	muteSnare: false,
 	muteHat: false,
