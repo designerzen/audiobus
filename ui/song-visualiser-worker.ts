@@ -63,8 +63,8 @@ function drawNoteBarsStacked(width, height) {
   if (!context || noteBars.length === 0) return;
 
   // Find time range of actual data
-  const minTime = Math.min(...noteBars.map((bar) => bar.startTime), 0);
-  const maxEndTime = Math.max(...noteBars.map((bar) => bar.endTime), 1);
+  const minTime = noteBars.reduce((min, bar) => Math.min(min, bar.startTime), 0);
+  const maxEndTime = noteBars.reduce((max, bar) => Math.max(max, bar.endTime), 1);
   const timeRange = maxEndTime - minTime || 1;
 
   const MARGIN_LEFT = 50;
@@ -122,8 +122,8 @@ function drawNoteBarsTimeline(width, height) {
   if (!context || noteBars.length === 0) return;
 
   // Find time range of actual data
-  const minTime = Math.min(...noteBars.map((bar) => bar.startTime), 0);
-  const maxEndTime = Math.max(...noteBars.map((bar) => bar.endTime), 1);
+  const minTime = noteBars.reduce((min, bar) => Math.min(min, bar.startTime), 0);
+  const maxEndTime = noteBars.reduce((max, bar) => Math.max(max, bar.endTime), 1);
   const timeRange = maxEndTime - minTime || 1;
 
   const noteRange = options.endNote - options.startNote || 1;

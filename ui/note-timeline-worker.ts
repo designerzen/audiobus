@@ -44,7 +44,7 @@ function render() {
     context.beginPath()
     context.rect(gutter, ruler, width(), canvas.height - ruler)
     context.clip()
-    for (const event of timeline.notes) {
+    for (const event of timeline.visibleNotes(offset, offset + width() / scale)) {
         const end = event.end ?? time
         if (end < offset || event.start > offset + width() / scale) continue
         const y = ruler + (Math.round(topNote) - event.note) * rowHeight
@@ -79,8 +79,7 @@ globalThis.onmessage = ({ data }) => {
         case NOTE_OFF: timeline.noteOff(data.note, time); break
         case 'allNotesOff': timeline.allNotesOff(time); break
         case 'clear':
-            timeline.notes.length = 0
-            timeline.active.clear()
+            timeline.clear()
             origin = undefined
             offset = 0
             follow = true

@@ -27,6 +27,31 @@ interface NoteBarData {
     source?: "live" | "recorded";
 }
 
+function commandNoteBars(commands: IAudioCommand[]): NoteBarData[] {
+    const pending = new Map<string, { commands: IAudioCommand[], head: number }>();
+    const bars: NoteBarData[] = [];
+    for (const command of commands) {
+        const number = (command as IAudioCommand & { noteNumber?: number }).noteNumber ?? command.number;
+        const type = command.type === NOTE_ON || command.type === NOTE_OFF ? command.type : command.subtype;
+        if (number == null || (type !== NOTE_ON && type !== NOTE_OFF)) continue;
+        const key = `${command.chainId ?? ''}|${command.from ?? ''}|${command.channel ?? 0}|${number}`;
+        if (type === NOTE_ON && command.velocity !== 0) {
+            const queue = pending.get(key) ?? { commands: [], head: 0 };
+            queue.commands.push(command);
+            pending.set(key, queue);
+        } else {
+            const queue = pending.get(key);
+            if (!queue) continue;
+            const on = queue.commands[queue.head++];
+            if (queue.head === queue.commands.length) pending.delete(key);
+            const start = on.startAt ?? on.time ?? 0;
+            bars.push({ startTime: start, endTime: Math.max(start, command.startAt ?? command.time ?? start),
+                noteNumber: number, velocity: on.velocity ?? 1, source: 'recorded' });
+        }
+    }
+    return bars.sort((a, b) => a.startTime - b.startTime);
+}
+
 type LayoutMode = "stacked" | "timeline";
 
 interface VisualisationOptions {
@@ -217,8 +242,8 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
     `;
 
         container.appendChild(this.canvas);
-        this.attachShadow({ mode: "open" });
-        this.shadowRoot?.appendChild(container);
+        const shadow = this.shadowRoot ?? this.attachShadow({ mode: "open" });
+        shadow.replaceChildren(container);
 
         this.canvas?.addEventListener('click', (e) => this.handleCanvasClick(e));
     }
@@ -235,6 +260,7 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
 
             // Transfer canvas to worker
             this.transferCanvasToWorker();
+            this.sendCommandsToWorker();
         } catch (error) {
             console.error("Failed to initialize worker:", error);
         }
@@ -322,32 +348,7 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
      * Process AudioCommand array into note bar data
      */
     private processCommands() {
-        const notesMap = new Map<number, IAudioCommand>();
-        this.noteBars = [];
-
-        for (const command of this.commands) {
-            // Check if command has noteNumber property
-            const noteNumber = (command as any).noteNumber || command.number;
-
-            if (command.subtype === NOTE_ON && noteNumber != null) {
-                notesMap.set(noteNumber, command);
-            } else if (command.subtype === NOTE_OFF && noteNumber != null) {
-                const noteOnCommand = notesMap.get(noteNumber);
-                if (noteOnCommand) {
-                    const velocity = (command as any).velocity || command.number || 1;
-                    this.noteBars.push({
-                        startTime: noteOnCommand.startAt || noteOnCommand.time || 0,
-                        endTime: command.startAt || command.time || 0,
-                        noteNumber,
-                        velocity,
-                    });
-                    notesMap.delete(noteNumber);
-                }
-            }
-        }
-
-        // Sort by start time
-        this.noteBars.sort((a, b) => a.startTime - b.startTime);
+        this.noteBars = commandNoteBars(this.commands);
     }
 
     /**
@@ -360,9 +361,9 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
         const dpr = window.devicePixelRatio || 1;
 
         this.worker.postMessage({
-            type: "setNoteBars",
+            type: "loadCommands",
             data: {
-                noteBars: this.noteBars,
+                commands: this.noteBars,
                 displayWidth: Math.ceil(rect.width * dpr),
                 displayHeight: Math.ceil(rect.height * dpr),
             },
@@ -389,28 +390,7 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
      * Process recorded commands
      */
     private processRecordedCommands(commands: IAudioCommand[]) {
-        const notesMap = new Map<number, IAudioCommand>();
-
-        for (const command of commands) {
-            const noteNumber = (command as any).noteNumber || command.number;
-
-            if (command.subtype === NOTE_ON && noteNumber != null) {
-                notesMap.set(noteNumber, command);
-            } else if (command.subtype === NOTE_OFF && noteNumber != null) {
-                const noteOnCommand = notesMap.get(noteNumber);
-                if (noteOnCommand) {
-                    const velocity = (command as any).velocity || 1;
-                    this.noteBars.push({
-                        startTime: noteOnCommand.startAt || noteOnCommand.time || 0,
-                        endTime: command.startAt || command.time || 0,
-                        noteNumber,
-                        velocity,
-                        source: "recorded",
-                    });
-                    notesMap.delete(noteNumber);
-                }
-            }
-        }
+        for (const bar of commandNoteBars(commands)) this.noteBars.push(bar);
     }
 
     /**
@@ -457,7 +437,7 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
         const normalizedY = y / rect.height;
 
         // Find which note bar was clicked using stored note bar data
-        const maxTime = Math.max(...this.noteBars.map((bar) => bar.endTime), 1);
+        const maxTime = this.noteBars.reduce((max, bar) => Math.max(max, bar.endTime), 1);
 
         const clickedBar = this.noteBars.find((bar) => {
             // Normalize bar positions to match click coordinates
@@ -511,6 +491,14 @@ export default class SongVisualiser extends HTMLElement implements IAudioOutput 
      */
     getCommands(): IAudioCommand[] {
         return [...this.commands];
+    }
+
+    get commandCount(): number {
+        return this.commands.length;
+    }
+
+    getCommandPage(offset: number, limit: number): IAudioCommand[] {
+        return this.commands.slice(offset, offset + limit);
     }
 
     /**

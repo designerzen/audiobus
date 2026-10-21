@@ -23,8 +23,12 @@ function drawNote(note: number, colour: string) {
 }
 
 function render(time: number) {
-    if (time - lastFrame >= 1000 / 60) {
-        lastFrame = time
+    const interval = 1000 / 60
+    const elapsed = time - lastFrame
+    // rAF timestamps fluctuate around 16.67 ms. Preserve the remainder so
+    // slightly early frames do not turn a 60 Hz display into a 30 Hz canvas.
+    if (elapsed >= interval - .5) {
+        lastFrame += Math.max(1, Math.floor((elapsed + .5) / interval)) * interval
         mirrorContext.clearRect(0, 0, mirror.width, mirror.height)
         mirrorContext.drawImage(canvas, 0, 0)
         context.clearRect(0, 0, canvas.width, canvas.height)

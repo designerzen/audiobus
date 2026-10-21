@@ -1,7 +1,7 @@
 import { EVENT_TRANSFORMERS_UPDATED, EVENT_TRANSFORMERS_ADDED, EVENT_TRANSFORMERS_REMOVED } from '../event-constants.ts'
 /**
- * TRANSFORMER MANAGER WITH WORKER SUPPORT -----------------------------------------------
- * Delegates transform operations to Web Workers to avoid blocking the main thread
+ * Runs the live transform pipeline in input order. Expensive transformers manage
+ * their own workers; live note delivery must never wait for browser idle time.
  */
 import { compressToBase64, decompressFromBase64 } from 'lz-string'
 
@@ -161,39 +161,14 @@ export default class TransformerManagerWorker extends EventTarget implements ITr
      * INTERFACE:
      * Run transforms asynchronously
      * Returns a Promise that resolves to the transformed commands
-     * Defers to next tick to avoid blocking
      */
     async transform(commands: IAudioCommand[], timer: Timer): Promise<IAudioCommand[]> {
-        // Defer to main thread on next tick to avoid blocking
-        return this.transformMainThreadAsync(commands, timer)
-    }
-
-    /**
-     * Fallback: Transform on main thread (synchronous)
-     */
-    private transformMainThread(commands: IAudioCommand[], timer: Timer): IAudioCommand[] {
-        return this.#transformers.reduce((v, t) => t.transform(v, timer), commands)
-    }
-
-    /**
-     * Fallback: Transform on main thread (asynchronous - defers to next tick)
-     */
-    private transformMainThreadAsync(commands: IAudioCommand[], timer: Timer): Promise<IAudioCommand[]> {
-        return new Promise((resolve) => {
-            // Use requestIdleCallback if available, otherwise setTimeout
-            const defer = typeof requestIdleCallback !== 'undefined' ? requestIdleCallback : (cb: () => void) => setTimeout(cb, 0)
-
-            defer(() => {
-                try {
-                    const result = this.transformMainThread(commands, timer)
-                    resolve(result)
-                } catch (error) {
-                    console.error('Transform error:', error)
-                    // Return untransformed commands on error
-                    resolve(commands)
-                }
-            })
-        })
+        try {
+            return this.#transformers.reduce((value, transformer) => transformer.transform(value, timer), commands)
+        } catch (error) {
+            console.error('Transform error:', error)
+            return commands
+        }
     }
 
 

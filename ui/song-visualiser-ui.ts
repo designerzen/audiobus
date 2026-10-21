@@ -1,11 +1,12 @@
-import { EVENT_NOTE_CLICK } from '../event-constants.ts'
+import { EVENT_NOTE_CLICK, EVENT_CLICK, EVENT_TOGGLE } from '../event-constants.ts'
 /**
  * Song Visualiser UI Wrapper
  * 
  * Provides controls and integration for the SongVisualiser component
  */
 
-import SongVisualiser from "./song-visualiser.js"
+import "./song-visualiser.ts"
+import type SongVisualiser from "./song-visualiser.ts"
 import type { IAudioCommand } from "../audio-command-interface.ts"
 import type OPFSStorage from "../storage/opfs-storage.ts"
 
@@ -14,6 +15,10 @@ export class SongVisualiserUI extends HTMLElement {
   private storage: OPFSStorage | null = null
   private darkMode: boolean = false
   private themeMediaQuery: MediaQueryList | null = null
+  private commandSource: (() => IAudioCommand[] | Promise<IAudioCommand[]>) | null = null
+  private commandPage = 0
+  private refreshTask: Promise<void> | null = null
+  private generation = 0
 
   constructor() {
     super()
@@ -58,7 +63,7 @@ export class SongVisualiserUI extends HTMLElement {
 
   connectedCallback() {
     this.detectAndApplyTheme()
-    this.render()
+    if (!this.shadowRoot) this.render()
     this.setupThemeListener()
   }
 
@@ -87,10 +92,10 @@ export class SongVisualiserUI extends HTMLElement {
            <input type="range" min="1" max="20" value="1" class="bar-height-slider">
          </div>
          <button class="song-visualiser-btn song-visualiser-btn--primary load-from-opfs">
-           Load from OPFS
+           Refresh recording
          </button>
          <button class="song-visualiser-btn clear-btn">
-           Clear
+           Clear view
          </button>
          <button class="song-visualiser-btn export-btn">
            Export JSON
@@ -117,6 +122,22 @@ export class SongVisualiserUI extends HTMLElement {
           <div class="song-visualiser-info__value max-note-value">-</div>
         </div>
       </div>
+      <p class="recording-status" role="status"></p>
+      <details class="recorded-commands">
+        <summary>Recorded MIDI commands</summary>
+        <p>Refresh to inspect the saved recording. This view updates on request.</p>
+        <div class="command-table" tabindex="0" role="region" aria-label="Recorded MIDI commands">
+          <table>
+            <thead><tr><th>Time (s)</th><th>Type</th><th>Channel</th><th>Number</th><th>Velocity</th><th>Value</th><th>Source</th><th>Chain</th><th>Data</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <nav aria-label="Command pages">
+          <button type="button" class="commands-previous">Previous</button>
+          <span class="commands-page" role="status"></span>
+          <button type="button" class="commands-next">Next</button>
+        </nav>
+      </details>
     `
 
     this.attachShadow({ mode: "open" })
@@ -127,6 +148,7 @@ export class SongVisualiserUI extends HTMLElement {
 
     this.setupElements()
     this.setupEventListeners()
+    this.updateRefreshButton()
   }
 
   private setupElements() {
@@ -174,7 +196,7 @@ export class SongVisualiserUI extends HTMLElement {
     }
 
     if (loadFromOPFSBtn) {
-      loadFromOPFSBtn.addEventListener('click', () => this.loadFromOPFS())
+      loadFromOPFSBtn.addEventListener(EVENT_CLICK, () => { void this.refresh() })
     }
 
     if (clearBtn) {
@@ -187,44 +209,98 @@ export class SongVisualiserUI extends HTMLElement {
 
     // Listen for note clicks
     this.visualiser?.addEventListener(EVENT_NOTE_CLICK, (e: any) => {
-      console.log("Note clicked:", e.detail)
       this.dispatchEvent(new CustomEvent(EVENT_NOTE_CLICK, { detail: e.detail }))
+    })
+    this.shadowRoot?.querySelector('.recorded-commands')?.addEventListener(EVENT_TOGGLE, () => this.renderCommandPage())
+    this.shadowRoot?.querySelector('.commands-previous')?.addEventListener(EVENT_CLICK, () => {
+      this.commandPage--
+      this.renderCommandPage()
+    })
+    this.shadowRoot?.querySelector('.commands-next')?.addEventListener(EVENT_CLICK, () => {
+      this.commandPage++
+      this.renderCommandPage()
     })
   }
 
   /**
    * Load commands from OPFS storage
    */
-  private async loadFromOPFS() {
-    if (!this.storage || !this.visualiser) return
+  refresh(): Promise<void> {
+    if (this.refreshTask) return this.refreshTask
+    if (!this.storage && !this.commandSource) return Promise.resolve()
+    const generation = this.generation
+    this.refreshTask = Promise.resolve().then(async () => {
+      const commands = this.storage ? await this.storage.readAll() as unknown as IAudioCommand[] : await this.commandSource!()
+      if (generation === this.generation) await this.loadCommands(commands)
+    }).then(() => {
+      if (generation === this.generation) this.setStatus('Recording refreshed.')
+    }).catch(() => {
+      if (generation === this.generation) this.setStatus('Unable to load the recording. Try refreshing again.')
+    }).finally(() => {
+      this.refreshTask = null
+      this.updateRefreshButton()
+    })
+    this.updateRefreshButton()
+    return this.refreshTask
+  }
 
-    const btn = this.shadowRoot?.querySelector(".load-from-opfs") as HTMLButtonElement
-    if (btn) {
-      btn.disabled = true
-      btn.textContent = "Loading..."
-    }
+  async showCommands(): Promise<void> {
+    const details = this.shadowRoot?.querySelector<HTMLDetailsElement>('.recorded-commands')
+    if (details) details.open = true
+    await this.refresh()
+    this.renderCommandPage()
+  }
 
-    try {
-      const success = await this.visualiser.loadFromOPFS(this.storage)
-      if (success) {
-        this.updateInfo()
+  private setStatus(message: string): void {
+    const status = this.shadowRoot?.querySelector('.recording-status')
+    if (status) status.textContent = message
+  }
+
+  private updateRefreshButton(): void {
+    const button = this.shadowRoot?.querySelector<HTMLButtonElement>('.load-from-opfs')
+    if (!button) return
+    button.disabled = this.refreshTask !== null || (!this.storage && !this.commandSource)
+    button.textContent = this.refreshTask ? 'Loading…' : 'Refresh recording'
+  }
+
+  private renderCommandPage(): void {
+    const details = this.shadowRoot?.querySelector<HTMLDetailsElement>('.recorded-commands')
+    const body = details?.querySelector('tbody')
+    if (!details?.open || !body || !this.visualiser) return
+    const count = this.visualiser.commandCount
+    const pages = Math.max(1, Math.ceil(count / 100))
+    this.commandPage = Math.max(0, Math.min(this.commandPage, pages - 1))
+    const fragment = document.createDocumentFragment()
+    for (const command of this.visualiser.getCommandPage(this.commandPage * 100, 100)) {
+      const row = document.createElement('tr')
+      const bytes = command.raw?.length ? Array.from(command.raw).map(byte => byte.toString(16).padStart(2, '0')).join(' ') : command.ump?.map(word => word.toString(16).padStart(8, '0')).join(' ')
+      for (const value of [command.startAt ?? command.time, command.type, command.channel, command.number,
+        command.velocity, command.value, command.from, command.chainName ?? command.chainId, bytes]) {
+        const cell = document.createElement('td')
+        cell.textContent = value === undefined || value === null ? '—' : String(value)
+        row.append(cell)
       }
-    } finally {
-      if (btn) {
-        btn.disabled = false
-        btn.textContent = "Load from OPFS"
-      }
+      fragment.append(row)
     }
+    body.replaceChildren(fragment)
+    details.querySelector('.commands-page')!.textContent = `${count} commands · Page ${this.commandPage + 1} of ${pages}`
+    details.querySelector<HTMLButtonElement>('.commands-previous')!.disabled = this.commandPage === 0
+    details.querySelector<HTMLButtonElement>('.commands-next')!.disabled = this.commandPage + 1 >= pages
+  }
+
+  reset(): void {
+    this.generation++
+    this.commandPage = 0
+    this.visualiser?.reset()
+    this.updateInfo()
+    this.renderCommandPage()
   }
 
   /**
    * Clear all data
    */
   private clear() {
-    if (confirm("Clear all data?")) {
-      this.visualiser?.clear()
-      this.updateInfo()
-    }
+    this.reset()
   }
 
   /**
@@ -247,7 +323,6 @@ export class SongVisualiserUI extends HTMLElement {
    * Update info display
    */
   private updateInfo() {
-    const commands = this.visualiser?.getCommands() ?? []
     const noteBars = this.visualiser?.getNoteBars() ?? []
 
     const commandCountEl = this.shadowRoot?.querySelector(".command-count")
@@ -255,14 +330,17 @@ export class SongVisualiserUI extends HTMLElement {
     const durationEl = this.shadowRoot?.querySelector(".duration-value")
     const maxNoteEl = this.shadowRoot?.querySelector(".max-note-value")
 
-    if (commandCountEl) commandCountEl.textContent = String(commands.length)
+    if (commandCountEl) commandCountEl.textContent = String(this.visualiser?.commandCount ?? 0)
     if (noteBarCountEl) noteBarCountEl.textContent = String(noteBars.length)
 
     if (noteBars.length > 0) {
-      const maxTime = Math.max(...noteBars.map((b) => b.endTime))
-      if (durationEl) durationEl.textContent = `${(maxTime / 1000).toFixed(2)}s`
-
-      const maxNote = Math.max(...noteBars.map((b) => b.noteNumber))
+      let minTime = Infinity, maxTime = -Infinity, maxNote = 0
+      for (const bar of noteBars) {
+        minTime = Math.min(minTime, bar.startTime)
+        maxTime = Math.max(maxTime, bar.endTime)
+        maxNote = Math.max(maxNote, bar.noteNumber)
+      }
+      if (durationEl) durationEl.textContent = `${(maxTime - minTime).toFixed(2)}s`
       if (maxNoteEl) maxNoteEl.textContent = String(maxNote)
     } else {
       if (durationEl) durationEl.textContent = "0s"
@@ -288,7 +366,9 @@ export class SongVisualiserUI extends HTMLElement {
     
     if (this.visualiser) {
       await this.visualiser.loadCommands(commands as IAudioCommand[])
+      this.commandPage = 0
       this.updateInfo()
+      this.renderCommandPage()
     }
   }
 
@@ -297,6 +377,12 @@ export class SongVisualiserUI extends HTMLElement {
    */
   setStorage(storage: OPFSStorage) {
     this.storage = storage
+    this.updateRefreshButton()
+  }
+
+  setCommandSource(source: () => IAudioCommand[] | Promise<IAudioCommand[]>): void {
+    this.commandSource = source
+    this.updateRefreshButton()
   }
 
   /**
@@ -330,6 +416,14 @@ export class SongVisualiserUI extends HTMLElement {
         height: 100%;
         color-scheme: ${this.darkMode ? "dark" : "light"};
       }
+
+      .recording-status, .recorded-commands { padding: .5rem 1rem; margin: 0; }
+      .recorded-commands summary { cursor: pointer; }
+      .command-table { overflow: auto; max-height: 24rem; }
+      table { border-collapse: collapse; width: 100%; font-size: .8rem; }
+      th, td { padding: .4rem; border-bottom: 1px solid ${borderColor}; text-align: left; white-space: nowrap; }
+      th { position: sticky; top: 0; background: ${bgSecondary}; }
+      nav { display: flex; align-items: center; gap: 1rem; padding-top: .5rem; }
 
       .song-visualiser-container {
         display: flex;
