@@ -259,8 +259,12 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 	 * Load a preset (instrument) from a bank
 	 * @param bankName - Name of the bank (e.g., "Will_Godfrey_Collection")
 	 * @param instrumentFilename - Filename of the instrument (e.g., "0040-Master Synth Low.xiz")
+	 * @param part - Zero-based part/MIDI channel (0-15); the preset browser controls part 0
 	 */
-	async loadPreset(bankName: string, instrumentFilename: string): Promise<void> {
+	async loadPreset(bankName: string, instrumentFilename: string, part: number = 0): Promise<void> {
+		if (!Number.isInteger(part) || part < 0 || part > 15) {
+			throw new RangeError('Yoshimi part must be an integer from 0 to 15')
+		}
 		if (!this.#isConnected || !this.#yoshimiInstance) {
 			console.warn("Yoshimi not connected")
 			return
@@ -278,18 +282,22 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
                 : new TextDecoder().decode(bytes)
 			// Send preset data to Yoshimi
 			if (typeof this.#yoshimiInstance.sendMessage === 'function') {
-				this.#yoshimiInstance.sendMessage("set", "patch", data)
+				this.#yoshimiInstance.sendMessage("set", `patch${part}`, data)
 			}
 
-			this.#currentBank = bankName
-			this.#currentPreset = instrumentFilename
+			if (part === 0) {
+				this.#currentBank = bankName
+				this.#currentPreset = instrumentFilename
+			}
 
 			console.info(`Loaded Yoshimi preset: ${bankName} / ${instrumentFilename}`)
 
 			// Dispatch event for UI updates
-			this.dispatchEvent(new CustomEvent(EVENT_PRESET_CHANGED, {
-				detail: { bank: bankName, preset: instrumentFilename }
-			}))
+			if (part === 0) {
+				this.dispatchEvent(new CustomEvent(EVENT_PRESET_CHANGED, {
+					detail: { bank: bankName, preset: instrumentFilename }
+				}))
+			}
 
 		} catch (error) {
 			console.error("Failed to load Yoshimi preset:", error)
