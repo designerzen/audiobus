@@ -119,6 +119,8 @@ export class TransformerNoteShortener extends Transformer<Config> implements ITr
                 const durationSeconds = durationMs / 1000
                 // Create a NOTE_OFF scheduled after the configured duration (tempo-synced)
                 const noteOffCmd = createAudioCommand(  Commands.NOTE_OFF, command.number, noteOnTime + durationSeconds )
+                noteOffCmd.channel = command.channel
+                noteOffCmd.from = command.from
                 noteOffCmd.velocity = command.velocity || 100
              
                 console.log('[NOTE_SHORTENER] Creating scheduled NOTE_OFF', {

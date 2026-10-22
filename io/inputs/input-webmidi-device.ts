@@ -113,8 +113,16 @@ export default class InputWebMIDIDevice extends AbstractInput implements IAudioI
             const command = midiToCommand(data, this.now, device.id)
             if (!command || !acceptsMidiInput(this.options, device.id, command.channel)) return
             const key = `${device.id}:${command.channel}:${command.number}`
-            if (command.type === NOTE_ON) this.#activeNotes.set(key, { note: command.number, channel: command.channel, deviceId: device.id })
+            if (command.type === NOTE_ON) {
+                // A retrigger replaces this source's held key. Balance it before
+                // the new note-on so one eventual note-off can release it.
+                if (this.#activeNotes.has(key)) this.dispatch(midiToCommand([0x80 | (command.channel - 1), command.number, 0], this.now, device.id)!, event.message ?? event)
+                this.#activeNotes.set(key, { note: command.number, channel: command.channel, deviceId: device.id })
+            }
             else if (command.type === NOTE_OFF) this.#activeNotes.delete(key)
+            if ((data[0] >> 4) === 0xb && (data[1] === 120 || data[1] === 123)) {
+                this.releaseNotes(device.id, event.message ?? event, command.channel)
+            }
             if ((data[0] >> 4) === 0xb && data[1] === 64) {
                 const pedal = `${device.id}:${command.channel}`
                 if (data[2] >= 64) this.#sustain.set(pedal, { deviceId: device.id, channel: command.channel })
@@ -130,19 +138,19 @@ export default class InputWebMIDIDevice extends AbstractInput implements IAudioI
             event.rawVelocity ?? event.rawValue ?? Math.round((event.velocity ?? event.value ?? 0) * 127)] }, device, _deviceName, _index)
     }
 
-    private releaseNotes(deviceId?: string, origin?: object): void {
+    private releaseNotes(deviceId?: string, origin?: object, channel?: number): void {
         const release = (data: number[], source: string) => {
             const command = midiToCommand(data, this.now, source)!
             if (origin) this.dispatch(command, origin)
             else this.dispatch(command)
         }
         for (const [key, active] of this.#sustain) {
-            if (deviceId !== undefined && active.deviceId !== deviceId) continue
+            if ((deviceId !== undefined && active.deviceId !== deviceId) || (channel !== undefined && active.channel !== channel)) continue
             release([0xb0 | (active.channel - 1), 64, 0], active.deviceId)
             this.#sustain.delete(key)
         }
         for (const [key, active] of this.#activeNotes) {
-            if (deviceId !== undefined && active.deviceId !== deviceId) continue
+            if ((deviceId !== undefined && active.deviceId !== deviceId) || (channel !== undefined && active.channel !== channel)) continue
             release([0x80 | (active.channel - 1), active.note, 0], active.deviceId)
             this.#activeNotes.delete(key)
         }

@@ -273,7 +273,7 @@ export default class IOChain extends EventTarget {
      * future or not yet set to trigger
      * @param queue
      */
-    executeQueueAndClearComplete(now: number, accumulatorLimit: number = 24 * 12): IAudioCommand[] {
+    executeQueueAndClearComplete(now: number): IAudioCommand[] {
 
         const queue: IAudioCommand[] = this.#audioCommandQueue
 
@@ -287,10 +287,10 @@ export default class IOChain extends EventTarget {
         const remainingCommands: IAudioCommand[] = []
 
         // act on all data in the buffer...
-        let unplayedAccumulator = 0
         const quantity = queue.length
-        for (let i = 0; i < quantity && unplayedAccumulator < accumulatorLimit; i++) {
+        for (let i = 0; i < quantity; i++) {
             const audioCommand: IAudioCommand = queue[i]
+            // Scan the entire queue: future notes must never hide a due note-off.
             const shouldTrigger = audioCommand.startAt <= now
             if (shouldTrigger) {
                 activeCommands.push(audioCommand)
@@ -301,7 +301,6 @@ export default class IOChain extends EventTarget {
                 // console.info("AudioCommand triggered in time domain", {audioCommand, triggers, timer} )
             } else {
                 // ignore this command as it is not yet ready
-                unplayedAccumulator++
                 remainingCommands.push(audioCommand)
             }
         }
