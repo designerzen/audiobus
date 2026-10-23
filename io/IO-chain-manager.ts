@@ -527,6 +527,26 @@ export class IOChainManager extends EventTarget {
 		return this.addChain(chain)
 	}
 
+    async createChainWithSounds(definitions: SavedDevice['definition'][]): Promise<string> {
+        const devices = new Map<string, IAudioOutput>()
+        try {
+            for (const definition of definitions) {
+                const id = crypto.randomUUID()
+                devices.set(id, await restoreDevice({ id, direction: 'output', definition: structuredClone(definition) },
+                    { ...this.#options, now: () => (this.#options.timer as Timer & { now: number }).now }, devices))
+            }
+            const id = await this.createDefaultChain(undefined, [...devices.values()])
+            const chain = this.getChain(id)!
+            for (const output of [...chain.outputs]) {
+                if (![...devices.values()].includes(output) && deviceDefinition(output).factory === 'polyphonic') chain.removeOutput(output)
+            }
+            return id
+        } catch (error) {
+            await Promise.all([...devices].map(([id, device]) => this.disposeDevice(id, device)))
+            throw error
+        }
+    }
+
 	/**
 	 * Create and add a chain from a preset
 	 */
