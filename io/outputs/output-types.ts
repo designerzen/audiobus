@@ -12,6 +12,7 @@ export const SPEECH_SYNTHESIS = "speech-synthesis" as const
 export const VIBRATOR = "vibrator" as const
 export const WAM2 = "wam2" as const
 export const MOOG = "moog" as const
+export const TB303 = 'tb303' as const
 export const WAM = "wam" as const
 export const YOSHIMI = "yoshimi" as const
 export const WEBMIDI = "webmidi" as const
@@ -38,6 +39,7 @@ export type OutputId =
 	| typeof VIBRATOR
 	| typeof WAM2
 	| typeof MOOG
+	| typeof TB303
 	| typeof WAM
 	| typeof YOSHIMI
 	| typeof WEBMIDI

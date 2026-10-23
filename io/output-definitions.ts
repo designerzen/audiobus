@@ -27,6 +27,12 @@ export interface OutputDefinition extends DeviceClassification {
 }
 
 export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
+	[OUTPUT_TYPES.TB303]: {
+		id: OUTPUT_TYPES.TB303,
+		type: 'engine', subtype: 'instrument', name: 'TB-303',
+		description: 'Monophonic acid bass with a nonlinear diode ladder, pitch slide and accents',
+		icon: '/icons/output-tb303.svg', category: 'Synthesis',
+	},
 	[OUTPUT_TYPES.DRUM_ACCOMPANIMENT]: {
 		id: OUTPUT_TYPES.DRUM_ACCOMPANIMENT,
 		type: 'engine',

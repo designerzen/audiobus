@@ -49,6 +49,8 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./outputs/output-wam2.ts")
 		case OUTPUT_TYPES.MOOG:
 			return await import("./outputs/output-moog.ts")
+		case OUTPUT_TYPES.TB303:
+			return await import('./outputs/output-tb303.ts')
 		case OUTPUT_TYPES.WAM:
 			return await import("./outputs/output-wam.ts")
 		case OUTPUT_TYPES.YOSHIMI:
@@ -128,8 +130,8 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
 			throw new Error('WAM2 output requires audioContext in options')
 		}
 		return new Class(options.audioContext, options.pluginUrl, options.name, options.mixer)
-	} else if (type === OUTPUT_TYPES.MOOG) {
-		if (!options?.audioContext) throw new Error('MOOG output requires audioContext in options')
+	} else if (type === OUTPUT_TYPES.MOOG || type === OUTPUT_TYPES.TB303) {
+		if (!options?.audioContext) throw new Error(`${type} output requires audioContext in options`)
 		return new Class(options.audioContext, options.mixer)
 	} else if (type === OUTPUT_TYPES.YOSHIMI) {
 		if (!options?.audioContext) {
@@ -158,6 +160,11 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
  * Uses lazy loading for better performance
  */
 export const OUTPUT_FACTORIES: OutputFactory[] = [
+	{
+		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.TB303],
+		isAvailable: () => typeof AudioWorkletNode !== 'undefined',
+		create: options => createOutput(OUTPUT_TYPES.TB303, options),
+	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.DRUM_ACCOMPANIMENT],
 		isAvailable: () => typeof AudioContext !== 'undefined',
