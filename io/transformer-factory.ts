@@ -4,6 +4,7 @@ import { TransformerHarmoniser, ID_HARMONISER } from "./transformers/transformer
 import { TransformerArpeggiator, ID_ARPEGGIATOR } from "./transformers/transformer-arpeggiator.ts"
 import { TransformerNoteShortener, ID_NOTE_SHORTENER } from "./transformers/transformer-note-shortener.ts"
 import { TransformerNoteRepeater, ID_NOTE_REPEATER } from "./transformers/transformer-note-repeater.ts"
+import { TransformerNoteReverb, ID_NOTE_REVERB } from "./transformers/transformer-note-reverb.ts"
 import { TransformerRandomiser, ID_RANDOMISER } from "./transformers/transformer-randomiser.ts"
 import { TransformerNoteDelay, ID_NOTE_DELAY } from "./transformers/transformer-note-delay.ts"
 import { TransformerChordifier, ID_CHORDIFIER } from "./transformers/transformer-chordifier.ts"
@@ -32,6 +33,7 @@ export const tranformerFactory = (type: string, config: any={} ) => {
         case ID_MIDI_FILE_PLAYER: return new TransformerMIDIFilePlayer(config)
         case ID_NOTE_DELAY: return new TransformerNoteDelay(config)
     case ID_NOTE_REPEATER: return new TransformerNoteRepeater(config)
+    case ID_NOTE_REVERB: return new TransformerNoteReverb(config)
     case ID_NOTE_SHORTENER: return new TransformerNoteShortener(config)
          case ID_QUANTISE: return new TransformerQuantise(config)
     case ID_RANDOMISER: return new TransformerRandomiser(config)
@@ -55,6 +57,7 @@ export const TRANSFORMER_TYPE = {
     ID_MIDI_FILE_PLAYER,
     ID_NOTE_SHORTENER,
     ID_NOTE_REPEATER,
+    ID_NOTE_REVERB,
     ID_NOTE_DELAY,
 	ID_QUANTISE,
     ID_RANDOMISER,

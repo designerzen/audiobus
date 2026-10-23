@@ -100,6 +100,14 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		subtype: "pattern",
 	},
 
+    [TRANSFORMER_TYPE.ID_NOTE_REVERB]: {
+        id: TRANSFORMER_TYPE.ID_NOTE_REVERB,
+        name: "Note Reverb",
+        description: "Repeats notes at intervals with progressively lower velocities",
+        icon: "/icons/transformer-note-repeater.svg",
+        category: "Timing", type: "transformer", subtype: "timing",
+    },
+
 	[TRANSFORMER_TYPE.ID_RANDOMISER]: {
 		id: TRANSFORMER_TYPE.ID_RANDOMISER,
 		name: "Randomiser",
