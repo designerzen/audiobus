@@ -108,7 +108,7 @@ export class IOChainFactory {
 	/**
 	 * Create a default IOChain with standard configuration
 	 * Includes keyboard, gamepad, onscreen keyboard inputs
-	 * and synthesizer, notation, spectrum analyzer outputs
+	 * and a synthesizer with an onscreen keyboard display
 	 */
 	static async createDefault(options: IOChainFactoryOptions): Promise<IOChain> {
 		const chain = new IOChain(options.timer)
@@ -174,8 +174,10 @@ export class IOChainFactory {
 		}
 
 		// Outputs
-		const outputOnscreenKeyboard = defineDevice(new OutputOnScreenKeyboard(inputSVGKeyboard.keyboard), { factory: 'keyboard-output', inputId: deviceId(inputSVGKeyboard) })
-		const outputs: IAudioOutput[] = [outputOnscreenKeyboard]
+		const outputs: IAudioOutput[] = []
+		if (!options.outputDevices) {
+			outputs.push(defineDevice(new OutputOnScreenKeyboard(inputSVGKeyboard.keyboard), { factory: 'keyboard-output', inputId: deviceId(inputSVGKeyboard) }))
+		}
 
 		// Add optional outputs
 		if (options.outputDevices) {
@@ -183,85 +185,10 @@ export class IOChainFactory {
 		}
 
 		// Add synthesizer if audioContext available
-		if (options.audioContext) {
+		if (options.audioContext && !options.outputDevices) {
 			const musicalOutput = defineDevice(new PolySynth(options.audioContext), { factory: 'polyphonic' })
 			musicalOutput.output.connect(options.outputMixer)
 			outputs.push(musicalOutput)
-		}
-
-		// Dynamically import output factory
-		const { createOutputById } = await import("./output-factory")
-
-		// Standard outputs
-		try {
-			const outputNotation = await createOutputById(OUTPUT_TYPES.NOTATION)
-			outputs.push(outputNotation)
-		} catch (e) {
-			console.debug("Notation output not available", e)
-		}
-
-		try {
-			const outputSpectrum = await createOutputById(OUTPUT_TYPES.SPECTRUM_ANALYSER, {
-				mixer: options.outputMixer,
-				audioContext: options.audioContext
-			})
-			outputs.push(outputSpectrum)
-		} catch (e) {
-			console.debug("Spectrum analyzer output not available", e)
-		}
-
-		// Add optional outputs
-		try {
-			if (typeof window !== "undefined") {
-				const outputSpeech = await createOutputById(OUTPUT_TYPES.SPEECH_SYNTHESIS)
-				outputs.push(outputSpeech)
-			}
-		} catch (e) {
-			console.debug("Speech synthesis output not available", e)
-		}
-
-		try {
-			// Add vibrator output - supports both mobile vibration API and gamepad vibration
-			const outputVibrator = await createOutputById(OUTPUT_TYPES.VIBRATOR)
-			outputs.push(outputVibrator)
-		} catch (e) {
-			console.debug("Vibrator output not available", e)
-		}
-
-		try {
-			if ((navigator as any).requestMIDIAccess) {
-				const outputWebMIDI = await createOutputById(OUTPUT_TYPES.WEBMIDI)
-				outputs.push(outputWebMIDI)
-			}
-		} catch (e) {
-			console.debug("WebMIDI output not available", e)
-		}
-
-		try {
-			if (navigator.bluetooth) {
-				const outputBLE = await createOutputById(OUTPUT_TYPES.BLE_MIDI)
-				outputs.push(outputBLE)
-			}
-		} catch (e) {
-			console.debug("BLE MIDI output not available", e)
-		}
-
-		try {
-			// Add MIDI 2.0 native output (Windows, macOS, Linux)
-			const outputMIDI2Native = await createOutputById(OUTPUT_TYPES.MIDI2_NATIVE)
-			outputs.push(outputMIDI2Native)
-			console.debug("MIDI 2.0 native output added")
-		} catch (e) {
-			console.debug("MIDI 2.0 native output not available", e)
-		}
-
-		if (import.meta.env.DEV) {
-			try {
-				const outputConsole = await createOutputById(OUTPUT_TYPES.CONSOLE)
-				outputs.push(outputConsole)
-			} catch (e) {
-				console.debug("Console output not available", e)
-			}
 		}
 
 		chain.addInputs(inputs)
