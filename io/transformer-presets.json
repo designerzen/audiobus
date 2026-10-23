@@ -748,7 +748,238 @@
           }
         }
       ]
+    },
+    {
+      "id": "acid-house",
+      "name": "Acid House",
+      "category": "Genres",
+      "description": "Short A minor bass arpeggios at sixteenth-note spacing.",
+      "useCase": "Play single notes around A3 to generate low minor figures. Try 120–130 BPM with a resonant mono synth; vary accents and filter cutoff on your instrument.",
+      "steps": [
+        {
+          "type": "Harmoniser",
+          "config": {
+            "root": 9,
+            "mode": [
+              0,
+              2,
+              3,
+              5,
+              7,
+              8,
+              10
+            ]
+          },
+          "summary": "Harmoniser — keeps notes in A natural minor."
+        },
+        {
+          "type": "Chordifier",
+          "config": {
+            "mode": "aeolian",
+            "root": 0,
+            "simultaneous": 3
+          },
+          "summary": "Chordifier — builds 3-note diatonic chords."
+        },
+        {
+          "type": "Transposer",
+          "config": {
+            "distance": -12
+          },
+          "summary": "Transposer — shifts notes down one octave."
+        },
+        {
+          "type": "Arpeggiator",
+          "config": {
+            "pattern": "up",
+            "rate": "1/16",
+            "octaves": 1
+          },
+          "summary": "Arpeggiator — plays chord tones up at 1/16 spacing, synced to tempo."
+        },
+        {
+          "type": "Note-Shortener",
+          "config": {
+            "duration": "1/32"
+          },
+          "summary": "Note Shortener — gives notes a 1/32 gate, synced to tempo."
+        }
+      ]
+    },
+    {
+      "id": "techno-pulse",
+      "name": "Techno Pulse",
+      "category": "Genres",
+      "description": "Clipped, low A minor notes for a driving bass motif.",
+      "useCase": "Play a repeating sixteenth-note rhythm around A3 over a four-on-the-floor kick. Adjust tempo and synth tone to suit your track.",
+      "steps": [
+        {
+          "type": "Harmoniser",
+          "config": {
+            "root": 9,
+            "mode": [
+              0,
+              2,
+              3,
+              5,
+              7,
+              8,
+              10
+            ]
+          },
+          "summary": "Harmoniser — keeps notes in A natural minor."
+        },
+        {
+          "type": "Transposer",
+          "config": {
+            "distance": -12
+          },
+          "summary": "Transposer — shifts notes down one octave."
+        },
+        {
+          "type": "Note-Shortener",
+          "config": {
+            "duration": "1/32"
+          },
+          "summary": "Note Shortener — gives notes a 1/32 gate, synced to tempo."
+        }
+      ]
+    },
+    {
+      "id": "dub-stabs",
+      "name": "Dub Stabs",
+      "category": "Genres",
+      "description": "Short minor chords shifted onto the offbeat.",
+      "useCase": "Play on quarter-note beats to place minor chord stabs an eighth note later. Add delay and reverb on your instrument for space.",
+      "steps": [
+        {
+          "type": "Harmoniser",
+          "config": {
+            "root": 9,
+            "mode": [
+              0,
+              2,
+              3,
+              5,
+              7,
+              8,
+              10
+            ]
+          },
+          "summary": "Harmoniser — keeps notes in A natural minor."
+        },
+        {
+          "type": "Chordifier",
+          "config": {
+            "mode": "aeolian",
+            "root": 0,
+            "simultaneous": 3
+          },
+          "summary": "Chordifier — builds 3-note diatonic chords."
+        },
+        {
+          "type": "Note-Delay",
+          "config": {
+            "useTimeDivision": true,
+            "timeDivision": "1/8",
+            "accumulate": false
+          },
+          "summary": "Note Delay — shifts the phrase later by 1/8, synced to tempo."
+        },
+        {
+          "type": "Note-Shortener",
+          "config": {
+            "duration": "1/16"
+          },
+          "summary": "Note Shortener — gives notes a 1/16 gate, synced to tempo."
+        }
+      ]
+    },
+    {
+      "id": "disco-keys",
+      "name": "Disco Keys",
+      "category": "Genres",
+      "description": "Bright C major seventh chords with a short rhythmic gate.",
+      "useCase": "Play syncopated single notes to sketch disco keys over a bass groove. Use a piano or electric piano patch.",
+      "steps": [
+        {
+          "type": "Harmoniser",
+          "config": {
+            "root": 0,
+            "mode": [
+              0,
+              2,
+              4,
+              5,
+              7,
+              9,
+              11
+            ]
+          },
+          "summary": "Harmoniser — keeps notes in C major."
+        },
+        {
+          "type": "Chordifier",
+          "config": {
+            "mode": "ionian",
+            "root": 3,
+            "simultaneous": 4
+          },
+          "summary": "Chordifier — builds 4-note diatonic chords."
+        },
+        {
+          "type": "Note-Shortener",
+          "config": {
+            "duration": "1/8"
+          },
+          "summary": "Note Shortener — gives notes a 1/8 gate, synced to tempo."
+        }
+      ]
+    },
+    {
+      "id": "ambient-drift",
+      "name": "Ambient Drift",
+      "category": "Genres",
+      "description": "Slow descending A minor chord tones for spacious sketches.",
+      "useCase": "Play sparse single notes into a pad with a long release and reverb. Lower the tempo to spread the quarter-note arpeggio.",
+      "steps": [
+        {
+          "type": "Harmoniser",
+          "config": {
+            "root": 9,
+            "mode": [
+              0,
+              2,
+              3,
+              5,
+              7,
+              8,
+              10
+            ]
+          },
+          "summary": "Harmoniser — keeps notes in A natural minor."
+        },
+        {
+          "type": "Chordifier",
+          "config": {
+            "mode": "aeolian",
+            "root": 0,
+            "simultaneous": 4
+          },
+          "summary": "Chordifier — builds 4-note diatonic chords."
+        },
+        {
+          "type": "Arpeggiator",
+          "config": {
+            "pattern": "down",
+            "rate": "1/4",
+            "octaves": 1
+          },
+          "summary": "Arpeggiator — plays chord tones down at 1/4 spacing, synced to tempo."
+        }
+      ]
     }
   ],
-  "setups": []
+  "setups": [],
+  "catalogueVersion": 1
 }
