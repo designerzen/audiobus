@@ -25,7 +25,6 @@ export interface PresetSetup {
     chains: { id: string; options: NonNullable<TransformerPreset['options']>; steps: PresetStep[]; inputs: string[]; outputs: string[] }[]
 }
 export interface PresetLibrary {
-    catalogueVersion?: number
     format: typeof PRESET_LIBRARY_FORMAT
     version: typeof PRESET_LIBRARY_VERSION
     presets: TransformerPreset[]
@@ -74,7 +73,6 @@ export function parsePresetLibrary(json: string): PresetLibrary {
     object(data)
     if (data.format !== PRESET_LIBRARY_FORMAT) throw new Error('Not a Harmoneasy preset library')
     if (data.version !== PRESET_LIBRARY_VERSION) throw new Error(`Unsupported preset library version: ${data.version}`)
-    if (data.catalogueVersion !== undefined && (!Number.isSafeInteger(data.catalogueVersion) || data.catalogueVersion < 0)) throw new Error('Invalid catalogue version')
     if (!Array.isArray(data.presets) || !Array.isArray(data.setups)) throw new Error('Expected presets and setups arrays')
     unique(data.presets, 'preset'); unique(data.setups, 'setup')
     for (const preset of data.presets) {
