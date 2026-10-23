@@ -1,4 +1,6 @@
 export const INPUT_EVENT = 'inputEvent'
+export const EVENT_RECORDER_TOGGLE = 'recorderToggle'
+export const EVENT_RECORDER_REVIEW = 'recorderReview'
 export const OUTPUT_EVENT = 'outputEvent'
 export const EVENT_INPUTS_UPDATED = 'EVENT_INPUTS_UPDATED'
 export const EVENT_OUTPUTS_UPDATED = 'outputsUpdated'

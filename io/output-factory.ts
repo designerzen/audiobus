@@ -29,6 +29,8 @@ export interface OutputFactory extends DeviceClassification {
 const loadSupportingLibrary = async (type: string) => {
 	// Create and return instance based on type
 	switch (type) {
+        case OUTPUT_TYPES.RECORDER:
+            return await import('./outputs/output-recorder.ts')
 		case OUTPUT_TYPES.DRUM_ACCOMPANIMENT:
 			return await import('./outputs/output-drum-accompaniment.ts')
 		case OUTPUT_TYPES.CONSOLE:
@@ -160,6 +162,11 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
  * Uses lazy loading for better performance
  */
 export const OUTPUT_FACTORIES: OutputFactory[] = [
+    {
+        ...OUTPUT_DEFINITIONS[OUTPUT_TYPES.RECORDER],
+        isAvailable: () => typeof AudioContext !== 'undefined',
+        create: options => createOutput(OUTPUT_TYPES.RECORDER, options),
+    },
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.TB303],
 		isAvailable: () => typeof AudioWorkletNode !== 'undefined',

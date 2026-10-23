@@ -27,6 +27,11 @@ export interface OutputDefinition extends DeviceClassification {
 }
 
 export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
+    [OUTPUT_TYPES.RECORDER]: {
+        id: OUTPUT_TYPES.RECORDER, type: 'audio', subtype: 'utility', name: 'Recorder',
+        description: 'Record the app’s master audio, review the last take and export WAV. All Recorder outputs share the recording session.',
+        icon: '/icons/output-recorder.svg', category: 'Audio',
+    },
 	[OUTPUT_TYPES.TB303]: {
 		id: OUTPUT_TYPES.TB303,
 		type: 'engine', subtype: 'instrument', name: 'TB-303',
