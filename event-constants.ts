@@ -71,3 +71,5 @@ export const EVENT_AUDIOCONTEXT_INTERRUPTED = 'audiocontext:interrupted'
 export const EVENT_PRESET_CHANGED = 'preset-changed'
 export const EVENT_PRESET_LIBRARY_UPDATED = 'preset-library-updated'
 export const EVENT_NOTE_CLICK = 'noteClick'
+
+export const EVENT_STORAGE = 'storage'

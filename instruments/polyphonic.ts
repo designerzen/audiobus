@@ -4,22 +4,28 @@
  * to the single oscillator
  */
 import type { IAudioOutput } from "../io/outputs/output-interface.ts"
+import type SynthOscillator from './oscillators/synth-oscillator.ts'
+import { EVENT_CONFIGURATION_CHANGED } from '../event-constants.ts'
+import { POLYSYNTH_DEFAULTS, POLYSYNTH_PARAMETERS, POLYSYNTH_WAVEFORMS, type PolySynthSettings } from './polyphonic-settings.ts'
+import { createPolySynthGui } from './polyphonic-gui.ts'
 
-export default class PolySynth implements IAudioOutput{
+export default class PolySynth extends EventTarget implements IAudioOutput{
 
 	static ID = 0
 
     options = {
+        ...POLYSYNTH_DEFAULTS,
         maxPolyphony: 24,
         class: null as any
     }
 
-    instruments = []
+    instruments: SynthOscillator[] = []
     instrumentActivity = new Map()
 
     #gainNode: GainNode
 	#audioContext: AudioContext
 	#activeVoices = 0
+    #gui?: ReturnType<typeof createPolySynthGui>
 
 	#uuid : string = 'polyphonic-' + (PolySynth.ID++)
 	
@@ -57,6 +63,7 @@ export default class PolySynth implements IAudioOutput{
     }
 
     constructor(audioContext: AudioContext,  options = {}) {
+         super()
          this.#audioContext = audioContext
          this.options = Object.assign({}, this.options, options)
         
@@ -152,15 +159,49 @@ export default class PolySynth implements IAudioOutput{
      * Releasing keys must not boost voices that are still sounding.
      */
     updateMasterGain(){
-        this.#gainNode.gain.value = 1 / Math.sqrt(Math.max(1, this.options.maxPolyphony))
+        this.#gainNode.gain.value = this.options.volume / Math.sqrt(Math.max(1, this.options.maxPolyphony))
+    }
+
+    configure(settings: Partial<PolySynthSettings>): void {
+        let changed = false
+        for (const key of Object.keys(settings) as (keyof PolySynthSettings)[]) {
+            const value = settings[key]
+            if (key === 'shape') {
+                if (!POLYSYNTH_WAVEFORMS.includes(value as PolySynthSettings['shape']) || value === this.options.shape) continue
+                this.options.shape = value as PolySynthSettings['shape']
+                for (const instrument of this.instruments) instrument.shape = this.options.shape
+            } else {
+                const parameter = POLYSYNTH_PARAMETERS[key]
+                if (!parameter || typeof value !== 'number' || !Number.isFinite(value)) continue
+                const bounded = Math.min(parameter.max, Math.max(parameter.min, value))
+                if (bounded === this.options[key]) continue
+                this.options[key] = bounded
+                if (key === 'volume') this.updateMasterGain()
+                else for (const instrument of this.instruments) {
+                    instrument.options[key] = bounded
+                    if (key === 'filterCutOff') instrument.filterCutOff = bounded
+                    if (key === 'filterResonance') instrument.Q = bounded
+                }
+            }
+            changed = true
+        }
+        if (changed) this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
+    }
+
+    async createGui(): Promise<HTMLElement> {
+        this.#gui ??= createPolySynthGui(this)
+        return this.#gui.element
+    }
+
+    async destroyGui(): Promise<void> {
+        this.#gui?.dispose()
+        this.#gui = undefined
     }
 
     /**
      * Set a random oscillator timbre from the collection
      */
     async setRandomTimbre(){
-        const { OSCILLATORS } = await import('./oscillators/synth-oscillator.ts')
-    const randomShape = OSCILLATORS[Math.floor(Math.random() * (OSCILLATORS.length - 1))]
-    this.instruments.forEach( instrument => instrument.shape = randomShape )
+        this.configure({ shape: POLYSYNTH_WAVEFORMS[Math.floor(Math.random() * POLYSYNTH_WAVEFORMS.length)] })
      }
 }

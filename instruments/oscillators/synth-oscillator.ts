@@ -282,7 +282,7 @@ export default class SynthOscillator implements IAudioOutput{
         // }
         this.shape = this.options.shape // OSCILLATORS[Math.floor(Math.random() * OSCILLATORS.length)]
         this.oscillator.frequency.value = frequency
-        this.oscillator.connect(this.gainNode)
+        this.oscillator.connect(this.filterNode)
         this.oscillator.start(startTime)
 
         if (this.tremoloActive)

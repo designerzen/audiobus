@@ -95,8 +95,14 @@ export default class OutputManager extends EventTarget implements IAudioOutput{
 	add(output:IAudioOutput){
 		if (this.#outputs.includes(output)) return
 		this.#outputs.push(output)
-        if (output.sendCommand && output instanceof EventTarget && output.configurationAffectsNoteRouting !== false) {
-            const changed = () => { owners.delete(output); noteCommands.delete(output) }
+        if (output instanceof EventTarget) {
+            const changed = () => {
+                if (output.sendCommand && output.configurationAffectsNoteRouting !== false) {
+                    owners.delete(output)
+                    noteCommands.delete(output)
+                }
+                this.dispatchEvent(new CustomEvent(EVENT_OUTPUTS_UPDATED))
+            }
             this.#configurationListeners.set(output, changed)
             output.addEventListener(EVENT_CONFIGURATION_CHANGED, changed)
         }
