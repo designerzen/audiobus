@@ -26,7 +26,7 @@ export const importMIDIFile = async(file: File) => {
 			noteOn.velocity = note.velocity * 127 || 100  // @tonejs/midi uses 0-1, convert to 0-127
 			noteOn.startAt = note.time
 			noteOn.from = file.name
-			noteOn.channel = track.channel
+			noteOn.channel = track.channel + 1
 			noteOn.patch = track.instrument.number
 			commands.push(noteOn)
 			//console.info("note", {note}, "track", {track})
@@ -38,7 +38,7 @@ export const importMIDIFile = async(file: File) => {
 			noteOff.velocity = note.velocity * 127 || 100
 			noteOff.startAt = note.time + note.duration
 			noteOff.from = file.name
-			noteOff.channel = track.channel
+			noteOff.channel = track.channel + 1
 			noteOff.patch = track.instrument.number
 			commands.push(noteOff)
 		}

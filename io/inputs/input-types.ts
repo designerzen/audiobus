@@ -4,6 +4,7 @@
  */
 
 export const KEYBOARD = "keyboard" as const
+export const MIDI_FILE = "midi-file" as const
 export const GAMEPAD = "gamepad" as const
 export const GAMEPAD_MUSIC = "gamepad-music" as const
 export const WEBMIDI = "webmidi" as const

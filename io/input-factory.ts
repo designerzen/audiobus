@@ -21,6 +21,8 @@ const loadSupportingLibrary = async (type: string) => {
     if (Object.hasOwn(MIDI_DEVICE_PROFILES, type)) return await import('./inputs/input-profiled-midi-device')
 	// Create and return instance based on type
 	switch (type) {
+		case INPUT_TYPES.MIDI_FILE:
+			return await import('./inputs/input-midi-file')
 		case INPUT_TYPES.KEYBOARD:
 			return await import("./inputs/input-keyboard.ts")
 		case INPUT_TYPES.GAMEPAD:
@@ -98,6 +100,11 @@ const createInput = async (type: string, options={} ): Promise<IAudioInput> => {
  * then uses the loaded imports in future requests
  */
 export const INPUT_FACTORIES: InputFactory[] = [
+    {
+        ...INPUT_DEFINITIONS[INPUT_TYPES.MIDI_FILE],
+        isAvailable: () => true,
+        create: options => createInput(INPUT_TYPES.MIDI_FILE, options),
+    },
     ...Object.entries(MIDI_DEVICE_PROFILES).map(([id, profile]): InputFactory => ({
         id, name: profile.name, description: profile.description, type: 'midi', subtype: 'device',
         isAvailable: () => typeof navigator !== 'undefined' && (!!(navigator as any).requestMIDIAccess || !!(globalThis as any).window?.electronAPI?.midi2),

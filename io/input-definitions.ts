@@ -22,6 +22,10 @@ export interface InputDefinition extends DeviceClassification {
 }
 
 export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
+    [INPUT_TYPES.MIDI_FILE]: {
+        id: INPUT_TYPES.MIDI_FILE, name: 'MIDI File', description: 'Drop a MIDI file to load a tune for transport playback',
+        type: 'midi', subtype: 'device', category: 'MIDI', icon: '/icons/transformer-midi-file-player.svg',
+    },
     ...Object.fromEntries(Object.entries(MIDI_DEVICE_PROFILES).map(([id, profile]) => [id, {
         id, name: profile.name, description: profile.description,
         type: 'midi', subtype: 'device', category: 'MIDI', icon: profile.icon ?? '/icons/input-webmidi.svg'
