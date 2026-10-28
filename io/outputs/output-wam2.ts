@@ -53,6 +53,7 @@ export default class OutputWAM2 extends EventTarget implements IAudioOutput {
     protected async createPlugin(url: string): Promise<any> {
         const groupId = await initializeHost(this.context)
         const { default: Plugin } = await import(/* @vite-ignore */ url)
+        if (typeof Plugin?.createInstance !== 'function') throw new Error('This module is not a WAM2 plugin. Use the built plugin index.js and include its companion assets.')
         return Plugin.createInstance(groupId, this.context)
     }
     async connect(): Promise<void> {

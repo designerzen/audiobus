@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
+import { wamArchiveWorkerSource } from '../../wam/archive-files.js'
 
 const require = createRequire(import.meta.url)
 const files = new Map([
@@ -10,6 +11,8 @@ const headers = {
     'Cross-Origin-Opener-Policy': 'same-origin',
     'Cross-Origin-Embedder-Policy': 'require-corp',
 }
+const fileSource = (name, path) => name === 'coi-serviceworker.js'
+    ? wamArchiveWorkerSource + readFileSync(path, 'utf8') : readFileSync(path)
 
 /** Serve the prebundled SDK processor unchanged; its internal URLs are worklet-relative. */
 export function opendawFilesPlugin() {
@@ -23,7 +26,7 @@ export function opendawFilesPlugin() {
             if (!pathname.startsWith(prefix) || !file) return next()
             response.setHeader('Content-Type', 'text/javascript')
             response.setHeader('Cache-Control', 'no-cache')
-            response.end(request.method === 'HEAD' ? undefined : readFileSync(file))
+            response.end(request.method === 'HEAD' ? undefined : fileSource(pathname.slice(prefix.length), file))
         })
     }
     return {
@@ -36,7 +39,7 @@ export function opendawFilesPlugin() {
             return [{ tag: 'script', attrs: { src: `${config.base}coi-serviceworker.js` }, injectTo: 'head-prepend' }]
         },
         generateBundle() {
-            for (const [fileName, file] of files) this.emitFile({ type: 'asset', fileName, source: readFileSync(file) })
+            for (const [fileName, file] of files) this.emitFile({ type: 'asset', fileName, source: fileSource(fileName, file) })
         },
     }
 }

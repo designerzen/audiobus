@@ -74,6 +74,7 @@ export class IOChainManager extends EventTarget {
     #handledControls = new WeakMap<object, boolean>()
     #clockOutputs = new Set<IAudioOutput>()
     #timedInputs = new Set<IAudioInput>()
+    #inputTransportRunning = false
 
     get transportRunning(): boolean { return this.externallyControlledTransport ? this.#options.timer.isRunning : this.#transportRunning ?? this.#options.timer.isRunning }
 
@@ -159,6 +160,7 @@ export class IOChainManager extends EventTarget {
         for (const output of this.#clockOutputs) output.stopClock?.()
         for (const input of this.#timedInputs) input.stopClock?.()
         this.#timedInputs.clear()
+        this.#inputTransportRunning = false
     }
 
     private async disposeDevice(id: string, device: any): Promise<void> {
@@ -383,10 +385,14 @@ export class IOChainManager extends EventTarget {
 	public updateTime(now:number, divisionsElapsed:number, options={} ){
         if (this.externallyControlledTransport ? !this.transportRunning : this.#transportRunning === false) return []
 
-        const inputs = new Set(this.chains.filter(chain => chain.isActive).flatMap(chain =>
-            chain.inputs.filter(input => input.updateTime && chain.inputManager.isEnabled(input))))
+        const inputs = new Set<IAudioInput>(this.chains.filter(chain => chain.isActive).flatMap(chain =>
+            chain.inputs.filter(input => (input as IAudioInput).updateTime && chain.inputManager.isEnabled(input))))
         for (const input of this.#timedInputs) if (!inputs.has(input)) input.stopClock?.()
         this.#timedInputs = inputs
+        if (!this.#inputTransportRunning) {
+            for (const input of inputs) input.startClock?.()
+            this.#inputTransportRunning = true
+        }
         for (const input of inputs) input.updateTime?.(now)
 		
 		return this.entries.map(([chainId, chain]) => {
@@ -681,6 +687,7 @@ export class IOChainManager extends EventTarget {
 	 * Stop all chains and clear them
 	 */
 	destroy(): void {
+		this.stopClock()
 		this.dispatchEvent(new Event(EVENT_DESTROYED))
 		this.#subscriptions.forEach(controller => controller.abort())
 		this.#subscriptions.clear()

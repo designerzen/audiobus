@@ -9,6 +9,7 @@ export interface IAudioInput{
 	// optional
 	readonly requiresConnectionControl?: boolean
 	updateTime?(now: number): void
+	startClock?(): void
 	stopClock?(): void
 	connect?():Promise<void | Function>|Function
 	disconnect?():Promise<void>|Function
