@@ -23,6 +23,8 @@ export default class PolySynth extends EventTarget implements IAudioOutput{
     instrumentActivity = new Map()
 
     #gainNode: GainNode
+    #voiceMix: GainNode
+    #limiter: WaveShaperNode
 	#audioContext: AudioContext
 	#activeVoices = 0
     #gui?: ReturnType<typeof createPolySynthGui>
@@ -69,6 +71,21 @@ export default class PolySynth extends EventTarget implements IAudioOutput{
         
          this.InstrumentClass = this.options.class
          this.#gainNode = audioContext.createGain()
+         this.#voiceMix = audioContext.createGain()
+         // Leave single voices at their native level. Bound the summed signal
+         // instead of attenuating every note for an entirely full voice pool.
+         const range = Math.max(1, this.options.maxPolyphony)
+         this.#voiceMix.gain.value = 1 / range
+         this.#limiter = audioContext.createWaveShaper()
+         const curve = new Float32Array(65537)
+         for (let i = 0; i < curve.length; i++) {
+             const input = (2 * i / (curve.length - 1) - 1) * range
+             curve[i] = 0.9 * Math.tanh(input / 0.9)
+         }
+         this.#limiter.curve = curve
+         this.#limiter.oversample = '4x'
+         this.#voiceMix.connect(this.#limiter)
+         this.#limiter.connect(this.#gainNode)
          this.updateMasterGain()
          this.#initializeDefaults().then(() => {
              this.factory(this.InstrumentClass, this.options.maxPolyphony)
@@ -84,7 +101,7 @@ export default class PolySynth extends EventTarget implements IAudioOutput{
         for ( let i=0; i < quantity; ++i){
             const instrument = new InstrumentClass( this.#audioContext, { ...this.options, title:'osc-0'+i } )
             this.instruments.push( instrument )
-            instrument.output.connect( this.#gainNode )
+            instrument.output.connect( this.#voiceMix )
         }
     }
     
@@ -155,11 +172,11 @@ export default class PolySynth extends EventTarget implements IAudioOutput{
     }
 
     /**
-     * Reserve headroom for the voice pool, including notes in their release phase.
-     * Releasing keys must not boost voices that are still sounding.
+     * Volume stays independent of held notes and their release tails. The
+     * saturator before this node reserves headroom for dense chords.
      */
     updateMasterGain(){
-        this.#gainNode.gain.value = this.options.volume / Math.sqrt(Math.max(1, this.options.maxPolyphony))
+        this.#gainNode.gain.value = this.options.volume
     }
 
     configure(settings: Partial<PolySynthSettings>): void {

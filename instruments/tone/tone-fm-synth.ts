@@ -17,7 +17,7 @@ export default class ToneFMSynth implements IAudioOutput {
 	options = {
 		title:"Tone.js FMSynth Instrument",
 		// Default amplitude
-		gain: 0.2, // ratio 0-1
+		gain: 0.8, // compensate Tone's quieter FM carrier
 		attack: 0.4, // in s
 		decay: 0.9, // in s
 		sustain: 0.85, // ratio 0-1

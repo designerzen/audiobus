@@ -17,7 +17,7 @@ export default class TonePluckString implements IAudioOutput {
 		titls:"Tone.js PluckString Instrument",
 
 		// Default amplitude
-		gain: 0.2, // ratio 0-1
+		gain: 0.5, // match the other instruments over the pluck's decay
 		attack: 0.1, // in s
 		decay: 0.5, // in s
 		sustain: 0.0, // ratio 0-1
@@ -41,7 +41,9 @@ export default class TonePluckString implements IAudioOutput {
 		reuseOscillators: true,
 
 		// Tone.js PluckString specific
-		dampening: 0.4 // controls decay of plucked string
+		dampening: 4000, // lowpass cutoff in Hz, not a normalized decay amount
+		attackNoise: 8,
+		resonance: 0.98,
 	}
 
 	#id = "TonePluckString"
@@ -155,6 +157,9 @@ export default class TonePluckString implements IAudioOutput {
 		// Initialize Tone.js PluckSynth and connect to our gain node
 		this.#synth = new PluckSynth({
 			dampening: this.options.dampening,
+			attackNoise: this.options.attackNoise,
+			resonance: this.options.resonance,
+			release: this.options.release,
 			volume: 0 // Tone volume is 0, use our gainNode instead
 		})
 		

@@ -16,7 +16,7 @@ export default class ToneSynth implements IAudioOutput {
 	options = {
 		title:"Tone.js Synth Instrument",
 		// Default amplitude
-		gain: 0.2, // ratio 0-1
+		gain: 0.3, // match the built-in oscillator's default level
 		attack: 0.4, // in s
 		decay: 0.9, // in s
 		sustain: 0.85, // ratio 0-1
