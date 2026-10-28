@@ -11,10 +11,6 @@ export const INSTRUMENT_TYPE_TONE_SAMPLER = "tone-sampler"
 export const INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT = "scsynth-instrument"
 export const INSTRUMENT_TYPE_CLAP = "clap"
 export const INSTRUMENT_TYPE_FAUST = "faust"
-export const INSTRUMENT_TYPE_OPENDAW_PLAYFIELD = "opendaw-playfield"
-export const INSTRUMENT_TYPE_OPENDAW_NANO = "opendaw-nano"
-export const INSTRUMENT_TYPE_OPENDAW_TAPE = "opendaw-tape"
-export const INSTRUMENT_TYPE_OPENDAW_SOUNDFONT = "opendaw-soundfont"
 export const INSTRUMENT_TYPE_OPENDAW_VAPORISATEUR = "opendaw-vaporisateur"
 
 /**
@@ -149,50 +145,6 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 			description: "Functional DSP synthesizer using FAUST compiled to WebAssembly",
 			category: INSTRUMENT_CATEGORY_FAUST,
 			loader: () => import("./faust/faust-instrument.ts")
-		}
-	],
-	[
-		INSTRUMENT_TYPE_OPENDAW_PLAYFIELD,
-		{
-			id: INSTRUMENT_TYPE_OPENDAW_PLAYFIELD,
-			...INSTRUMENT_CLASSIFICATION,
-			name: "openDAW Playfield",
-			description: "Playfield instrument using openDAW framework",
-			category: INSTRUMENT_CATEGORY_SYNTHESIS,
-			loader: () => import("./openDAW/opendaw-playfield.ts")
-		}
-	],
-	[
-		INSTRUMENT_TYPE_OPENDAW_NANO,
-		{
-			id: INSTRUMENT_TYPE_OPENDAW_NANO,
-			...INSTRUMENT_CLASSIFICATION,
-			name: "openDAW Nano",
-			description: "Nano synthesizer using openDAW framework",
-			category: INSTRUMENT_CATEGORY_SYNTHESIS,
-			loader: () => import("./openDAW/opendaw-nano.ts")
-		}
-	],
-	[
-		INSTRUMENT_TYPE_OPENDAW_TAPE,
-		{
-			id: INSTRUMENT_TYPE_OPENDAW_TAPE,
-			...INSTRUMENT_CLASSIFICATION,
-			name: "openDAW Tape",
-			description: "Tape synthesizer using openDAW framework",
-			category: INSTRUMENT_CATEGORY_SYNTHESIS,
-			loader: () => import("./openDAW/opendaw-tape.ts")
-		}
-	],
-	[
-		INSTRUMENT_TYPE_OPENDAW_SOUNDFONT,
-		{
-			id: INSTRUMENT_TYPE_OPENDAW_SOUNDFONT,
-			...INSTRUMENT_CLASSIFICATION,
-			name: "openDAW SoundFont",
-			description: "SoundFont sampler using openDAW framework",
-			category: INSTRUMENT_CATEGORY_SAMPLING,
-			loader: () => import("./openDAW/opendaw-soundfont.ts")
 		}
 	],
 	[

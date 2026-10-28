@@ -268,7 +268,9 @@ export default function registerTB303Processor(moduleId, definitions) {
                     const filtered = this._filterSample(oscillator, cutoff, c.resonance)
                     // BA662 gain-control current sums VEG and smoothed accent.
                     const vca = 0.55 * this.volumeEnvelope + 1.1 * this.accentVca
-                    const sample = tick(this.vcaCoupling, Math.tanh(filtered * vca * 1.8)) * c.volume
+                    // Calibrate the circuit's low VCA level to the other built-in
+                    // instruments. Soft saturation bounds extreme accent settings.
+                    const sample = Math.tanh(tick(this.vcaCoupling, Math.tanh(filtered * vca * 1.8)) * 4) * c.volume
                     this.history[this.historyPosition] = sample
                     this.historyPosition = (this.historyPosition + 1) & 127
                 }

@@ -1,266 +1,117 @@
-import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
-import { linearToDb } from "../../conversion/linear-to-decibels.ts"
-import { dbToLinear } from "../../conversion/decibels-to-linear.ts"
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
+import { velocityToGain } from "../../conversion/velocity-to-gain.ts"
+import { createVaporisateurEngine, type VaporisateurEngine } from "./vaporisateur-engine.ts"
 
-/**
- * OpenDAW Vaporisateur Instrument
- * Subtractive synthesizer with classical waveforms
- */
+export interface VaporisateurOptions {
+	title?: string
+	gain?: number
+	attack?: number
+	decay?: number
+	sustain?: number
+	release?: number
+	filterCutOff?: number
+	filterResonance?: number
+	slideDuration?: number
+	fadeDuration?: number
+	oscillator?: { type: "sine" | "triangle" | "sawtooth" | "square" }
+}
+
+/** OpenDAW's polyphonic subtractive synth, routed through Harmoneasy's mixer. */
 export default class OpenDAWVaporisateur implements IAudioOutput {
-	static ID: number = 0
+	static ID = 0
+	readonly uuid = `OpenDAWVaporisateur-${OpenDAWVaporisateur.ID++}`
+	readonly options: Required<Omit<VaporisateurOptions, "title">> & Pick<VaporisateurOptions, "title">
+	readonly output: GainNode
+	readonly requiresConnectionControl = false
+	readonly activeNotes = new Set<number>()
+	#engine: VaporisateurEngine | null = null
+	#connecting: Promise<void> | null = null
+	#generation = 0
+	#timers = new Map<number, ReturnType<typeof setTimeout>>()
 
-	options = {
-		// Default amplitude
-		gain: 0.2, // ratio 0-1
-		attack: 0.4, // in s
-		decay: 0.9, // in s
-		sustain: 0.85, // ratio 0-1
-		release: 0.3, // in s
-		minDuration: 0.6,
-
-		arpeggioDuration: 0.2,
-		slideDuration: 0.2, // portamento/glide time
-		fadeDuration: 0.2,
-
-		filterGain: 0.7,
-		filterCutOff: 2200,
-		filterOverdrive: 2.5,
-		filterResonance: 1.8,
-
-		filterAttack: 0.2,
-		filterDecay: 0.08,
-		filterSustain: 0.8,
-		filterRelease: 0.2,
-
-		reuseOscillators: true,
-
-		// OpenDAW Vaporisateur specific
-		oscillator: {
-			type: "square"
-		},
-		envelope: {
-			attack: 0.4,
-			decay: 0.9,
-			sustain: 0.85,
-			release: 0.3
-		},
-		filter: {
-			Q: 6,
-			type: "lowpass",
-			rolloff: -24
-		},
-		filterEnvelope: {
-			attack: 0.2,
-			decay: 0.08,
-			sustain: 0.8,
-			release: 0.2
+	constructor(readonly audioContext: BaseAudioContext, options: VaporisateurOptions = {}) {
+		this.options = {
+			gain: 0.2, attack: 0.005, decay: 0.1, sustain: 0.5, release: 0.5,
+			filterCutOff: 8000, filterResonance: 0.1, slideDuration: 0,
+			fadeDuration: 0.02, oscillator: { type: "sawtooth" }, ...options
 		}
+		this.output = audioContext.createGain()
+		this.output.gain.value = this.options.gain
 	}
 
-	#id = "OpenDAWVaporisateur"
-	#uuid = this.#id + "-" + OpenDAWVaporisateur.ID++
+	get name() { return "OpenDAW Vaporisateur" }
+	get title() { return this.options.title ?? this.name }
+	get description() { return "OpenDAW polyphonic subtractive synthesizer with dual oscillators, filter and ADSR" }
+	get isConnected() { return this.#engine !== null }
+	get isHidden() { return false }
+	get isNoteDown() { return this.activeNotes.size > 0 }
+	get now() { return this.audioContext.currentTime }
+	get gain() { return this.options.gain }
+	set gain(value: number) {
+		if (!Number.isFinite(value)) return
+		this.options.gain = Math.max(0, value)
+		this.output.gain.cancelScheduledValues(this.now)
+		this.output.gain.setTargetAtTime(this.options.gain, this.now, Math.max(0.001, this.options.fadeDuration))
+	}
+	get volume() { return this.gain }
+	set volume(value: number) { this.gain = value }
+	hasMidiOutput() { return false }
+	hasAudioOutput() { return true }
+	hasAutomationOutput() { return false }
+	hasMpeOutput() { return false }
+	hasOscOutput() { return false }
+	hasSysexOutput() { return false }
 
-	activeNote = null
-	#synth: any // Reference to the actual OpenDAW Vaporisateur instance
-	#audioContext: BaseAudioContext
-
-	get isNoteDown() {
-		return this.activeNote !== null
+	async connect(): Promise<void> {
+		if (this.#engine) return
+		if (this.#connecting) return this.#connecting
+		const generation = this.#generation
+		const connecting = (async () => {
+			const engine = await createVaporisateurEngine(this.audioContext, this.options)
+			if (generation !== this.#generation) { engine.dispose(); return }
+			engine.output.connect(this.output)
+			this.#engine = engine
+		})()
+		this.#connecting = connecting
+		try { await connecting }
+		finally { if (this.#connecting === connecting) this.#connecting = null }
 	}
 
-	get id() {
-		return this.#id
-	}
-
-	set id(value) {
-		this.#id = value
-	}
-
-	get uuid(): string {
-		return this.#uuid
-	}
-
-	get name(): string {
-		return "OpenDAW Vaporisateur"
-	}
-
-	get description(): string {
-		return "Subtractive synthesizer with classical waveforms using OpenDAW"
-	}
-
-	get isConnected(): boolean {
-		return this.#synth !== null && this.#synth !== undefined
-	}
-
-	get isHidden(): boolean {
-		return false
-	}
-
-	get now() {
-		return this.#audioContext.currentTime
-	}
-
-	get gain() {
-		return this.options.gain
-	}
-
-	set gain(value) {
-		this.options.gain = value
-		if (this.#synth) {
-			this.#synth.volume.value = dbToLinear(value)
+	noteOn(noteNumber: number, velocity = 127, _arp = null, delay = 0) {
+		if (!Number.isInteger(noteNumber) || noteNumber < 0 || noteNumber > 127 || !Number.isFinite(velocity)) return
+		if (velocity <= 0) { this.noteOff(noteNumber); return }
+		if (!this.#engine) return
+		this.noteOff(noteNumber)
+		this.activeNotes.add(noteNumber)
+		const play = () => {
+			this.#timers.delete(noteNumber)
+			this.#engine?.noteOn(noteNumber, velocityToGain(velocity))
 		}
+		if (Number.isFinite(delay) && delay > 0) this.#timers.set(noteNumber, setTimeout(play, delay * 1000))
+		else play()
 	}
 
-	get volume() {
-		return this.#synth?.volume.value ?? 0
-	}
-
-	set volume(value) {
-		if (this.#synth) {
-			const dbValue = linearToDb(value)
-			this.#synth.volume.rampTo(dbValue, this.options.fadeDuration)
-		}
-	}
-
-	get frequency() {
-		return this.#synth?.frequency.value ?? 440
-	}
-
-	set frequency(value: number) {
-		if (this.#synth && Number.isFinite(value)) {
-			this.#synth.frequency.rampTo(value, this.options.slideDuration)
-		}
-	}
-
-	get output() {
-		return this.#synth
-	}
-
-	get audioContext(): BaseAudioContext {
-		return this.#audioContext
-	}
-
-	get title() {
-		return this.options.title ?? "OpenDAW Vaporisateur"
-	}
-
-	constructor(audioContext: BaseAudioContext, options = {}) {
-		this.#audioContext = audioContext
-		this.options = Object.assign({}, this.options, options)
-
-		// Initialize OpenDAW Vaporisateur
-		// In a real implementation, this would instantiate the actual OpenDAW device
-		this.#synth = this.createVaporisateurInstance()
-	}
-
-	/**
-	 * Create a Vaporisateur instance from OpenDAW
-	 */
-	private createVaporisateurInstance(): any {
-		// Placeholder for actual OpenDAW Vaporisateur instantiation
-		// This would connect to the actual OpenDAW audio engine
-		return {
-			volume: { value: dbToLinear(this.options.gain), rampTo: () => {} },
-			frequency: { value: 440, rampTo: () => {} },
-			triggerAttack: () => {},
-			triggerRelease: () => {},
-			dispose: () => {}
-		}
-	}
-
-
-
-	hasMidiOutput(): boolean {
-		return false
-	}
-
-	hasAudioOutput(): boolean {
-		return true
-	}
-
-	hasAutomationOutput(): boolean {
-		return false
-	}
-
-	hasMpeOutput(): boolean {
-		return false
-	}
-
-	hasOscOutput(): boolean {
-		return false
-	}
-
-	hasSysexOutput(): boolean {
-		return false
-	}
-
-	/**
-	 * Note ON
-	 * @param {Number} noteNumber - MIDI note number
-	 * @param {Number} velocity - strength of the note (0-1)
-	 * @param {Array<Number>} arp - intervals (currently unused)
-	 * @param {Number} delay - number to pause before playing
-	 */
-	noteOn(noteNumber: number, velocity: number = 1, arp = null, delay: number = 0) {
-		const frequency = noteNumberToFrequency(noteNumber)
-		const startTime = this.now + delay
-		const amplitude = Math.max(0.001, velocity * this.options.gain)
-
-		this.activeNote = noteNumber
-
-		try {
-			this.frequency = frequency
-			this.#synth.triggerAttack(frequency, "+0.1")
-		} catch (e) {
-			console.error("Failed to trigger Vaporisateur attack:", e)
-		}
-
-		return this
-	}
-
-	/**
-	 * Note OFF
-	 * @param {Number} noteNumber - MIDI note number
-	 */
 	noteOff(noteNumber: number) {
-		if (!this.isNoteDown) {
-			console.warn("noteOff IGNORED - note NOT playing", noteNumber, this)
-			return
-		}
-
-		this.activeNote = null
-
-		try {
-			this.#synth.triggerRelease("+0.1")
-		} catch (e) {
-			console.error("Failed to trigger Vaporisateur release:", e)
-		}
-
-		return this
+		const timer = this.#timers.get(noteNumber)
+		if (timer !== undefined) { clearTimeout(timer); this.#timers.delete(noteNumber) }
+		if (this.activeNotes.delete(noteNumber) && timer === undefined) this.#engine?.noteOff(noteNumber)
 	}
 
-	/**
-	 * Stop all notes on this instrument
-	 */
 	allNotesOff() {
-		if (this.isNoteDown) {
-			try {
-				this.#synth.triggerRelease()
-			} catch (e) {
-				console.error("Failed to stop Vaporisateur:", e)
-			}
-			this.activeNote = null
-		}
+		for (const note of this.activeNotes) this.noteOff(note)
+		this.#engine?.panic()
 	}
 
-	/**
-	 * Clean up resources
-	 */
-	dispose() {
-		if (this.#synth) {
-			this.#synth.dispose()
-			this.#synth = null
-		}
+	async disconnect(): Promise<void> {
+		this.#generation++
+		this.allNotesOff()
+		this.#engine?.dispose()
+		this.#engine = null
+		await this.#connecting
+	}
+
+	async dispose(): Promise<void> {
+		this.output.disconnect()
+		await this.disconnect()
 	}
 }

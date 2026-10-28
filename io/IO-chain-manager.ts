@@ -68,6 +68,8 @@ export class IOChainManager extends EventTarget {
     transportHandler?: (type: string) => void
     controlChangeHandler?: (command: IAudioCommand) => boolean
     clockCommandHandler?: (command: IAudioCommand) => boolean
+    sessionInputHandler?: (chainId: string, command: IAudioCommand) => boolean
+    sessionOutputHandler?: (chainId: string, commands: IAudioCommand[]) => boolean
     externallyControlledTransport = false
     #handledControls = new WeakMap<object, boolean>()
     #clockOutputs = new Set<IAudioOutput>()
@@ -234,7 +236,9 @@ export class IOChainManager extends EventTarget {
         return {
             version: 2, activeChainId: this.activeChainId, devices,
             chains: this.entries.map(([id, chain]) => ({ id, ...chain.exportConfiguration(),
-                inputs: chain.inputs.map(deviceId), outputs: chain.outputs.map(deviceId) }))
+                inputs: chain.inputs.map(deviceId), outputs: chain.outputs.map(deviceId),
+                disabledInputs: chain.inputs.filter(input => !chain.inputManager.isEnabled(input)).map(deviceId),
+                disabledOutputs: chain.outputs.filter(output => !chain.outputManager.isEnabled(output)).map(deviceId) }))
         }
     }
 
@@ -272,6 +276,11 @@ export class IOChainManager extends EventTarget {
                             if (!data.devices.some((d: SavedDevice) => d.id === id && d.direction === direction)) throw new Error('Invalid device reference')
                         }
                     }
+                    for (const [key, endpoints] of [['disabledInputs', config.inputs], ['disabledOutputs', config.outputs]] as const) {
+                        if (config[key] !== undefined && (!Array.isArray(config[key]) || config[key].some((id: unknown) => !endpoints.includes(id)))) {
+                            throw new Error('Invalid disabled device reference')
+                        }
+                    }
                     const chain = new IOChain(this.#options.timer)
                     staged.set(config.id, chain)
                     chain.importConfiguration(config)
@@ -291,6 +300,8 @@ export class IOChainManager extends EventTarget {
                     const chain = staged.get(config.id)!
                     chain.addInputs(config.inputs.map((id: string) => devices.get(id)))
                     chain.addOutputs(config.outputs.map((id: string) => devices.get(id)))
+                    for (const id of config.disabledInputs ?? []) chain.setInputEnabled(devices.get(id), false)
+                    for (const id of config.disabledOutputs ?? []) chain.outputManager.setEnabled(devices.get(id), false)
                 }
             }
         } catch (error) {
@@ -367,7 +378,7 @@ export class IOChainManager extends EventTarget {
 	}
 
 	public updateTime(now:number, divisionsElapsed:number, options={} ){
-        if (this.#transportRunning === false) return []
+        if (this.externallyControlledTransport ? !this.transportRunning : this.#transportRunning === false) return []
 		
 		return this.entries.map(([chainId, chain]) => {
 		  	// Always process the queue, with or without quantisation
@@ -403,6 +414,7 @@ export class IOChainManager extends EventTarget {
 
         if (!chain.options.name) chain.setName(`Chain ${chainId.replace(/^chain-/, '')}`)
         chain.inputCommandHandler = event => {
+            if (this.sessionInputHandler?.(chainId, event.command)) return true
             if (!this.clockCommandHandler && (event.command.type !== CONTROL_CHANGE || !this.controlChangeHandler)) return false
             if (!this.#handledControls.has(event.origin)) {
                 const consumed = this.clockCommandHandler?.(event.command) ||
@@ -415,6 +427,7 @@ export class IOChainManager extends EventTarget {
             if (this.transportHandler) this.transportHandler(type)
             else void this.handleTransportCommand(type).catch(error => console.error('Transport failed', error))
         }
+        chain.outputCommandHandler = commands => this.sessionOutputHandler?.(chainId, commands) ?? false
 		this.#chains.set(chainId, chain)
         if (!this.#restoring) this.syncDevices()
         const controller = new AbortController()

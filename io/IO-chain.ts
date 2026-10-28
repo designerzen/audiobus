@@ -75,6 +75,7 @@ export default class IOChain extends EventTarget {
 
     transportCommand?: (type: string) => void
     inputCommandHandler?: (event: InputAudioEvent) => boolean
+    outputCommandHandler?: (commands: IAudioCommand[]) => boolean
 
     setName(name: string): void {
         const trimmed = name.trim().slice(0, 80)
@@ -405,6 +406,7 @@ export default class IOChain extends EventTarget {
      * @returns 
     */
     triggerAudioCommandsOnDevice(commands: IAudioCommand[]) {
+        if (this.outputCommandHandler?.(commands)) return Promise.resolve(commands)
         return this.outputManager.triggerAudioCommandsOnOutputs(commands)
     }
 
@@ -693,7 +695,7 @@ export default class IOChain extends EventTarget {
         // Channel controllers and system messages must not be interpreted as notes
         // by pitch transformers, quantised, or swallowed by transport handling.
         const midiControl = (audioCommand.raw?.length || audioCommand.ump?.length) && audioCommand.type !== NOTE_ON && audioCommand.type !== NOTE_OFF
-        if (midiControl) void this.#outputManager.triggerAudioCommandsOnOutputs([audioCommand])
+        if (midiControl) void this.triggerAudioCommandsOnDevice([audioCommand])
         const origin = inputEvent.origin ?? inputEvent
         let handled = handledTransport.get(this.timer)
         if (!handled) handledTransport.set(this.timer, handled = new WeakSet())

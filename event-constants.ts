@@ -73,3 +73,8 @@ export const EVENT_PRESET_LIBRARY_UPDATED = 'preset-library-updated'
 export const EVENT_NOTE_CLICK = 'noteClick'
 
 export const EVENT_STORAGE = 'storage'
+export const EVENT_MESSAGE = 'message'
+export const EVENT_PAGE_HIDE = 'pagehide'
+export const EVENT_BUFFERED_AMOUNT_LOW = 'bufferedamountlow'
+export const EVENT_ICE_GATHERING_STATE_CHANGE = 'icegatheringstatechange'
+export const EVENT_OPEN = 'open'
