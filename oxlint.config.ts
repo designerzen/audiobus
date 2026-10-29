@@ -1,3 +1,3 @@
-import sharedConfig from '@harmoneasy/shared-config';
+import sharedConfig from "@harmoneasy/shared-config"
 
-export default sharedConfig;
+export default sharedConfig
