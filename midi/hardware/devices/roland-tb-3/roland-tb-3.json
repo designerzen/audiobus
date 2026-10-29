@@ -1,0 +1,479 @@
+{
+  "$schema": "../profile.schema.json",
+  "schemaVersion": 1,
+  "id": "roland-tb-3",
+  "name": "Roland TB-3",
+  "manufacturer": "Roland",
+  "manufacturerUrl": "https://www.roland.com/",
+  "productUrl": "https://www.roland.com/global/products/tb-3/",
+  "ids": [
+    "roland-tb-3"
+  ],
+  "portNames": [
+    "TB-3",
+    "3- TB-3"
+  ],
+  "description": "Hardware MIDI input for the Roland TB-3 Touch Bassline: notes, touchpad expression and front-panel controllers.",
+  "icon": "icon.svg",
+  "documentation": [
+    {
+      "title": "Roland TB-3 MIDI implementation chart",
+      "url": "https://static.roland.com/assets/media/pdf/TB-3_MI_2.pdf"
+    },
+    {
+      "title": "Roland TB-3 MIDI implementation",
+      "url": "https://static.roland.com/assets/media/pdf/TB-3_MI_1.pdf"
+    }
+  ],
+  "abilities": [
+    "Touchpad and sequencer notes",
+    "Pitch bend",
+    "Touchpad expression",
+    "Cutoff and resonance",
+    "Accent and effect controllers"
+  ],
+  "hardwareControls": [
+    "Touchpad",
+    "Cutoff knob",
+    "Resonance knob",
+    "Accent knob",
+    "Effect knob",
+    "Pattern sequencer"
+  ],
+  "notice": "Connect the TB-3 MIDI input and enable MIDI transmission on the hardware. The factory MIDI channel is 2; channel 0 in Harmoneasy listens to all channels. These controls generate MIDI into this chain and do not configure or send audio from the hardware. Scatter controls are receive-only and are not shown as input controls. Configurable surface controls use virtual defaults; match your hardware preset with MIDI learn or edit note/CC/channel mappings. Keyboard surfaces start at MIDI note 48.",
+  "controls": [
+    {
+      "id": "cutoff",
+      "label": "Cutoff",
+      "cc": 74,
+      "widget": "slider"
+    },
+    {
+      "id": "resonance",
+      "label": "Resonance",
+      "cc": 71,
+      "widget": "slider"
+    },
+    {
+      "id": "accent",
+      "label": "Accent",
+      "cc": 16,
+      "widget": "slider"
+    },
+    {
+      "id": "effect",
+      "label": "Effect",
+      "cc": 17,
+      "widget": "slider"
+    },
+    {
+      "id": "pad-z",
+      "label": "Pad pressure (Z)",
+      "cc": 1,
+      "widget": "slider"
+    },
+    {
+      "id": "pad-y",
+      "label": "XY Play: pad Y",
+      "cc": 11,
+      "widget": "slider"
+    },
+    {
+      "id": "env-x",
+      "label": "Env Mod: pad X",
+      "cc": 12,
+      "widget": "slider"
+    },
+    {
+      "id": "env-y",
+      "label": "Env Mod: pad Y",
+      "cc": 13,
+      "widget": "slider"
+    },
+    {
+      "id": "pitch-bend",
+      "label": "XY Play: pitch bend",
+      "message": {
+        "type": "pitchBend"
+      },
+      "widget": "slider",
+      "default": 8192
+    },
+    {
+      "id": "pattern-slide",
+      "label": "Pattern slide",
+      "cc": 102,
+      "widget": "toggle"
+    },
+    {
+      "id": "pattern-accent",
+      "label": "Pattern accent",
+      "cc": 103,
+      "widget": "toggle"
+    },
+    {
+      "id": "tuning",
+      "label": "Tuning",
+      "cc": 104,
+      "widget": "slider",
+      "default": 64
+    }
+  ],
+  "modes": [],
+  "gui": {
+    "type": "column",
+    "gap": "0.65rem",
+    "children": [
+      {
+        "type": "status"
+      },
+      {
+        "type": "image",
+        "src": "panel.svg",
+        "alt": "Roland TB-3 touchpad and four-knob layout illustration"
+      },
+      {
+        "type": "notes"
+      },
+      {
+        "type": "channel"
+      },
+      {
+        "type": "section",
+        "label": "TB-3 MIDI controllers",
+        "children": [
+          {
+            "type": "grid",
+            "columns": 2,
+            "children": [
+              {
+                "type": "controls"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "xy",
+        "x": "env-x",
+        "y": "env-y",
+        "label": "Envelope modulation touchpad"
+      },
+      {
+        "type": "guide",
+        "label": "Hardware and MIDI documentation"
+      }
+    ]
+  },
+  "surface": {
+    "src": "panel.svg",
+    "width": 480,
+    "height": 240,
+    "elements": [
+      {
+        "id": "cutoff",
+        "label": "Cutoff",
+        "kind": "knob",
+        "position": {
+          "x": 10.2083,
+          "y": 23.75,
+          "width": 7.9167,
+          "height": 15.8333
+        },
+        "control": "cutoff"
+      },
+      {
+        "id": "resonance",
+        "label": "Resonance",
+        "kind": "knob",
+        "position": {
+          "x": 33.5417,
+          "y": 23.75,
+          "width": 7.9167,
+          "height": 15.8333
+        },
+        "control": "resonance"
+      },
+      {
+        "id": "accent",
+        "label": "Accent",
+        "kind": "knob",
+        "position": {
+          "x": 56.875,
+          "y": 23.75,
+          "width": 7.9167,
+          "height": 15.8333
+        },
+        "control": "accent"
+      },
+      {
+        "id": "effect",
+        "label": "Effect",
+        "kind": "knob",
+        "position": {
+          "x": 80.2083,
+          "y": 23.75,
+          "width": 7.9167,
+          "height": 15.8333
+        },
+        "control": "effect"
+      },
+      {
+        "id": "touch-note-0",
+        "label": "Touchpad note 48",
+        "kind": "key",
+        "position": {
+          "x": 6.25,
+          "y": 56.6667,
+          "width": 8.75,
+          "height": 32.5
+        },
+        "message": {
+          "type": "note",
+          "number": 48
+        },
+        "learnable": true
+      },
+      {
+        "id": "touch-note-1",
+        "label": "Touchpad note 49",
+        "kind": "key",
+        "position": {
+          "x": 15.0,
+          "y": 56.6667,
+          "width": 8.75,
+          "height": 32.5
+        },
+        "message": {
+          "type": "note",
+          "number": 49
+        },
+        "learnable": true
+      },
+      {
+        "id": "touch-note-2",
+        "label": "Touchpad note 50",
+        "kind": "key",
+        "position": {
+          "x": 23.75,
+          "y": 56.6667,
+          "width": 8.75,
+          "height": 32.5
+        },
+        "message": {
+          "type": "note",
+          "number": 50
+        },
+        "learnable": true
+      },
+      {
+        "id": "touch-note-3",
+        "label": "Touchpad note 51",
+        "kind": "key",
+        "position": {
+          "x": 32.5,
+          "y": 56.6667,
+          "width": 8.75,
+          "height": 32.5
+        },
+        "message": {
+          "type": "note",
+          "number": 51
+        },
+        "learnable": true
+      },
+      {
+        "id": "touch-note-4",
+        "label": "Touchpad note 52",
+        "kind": "key",
+        "position": {
+          "x": 41.25,
+          "y": 56.6667,
+          "width": 8.75,
+          "height": 32.5
+        },
+        "message": {
+          "type": "note",
+          "number": 52
+        },
+        "learnable": true
+      },
+      {
+        "id": "touch-note-5",
+        "label": "Touchpad note 53",
+        "kind": "key",
+        "position": {
+          "x": 50.0,
+          "y": 56.6667,
+          "width": 8.75,
+          "height": 32.5
+        },
+        "message": {
+          "type": "note",
+          "number": 53
+        },
+        "learnable": true
+      },
+      {
+        "id": "touch-note-6",
+        "label": "Touchpad note 54",
+        "kind": "key",
+        "position": {
+          "x": 58.75,
+          "y": 56.6667,
+          "width": 8.75,
+          "height": 32.5
+        },
+        "message": {
+          "type": "note",
+          "number": 54
+        },
+        "learnable": true
+      },
+      {
+        "id": "touch-note-7",
+        "label": "Touchpad note 55",
+        "kind": "key",
+        "position": {
+          "x": 67.5,
+          "y": 56.6667,
+          "width": 8.75,
+          "height": 32.5
+        },
+        "message": {
+          "type": "note",
+          "number": 55
+        },
+        "learnable": true
+      },
+      {
+        "id": "touch-note-8",
+        "label": "Touchpad note 56",
+        "kind": "key",
+        "position": {
+          "x": 76.25,
+          "y": 56.6667,
+          "width": 8.75,
+          "height": 32.5
+        },
+        "message": {
+          "type": "note",
+          "number": 56
+        },
+        "learnable": true
+      },
+      {
+        "id": "touch-note-9",
+        "label": "Touchpad note 57",
+        "kind": "key",
+        "position": {
+          "x": 85.0,
+          "y": 56.6667,
+          "width": 8.75,
+          "height": 32.5
+        },
+        "message": {
+          "type": "note",
+          "number": 57
+        },
+        "learnable": true
+      },
+      {
+        "id": "control-pad-z",
+        "label": "Pad pressure (Z)",
+        "kind": "fader",
+        "position": {
+          "x": 2.5,
+          "y": 14.1667,
+          "width": 11.7708,
+          "height": 7.5
+        },
+        "control": "pad-z"
+      },
+      {
+        "id": "control-pad-y",
+        "label": "XY Play: pad Y",
+        "kind": "fader",
+        "position": {
+          "x": 14.375,
+          "y": 14.1667,
+          "width": 11.7708,
+          "height": 7.5
+        },
+        "control": "pad-y"
+      },
+      {
+        "id": "control-env-x",
+        "label": "Env Mod: pad X",
+        "kind": "fader",
+        "position": {
+          "x": 26.25,
+          "y": 14.1667,
+          "width": 11.7708,
+          "height": 7.5
+        },
+        "control": "env-x"
+      },
+      {
+        "id": "control-env-y",
+        "label": "Env Mod: pad Y",
+        "kind": "fader",
+        "position": {
+          "x": 38.125,
+          "y": 14.1667,
+          "width": 11.7708,
+          "height": 7.5
+        },
+        "control": "env-y"
+      },
+      {
+        "id": "control-pitch-bend",
+        "label": "XY Play: pitch bend",
+        "kind": "fader",
+        "position": {
+          "x": 50.0,
+          "y": 14.1667,
+          "width": 11.7708,
+          "height": 7.5
+        },
+        "control": "pitch-bend"
+      },
+      {
+        "id": "control-pattern-slide",
+        "label": "Pattern slide",
+        "kind": "button",
+        "position": {
+          "x": 61.875,
+          "y": 14.1667,
+          "width": 11.7708,
+          "height": 7.5
+        },
+        "control": "pattern-slide"
+      },
+      {
+        "id": "control-pattern-accent",
+        "label": "Pattern accent",
+        "kind": "button",
+        "position": {
+          "x": 73.75,
+          "y": 14.1667,
+          "width": 11.7708,
+          "height": 7.5
+        },
+        "control": "pattern-accent"
+      },
+      {
+        "id": "control-tuning",
+        "label": "Tuning",
+        "kind": "fader",
+        "position": {
+          "x": 85.625,
+          "y": 14.1667,
+          "width": 11.7708,
+          "height": 7.5
+        },
+        "control": "tuning"
+      }
+    ]
+  }
+}

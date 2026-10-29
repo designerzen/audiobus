@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 240" role="img" aria-labelledby="title">
+  <title id="title">Roland TB-3 MIDI controller layout</title>
+  <rect x="2" y="2" width="476" height="236" rx="14" fill="#222" stroke="#83cf34" stroke-width="3"/>
+  <text x="22" y="32" fill="#eee" font-family="sans-serif" font-size="18">Roland TB-3</text>
+  <g fill="#aaa" stroke="#ddd" stroke-width="2"><circle cx="68" cy="76" r="19"/><circle cx="180" cy="76" r="19"/><circle cx="292" cy="76" r="19"/><circle cx="404" cy="76" r="19"/></g>
+  <g stroke="#222" stroke-width="3"><path d="M68 60v13m112-13v13m112-13v13m112-13v13"/></g>
+  <g fill="#eee" font-family="sans-serif" font-size="12" text-anchor="middle"><text x="68" y="115">Cutoff</text><text x="180" y="115">Resonance</text><text x="292" y="115">Accent</text><text x="404" y="115">Effect</text></g>
+  <rect x="30" y="136" width="420" height="78" rx="5" fill="#83cf34" fill-opacity=".15" stroke="#83cf34" stroke-width="2"/>
+  <g stroke="#83cf34" opacity=".5"><path d="M72 137v76m42-76v76m42-76v76m42-76v76m42-76v76m42-76v76m42-76v76m42-76v76m42-76v76"/></g>
+  <text x="240" y="180" fill="#eee" font-family="sans-serif" font-size="15" text-anchor="middle">Touchpad · XY / Envelope / Pressure</text>
+</svg>
