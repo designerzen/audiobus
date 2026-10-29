@@ -1,18 +1,26 @@
-import { TB303_PARAMETERS } from './parameters'
-import { WAM_AUTOMATION_EVENT } from '../host'
-import { EVENT_CHANGE, EVENT_INPUT, EVENT_LOST_POINTER_CAPTURE, EVENT_POINTER_CANCEL, EVENT_POINTER_DOWN, EVENT_POINTER_MOVE, EVENT_POINTER_UP } from '../../event-constants'
+import { TB303_PARAMETERS } from "./parameters"
+import { WAM_AUTOMATION_EVENT } from "../host"
+import {
+	EVENT_CHANGE,
+	EVENT_INPUT,
+	EVENT_LOST_POINTER_CAPTURE,
+	EVENT_POINTER_CANCEL,
+	EVENT_POINTER_DOWN,
+	EVENT_POINTER_MOVE,
+	EVENT_POINTER_UP
+} from "../../event-constants"
 
 const disposers = new WeakMap<HTMLElement, () => void>()
 export function destroyTB303Gui(gui: HTMLElement) {
-    disposers.get(gui)?.()
-    disposers.delete(gui)
-    gui.remove()
+	disposers.get(gui)?.()
+	disposers.delete(gui)
+	gui.remove()
 }
 export async function createTB303Gui(node: any): Promise<HTMLElement> {
-    const host = document.createElement('div')
-    const root = host.attachShadow({ mode: 'open' })
-    const style = document.createElement('style')
-    style.textContent = `
+	const host = document.createElement("div")
+	const root = host.attachShadow({ mode: "open" })
+	const style = document.createElement("style")
+	style.textContent = `
         :host { display:block; color:#222925; font:12px Arial,sans-serif; }
         * { box-sizing:border-box; }
         section { padding:20px 22px 16px; border:1px solid #929795; border-bottom:7px solid #737a76;
@@ -41,111 +49,161 @@ export async function createTB303Gui(node: any): Promise<HTMLElement> {
         select:focus-visible { outline:2px solid #aa3928; outline-offset:3px; }
         @media (max-width:400px) { section { padding:15px 12px; } header { flex-wrap:wrap; gap:5px 12px; } }
     `
-    const panel = document.createElement('section')
-    panel.setAttribute('aria-label', 'TB-303 bass synthesizer')
-    const header = document.createElement('header')
-    const title = document.createElement('h2')
-    title.textContent = 'TB-303'
-    const subtitle = document.createElement('span')
-    subtitle.textContent = 'BASS LINE'
-    header.append(title, subtitle)
-    const controls = document.createElement('div')
-    controls.className = 'controls'
-    const footer = document.createElement('footer')
-    const values = await node.getParameterValues()
-    const updates = new Map<string, (value: number) => void>()
-    const cleanup: Array<() => void> = []
-    for (const [id, config] of Object.entries(TB303_PARAMETERS)) {
-        const label = document.createElement('label')
-        const caption = document.createElement('span')
-        caption.className = 'label'; caption.textContent = config.label
-        const choices = 'choices' in config ? config.choices : null
-        const input = document.createElement(choices ? 'select' : 'input') as HTMLInputElement | HTMLSelectElement
-        input.setAttribute('aria-label', config.label)
-        const output = document.createElement('output')
-        const knob = document.createElement('div')
-        knob.className = 'knob'; knob.setAttribute('aria-hidden', 'true')
-        const logarithmic = id === 'cutoff' || id === 'decay'
-        const toPosition = (value: number) => logarithmic
-            ? Math.log(value / config.minValue) / Math.log(config.maxValue / config.minValue)
-            : (value - config.minValue) / (config.maxValue - config.minValue)
-        const fromPosition = (position: number) => logarithmic
-            ? config.minValue * (config.maxValue / config.minValue) ** position
-            : config.minValue + position * (config.maxValue - config.minValue)
-        if (choices) {
-            choices.forEach((choice, index) => {
-                const option = document.createElement('option')
-                option.textContent = choice; option.value = String(index); input.append(option)
-            })
-            label.append(caption, input); footer.append(label)
-        } else {
-            const slider = input as HTMLInputElement
-            slider.type = 'range'; slider.min = '0'; slider.max = '1'; slider.step = '0.001'
-            const dial = document.createElement('div')
-            dial.className = 'dial'; dial.append(knob, input)
-            label.append(caption, dial, output); controls.append(label)
-            let drag: { id: number; y: number; position: number } | null = null
-            const down = (event: PointerEvent) => {
-                if (event.button !== 0) return
-                event.preventDefault(); slider.focus()
-                drag = { id: event.pointerId, y: event.clientY, position: Number(slider.value) }
-                slider.setPointerCapture(event.pointerId)
-            }
-            const move = (event: PointerEvent) => {
-                if (!drag || event.pointerId !== drag.id) return
-                slider.value = String(Math.max(0, Math.min(1, drag.position + (drag.y - event.clientY) / (event.shiftKey ? 1200 : 180))))
-                slider.dispatchEvent(new Event(EVENT_INPUT))
-            }
-            const up = (event: PointerEvent) => {
-                if (!drag || event.pointerId !== drag.id) return
-                drag = null
-                if (slider.hasPointerCapture(event.pointerId)) slider.releasePointerCapture(event.pointerId)
-            }
-            slider.addEventListener(EVENT_POINTER_DOWN, down)
-            slider.addEventListener(EVENT_POINTER_MOVE, move)
-            slider.addEventListener(EVENT_POINTER_UP, up)
-            slider.addEventListener(EVENT_POINTER_CANCEL, up)
-            slider.addEventListener(EVENT_LOST_POINTER_CAPTURE, up)
-            cleanup.push(() => {
-                if (drag && slider.hasPointerCapture(drag.id)) slider.releasePointerCapture(drag.id)
-                slider.removeEventListener(EVENT_POINTER_DOWN, down)
-                slider.removeEventListener(EVENT_POINTER_MOVE, move)
-                slider.removeEventListener(EVENT_POINTER_UP, up)
-                slider.removeEventListener(EVENT_POINTER_CANCEL, up)
-                slider.removeEventListener(EVENT_LOST_POINTER_CAPTURE, up)
-            })
-        }
-        const update = (raw: number) => {
-            const value = Math.max(config.minValue, Math.min(config.maxValue, raw))
-            const position = toPosition(value)
-            input.value = choices ? String(Math.round(value)) : String(position)
-            knob.style.transform = `rotate(${-135 + 270 * position}deg)`
-            output.value = choices ? choices[Math.round(value)] : id === 'cutoff' ? `${Math.round(value)} Hz`
-                : id === 'decay' ? `${value.toFixed(2)} s` : id === 'tuning' ? `${Math.round(value)} ct` : `${Math.round(value * 100)}%`
-            input.setAttribute('aria-valuetext', output.value)
-        }
-        updates.set(id, update)
-        update(values[id]?.value ?? config.defaultValue)
-        const change = () => {
-            const value = choices ? Number(input.value) : fromPosition(Number(input.value))
-            update(value)
-            node.scheduleEvents({ type: WAM_AUTOMATION_EVENT, time: node.context.currentTime, data: { id, value, normalized: false } })
-        }
-        const eventName = choices ? EVENT_CHANGE : EVENT_INPUT
-        input.addEventListener(eventName, change)
-        cleanup.push(() => input.removeEventListener(eventName, change))
-    }
-    const hint = document.createElement('p')
-    hint.textContent = 'Overlap notes to slide · Velocity 100–127 accents · Shift-drag for fine tuning'
-    footer.append(hint)
-    const automation = (event: Event) => {
-        const { id, value, normalized } = (event as CustomEvent).detail.data
-        const config = TB303_PARAMETERS[id as keyof typeof TB303_PARAMETERS]
-        if (config) updates.get(id)?.(normalized ? config.minValue + value * (config.maxValue - config.minValue) : value)
-    }
-    node.addEventListener(WAM_AUTOMATION_EVENT, automation)
-    cleanup.push(() => node.removeEventListener(WAM_AUTOMATION_EVENT, automation))
-    disposers.set(host, () => cleanup.forEach(dispose => dispose()))
-    panel.append(header, controls, footer); root.append(style, panel)
-    return host
+	const panel = document.createElement("section")
+	panel.setAttribute("aria-label", "TB-303 bass synthesizer")
+	const header = document.createElement("header")
+	const title = document.createElement("h2")
+	title.textContent = "TB-303"
+	const subtitle = document.createElement("span")
+	subtitle.textContent = "BASS LINE"
+	header.append(title, subtitle)
+	const controls = document.createElement("div")
+	controls.className = "controls"
+	const footer = document.createElement("footer")
+	const values = await node.getParameterValues()
+	const updates = new Map<string, (value: number) => void>()
+	const cleanup: Array<() => void> = []
+	for (const [id, config] of Object.entries(TB303_PARAMETERS)) {
+		const label = document.createElement("label")
+		const caption = document.createElement("span")
+		caption.className = "label"
+		caption.textContent = config.label
+		const choices = "choices" in config ? config.choices : null
+		const input = document.createElement(choices ? "select" : "input") as
+			| HTMLInputElement
+			| HTMLSelectElement
+		input.setAttribute("aria-label", config.label)
+		const output = document.createElement("output")
+		const knob = document.createElement("div")
+		knob.className = "knob"
+		knob.setAttribute("aria-hidden", "true")
+		const logarithmic = id === "cutoff" || id === "decay"
+		const toPosition = (value: number) =>
+			logarithmic
+				? Math.log(value / config.minValue) / Math.log(config.maxValue / config.minValue)
+				: (value - config.minValue) / (config.maxValue - config.minValue)
+		const fromPosition = (position: number) =>
+			logarithmic
+				? config.minValue * (config.maxValue / config.minValue) ** position
+				: config.minValue + position * (config.maxValue - config.minValue)
+		if (choices) {
+			choices.forEach((choice, index) => {
+				const option = document.createElement("option")
+				option.textContent = choice
+				option.value = String(index)
+				input.append(option)
+			})
+			label.append(caption, input)
+			footer.append(label)
+		} else {
+			const slider = input as HTMLInputElement
+			slider.type = "range"
+			slider.min = "0"
+			slider.max = "1"
+			slider.step = "0.001"
+			const dial = document.createElement("div")
+			dial.className = "dial"
+			dial.append(knob, input)
+			label.append(caption, dial, output)
+			controls.append(label)
+			let drag: { id: number; y: number; position: number } | null = null
+			const down = (event: PointerEvent) => {
+				if (event.button !== 0) {
+					return
+				}
+				event.preventDefault()
+				slider.focus()
+				drag = { id: event.pointerId, y: event.clientY, position: Number(slider.value) }
+				slider.setPointerCapture(event.pointerId)
+			}
+			const move = (event: PointerEvent) => {
+				if (!drag || event.pointerId !== drag.id) {
+					return
+				}
+				slider.value = String(
+					Math.max(
+						0,
+						Math.min(
+							1,
+							drag.position + (drag.y - event.clientY) / (event.shiftKey ? 1200 : 180)
+						)
+					)
+				)
+				slider.dispatchEvent(new Event(EVENT_INPUT))
+			}
+			const up = (event: PointerEvent) => {
+				if (!drag || event.pointerId !== drag.id) {
+					return
+				}
+				drag = null
+				if (slider.hasPointerCapture(event.pointerId)) {
+					slider.releasePointerCapture(event.pointerId)
+				}
+			}
+			slider.addEventListener(EVENT_POINTER_DOWN, down)
+			slider.addEventListener(EVENT_POINTER_MOVE, move)
+			slider.addEventListener(EVENT_POINTER_UP, up)
+			slider.addEventListener(EVENT_POINTER_CANCEL, up)
+			slider.addEventListener(EVENT_LOST_POINTER_CAPTURE, up)
+			cleanup.push(() => {
+				if (drag && slider.hasPointerCapture(drag.id)) {
+					slider.releasePointerCapture(drag.id)
+				}
+				slider.removeEventListener(EVENT_POINTER_DOWN, down)
+				slider.removeEventListener(EVENT_POINTER_MOVE, move)
+				slider.removeEventListener(EVENT_POINTER_UP, up)
+				slider.removeEventListener(EVENT_POINTER_CANCEL, up)
+				slider.removeEventListener(EVENT_LOST_POINTER_CAPTURE, up)
+			})
+		}
+		const update = (raw: number) => {
+			const value = Math.max(config.minValue, Math.min(config.maxValue, raw))
+			const position = toPosition(value)
+			input.value = choices ? String(Math.round(value)) : String(position)
+			knob.style.transform = `rotate(${-135 + 270 * position}deg)`
+			output.value = choices
+				? choices[Math.round(value)]
+				: id === "cutoff"
+					? `${Math.round(value)} Hz`
+					: id === "decay"
+						? `${value.toFixed(2)} s`
+						: id === "tuning"
+							? `${Math.round(value)} ct`
+							: `${Math.round(value * 100)}%`
+			input.setAttribute("aria-valuetext", output.value)
+		}
+		updates.set(id, update)
+		update(values[id]?.value ?? config.defaultValue)
+		const change = () => {
+			const value = choices ? Number(input.value) : fromPosition(Number(input.value))
+			update(value)
+			node.scheduleEvents({
+				type: WAM_AUTOMATION_EVENT,
+				time: node.context.currentTime,
+				data: { id, value, normalized: false }
+			})
+		}
+		const eventName = choices ? EVENT_CHANGE : EVENT_INPUT
+		input.addEventListener(eventName, change)
+		cleanup.push(() => input.removeEventListener(eventName, change))
+	}
+	const hint = document.createElement("p")
+	hint.textContent =
+		"Overlap notes to slide · Velocity 100–127 accents · Shift-drag for fine tuning"
+	footer.append(hint)
+	const automation = (event: Event) => {
+		const { id, value, normalized } = (event as CustomEvent).detail.data
+		const config = TB303_PARAMETERS[id as keyof typeof TB303_PARAMETERS]
+		if (config) {
+			updates.get(id)?.(
+				normalized ? config.minValue + value * (config.maxValue - config.minValue) : value
+			)
+		}
+	}
+	node.addEventListener(WAM_AUTOMATION_EVENT, automation)
+	cleanup.push(() => node.removeEventListener(WAM_AUTOMATION_EVENT, automation))
+	disposers.set(host, () => cleanup.forEach((dispose) => dispose()))
+	panel.append(header, controls, footer)
+	root.append(style, panel)
+	return host
 }

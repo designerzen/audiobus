@@ -1,4 +1,4 @@
-import { EVENT_ERROR, EVENT_CLICK } from '../../event-constants.ts'
+import { EVENT_ERROR, EVENT_CLICK } from "../../event-constants.ts"
 import InputPromptAI from "./input-prompt-ai.ts"
 import type { IAudioInput } from "./input-interface.ts"
 
@@ -9,7 +9,7 @@ interface PromptAISpeechOptions {
 }
 
 const DEFAULT_OPTIONS: PromptAISpeechOptions = {
-	language: "en-US",
+	language: "en-US"
 }
 
 /**
@@ -37,7 +37,8 @@ export default class InputPromptAISpeech extends InputPromptAI implements IAudio
 	}
 
 	private initializeSpeechRecognition(): void {
-		const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+		const SpeechRecognition =
+			(window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
 
 		if (!SpeechRecognition) {
 			console.warn("Speech Recognition API not available in this browser")
@@ -86,15 +87,20 @@ export default class InputPromptAISpeech extends InputPromptAI implements IAudio
 	}
 
 	async createGui(): Promise<HTMLElement> {
-		if (this.#promptElement) return this.#promptElement
+		if (this.#promptElement) {
+			return this.#promptElement
+		}
 		// Create the parent GUI from InputPromptAI
 		this.#promptElement = await super.createGui()
 
 		// Add speech input controls
 		const container = this.#promptElement.querySelector(".prompt-ai-container")
-		if (!container) return this.#promptElement
-		const speechHelp = document.createElement('p')
-		speechHelp.textContent = 'Speak an idea, then click Generate and play. Speech recognition may use your browser’s online service.'
+		if (!container) {
+			return this.#promptElement
+		}
+		const speechHelp = document.createElement("p")
+		speechHelp.textContent =
+			"Speak an idea, then click Generate and play. Speech recognition may use your browser’s online service."
 		container.append(speechHelp)
 
 		// Create speech controls div
@@ -121,11 +127,11 @@ export default class InputPromptAISpeech extends InputPromptAI implements IAudio
 		const stopBtn = this.#promptElement.querySelector("#stop-listening") as HTMLButtonElement
 
 		if (startBtn) {
-		startBtn.addEventListener(EVENT_CLICK, () => this.startListening())
+			startBtn.addEventListener(EVENT_CLICK, () => this.startListening())
 		}
 
 		if (stopBtn) {
-		stopBtn.addEventListener(EVENT_CLICK, () => this.stopListening())
+			stopBtn.addEventListener(EVENT_CLICK, () => this.stopListening())
 		}
 
 		return this.#promptElement
@@ -165,8 +171,12 @@ export default class InputPromptAISpeech extends InputPromptAI implements IAudio
 		const stopBtn = this.#promptElement?.querySelector("#stop-listening") as HTMLButtonElement
 		const indicator = this.#promptElement?.querySelector("#listening-indicator") as HTMLElement
 
-		if (startBtn) startBtn.disabled = isListening
-		if (stopBtn) stopBtn.disabled = !isListening
+		if (startBtn) {
+			startBtn.disabled = isListening
+		}
+		if (stopBtn) {
+			stopBtn.disabled = !isListening
+		}
 		if (indicator) {
 			if (isListening) {
 				indicator.classList.remove("hidden")
@@ -178,20 +188,28 @@ export default class InputPromptAISpeech extends InputPromptAI implements IAudio
 
 	private updateTranscript(transcript: string, isFinal: boolean): void {
 		const preview = this.#promptElement?.querySelector("#transcript-preview") as HTMLElement
-		if (!preview) return
+		if (!preview) {
+			return
+		}
 
-		preview.textContent = `${isFinal ? 'Recognized' : 'Interim'}: ${transcript}`
+		preview.textContent = `${isFinal ? "Recognized" : "Interim"}: ${transcript}`
 	}
 
 	private populatePromptAndGenerate(transcript: string): void {
-		const promptInput = this.#promptElement?.querySelector("#prompt-input") as HTMLTextAreaElement
-		if (!promptInput) return
+		const promptInput = this.#promptElement?.querySelector(
+			"#prompt-input"
+		) as HTMLTextAreaElement
+		if (!promptInput) {
+			return
+		}
 
 		// Populate the text area with the recognized speech
 		promptInput.value = transcript
 
 		// Native model creation/download may require a fresh user gesture.
-		this.updateStatus('Speech captured. Click Generate and play to use browser AI. Speech recognition may use your browser’s online service.')
+		this.updateStatus(
+			"Speech captured. Click Generate and play to use browser AI. Speech recognition may use your browser’s online service."
+		)
 	}
 
 	async destroyGui(): Promise<void> {

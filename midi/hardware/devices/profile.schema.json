@@ -1,97 +1,257 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Harmoneasy MIDI device profile",
-  "type": "object",
-  "required": ["schemaVersion", "name", "gui"],
-  "additionalProperties": false,
-  "properties": {
-    "$schema": { "type": "string" },
-    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
-    "schemaVersion": { "const": 1 },
-    "name": { "type": "string", "minLength": 1 },
-    "manufacturer": { "type": "string" },
-    "manufacturerUrl": { "type": "string", "pattern": "^https?://" },
-    "productUrl": { "type": "string", "pattern": "^https?://" },
-    "description": { "type": "string" },
-    "ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
-    "portNames": { "$ref": "#/$defs/strings" },
-    "icon": { "$ref": "#/$defs/asset" },
-    "abilities": { "$ref": "#/$defs/strings" },
-    "hardwareControls": { "$ref": "#/$defs/strings" },
-    "notice": { "type": "string" },
-    "documentation": { "type": "array", "items": { "type": "object", "required": ["title", "url"], "properties": { "title": { "type": "string" }, "url": { "type": "string", "pattern": "^https?://" } }, "additionalProperties": false } },
-    "controls": { "type": "array", "items": { "$ref": "#/$defs/control" } },
-    "modes": { "type": "array", "items": { "type": "object", "required": ["id", "label", "cc"], "properties": { "id": { "type": "string" }, "label": { "type": "string" }, "cc": { "type": "array", "items": { "$ref": "#/$defs/midi7" } } }, "additionalProperties": false } },
-    "gui": { "$ref": "#/$defs/node" },
-    "surface": { "$ref": "#/$defs/surface" }
-  },
-  "$defs": {
-    "strings": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-    "midi7": { "type": "integer", "minimum": 0, "maximum": 127 },
-    "asset": { "type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.?(?:/|$))[\\w./ -]+\\.(svg|png|jpg|jpeg|webp|avif|gif)$" },
-    "message": {
-      "type": "object",
-      "required": ["type"],
-      "additionalProperties": false,
-      "properties": {
-        "type": { "enum": ["cc", "note", "pitchBend", "programChange", "channelPressure", "sysex"] },
-        "number": { "$ref": "#/$defs/midi7" },
-        "channel": { "type": "integer", "minimum": 1, "maximum": 16 },
-        "bytes": { "type": "array", "minItems": 2, "items": { "oneOf": [{ "type": "integer", "minimum": 0, "maximum": 255 }, { "const": "value" }] } }
-      },
-      "allOf": [
-        { "if": { "properties": { "type": { "enum": ["cc", "note"] } } }, "then": { "required": ["number"] } },
-        { "if": { "properties": { "type": { "const": "sysex" } } }, "then": { "required": ["bytes"] } }
-      ]
-    },
-    "control": {
-      "type": "object",
-      "required": ["id", "label"],
-      "additionalProperties": false,
-      "oneOf": [{ "required": ["cc"], "not": { "required": ["message"] } }, { "required": ["message"], "not": { "required": ["cc"] } }],
-      "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "label": { "type": "string" },
-        "widget": { "enum": ["slider", "toggle", "button", "select", "meter"] },
-        "momentary": { "type": "boolean" },
-        "cc": { "$ref": "#/$defs/midi7" },
-        "message": { "$ref": "#/$defs/message" },
-        "messages": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/message" } },
-        "min": { "type": "integer", "minimum": 0, "maximum": 16383 },
-        "max": { "type": "integer", "minimum": 0, "maximum": 16383 },
-        "step": { "type": "integer", "minimum": 1 },
-        "default": { "type": "integer", "minimum": 0, "maximum": 16383 },
-        "options": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["label", "value"], "properties": { "label": { "type": "string" }, "value": { "type": "integer", "minimum": 0, "maximum": 16383 } }, "additionalProperties": false } }
-      },
-      "allOf": [{ "if": { "properties": { "widget": { "const": "select" } }, "required": ["widget"] }, "then": { "required": ["options"] } }]
-    },
-    "node": {
-      "type": "object",
-      "required": ["type"],
-      "additionalProperties": false,
-      "properties": {
-        "type": { "enum": ["column", "row", "grid", "overlay", "section", "tabs", "text", "image", "status", "notes", "channel", "mode", "controls", "control", "xy", "guide"] },
-        "label": { "type": "string" },
-        "text": { "type": "string" },
-        "src": { "$ref": "#/$defs/asset" },
-        "alt": { "type": "string" },
-        "control": { "type": "string" },
-        "controls": { "$ref": "#/$defs/strings" },
-        "x": { "type": "string" },
-        "y": { "type": "string" },
-        "columns": { "type": "integer", "minimum": 1, "maximum": 12 },
-        "gap": { "type": "string" },
-        "position": { "type": "object", "required": ["x", "y"], "properties": { "x": { "$ref": "#/$defs/percent" }, "y": { "$ref": "#/$defs/percent" }, "width": { "$ref": "#/$defs/percent" }, "height": { "$ref": "#/$defs/percent" } }, "additionalProperties": false },
-        "style": { "type": "object", "propertyNames": { "enum": ["background", "color", "padding", "borderRadius", "maxWidth", "minHeight", "aspectRatio", "fontSize"] }, "additionalProperties": { "type": "string" } },
-        "children": { "type": "array", "items": { "$ref": "#/$defs/node" } }
-      },
-      "allOf": [
-        { "if": { "properties": { "type": { "const": "image" } } }, "then": { "required": ["src"] } },
-        { "if": { "properties": { "type": { "const": "control" } } }, "then": { "required": ["control"] } },
-        { "if": { "properties": { "type": { "const": "xy" } } }, "then": { "required": ["x", "y"] } }
-      ]
-    },
-    "surface": {"type": "object", "required": ["src", "width", "height", "elements"], "additionalProperties": false, "properties": {"src": {"$ref": "#/$defs/asset"}, "width": {"type": "integer", "minimum": 1, "maximum": 8192}, "height": {"type": "integer", "minimum": 1, "maximum": 8192}, "elements": {"type": "array", "items": {"type": "object", "required": ["id", "label", "kind", "position"], "additionalProperties": false, "properties": {"id": {"type": "string", "minLength": 1}, "label": {"type": "string"}, "kind": {"enum": ["key", "pad", "button", "knob", "fader"]}, "control": {"type": "string"}, "message": {"$ref": "#/$defs/message"}, "learnable": {"type": "boolean"}, "dark": {"type": "boolean"}, "position": {"type": "object", "required": ["x", "y", "width", "height"], "additionalProperties": false, "properties": {"x": {"$ref": "#/$defs/percent"}, "y": {"$ref": "#/$defs/percent"}, "width": {"$ref": "#/$defs/percent"}, "height": {"$ref": "#/$defs/percent"}}}}}}}},
-    "percent": { "type": "number", "minimum": 0, "maximum": 100 }
-  }
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"title": "Harmoneasy MIDI device profile",
+	"type": "object",
+	"required": ["schemaVersion", "name", "gui"],
+	"additionalProperties": false,
+	"properties": {
+		"$schema": { "type": "string" },
+		"id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+		"schemaVersion": { "const": 1 },
+		"name": { "type": "string", "minLength": 1 },
+		"manufacturer": { "type": "string" },
+		"manufacturerUrl": { "type": "string", "pattern": "^https?://" },
+		"productUrl": { "type": "string", "pattern": "^https?://" },
+		"description": { "type": "string" },
+		"ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+		"portNames": { "$ref": "#/$defs/strings" },
+		"icon": { "$ref": "#/$defs/asset" },
+		"abilities": { "$ref": "#/$defs/strings" },
+		"hardwareControls": { "$ref": "#/$defs/strings" },
+		"notice": { "type": "string" },
+		"documentation": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"required": ["title", "url"],
+				"properties": {
+					"title": { "type": "string" },
+					"url": { "type": "string", "pattern": "^https?://" }
+				},
+				"additionalProperties": false
+			}
+		},
+		"controls": { "type": "array", "items": { "$ref": "#/$defs/control" } },
+		"modes": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"required": ["id", "label", "cc"],
+				"properties": {
+					"id": { "type": "string" },
+					"label": { "type": "string" },
+					"cc": { "type": "array", "items": { "$ref": "#/$defs/midi7" } }
+				},
+				"additionalProperties": false
+			}
+		},
+		"gui": { "$ref": "#/$defs/node" },
+		"surface": { "$ref": "#/$defs/surface" }
+	},
+	"$defs": {
+		"strings": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+		"midi7": { "type": "integer", "minimum": 0, "maximum": 127 },
+		"asset": {
+			"type": "string",
+			"pattern": "^(?!/)(?!.*(?:^|/)\\.\\.?(?:/|$))[\\w./ -]+\\.(svg|png|jpg|jpeg|webp|avif|gif)$"
+		},
+		"message": {
+			"type": "object",
+			"required": ["type"],
+			"additionalProperties": false,
+			"properties": {
+				"type": {
+					"enum": ["cc", "note", "pitchBend", "programChange", "channelPressure", "sysex"]
+				},
+				"number": { "$ref": "#/$defs/midi7" },
+				"channel": { "type": "integer", "minimum": 1, "maximum": 16 },
+				"bytes": {
+					"type": "array",
+					"minItems": 2,
+					"items": {
+						"oneOf": [
+							{ "type": "integer", "minimum": 0, "maximum": 255 },
+							{ "const": "value" }
+						]
+					}
+				}
+			},
+			"allOf": [
+				{
+					"if": { "properties": { "type": { "enum": ["cc", "note"] } } },
+					"then": { "required": ["number"] }
+				},
+				{
+					"if": { "properties": { "type": { "const": "sysex" } } },
+					"then": { "required": ["bytes"] }
+				}
+			]
+		},
+		"control": {
+			"type": "object",
+			"required": ["id", "label"],
+			"additionalProperties": false,
+			"oneOf": [
+				{ "required": ["cc"], "not": { "required": ["message"] } },
+				{ "required": ["message"], "not": { "required": ["cc"] } }
+			],
+			"properties": {
+				"id": { "type": "string", "minLength": 1 },
+				"label": { "type": "string" },
+				"widget": { "enum": ["slider", "toggle", "button", "select", "meter"] },
+				"momentary": { "type": "boolean" },
+				"cc": { "$ref": "#/$defs/midi7" },
+				"message": { "$ref": "#/$defs/message" },
+				"messages": {
+					"type": "array",
+					"minItems": 1,
+					"items": { "$ref": "#/$defs/message" }
+				},
+				"min": { "type": "integer", "minimum": 0, "maximum": 16383 },
+				"max": { "type": "integer", "minimum": 0, "maximum": 16383 },
+				"step": { "type": "integer", "minimum": 1 },
+				"default": { "type": "integer", "minimum": 0, "maximum": 16383 },
+				"options": {
+					"type": "array",
+					"minItems": 1,
+					"items": {
+						"type": "object",
+						"required": ["label", "value"],
+						"properties": {
+							"label": { "type": "string" },
+							"value": { "type": "integer", "minimum": 0, "maximum": 16383 }
+						},
+						"additionalProperties": false
+					}
+				}
+			},
+			"allOf": [
+				{
+					"if": {
+						"properties": { "widget": { "const": "select" } },
+						"required": ["widget"]
+					},
+					"then": { "required": ["options"] }
+				}
+			]
+		},
+		"node": {
+			"type": "object",
+			"required": ["type"],
+			"additionalProperties": false,
+			"properties": {
+				"type": {
+					"enum": [
+						"column",
+						"row",
+						"grid",
+						"overlay",
+						"section",
+						"tabs",
+						"text",
+						"image",
+						"status",
+						"notes",
+						"channel",
+						"mode",
+						"controls",
+						"control",
+						"xy",
+						"guide"
+					]
+				},
+				"label": { "type": "string" },
+				"text": { "type": "string" },
+				"src": { "$ref": "#/$defs/asset" },
+				"alt": { "type": "string" },
+				"control": { "type": "string" },
+				"controls": { "$ref": "#/$defs/strings" },
+				"x": { "type": "string" },
+				"y": { "type": "string" },
+				"columns": { "type": "integer", "minimum": 1, "maximum": 12 },
+				"gap": { "type": "string" },
+				"position": {
+					"type": "object",
+					"required": ["x", "y"],
+					"properties": {
+						"x": { "$ref": "#/$defs/percent" },
+						"y": { "$ref": "#/$defs/percent" },
+						"width": { "$ref": "#/$defs/percent" },
+						"height": { "$ref": "#/$defs/percent" }
+					},
+					"additionalProperties": false
+				},
+				"style": {
+					"type": "object",
+					"propertyNames": {
+						"enum": [
+							"background",
+							"color",
+							"padding",
+							"borderRadius",
+							"maxWidth",
+							"minHeight",
+							"aspectRatio",
+							"fontSize"
+						]
+					},
+					"additionalProperties": { "type": "string" }
+				},
+				"children": { "type": "array", "items": { "$ref": "#/$defs/node" } }
+			},
+			"allOf": [
+				{
+					"if": { "properties": { "type": { "const": "image" } } },
+					"then": { "required": ["src"] }
+				},
+				{
+					"if": { "properties": { "type": { "const": "control" } } },
+					"then": { "required": ["control"] }
+				},
+				{
+					"if": { "properties": { "type": { "const": "xy" } } },
+					"then": { "required": ["x", "y"] }
+				}
+			]
+		},
+		"surface": {
+			"type": "object",
+			"required": ["src", "width", "height", "elements"],
+			"additionalProperties": false,
+			"properties": {
+				"src": { "$ref": "#/$defs/asset" },
+				"width": { "type": "integer", "minimum": 1, "maximum": 8192 },
+				"height": { "type": "integer", "minimum": 1, "maximum": 8192 },
+				"elements": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"required": ["id", "label", "kind", "position"],
+						"additionalProperties": false,
+						"properties": {
+							"id": { "type": "string", "minLength": 1 },
+							"label": { "type": "string" },
+							"kind": { "enum": ["key", "pad", "button", "knob", "fader"] },
+							"control": { "type": "string" },
+							"message": { "$ref": "#/$defs/message" },
+							"learnable": { "type": "boolean" },
+							"dark": { "type": "boolean" },
+							"position": {
+								"type": "object",
+								"required": ["x", "y", "width", "height"],
+								"additionalProperties": false,
+								"properties": {
+									"x": { "$ref": "#/$defs/percent" },
+									"y": { "$ref": "#/$defs/percent" },
+									"width": { "$ref": "#/$defs/percent" },
+									"height": { "$ref": "#/$defs/percent" }
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"percent": { "type": "number", "minimum": 0, "maximum": 100 }
+	}
 }

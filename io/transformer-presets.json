@@ -1,1345 +1,1161 @@
 {
-  "format": "harmoneasy-preset-library",
-  "version": 1,
-  "presets": [
-    {
-      "id": "c-major-sketchbook",
-      "name": "C Major Sketchbook",
-      "category": "Play in key",
-      "description": "Keep melodic sketches in C major while preserving your rhythm.",
-      "useCase": "Improvise over a C major backing track or explore melodies on an unfamiliar controller.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — moves notes to the nearest pitch in C major.",
-          "config": {
-            "root": 0,
-            "mode": [
-              0,
-              2,
-              4,
-              5,
-              7,
-              9,
-              11
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "id": "a-minor-nocturne",
-      "name": "A Minor Nocturne",
-      "category": "Play in key",
-      "description": "Turn free playing into a melody in A natural minor.",
-      "useCase": "Write a reflective lead or find a topline over an A minor progression.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — moves notes into A natural minor.",
-          "config": {
-            "root": 9,
-            "mode": [
-              0,
-              2,
-              3,
-              5,
-              7,
-              8,
-              10
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "id": "d-dorian-session",
-      "name": "D Dorian Session",
-      "category": "Play in key",
-      "description": "Explore the minor colour and raised sixth of D Dorian.",
-      "useCase": "Jam over a D minor vamp with a brighter modal palette.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — fits pitches to D Dorian, including its characteristic B natural.",
-          "config": {
-            "root": 2,
-            "mode": [
-              0,
-              2,
-              3,
-              5,
-              7,
-              9,
-              10
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "id": "minimal-motion",
-      "name": "Minimal Motion",
-      "category": "Play in key",
-      "description": "Short, scale-constrained notes for uncluttered melodic sketches.",
-      "useCase": "Keep a busy input part concise while trying ideas in C major.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — moves notes to the nearest pitch in C major.",
-          "config": {
-            "root": 0,
-            "mode": [
-              0,
-              2,
-              4,
-              5,
-              7,
-              9,
-              11
-            ]
-          }
-        },
-        {
-          "type": "Note-Shortener",
-          "summary": "Note Shortener — gives each note a 1/8 gate, synced to tempo.",
-          "config": {
-            "duration": "1/8"
-          }
-        }
-      ]
-    },
-    {
-      "id": "classic-chord",
-      "name": "Classic Chord",
-      "category": "Chords & accompaniment",
-      "description": "Play diatonic C major triads with one finger.",
-      "useCase": "Sketch chord progressions when you have a small keyboard or only one hand free.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — moves notes to the nearest pitch in C major.",
-          "config": {
-            "root": 0,
-            "mode": [
-              0,
-              2,
-              4,
-              5,
-              7,
-              9,
-              11
-            ]
-          }
-        },
-        {
-          "type": "Chordifier",
-          "summary": "Chordifier — builds 3-note major-key chords from each note.",
-          "config": {
-            "mode": "ionian",
-            "root": 3,
-            "simultaneous": 3
-          }
-        }
-      ]
-    },
-    {
-      "id": "minor-chord-diary",
-      "name": "Minor Chord Diary",
-      "category": "Chords & accompaniment",
-      "description": "Build A minor harmony from single notes.",
-      "useCase": "Find a minor-key accompaniment without entering every chord tone.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — moves notes into A natural minor.",
-          "config": {
-            "root": 9,
-            "mode": [
-              0,
-              2,
-              3,
-              5,
-              7,
-              8,
-              10
-            ]
-          }
-        },
-        {
-          "type": "Chordifier",
-          "summary": "Chordifier — builds 3-note minor-key chords from each note.",
-          "config": {
-            "mode": "aeolian",
-            "root": 0,
-            "simultaneous": 3
-          }
-        }
-      ]
-    },
-    {
-      "id": "seventh-heaven",
-      "name": "Seventh Heaven",
-      "category": "Chords & accompaniment",
-      "description": "Expand C major scale notes into four-note chords.",
-      "useCase": "Try richer seventh-chord colours for keys, pads or songwriting.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — moves notes to the nearest pitch in C major.",
-          "config": {
-            "root": 0,
-            "mode": [
-              0,
-              2,
-              4,
-              5,
-              7,
-              9,
-              11
-            ]
-          }
-        },
-        {
-          "type": "Chordifier",
-          "summary": "Chordifier — builds 4-note major-key chords from each note.",
-          "config": {
-            "mode": "ionian",
-            "root": 3,
-            "simultaneous": 4
-          }
-        }
-      ]
-    },
-    {
-      "id": "offbeat-chord-stabs",
-      "name": "Offbeat Chord Stabs",
-      "category": "Chords & accompaniment",
-      "description": "Shift short C major chords an eighth note later.",
-      "useCase": "Play on the beat to create offbeat accompaniment against a steady pulse.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — moves notes to the nearest pitch in C major.",
-          "config": {
-            "root": 0,
-            "mode": [
-              0,
-              2,
-              4,
-              5,
-              7,
-              9,
-              11
-            ]
-          }
-        },
-        {
-          "type": "Chordifier",
-          "summary": "Chordifier — builds 3-note major-key chords from each note.",
-          "config": {
-            "mode": "ionian",
-            "root": 3,
-            "simultaneous": 3
-          }
-        },
-        {
-          "type": "Note-Delay",
-          "summary": "Note Delay — moves the whole phrase later by 1/8, synced to tempo.",
-          "config": {
-            "useTimeDivision": true,
-            "timeDivision": "1/8",
-            "accumulate": false
-          }
-        },
-        {
-          "type": "Note-Shortener",
-          "summary": "Note Shortener — gives each note a 1/16 gate, synced to tempo.",
-          "config": {
-            "duration": "1/16"
-          }
-        }
-      ]
-    },
-    {
-      "id": "chord-arpeggiator",
-      "name": "Chord Arpeggiator",
-      "category": "Arpeggios & movement",
-      "description": "Turn single notes into ascending C major chord patterns.",
-      "useCase": "Create a moving synth accompaniment from a simple root-note performance.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — moves notes to the nearest pitch in C major.",
-          "config": {
-            "root": 0,
-            "mode": [
-              0,
-              2,
-              4,
-              5,
-              7,
-              9,
-              11
-            ]
-          }
-        },
-        {
-          "type": "Chordifier",
-          "summary": "Chordifier — builds 3-note major-key chords from each note.",
-          "config": {
-            "mode": "ionian",
-            "root": 3,
-            "simultaneous": 3
-          }
-        },
-        {
-          "type": "Arpeggiator",
-          "summary": "Arpeggiator — plays chord tones in up order at 1/16 spacing across 1 octave.",
-          "config": {
-            "pattern": "up",
-            "rate": "1/16",
-            "octaves": 1
-          }
-        }
-      ]
-    },
-    {
-      "id": "falling-minor-arp",
-      "name": "Falling Minor Arp",
-      "category": "Arpeggios & movement",
-      "description": "Descending A minor chord tones at eighth-note spacing.",
-      "useCase": "Add a slower answering figure beneath a vocal or lead.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — moves notes into A natural minor.",
-          "config": {
-            "root": 9,
-            "mode": [
-              0,
-              2,
-              3,
-              5,
-              7,
-              8,
-              10
-            ]
-          }
-        },
-        {
-          "type": "Chordifier",
-          "summary": "Chordifier — builds 3-note minor-key chords from each note.",
-          "config": {
-            "mode": "aeolian",
-            "root": 0,
-            "simultaneous": 3
-          }
-        },
-        {
-          "type": "Arpeggiator",
-          "summary": "Arpeggiator — plays chord tones in down order at 1/8 spacing across 1 octave.",
-          "config": {
-            "pattern": "down",
-            "rate": "1/8",
-            "octaves": 1
-          }
-        }
-      ]
-    },
-    {
-      "id": "two-octave-pendulum",
-      "name": "Two Octave Pendulum",
-      "category": "Arpeggios & movement",
-      "description": "Sweep C major chords up and down across two octaves.",
-      "useCase": "Give a sparse progression a wider register and a repeating contour.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — moves notes to the nearest pitch in C major.",
-          "config": {
-            "root": 0,
-            "mode": [
-              0,
-              2,
-              4,
-              5,
-              7,
-              9,
-              11
-            ]
-          }
-        },
-        {
-          "type": "Chordifier",
-          "summary": "Chordifier — builds 3-note major-key chords from each note.",
-          "config": {
-            "mode": "ionian",
-            "root": 3,
-            "simultaneous": 3
-          }
-        },
-        {
-          "type": "Arpeggiator",
-          "summary": "Arpeggiator — plays chord tones in up-down order at 1/16 spacing across 2 octaves.",
-          "config": {
-            "pattern": "up-down",
-            "rate": "1/16",
-            "octaves": 2
-          }
-        }
-      ]
-    },
-    {
-      "id": "triplet-cascade",
-      "name": "Triplet Cascade",
-      "category": "Arpeggios & movement",
-      "description": "Spread major chord tones into ascending triplets.",
-      "useCase": "Try a rolling three-part subdivision against a straight beat.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — moves notes to the nearest pitch in C major.",
-          "config": {
-            "root": 0,
-            "mode": [
-              0,
-              2,
-              4,
-              5,
-              7,
-              9,
-              11
-            ]
-          }
-        },
-        {
-          "type": "Chordifier",
-          "summary": "Chordifier — builds 3-note major-key chords from each note.",
-          "config": {
-            "mode": "ionian",
-            "root": 3,
-            "simultaneous": 3
-          }
-        },
-        {
-          "type": "Arpeggiator",
-          "summary": "Arpeggiator — plays chord tones in up order at triplet spacing across 2 octaves.",
-          "config": {
-            "pattern": "up",
-            "rate": "triplet",
-            "octaves": 2
-          }
-        }
-      ]
-    },
-    {
-      "id": "staccato-arp",
-      "name": "Staccato Arp",
-      "category": "Arpeggios & movement",
-      "description": "Crisp ascending chord patterns with short gates.",
-      "useCase": "Leave space between synth notes so a dense arrangement stays clear.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — moves notes to the nearest pitch in C major.",
-          "config": {
-            "root": 0,
-            "mode": [
-              0,
-              2,
-              4,
-              5,
-              7,
-              9,
-              11
-            ]
-          }
-        },
-        {
-          "type": "Chordifier",
-          "summary": "Chordifier — builds 3-note major-key chords from each note.",
-          "config": {
-            "mode": "ionian",
-            "root": 3,
-            "simultaneous": 3
-          }
-        },
-        {
-          "type": "Arpeggiator",
-          "summary": "Arpeggiator — plays chord tones in up order at 1/8 spacing across 1 octave.",
-          "config": {
-            "pattern": "up",
-            "rate": "1/8",
-            "octaves": 1
-          }
-        },
-        {
-          "type": "Note-Shortener",
-          "summary": "Note Shortener — gives each note a 1/16 gate, synced to tempo.",
-          "config": {
-            "duration": "1/16"
-          }
-        }
-      ]
-    },
-    {
-      "id": "shuffled-chord-tones",
-      "name": "Shuffled Chord Tones",
-      "category": "Arpeggios & movement",
-      "description": "Reorder C major chord tones randomly while staying in harmony.",
-      "useCase": "Discover melodic variations without scattering pitches outside the chord.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — moves notes to the nearest pitch in C major.",
-          "config": {
-            "root": 0,
-            "mode": [
-              0,
-              2,
-              4,
-              5,
-              7,
-              9,
-              11
-            ]
-          }
-        },
-        {
-          "type": "Chordifier",
-          "summary": "Chordifier — builds 3-note major-key chords from each note.",
-          "config": {
-            "mode": "ionian",
-            "root": 3,
-            "simultaneous": 3
-          }
-        },
-        {
-          "type": "Arpeggiator",
-          "summary": "Arpeggiator — plays chord tones in random order at 1/8 spacing across 1 octave.",
-          "config": {
-            "pattern": "random",
-            "rate": "1/8",
-            "octaves": 1
-          }
-        }
-      ]
-    },
-    {
-      "id": "double-tap",
-      "name": "Double Tap",
-      "category": "Rhythm & repeats",
-      "description": "Two short strikes for every note you play.",
-      "useCase": "Add a double hit to a pluck or percussion patch; 125 ms spacing suits sixteenths at 120 BPM.",
-      "steps": [
-        {
-          "type": "Note-Repeater",
-          "summary": "Note Repeater — plays 2 strikes per note, 125 ms apart, each lasting 50 ms. Spacing stays fixed when tempo changes.",
-          "config": {
-            "repeats": 2,
-            "delay": 125,
-            "noteDuration": 50
-          }
-        }
-      ]
-    },
-    {
-      "id": "chord-repeater",
-      "name": "Chord Repeater",
-      "category": "Rhythm & repeats",
-      "description": "Turn a root note into four evenly spaced C major chord strikes.",
-      "useCase": "Build a rhythmic chord pulse; 250 ms spacing suits eighth notes at 120 BPM.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — moves notes to the nearest pitch in C major.",
-          "config": {
-            "root": 0,
-            "mode": [
-              0,
-              2,
-              4,
-              5,
-              7,
-              9,
-              11
-            ]
-          }
-        },
-        {
-          "type": "Chordifier",
-          "summary": "Chordifier — builds 3-note major-key chords from each note.",
-          "config": {
-            "mode": "ionian",
-            "root": 3,
-            "simultaneous": 3
-          }
-        },
-        {
-          "type": "Note-Repeater",
-          "summary": "Note Repeater — plays 4 strikes per note, 250 ms apart, each lasting 100 ms. Spacing stays fixed when tempo changes.",
-          "config": {
-            "repeats": 4,
-            "delay": 250,
-            "noteDuration": 100
-          }
-        }
-      ]
-    },
-    {
-      "id": "ratchet-fill",
-      "name": "Ratchet Fill",
-      "category": "Rhythm & repeats",
-      "description": "Eight rapid, short strikes from one input note.",
-      "useCase": "Trigger a brief roll for transitions or fills; 62.5 ms spacing suits thirty-seconds at 120 BPM.",
-      "steps": [
-        {
-          "type": "Note-Repeater",
-          "summary": "Note Repeater — plays 8 strikes per note, 62.5 ms apart, each lasting 50 ms. Spacing stays fixed when tempo changes.",
-          "config": {
-            "repeats": 8,
-            "delay": 62.5,
-            "noteDuration": 50
-          }
-        }
-      ]
-    },
-    {
-      "id": "late-answer",
-      "name": "Late Answer",
-      "category": "Rhythm & repeats",
-      "description": "Move your phrase a quarter note behind your playing.",
-      "useCase": "Create a delayed response on a separate chain alongside a direct part.",
-      "steps": [
-        {
-          "type": "Note-Delay",
-          "summary": "Note Delay — moves the whole phrase later by 1/4, synced to tempo.",
-          "config": {
-            "useTimeDivision": true,
-            "timeDivision": "1/4",
-            "accumulate": false
-          }
-        }
-      ]
-    },
-    {
-      "id": "bass-register",
-      "name": "Bass Register",
-      "category": "Register & layering",
-      "description": "Move a C major melody down one octave.",
-      "useCase": "Reuse a midrange keyboard part as a bass line with a bass instrument on this chain.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — moves notes to the nearest pitch in C major.",
-          "config": {
-            "root": 0,
-            "mode": [
-              0,
-              2,
-              4,
-              5,
-              7,
-              9,
-              11
-            ]
-          }
-        },
-        {
-          "type": "Transposer",
-          "summary": "Transposer — shifts every note down 12 semitones.",
-          "config": {
-            "distance": -12
-          }
-        }
-      ]
-    },
-    {
-      "id": "upper-octave-sparkle",
-      "name": "Upper Octave Sparkle",
-      "category": "Register & layering",
-      "description": "Raise C major notes an octave and give them short gates.",
-      "useCase": "Add a high pluck layer on a separate chain above your main performance.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — moves notes to the nearest pitch in C major.",
-          "config": {
-            "root": 0,
-            "mode": [
-              0,
-              2,
-              4,
-              5,
-              7,
-              9,
-              11
-            ]
-          }
-        },
-        {
-          "type": "Transposer",
-          "summary": "Transposer — shifts every note up 12 semitones.",
-          "config": {
-            "distance": 12
-          }
-        },
-        {
-          "type": "Note-Shortener",
-          "summary": "Note Shortener — gives each note a 1/8 gate, synced to tempo.",
-          "config": {
-            "duration": "1/8"
-          }
-        }
-      ]
-    },
-    {
-      "id": "fifth-above",
-      "name": "Fifth Above",
-      "category": "Register & layering",
-      "description": "Transpose your performance up a perfect fifth.",
-      "useCase": "Layer this chain with a direct chain for a parallel fifth, or move a part into another key.",
-      "steps": [
-        {
-          "type": "Transposer",
-          "summary": "Transposer — shifts every note up 7 semitones.",
-          "config": {
-            "distance": 7
-          }
-        }
-      ]
-    },
-    {
-      "id": "low-minor-pulse",
-      "name": "Low Minor Pulse",
-      "category": "Register & layering",
-      "description": "Short A minor notes shifted an octave down.",
-      "useCase": "Sketch a detached bass part beneath a minor-key arrangement.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "summary": "Harmoniser — moves notes into A natural minor.",
-          "config": {
-            "root": 9,
-            "mode": [
-              0,
-              2,
-              3,
-              5,
-              7,
-              8,
-              10
-            ]
-          }
-        },
-        {
-          "type": "Transposer",
-          "summary": "Transposer — shifts every note down 12 semitones.",
-          "config": {
-            "distance": -12
-          }
-        },
-        {
-          "type": "Note-Shortener",
-          "summary": "Note Shortener — gives each note a 1/8 gate, synced to tempo.",
-          "config": {
-            "duration": "1/8"
-          }
-        }
-      ]
-    },
-    {
-      "id": "acid-house",
-      "name": "Acid House",
-      "category": "Genres",
-      "description": "Short A minor bass arpeggios at sixteenth-note spacing.",
-      "useCase": "Play single notes around A3 to generate low minor figures. Try 120–130 BPM with a resonant mono synth; vary accents and filter cutoff on your instrument.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "config": {
-            "root": 9,
-            "mode": [
-              0,
-              2,
-              3,
-              5,
-              7,
-              8,
-              10
-            ]
-          },
-          "summary": "Harmoniser — keeps notes in A natural minor."
-        },
-        {
-          "type": "Chordifier",
-          "config": {
-            "mode": "aeolian",
-            "root": 0,
-            "simultaneous": 3
-          },
-          "summary": "Chordifier — builds 3-note diatonic chords."
-        },
-        {
-          "type": "Transposer",
-          "config": {
-            "distance": -12
-          },
-          "summary": "Transposer — shifts notes down one octave."
-        },
-        {
-          "type": "Arpeggiator",
-          "config": {
-            "pattern": "up",
-            "rate": "1/16",
-            "octaves": 1
-          },
-          "summary": "Arpeggiator — plays chord tones up at 1/16 spacing, synced to tempo."
-        },
-        {
-          "type": "Note-Shortener",
-          "config": {
-            "duration": "1/32"
-          },
-          "summary": "Note Shortener — gives notes a 1/32 gate, synced to tempo."
-        }
-      ]
-    },
-    {
-      "id": "techno-pulse",
-      "name": "Techno Pulse",
-      "category": "Genres",
-      "description": "Clipped, low A minor notes for a driving bass motif.",
-      "useCase": "Play a repeating sixteenth-note rhythm around A3 over a four-on-the-floor kick. Adjust tempo and synth tone to suit your track.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "config": {
-            "root": 9,
-            "mode": [
-              0,
-              2,
-              3,
-              5,
-              7,
-              8,
-              10
-            ]
-          },
-          "summary": "Harmoniser — keeps notes in A natural minor."
-        },
-        {
-          "type": "Transposer",
-          "config": {
-            "distance": -12
-          },
-          "summary": "Transposer — shifts notes down one octave."
-        },
-        {
-          "type": "Note-Shortener",
-          "config": {
-            "duration": "1/32"
-          },
-          "summary": "Note Shortener — gives notes a 1/32 gate, synced to tempo."
-        }
-      ]
-    },
-    {
-      "id": "dub-stabs",
-      "name": "Dub Stabs",
-      "category": "Genres",
-      "description": "Short minor chords shifted onto the offbeat.",
-      "useCase": "Play on quarter-note beats to place minor chord stabs an eighth note later. Add delay and reverb on your instrument for space.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "config": {
-            "root": 9,
-            "mode": [
-              0,
-              2,
-              3,
-              5,
-              7,
-              8,
-              10
-            ]
-          },
-          "summary": "Harmoniser — keeps notes in A natural minor."
-        },
-        {
-          "type": "Chordifier",
-          "config": {
-            "mode": "aeolian",
-            "root": 0,
-            "simultaneous": 3
-          },
-          "summary": "Chordifier — builds 3-note diatonic chords."
-        },
-        {
-          "type": "Note-Delay",
-          "config": {
-            "useTimeDivision": true,
-            "timeDivision": "1/8",
-            "accumulate": false
-          },
-          "summary": "Note Delay — shifts the phrase later by 1/8, synced to tempo."
-        },
-        {
-          "type": "Note-Shortener",
-          "config": {
-            "duration": "1/16"
-          },
-          "summary": "Note Shortener — gives notes a 1/16 gate, synced to tempo."
-        }
-      ]
-    },
-    {
-      "id": "disco-keys",
-      "name": "Disco Keys",
-      "category": "Genres",
-      "description": "Bright C major seventh chords with a short rhythmic gate.",
-      "useCase": "Play syncopated single notes to sketch disco keys over a bass groove. Use a piano or electric piano patch.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "config": {
-            "root": 0,
-            "mode": [
-              0,
-              2,
-              4,
-              5,
-              7,
-              9,
-              11
-            ]
-          },
-          "summary": "Harmoniser — keeps notes in C major."
-        },
-        {
-          "type": "Chordifier",
-          "config": {
-            "mode": "ionian",
-            "root": 3,
-            "simultaneous": 4
-          },
-          "summary": "Chordifier — builds 4-note diatonic chords."
-        },
-        {
-          "type": "Note-Shortener",
-          "config": {
-            "duration": "1/8"
-          },
-          "summary": "Note Shortener — gives notes a 1/8 gate, synced to tempo."
-        }
-      ]
-    },
-    {
-      "id": "ambient-drift",
-      "name": "Ambient Drift",
-      "category": "Genres",
-      "description": "Slow descending A minor chord tones for spacious sketches.",
-      "useCase": "Play sparse single notes into a pad with a long release and reverb. Lower the tempo to spread the quarter-note arpeggio.",
-      "steps": [
-        {
-          "type": "Harmoniser",
-          "config": {
-            "root": 9,
-            "mode": [
-              0,
-              2,
-              3,
-              5,
-              7,
-              8,
-              10
-            ]
-          },
-          "summary": "Harmoniser — keeps notes in A natural minor."
-        },
-        {
-          "type": "Chordifier",
-          "config": {
-            "mode": "aeolian",
-            "root": 0,
-            "simultaneous": 4
-          },
-          "summary": "Chordifier — builds 4-note diatonic chords."
-        },
-        {
-          "type": "Arpeggiator",
-          "config": {
-            "pattern": "down",
-            "rate": "1/4",
-            "octaves": 1
-          },
-          "summary": "Arpeggiator — plays chord tones down at 1/4 spacing, synced to tempo."
-        }
-      ]
-    },
-    {
-      "id": "gentle-strummed-chords",
-      "name": "Gentle Strummed Chords",
-      "category": "Chords & accompaniment",
-      "description": "Turn one-finger chords into soft alternating strokes.",
-      "useCase": "Play single notes to sketch a strummed accompaniment.",
-      "steps": [
-        {
-          "type": "Chordifier",
-          "config": {
-            "root": 3,
-            "mode": "ionian",
-            "simultaneous": 3
-          },
-          "summary": "Build diatonic triads."
-        },
-        {
-          "type": "Velocity-Shaper",
-          "config": {
-            "curve": 0.75,
-            "minimum": 35,
-            "maximum": 95
-          },
-          "summary": "Keep dynamics gentle."
-        },
-        {
-          "type": "Strummer",
-          "config": {
-            "direction": "alternate",
-            "spread": 80,
-            "collect": 25
-          },
-          "summary": "Alternate up and down strokes."
-        }
-      ]
-    },
-    {
-      "id": "smooth-chord-voices",
-      "name": "Smooth Chord Voices",
-      "category": "Chords & accompaniment",
-      "description": "Keep chord changes in a comfortable register with less voice movement.",
-      "useCase": "Play chords or single-note chord roots.",
-      "steps": [
-        {
-          "type": "Chordifier",
-          "config": {
-            "root": 3,
-            "mode": "ionian",
-            "simultaneous": 3
-          },
-          "summary": "Generate chords in C major."
-        },
-        {
-          "type": "Voice-Leader",
-          "config": {
-            "lower": 48,
-            "upper": 84,
-            "collect": 30
-          },
-          "summary": "Choose nearby chord voicings."
-        }
-      ]
-    },
-    {
-      "id": "held-euclidean-pulses",
-      "name": "Held Euclidean Pulses",
-      "category": "Rhythm & repeats",
-      "description": "Latch a chord and turn it into a rotating five-in-sixteen pulse.",
-      "useCase": "Play a chord, release the keys and use Latch Enabled to stop.",
-      "steps": [
-        {
-          "type": "Latch",
-          "config": {
-            "mode": "replace"
-          },
-          "summary": "Hold the last chord."
-        },
-        {
-          "type": "Euclidean-Gate",
-          "config": {
-            "steps": 16,
-            "pulses": 5,
-            "rotation": 0,
-            "rate": 0.25,
-            "gate": 50
-          },
-          "summary": "Five pulses over sixteen steps."
-        }
-      ]
-    },
-    {
-      "id": "sparse-drum-variation",
-      "name": "Sparse Drum Variation",
-      "category": "Rhythm & repeats",
-      "description": "Thin a drum pattern with repeatable chance and varied dynamics.",
-      "useCase": "Feed a busy drum pattern into this chain.",
-      "steps": [
-        {
-          "type": "Probability-Gate",
-          "config": {
-            "chance": 70,
-            "seed": 7
-          },
-          "summary": "Keep about 70% of incoming hits."
-        },
-        {
-          "type": "Velocity-Shaper",
-          "config": {
-            "minimum": 45,
-            "maximum": 115,
-            "variation": 10
-          },
-          "summary": "Vary the strength of surviving hits."
-        }
-      ]
-    },
-    {
-      "id": "breathing-mod-wheel",
-      "name": "Breathing Mod Wheel",
-      "category": "Register & layering",
-      "description": "Send a smooth four-beat modulation cycle while notes are held.",
-      "useCase": "Use an instrument that responds to MIDI CC 1.",
-      "steps": [
-        {
-          "type": "CC-Animator",
-          "config": {
-            "controller": 1,
-            "waveform": "sine",
-            "beats": 4,
-            "maximum": 90
-          },
-          "summary": "Animate the modulation wheel."
-        }
-      ]
-    },
-    {
-      "id": "mod-wheel-to-expression",
-      "name": "Mod Wheel to Expression",
-      "category": "Register & layering",
-      "description": "Map the modulation wheel to a useful expression range.",
-      "useCase": "Control MIDI CC 11 with a hardware modulation wheel.",
-      "steps": [
-        {
-          "type": "CC-Mapper",
-          "config": {
-            "input": 1,
-            "output": 11,
-            "minimum": 35,
-            "maximum": 127
-          },
-          "summary": "Map CC 1 to CC 11."
-        }
-      ]
-    },
-    {
-      "id": "connected-ornaments",
-      "name": "Connected Ornaments",
-      "category": "Arpeggios & movement",
-      "description": "Join a melody smoothly and add light upper-note mordents.",
-      "useCase": "Play a monophonic line; the final note ends after four beats.",
-      "steps": [
-        {
-          "type": "Legato",
-          "config": {
-            "overlap": 20,
-            "hold": 4
-          },
-          "summary": "Join successive notes."
-        },
-        {
-          "type": "Ornamenter",
-          "config": {
-            "style": "mordent",
-            "chance": 50,
-            "interval": 2
-          },
-          "summary": "Decorate selected notes."
-        }
-      ]
-    },
-    {
-      "id": "rotating-phrase",
-      "name": "Rotating Phrase",
-      "category": "Arpeggios & movement",
-      "description": "Capture four beats and replay the rhythm with rotated pitches.",
-      "useCase": "Play a short phrase, then listen; playing again records a fresh phrase.",
-      "steps": [
-        {
-          "type": "Phrase-Recombiner",
-          "config": {
-            "beats": 4,
-            "operation": "rotate",
-            "dimension": "pitch",
-            "rotation": 1
-          },
-          "summary": "Rotate the captured pitches by one note."
-        }
-      ]
-    },
-    {
-      "id": "drum-map-octave",
-      "name": "Drum Map: Octave Layer",
-      "category": "Register & layering",
-      "description": "Map selected drum notes and layer the snare an octave above.",
-      "useCase": "Try a drum controller or edit the map for your instrument.",
-      "steps": [
-        {
-          "type": "Note-Mapper",
-          "config": {
-            "mapping": "36:36; 38:38+50; 42:42",
-            "unmatched": "pass"
-          },
-          "summary": "Layer snare note 38 with note 50."
-        }
-      ]
-    },
-    {
-      "id": "mirrored-melody",
-      "name": "Mirrored Melody",
-      "category": "Arpeggios & movement",
-      "description": "Turn rising phrases into falling phrases around middle C.",
-      "useCase": "Explore an inverted melodic idea, then adjust the mirror centre.",
-      "steps": [
-        {
-          "type": "Pitch-Mirror",
-          "config": {
-            "centre": 60,
-            "outside": "octave-fold"
-          },
-          "summary": "Mirror intervals around MIDI note 60."
-        }
-      ]
-    },
-    {
-      "id": "parallel-fifths",
-      "name": "Parallel Fifths",
-      "category": "Chords & accompaniment",
-      "description": "Add a perfect fifth and octave to each note.",
-      "useCase": "Build open power-chord textures from a single melodic line.",
-      "steps": [
-        {
-          "type": "Interval-Stack",
-          "config": {
-            "intervals": "0, 7, 12",
-            "falloff": 15
-          },
-          "summary": "Stack a root, fifth and octave."
-        }
-      ]
-    },
-    {
-      "id": "falling-note-bounces",
-      "name": "Falling Note Bounces",
-      "category": "Rhythm & repeats",
-      "description": "Create accelerating repeats that become softer with each bounce.",
-      "useCase": "Hold a note to hear the complete bounce pattern.",
-      "steps": [
-        {
-          "type": "Note-Bouncer",
-          "config": {
-            "beats": 1,
-            "damping": 70,
-            "decay": 80,
-            "count": 8
-          },
-          "summary": "Play up to eight progressively shorter bounces."
-        }
-      ]
-    },
-    {
-      "id": "release-octaves",
-      "name": "Release Octaves",
-      "category": "Arpeggios & movement",
-      "description": "Add a short octave response whenever a key is released.",
-      "useCase": "Play short phrases and let the release notes answer them.",
-      "steps": [
-        {
-          "type": "Release-Trigger",
-          "config": {
-            "transpose": 12,
-            "beats": 0.25,
-            "dry": 1,
-            "level": 70
-          },
-          "summary": "Keep the attack and add a softer octave on release."
-        }
-      ]
-    },
-    {
-      "id": "mono-high-priority",
-      "name": "Mono High Priority",
-      "category": "Register & layering",
-      "description": "Keep only the highest held note when notes overlap.",
-      "useCase": "Extract a top line from chords or protect a monophonic instrument.",
-      "steps": [
-        {
-          "type": "Polyphony-Limiter",
-          "config": {
-            "limit": 1,
-            "priority": "lowest"
-          },
-          "summary": "Discard the lowest note when the voice limit is reached."
-        }
-      ]
-    },
-    {
-      "id": "keyboard-channel-split",
-      "name": "Keyboard Channel Split",
-      "category": "Register & layering",
-      "description": "Send the left and right sides of the keyboard to different MIDI channels.",
-      "useCase": "Use a multitimbral instrument listening on channels 1 and 2.",
-      "steps": [
-        {
-          "type": "Note-Router",
-          "config": {
-            "source": "key",
-            "split": 60,
-            "lowerChannel": 1,
-            "upperChannel": 2
-          },
-          "summary": "Route notes below middle C to channel 1 and the rest to channel 2."
-        }
-      ]
-    },
-    {
-      "id": "four-channel-voices",
-      "name": "Four Channel Voices",
-      "category": "Register & layering",
-      "description": "Distribute successive notes across four independent MIDI channels.",
-      "useCase": "Connect synth voices or multitimbral parts on channels 2 through 5.",
-      "steps": [
-        {
-          "type": "Channel-Allocator",
-          "config": {
-            "first": 2,
-            "last": 5,
-            "mode": "round-robin"
-          },
-          "summary": "Assign one note per channel and steal the oldest when full."
-        }
-      ]
-    },
-    {
-      "id": "stepped-mod-wheel",
-      "name": "Stepped Mod Wheel",
-      "category": "Rhythm & repeats",
-      "description": "Turn the modulation wheel into eight rhythmic steps.",
-      "useCase": "Use a synth that responds to CC 1, then move the wheel between beats.",
-      "steps": [
-        {
-          "type": "CC-Stepper",
-          "config": {
-            "lower": 1,
-            "upper": 1,
-            "levels": 8,
-            "beats": 0.25
-          },
-          "summary": "Quantise CC 1 to eight values on a sixteenth-note grid."
-        }
-      ]
-    }
-  ],
-  "setups": []
+	"format": "harmoneasy-preset-library",
+	"version": 1,
+	"presets": [
+		{
+			"id": "c-major-sketchbook",
+			"name": "C Major Sketchbook",
+			"category": "Play in key",
+			"description": "Keep melodic sketches in C major while preserving your rhythm.",
+			"useCase": "Improvise over a C major backing track or explore melodies on an unfamiliar controller.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — moves notes to the nearest pitch in C major.",
+					"config": {
+						"root": 0,
+						"mode": [0, 2, 4, 5, 7, 9, 11]
+					}
+				}
+			]
+		},
+		{
+			"id": "a-minor-nocturne",
+			"name": "A Minor Nocturne",
+			"category": "Play in key",
+			"description": "Turn free playing into a melody in A natural minor.",
+			"useCase": "Write a reflective lead or find a topline over an A minor progression.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — moves notes into A natural minor.",
+					"config": {
+						"root": 9,
+						"mode": [0, 2, 3, 5, 7, 8, 10]
+					}
+				}
+			]
+		},
+		{
+			"id": "d-dorian-session",
+			"name": "D Dorian Session",
+			"category": "Play in key",
+			"description": "Explore the minor colour and raised sixth of D Dorian.",
+			"useCase": "Jam over a D minor vamp with a brighter modal palette.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — fits pitches to D Dorian, including its characteristic B natural.",
+					"config": {
+						"root": 2,
+						"mode": [0, 2, 3, 5, 7, 9, 10]
+					}
+				}
+			]
+		},
+		{
+			"id": "minimal-motion",
+			"name": "Minimal Motion",
+			"category": "Play in key",
+			"description": "Short, scale-constrained notes for uncluttered melodic sketches.",
+			"useCase": "Keep a busy input part concise while trying ideas in C major.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — moves notes to the nearest pitch in C major.",
+					"config": {
+						"root": 0,
+						"mode": [0, 2, 4, 5, 7, 9, 11]
+					}
+				},
+				{
+					"type": "Note-Shortener",
+					"summary": "Note Shortener — gives each note a 1/8 gate, synced to tempo.",
+					"config": {
+						"duration": "1/8"
+					}
+				}
+			]
+		},
+		{
+			"id": "classic-chord",
+			"name": "Classic Chord",
+			"category": "Chords & accompaniment",
+			"description": "Play diatonic C major triads with one finger.",
+			"useCase": "Sketch chord progressions when you have a small keyboard or only one hand free.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — moves notes to the nearest pitch in C major.",
+					"config": {
+						"root": 0,
+						"mode": [0, 2, 4, 5, 7, 9, 11]
+					}
+				},
+				{
+					"type": "Chordifier",
+					"summary": "Chordifier — builds 3-note major-key chords from each note.",
+					"config": {
+						"mode": "ionian",
+						"root": 3,
+						"simultaneous": 3
+					}
+				}
+			]
+		},
+		{
+			"id": "minor-chord-diary",
+			"name": "Minor Chord Diary",
+			"category": "Chords & accompaniment",
+			"description": "Build A minor harmony from single notes.",
+			"useCase": "Find a minor-key accompaniment without entering every chord tone.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — moves notes into A natural minor.",
+					"config": {
+						"root": 9,
+						"mode": [0, 2, 3, 5, 7, 8, 10]
+					}
+				},
+				{
+					"type": "Chordifier",
+					"summary": "Chordifier — builds 3-note minor-key chords from each note.",
+					"config": {
+						"mode": "aeolian",
+						"root": 0,
+						"simultaneous": 3
+					}
+				}
+			]
+		},
+		{
+			"id": "seventh-heaven",
+			"name": "Seventh Heaven",
+			"category": "Chords & accompaniment",
+			"description": "Expand C major scale notes into four-note chords.",
+			"useCase": "Try richer seventh-chord colours for keys, pads or songwriting.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — moves notes to the nearest pitch in C major.",
+					"config": {
+						"root": 0,
+						"mode": [0, 2, 4, 5, 7, 9, 11]
+					}
+				},
+				{
+					"type": "Chordifier",
+					"summary": "Chordifier — builds 4-note major-key chords from each note.",
+					"config": {
+						"mode": "ionian",
+						"root": 3,
+						"simultaneous": 4
+					}
+				}
+			]
+		},
+		{
+			"id": "offbeat-chord-stabs",
+			"name": "Offbeat Chord Stabs",
+			"category": "Chords & accompaniment",
+			"description": "Shift short C major chords an eighth note later.",
+			"useCase": "Play on the beat to create offbeat accompaniment against a steady pulse.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — moves notes to the nearest pitch in C major.",
+					"config": {
+						"root": 0,
+						"mode": [0, 2, 4, 5, 7, 9, 11]
+					}
+				},
+				{
+					"type": "Chordifier",
+					"summary": "Chordifier — builds 3-note major-key chords from each note.",
+					"config": {
+						"mode": "ionian",
+						"root": 3,
+						"simultaneous": 3
+					}
+				},
+				{
+					"type": "Note-Delay",
+					"summary": "Note Delay — moves the whole phrase later by 1/8, synced to tempo.",
+					"config": {
+						"useTimeDivision": true,
+						"timeDivision": "1/8",
+						"accumulate": false
+					}
+				},
+				{
+					"type": "Note-Shortener",
+					"summary": "Note Shortener — gives each note a 1/16 gate, synced to tempo.",
+					"config": {
+						"duration": "1/16"
+					}
+				}
+			]
+		},
+		{
+			"id": "chord-arpeggiator",
+			"name": "Chord Arpeggiator",
+			"category": "Arpeggios & movement",
+			"description": "Turn single notes into ascending C major chord patterns.",
+			"useCase": "Create a moving synth accompaniment from a simple root-note performance.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — moves notes to the nearest pitch in C major.",
+					"config": {
+						"root": 0,
+						"mode": [0, 2, 4, 5, 7, 9, 11]
+					}
+				},
+				{
+					"type": "Chordifier",
+					"summary": "Chordifier — builds 3-note major-key chords from each note.",
+					"config": {
+						"mode": "ionian",
+						"root": 3,
+						"simultaneous": 3
+					}
+				},
+				{
+					"type": "Arpeggiator",
+					"summary": "Arpeggiator — plays chord tones in up order at 1/16 spacing across 1 octave.",
+					"config": {
+						"pattern": "up",
+						"rate": "1/16",
+						"octaves": 1
+					}
+				}
+			]
+		},
+		{
+			"id": "falling-minor-arp",
+			"name": "Falling Minor Arp",
+			"category": "Arpeggios & movement",
+			"description": "Descending A minor chord tones at eighth-note spacing.",
+			"useCase": "Add a slower answering figure beneath a vocal or lead.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — moves notes into A natural minor.",
+					"config": {
+						"root": 9,
+						"mode": [0, 2, 3, 5, 7, 8, 10]
+					}
+				},
+				{
+					"type": "Chordifier",
+					"summary": "Chordifier — builds 3-note minor-key chords from each note.",
+					"config": {
+						"mode": "aeolian",
+						"root": 0,
+						"simultaneous": 3
+					}
+				},
+				{
+					"type": "Arpeggiator",
+					"summary": "Arpeggiator — plays chord tones in down order at 1/8 spacing across 1 octave.",
+					"config": {
+						"pattern": "down",
+						"rate": "1/8",
+						"octaves": 1
+					}
+				}
+			]
+		},
+		{
+			"id": "two-octave-pendulum",
+			"name": "Two Octave Pendulum",
+			"category": "Arpeggios & movement",
+			"description": "Sweep C major chords up and down across two octaves.",
+			"useCase": "Give a sparse progression a wider register and a repeating contour.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — moves notes to the nearest pitch in C major.",
+					"config": {
+						"root": 0,
+						"mode": [0, 2, 4, 5, 7, 9, 11]
+					}
+				},
+				{
+					"type": "Chordifier",
+					"summary": "Chordifier — builds 3-note major-key chords from each note.",
+					"config": {
+						"mode": "ionian",
+						"root": 3,
+						"simultaneous": 3
+					}
+				},
+				{
+					"type": "Arpeggiator",
+					"summary": "Arpeggiator — plays chord tones in up-down order at 1/16 spacing across 2 octaves.",
+					"config": {
+						"pattern": "up-down",
+						"rate": "1/16",
+						"octaves": 2
+					}
+				}
+			]
+		},
+		{
+			"id": "triplet-cascade",
+			"name": "Triplet Cascade",
+			"category": "Arpeggios & movement",
+			"description": "Spread major chord tones into ascending triplets.",
+			"useCase": "Try a rolling three-part subdivision against a straight beat.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — moves notes to the nearest pitch in C major.",
+					"config": {
+						"root": 0,
+						"mode": [0, 2, 4, 5, 7, 9, 11]
+					}
+				},
+				{
+					"type": "Chordifier",
+					"summary": "Chordifier — builds 3-note major-key chords from each note.",
+					"config": {
+						"mode": "ionian",
+						"root": 3,
+						"simultaneous": 3
+					}
+				},
+				{
+					"type": "Arpeggiator",
+					"summary": "Arpeggiator — plays chord tones in up order at triplet spacing across 2 octaves.",
+					"config": {
+						"pattern": "up",
+						"rate": "triplet",
+						"octaves": 2
+					}
+				}
+			]
+		},
+		{
+			"id": "staccato-arp",
+			"name": "Staccato Arp",
+			"category": "Arpeggios & movement",
+			"description": "Crisp ascending chord patterns with short gates.",
+			"useCase": "Leave space between synth notes so a dense arrangement stays clear.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — moves notes to the nearest pitch in C major.",
+					"config": {
+						"root": 0,
+						"mode": [0, 2, 4, 5, 7, 9, 11]
+					}
+				},
+				{
+					"type": "Chordifier",
+					"summary": "Chordifier — builds 3-note major-key chords from each note.",
+					"config": {
+						"mode": "ionian",
+						"root": 3,
+						"simultaneous": 3
+					}
+				},
+				{
+					"type": "Arpeggiator",
+					"summary": "Arpeggiator — plays chord tones in up order at 1/8 spacing across 1 octave.",
+					"config": {
+						"pattern": "up",
+						"rate": "1/8",
+						"octaves": 1
+					}
+				},
+				{
+					"type": "Note-Shortener",
+					"summary": "Note Shortener — gives each note a 1/16 gate, synced to tempo.",
+					"config": {
+						"duration": "1/16"
+					}
+				}
+			]
+		},
+		{
+			"id": "shuffled-chord-tones",
+			"name": "Shuffled Chord Tones",
+			"category": "Arpeggios & movement",
+			"description": "Reorder C major chord tones randomly while staying in harmony.",
+			"useCase": "Discover melodic variations without scattering pitches outside the chord.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — moves notes to the nearest pitch in C major.",
+					"config": {
+						"root": 0,
+						"mode": [0, 2, 4, 5, 7, 9, 11]
+					}
+				},
+				{
+					"type": "Chordifier",
+					"summary": "Chordifier — builds 3-note major-key chords from each note.",
+					"config": {
+						"mode": "ionian",
+						"root": 3,
+						"simultaneous": 3
+					}
+				},
+				{
+					"type": "Arpeggiator",
+					"summary": "Arpeggiator — plays chord tones in random order at 1/8 spacing across 1 octave.",
+					"config": {
+						"pattern": "random",
+						"rate": "1/8",
+						"octaves": 1
+					}
+				}
+			]
+		},
+		{
+			"id": "double-tap",
+			"name": "Double Tap",
+			"category": "Rhythm & repeats",
+			"description": "Two short strikes for every note you play.",
+			"useCase": "Add a double hit to a pluck or percussion patch; 125 ms spacing suits sixteenths at 120 BPM.",
+			"steps": [
+				{
+					"type": "Note-Repeater",
+					"summary": "Note Repeater — plays 2 strikes per note, 125 ms apart, each lasting 50 ms. Spacing stays fixed when tempo changes.",
+					"config": {
+						"repeats": 2,
+						"delay": 125,
+						"noteDuration": 50
+					}
+				}
+			]
+		},
+		{
+			"id": "chord-repeater",
+			"name": "Chord Repeater",
+			"category": "Rhythm & repeats",
+			"description": "Turn a root note into four evenly spaced C major chord strikes.",
+			"useCase": "Build a rhythmic chord pulse; 250 ms spacing suits eighth notes at 120 BPM.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — moves notes to the nearest pitch in C major.",
+					"config": {
+						"root": 0,
+						"mode": [0, 2, 4, 5, 7, 9, 11]
+					}
+				},
+				{
+					"type": "Chordifier",
+					"summary": "Chordifier — builds 3-note major-key chords from each note.",
+					"config": {
+						"mode": "ionian",
+						"root": 3,
+						"simultaneous": 3
+					}
+				},
+				{
+					"type": "Note-Repeater",
+					"summary": "Note Repeater — plays 4 strikes per note, 250 ms apart, each lasting 100 ms. Spacing stays fixed when tempo changes.",
+					"config": {
+						"repeats": 4,
+						"delay": 250,
+						"noteDuration": 100
+					}
+				}
+			]
+		},
+		{
+			"id": "ratchet-fill",
+			"name": "Ratchet Fill",
+			"category": "Rhythm & repeats",
+			"description": "Eight rapid, short strikes from one input note.",
+			"useCase": "Trigger a brief roll for transitions or fills; 62.5 ms spacing suits thirty-seconds at 120 BPM.",
+			"steps": [
+				{
+					"type": "Note-Repeater",
+					"summary": "Note Repeater — plays 8 strikes per note, 62.5 ms apart, each lasting 50 ms. Spacing stays fixed when tempo changes.",
+					"config": {
+						"repeats": 8,
+						"delay": 62.5,
+						"noteDuration": 50
+					}
+				}
+			]
+		},
+		{
+			"id": "late-answer",
+			"name": "Late Answer",
+			"category": "Rhythm & repeats",
+			"description": "Move your phrase a quarter note behind your playing.",
+			"useCase": "Create a delayed response on a separate chain alongside a direct part.",
+			"steps": [
+				{
+					"type": "Note-Delay",
+					"summary": "Note Delay — moves the whole phrase later by 1/4, synced to tempo.",
+					"config": {
+						"useTimeDivision": true,
+						"timeDivision": "1/4",
+						"accumulate": false
+					}
+				}
+			]
+		},
+		{
+			"id": "bass-register",
+			"name": "Bass Register",
+			"category": "Register & layering",
+			"description": "Move a C major melody down one octave.",
+			"useCase": "Reuse a midrange keyboard part as a bass line with a bass instrument on this chain.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — moves notes to the nearest pitch in C major.",
+					"config": {
+						"root": 0,
+						"mode": [0, 2, 4, 5, 7, 9, 11]
+					}
+				},
+				{
+					"type": "Transposer",
+					"summary": "Transposer — shifts every note down 12 semitones.",
+					"config": {
+						"distance": -12
+					}
+				}
+			]
+		},
+		{
+			"id": "upper-octave-sparkle",
+			"name": "Upper Octave Sparkle",
+			"category": "Register & layering",
+			"description": "Raise C major notes an octave and give them short gates.",
+			"useCase": "Add a high pluck layer on a separate chain above your main performance.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — moves notes to the nearest pitch in C major.",
+					"config": {
+						"root": 0,
+						"mode": [0, 2, 4, 5, 7, 9, 11]
+					}
+				},
+				{
+					"type": "Transposer",
+					"summary": "Transposer — shifts every note up 12 semitones.",
+					"config": {
+						"distance": 12
+					}
+				},
+				{
+					"type": "Note-Shortener",
+					"summary": "Note Shortener — gives each note a 1/8 gate, synced to tempo.",
+					"config": {
+						"duration": "1/8"
+					}
+				}
+			]
+		},
+		{
+			"id": "fifth-above",
+			"name": "Fifth Above",
+			"category": "Register & layering",
+			"description": "Transpose your performance up a perfect fifth.",
+			"useCase": "Layer this chain with a direct chain for a parallel fifth, or move a part into another key.",
+			"steps": [
+				{
+					"type": "Transposer",
+					"summary": "Transposer — shifts every note up 7 semitones.",
+					"config": {
+						"distance": 7
+					}
+				}
+			]
+		},
+		{
+			"id": "low-minor-pulse",
+			"name": "Low Minor Pulse",
+			"category": "Register & layering",
+			"description": "Short A minor notes shifted an octave down.",
+			"useCase": "Sketch a detached bass part beneath a minor-key arrangement.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — moves notes into A natural minor.",
+					"config": {
+						"root": 9,
+						"mode": [0, 2, 3, 5, 7, 8, 10]
+					}
+				},
+				{
+					"type": "Transposer",
+					"summary": "Transposer — shifts every note down 12 semitones.",
+					"config": {
+						"distance": -12
+					}
+				},
+				{
+					"type": "Note-Shortener",
+					"summary": "Note Shortener — gives each note a 1/8 gate, synced to tempo.",
+					"config": {
+						"duration": "1/8"
+					}
+				}
+			]
+		},
+		{
+			"id": "acid-house",
+			"name": "Acid House",
+			"category": "Genres",
+			"description": "Short A minor bass arpeggios at sixteenth-note spacing.",
+			"useCase": "Play single notes around A3 to generate low minor figures. Try 120–130 BPM with a resonant mono synth; vary accents and filter cutoff on your instrument.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"config": {
+						"root": 9,
+						"mode": [0, 2, 3, 5, 7, 8, 10]
+					},
+					"summary": "Harmoniser — keeps notes in A natural minor."
+				},
+				{
+					"type": "Chordifier",
+					"config": {
+						"mode": "aeolian",
+						"root": 0,
+						"simultaneous": 3
+					},
+					"summary": "Chordifier — builds 3-note diatonic chords."
+				},
+				{
+					"type": "Transposer",
+					"config": {
+						"distance": -12
+					},
+					"summary": "Transposer — shifts notes down one octave."
+				},
+				{
+					"type": "Arpeggiator",
+					"config": {
+						"pattern": "up",
+						"rate": "1/16",
+						"octaves": 1
+					},
+					"summary": "Arpeggiator — plays chord tones up at 1/16 spacing, synced to tempo."
+				},
+				{
+					"type": "Note-Shortener",
+					"config": {
+						"duration": "1/32"
+					},
+					"summary": "Note Shortener — gives notes a 1/32 gate, synced to tempo."
+				}
+			]
+		},
+		{
+			"id": "techno-pulse",
+			"name": "Techno Pulse",
+			"category": "Genres",
+			"description": "Clipped, low A minor notes for a driving bass motif.",
+			"useCase": "Play a repeating sixteenth-note rhythm around A3 over a four-on-the-floor kick. Adjust tempo and synth tone to suit your track.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"config": {
+						"root": 9,
+						"mode": [0, 2, 3, 5, 7, 8, 10]
+					},
+					"summary": "Harmoniser — keeps notes in A natural minor."
+				},
+				{
+					"type": "Transposer",
+					"config": {
+						"distance": -12
+					},
+					"summary": "Transposer — shifts notes down one octave."
+				},
+				{
+					"type": "Note-Shortener",
+					"config": {
+						"duration": "1/32"
+					},
+					"summary": "Note Shortener — gives notes a 1/32 gate, synced to tempo."
+				}
+			]
+		},
+		{
+			"id": "dub-stabs",
+			"name": "Dub Stabs",
+			"category": "Genres",
+			"description": "Short minor chords shifted onto the offbeat.",
+			"useCase": "Play on quarter-note beats to place minor chord stabs an eighth note later. Add delay and reverb on your instrument for space.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"config": {
+						"root": 9,
+						"mode": [0, 2, 3, 5, 7, 8, 10]
+					},
+					"summary": "Harmoniser — keeps notes in A natural minor."
+				},
+				{
+					"type": "Chordifier",
+					"config": {
+						"mode": "aeolian",
+						"root": 0,
+						"simultaneous": 3
+					},
+					"summary": "Chordifier — builds 3-note diatonic chords."
+				},
+				{
+					"type": "Note-Delay",
+					"config": {
+						"useTimeDivision": true,
+						"timeDivision": "1/8",
+						"accumulate": false
+					},
+					"summary": "Note Delay — shifts the phrase later by 1/8, synced to tempo."
+				},
+				{
+					"type": "Note-Shortener",
+					"config": {
+						"duration": "1/16"
+					},
+					"summary": "Note Shortener — gives notes a 1/16 gate, synced to tempo."
+				}
+			]
+		},
+		{
+			"id": "disco-keys",
+			"name": "Disco Keys",
+			"category": "Genres",
+			"description": "Bright C major seventh chords with a short rhythmic gate.",
+			"useCase": "Play syncopated single notes to sketch disco keys over a bass groove. Use a piano or electric piano patch.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"config": {
+						"root": 0,
+						"mode": [0, 2, 4, 5, 7, 9, 11]
+					},
+					"summary": "Harmoniser — keeps notes in C major."
+				},
+				{
+					"type": "Chordifier",
+					"config": {
+						"mode": "ionian",
+						"root": 3,
+						"simultaneous": 4
+					},
+					"summary": "Chordifier — builds 4-note diatonic chords."
+				},
+				{
+					"type": "Note-Shortener",
+					"config": {
+						"duration": "1/8"
+					},
+					"summary": "Note Shortener — gives notes a 1/8 gate, synced to tempo."
+				}
+			]
+		},
+		{
+			"id": "ambient-drift",
+			"name": "Ambient Drift",
+			"category": "Genres",
+			"description": "Slow descending A minor chord tones for spacious sketches.",
+			"useCase": "Play sparse single notes into a pad with a long release and reverb. Lower the tempo to spread the quarter-note arpeggio.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"config": {
+						"root": 9,
+						"mode": [0, 2, 3, 5, 7, 8, 10]
+					},
+					"summary": "Harmoniser — keeps notes in A natural minor."
+				},
+				{
+					"type": "Chordifier",
+					"config": {
+						"mode": "aeolian",
+						"root": 0,
+						"simultaneous": 4
+					},
+					"summary": "Chordifier — builds 4-note diatonic chords."
+				},
+				{
+					"type": "Arpeggiator",
+					"config": {
+						"pattern": "down",
+						"rate": "1/4",
+						"octaves": 1
+					},
+					"summary": "Arpeggiator — plays chord tones down at 1/4 spacing, synced to tempo."
+				}
+			]
+		},
+		{
+			"id": "gentle-strummed-chords",
+			"name": "Gentle Strummed Chords",
+			"category": "Chords & accompaniment",
+			"description": "Turn one-finger chords into soft alternating strokes.",
+			"useCase": "Play single notes to sketch a strummed accompaniment.",
+			"steps": [
+				{
+					"type": "Chordifier",
+					"config": {
+						"root": 3,
+						"mode": "ionian",
+						"simultaneous": 3
+					},
+					"summary": "Build diatonic triads."
+				},
+				{
+					"type": "Velocity-Shaper",
+					"config": {
+						"curve": 0.75,
+						"minimum": 35,
+						"maximum": 95
+					},
+					"summary": "Keep dynamics gentle."
+				},
+				{
+					"type": "Strummer",
+					"config": {
+						"direction": "alternate",
+						"spread": 80,
+						"collect": 25
+					},
+					"summary": "Alternate up and down strokes."
+				}
+			]
+		},
+		{
+			"id": "smooth-chord-voices",
+			"name": "Smooth Chord Voices",
+			"category": "Chords & accompaniment",
+			"description": "Keep chord changes in a comfortable register with less voice movement.",
+			"useCase": "Play chords or single-note chord roots.",
+			"steps": [
+				{
+					"type": "Chordifier",
+					"config": {
+						"root": 3,
+						"mode": "ionian",
+						"simultaneous": 3
+					},
+					"summary": "Generate chords in C major."
+				},
+				{
+					"type": "Voice-Leader",
+					"config": {
+						"lower": 48,
+						"upper": 84,
+						"collect": 30
+					},
+					"summary": "Choose nearby chord voicings."
+				}
+			]
+		},
+		{
+			"id": "held-euclidean-pulses",
+			"name": "Held Euclidean Pulses",
+			"category": "Rhythm & repeats",
+			"description": "Latch a chord and turn it into a rotating five-in-sixteen pulse.",
+			"useCase": "Play a chord, release the keys and use Latch Enabled to stop.",
+			"steps": [
+				{
+					"type": "Latch",
+					"config": {
+						"mode": "replace"
+					},
+					"summary": "Hold the last chord."
+				},
+				{
+					"type": "Euclidean-Gate",
+					"config": {
+						"steps": 16,
+						"pulses": 5,
+						"rotation": 0,
+						"rate": 0.25,
+						"gate": 50
+					},
+					"summary": "Five pulses over sixteen steps."
+				}
+			]
+		},
+		{
+			"id": "sparse-drum-variation",
+			"name": "Sparse Drum Variation",
+			"category": "Rhythm & repeats",
+			"description": "Thin a drum pattern with repeatable chance and varied dynamics.",
+			"useCase": "Feed a busy drum pattern into this chain.",
+			"steps": [
+				{
+					"type": "Probability-Gate",
+					"config": {
+						"chance": 70,
+						"seed": 7
+					},
+					"summary": "Keep about 70% of incoming hits."
+				},
+				{
+					"type": "Velocity-Shaper",
+					"config": {
+						"minimum": 45,
+						"maximum": 115,
+						"variation": 10
+					},
+					"summary": "Vary the strength of surviving hits."
+				}
+			]
+		},
+		{
+			"id": "breathing-mod-wheel",
+			"name": "Breathing Mod Wheel",
+			"category": "Register & layering",
+			"description": "Send a smooth four-beat modulation cycle while notes are held.",
+			"useCase": "Use an instrument that responds to MIDI CC 1.",
+			"steps": [
+				{
+					"type": "CC-Animator",
+					"config": {
+						"controller": 1,
+						"waveform": "sine",
+						"beats": 4,
+						"maximum": 90
+					},
+					"summary": "Animate the modulation wheel."
+				}
+			]
+		},
+		{
+			"id": "mod-wheel-to-expression",
+			"name": "Mod Wheel to Expression",
+			"category": "Register & layering",
+			"description": "Map the modulation wheel to a useful expression range.",
+			"useCase": "Control MIDI CC 11 with a hardware modulation wheel.",
+			"steps": [
+				{
+					"type": "CC-Mapper",
+					"config": {
+						"input": 1,
+						"output": 11,
+						"minimum": 35,
+						"maximum": 127
+					},
+					"summary": "Map CC 1 to CC 11."
+				}
+			]
+		},
+		{
+			"id": "connected-ornaments",
+			"name": "Connected Ornaments",
+			"category": "Arpeggios & movement",
+			"description": "Join a melody smoothly and add light upper-note mordents.",
+			"useCase": "Play a monophonic line; the final note ends after four beats.",
+			"steps": [
+				{
+					"type": "Legato",
+					"config": {
+						"overlap": 20,
+						"hold": 4
+					},
+					"summary": "Join successive notes."
+				},
+				{
+					"type": "Ornamenter",
+					"config": {
+						"style": "mordent",
+						"chance": 50,
+						"interval": 2
+					},
+					"summary": "Decorate selected notes."
+				}
+			]
+		},
+		{
+			"id": "rotating-phrase",
+			"name": "Rotating Phrase",
+			"category": "Arpeggios & movement",
+			"description": "Capture four beats and replay the rhythm with rotated pitches.",
+			"useCase": "Play a short phrase, then listen; playing again records a fresh phrase.",
+			"steps": [
+				{
+					"type": "Phrase-Recombiner",
+					"config": {
+						"beats": 4,
+						"operation": "rotate",
+						"dimension": "pitch",
+						"rotation": 1
+					},
+					"summary": "Rotate the captured pitches by one note."
+				}
+			]
+		},
+		{
+			"id": "drum-map-octave",
+			"name": "Drum Map: Octave Layer",
+			"category": "Register & layering",
+			"description": "Map selected drum notes and layer the snare an octave above.",
+			"useCase": "Try a drum controller or edit the map for your instrument.",
+			"steps": [
+				{
+					"type": "Note-Mapper",
+					"config": {
+						"mapping": "36:36; 38:38+50; 42:42",
+						"unmatched": "pass"
+					},
+					"summary": "Layer snare note 38 with note 50."
+				}
+			]
+		},
+		{
+			"id": "mirrored-melody",
+			"name": "Mirrored Melody",
+			"category": "Arpeggios & movement",
+			"description": "Turn rising phrases into falling phrases around middle C.",
+			"useCase": "Explore an inverted melodic idea, then adjust the mirror centre.",
+			"steps": [
+				{
+					"type": "Pitch-Mirror",
+					"config": {
+						"centre": 60,
+						"outside": "octave-fold"
+					},
+					"summary": "Mirror intervals around MIDI note 60."
+				}
+			]
+		},
+		{
+			"id": "parallel-fifths",
+			"name": "Parallel Fifths",
+			"category": "Chords & accompaniment",
+			"description": "Add a perfect fifth and octave to each note.",
+			"useCase": "Build open power-chord textures from a single melodic line.",
+			"steps": [
+				{
+					"type": "Interval-Stack",
+					"config": {
+						"intervals": "0, 7, 12",
+						"falloff": 15
+					},
+					"summary": "Stack a root, fifth and octave."
+				}
+			]
+		},
+		{
+			"id": "falling-note-bounces",
+			"name": "Falling Note Bounces",
+			"category": "Rhythm & repeats",
+			"description": "Create accelerating repeats that become softer with each bounce.",
+			"useCase": "Hold a note to hear the complete bounce pattern.",
+			"steps": [
+				{
+					"type": "Note-Bouncer",
+					"config": {
+						"beats": 1,
+						"damping": 70,
+						"decay": 80,
+						"count": 8
+					},
+					"summary": "Play up to eight progressively shorter bounces."
+				}
+			]
+		},
+		{
+			"id": "release-octaves",
+			"name": "Release Octaves",
+			"category": "Arpeggios & movement",
+			"description": "Add a short octave response whenever a key is released.",
+			"useCase": "Play short phrases and let the release notes answer them.",
+			"steps": [
+				{
+					"type": "Release-Trigger",
+					"config": {
+						"transpose": 12,
+						"beats": 0.25,
+						"dry": 1,
+						"level": 70
+					},
+					"summary": "Keep the attack and add a softer octave on release."
+				}
+			]
+		},
+		{
+			"id": "mono-high-priority",
+			"name": "Mono High Priority",
+			"category": "Register & layering",
+			"description": "Keep only the highest held note when notes overlap.",
+			"useCase": "Extract a top line from chords or protect a monophonic instrument.",
+			"steps": [
+				{
+					"type": "Polyphony-Limiter",
+					"config": {
+						"limit": 1,
+						"priority": "lowest"
+					},
+					"summary": "Discard the lowest note when the voice limit is reached."
+				}
+			]
+		},
+		{
+			"id": "keyboard-channel-split",
+			"name": "Keyboard Channel Split",
+			"category": "Register & layering",
+			"description": "Send the left and right sides of the keyboard to different MIDI channels.",
+			"useCase": "Use a multitimbral instrument listening on channels 1 and 2.",
+			"steps": [
+				{
+					"type": "Note-Router",
+					"config": {
+						"source": "key",
+						"split": 60,
+						"lowerChannel": 1,
+						"upperChannel": 2
+					},
+					"summary": "Route notes below middle C to channel 1 and the rest to channel 2."
+				}
+			]
+		},
+		{
+			"id": "four-channel-voices",
+			"name": "Four Channel Voices",
+			"category": "Register & layering",
+			"description": "Distribute successive notes across four independent MIDI channels.",
+			"useCase": "Connect synth voices or multitimbral parts on channels 2 through 5.",
+			"steps": [
+				{
+					"type": "Channel-Allocator",
+					"config": {
+						"first": 2,
+						"last": 5,
+						"mode": "round-robin"
+					},
+					"summary": "Assign one note per channel and steal the oldest when full."
+				}
+			]
+		},
+		{
+			"id": "stepped-mod-wheel",
+			"name": "Stepped Mod Wheel",
+			"category": "Rhythm & repeats",
+			"description": "Turn the modulation wheel into eight rhythmic steps.",
+			"useCase": "Use a synth that responds to CC 1, then move the wheel between beats.",
+			"steps": [
+				{
+					"type": "CC-Stepper",
+					"config": {
+						"lower": 1,
+						"upper": 1,
+						"levels": 8,
+						"beats": 0.25
+					},
+					"summary": "Quantise CC 1 to eight values on a sixteenth-note grid."
+				}
+			]
+		}
+	],
+	"setups": []
 }

@@ -1,7 +1,7 @@
-import type { RecorderAudioEvent } from '../audio-event-recorder.ts'
-import type AudioEvent from '../audio-event.ts'
-import type { ITimerControl as Timer } from "netronome"
-import { NOTE_ON } from '../commands.ts'
+import type RecorderAudioEvent from "../audio-event-recorder.ts"
+import type AudioEvent from "../audio-event.ts"
+import type { Timer } from "netronome"
+import { NOTE_ON } from "../commands.ts"
 
 /**
  * Generates a Markdown representation of MIDI events with timing and note information
@@ -43,13 +43,10 @@ export const createMIDIMarkdownFromAudioEventRecording = (
 /**
  * Saves markdown content to local file system as download
  */
-export const saveMarkdownToLocalFileSystem = (
-	content: string,
-	fileName: string
-) => {
-	const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' })
+export const saveMarkdownToLocalFileSystem = (content: string, fileName: string) => {
+	const blob = new Blob([content], { type: "text/markdown;charset=utf-8" })
 	const url = URL.createObjectURL(blob)
-	const a = document.createElement('a')
+	const a = document.createElement("a")
 	a.href = url
 	a.download = `${fileName}.md`
 
@@ -66,7 +63,7 @@ export const saveMarkdownToLocalFileSystem = (
 function formatTime(seconds: number): string {
 	const minutes = Math.floor(seconds / 60)
 	const secs = seconds % 60
-	return `${minutes}:${secs.toFixed(2).padStart(5, '0')}`
+	return `${minutes}:${secs.toFixed(2).padStart(5, "0")}`
 }
 
 /**
@@ -85,23 +82,8 @@ function formatDuration(seconds: number): string {
  * Convert MIDI note number to note name (e.g., 60 -> C4)
  */
 function midiNumberToNoteName(midiNumber: number): string {
-	const noteNames = [
-		'C',
-		'C#',
-		'D',
-		'D#',
-		'E',
-		'F',
-		'F#',
-		'G',
-		'G#',
-		'A',
-		'A#',
-		'B'
-	]
+	const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 	const octave = Math.floor(midiNumber / 12) - 1
 	const noteIndex = midiNumber % 12
 	return `${noteNames[noteIndex]}${octave}`
 }
-
-

@@ -14,7 +14,6 @@ import { convertNoteNumberToColour } from "../../conversion/note-to-colour.ts"
  * notation.noteOff(60)
  */
 export default class OutputNotation implements IAudioOutput {
-	
 	static ID: number = 0
 
 	#uuid: string = "Output-Notation-" + OutputNotation.ID++
@@ -63,8 +62,7 @@ export default class OutputNotation implements IAudioOutput {
 		return this.#canvas
 	}
 
-	constructor() {
-	}
+	constructor() {}
 
 	/**
 	 * Create the GUI (canvas and staff display)
@@ -125,7 +123,7 @@ export default class OutputNotation implements IAudioOutput {
 			console.error("Error disconnecting Notation output:", error)
 		}
 	}
-	
+
 	/**
 	 * Start playing a note
 	 * @param noteNumber MIDI note number (0-127)
@@ -197,7 +195,7 @@ export default class OutputNotation implements IAudioOutput {
 	 * Render the staff and notes
 	 */
 	#render(): void {
-		if (!this.#canvas || !this.#ctx){ 
+		if (!this.#canvas || !this.#ctx) {
 			return
 		}
 
@@ -223,7 +221,7 @@ export default class OutputNotation implements IAudioOutput {
 	 * Draw the musical staff
 	 */
 	#drawStaff(ctx: CanvasRenderingContext2D, width: number, height: number): void {
-		const topMargin = height / 2 - (this.#staffLineCount - 1) * this.#lineSpacing / 2
+		const topMargin = height / 2 - ((this.#staffLineCount - 1) * this.#lineSpacing) / 2
 		const lineColor = "#333"
 		const ledgerLineColor = "#999"
 
@@ -296,8 +294,7 @@ export default class OutputNotation implements IAudioOutput {
 	 * Draw notes on the staff
 	 */
 	#drawNotes(ctx: CanvasRenderingContext2D, width: number, height: number): void {
-		const topMargin = height / 2 - (this.#staffLineCount - 1) * this.#lineSpacing / 2
-		const bottomMargin = topMargin + (this.#staffLineCount - 1) * this.#lineSpacing
+		const topMargin = height / 2 - ((this.#staffLineCount - 1) * this.#lineSpacing) / 2
 
 		// Group notes by their vertical position
 		const notesByY: Map<number, Array<{ note: number; velocity: number }>> = new Map()
@@ -307,7 +304,9 @@ export default class OutputNotation implements IAudioOutput {
 		// E4=64 (line 1), F4=65 (space), G4=67 (line 2), A4=69 (space), B4=71 (line 3), C5=72 (space), D5=74 (line 4), E5=76 (space), F5=77 (line 5)
 		// C4=60 (below staff)
 
-		console.log(`Drawing ${this.#activeNotes.size} notes, topMargin: ${topMargin}, height: ${height}`)
+		console.log(
+			`Drawing ${this.#activeNotes.size} notes, topMargin: ${topMargin}, height: ${height}`
+		)
 
 		for (const { noteNumber, velocity } of this.#activeNotes.values()) {
 			const y = this.#getNoteYPosition(noteNumber, topMargin)
@@ -329,7 +328,9 @@ export default class OutputNotation implements IAudioOutput {
 				const x = xStart + i * 20
 				// Velocity is normalized (0-1), ensure at least 0.3 opacity for visibility
 				const opacity = Math.max(0.3, notes[i].velocity)
-				console.log(`Drawing note at x: ${x}, y: ${y}, velocity: ${notes[i].velocity}, opacity: ${opacity}`)
+				console.log(
+					`Drawing note at x: ${x}, y: ${y}, velocity: ${notes[i].velocity}, opacity: ${opacity}`
+				)
 				this.#drawNote(ctx, x, y, notes[i].note, opacity)
 			}
 		}
@@ -353,7 +354,13 @@ export default class OutputNotation implements IAudioOutput {
 	/**
 	 * Draw a single note head with pitch-based coloring
 	 */
-	#drawNote(ctx: CanvasRenderingContext2D, x: number, y: number, noteNumber: number, opacity: number): void {
+	#drawNote(
+		ctx: CanvasRenderingContext2D,
+		x: number,
+		y: number,
+		noteNumber: number,
+		opacity: number
+	): void {
 		ctx.save()
 		ctx.globalAlpha = opacity
 

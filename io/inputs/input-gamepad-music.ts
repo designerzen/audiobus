@@ -1,26 +1,26 @@
 /**
  * Advanced Gamepad Music Input
- * 
+ *
  * A competent and enjoyable gamepad-based music input system with multiple intuitive modes:
- * 
+ *
  * MODE 1: Chord Mode (Default)
  * - D-Pad: Select root note (C to B with chromatic notes)
  * - A/B/X/Y: Play common chord shapes (Major, Minor, Major7, Minor7)
  * - Triggers: Octave up/down
  * - Sticks: Velocity/dynamics control
- * 
- * MODE 2: Melodic Mode  
+ *
+ * MODE 2: Melodic Mode
  * - Right Stick: 8-way note selection (X-axis for pitch, Y-axis for octave)
  * - A/B/X/Y: Scale-based note selection (pentatonic/diatonic)
  * - D-Pad: Quick note stepping
  * - Triggers: Sustain/note duration
- * 
+ *
  * MODE 3: Drum Pad Mode
  * - A/B/X/Y: Drum sounds with velocity from stick pressure
  * - D-Pad + Buttons: Percussion variations
  * - Triggers: Effects (reverb/delay)
  * - Sticks: Mixing/panning
- * 
+ *
  * MODE 4: Arpeggiator Mode
  * - D-Pad: Note selection
  * - Buttons: Arpeggio patterns (up, down, up-down, random)
@@ -28,7 +28,8 @@
  * - Triggers: Start/stop playback
  */
 
-import { NOTE_OFF, NOTE_ON, CONTROL_CHANGE } from '../../commands'
+import { NOTE_OFF, NOTE_ON, CONTROL_CHANGE } from "../../commands"
+import type GamePad from "../../hardware/gamepad/gamepad"
 import { COMMANDS, GamePadManager } from "../../hardware/gamepad/gamepad"
 import AudioCommand from "../../audio-command"
 import AbstractInput from "./abstract-input"
@@ -42,12 +43,12 @@ const BASE_OCTAVE = 4
 
 // Common chord intervals (in semitones from root)
 const CHORD_SHAPES = {
-	major: [0, 4, 7],        // Major triad
-	minor: [0, 3, 7],        // Minor triad
-	major7: [0, 4, 7, 11],   // Major 7th
-	minor7: [0, 3, 7, 10],   // Minor 7th
-	diminished: [0, 3, 6],   // Diminished
-	augmented: [0, 4, 8],    // Augmented
+	major: [0, 4, 7], // Major triad
+	minor: [0, 3, 7], // Minor triad
+	major7: [0, 4, 7, 11], // Major 7th
+	minor7: [0, 3, 7, 10], // Minor 7th
+	diminished: [0, 3, 6], // Diminished
+	augmented: [0, 4, 8] // Augmented
 }
 
 // Pentatonic scale (relative to root)
@@ -70,11 +71,10 @@ interface GamePadMusicState {
 }
 
 export default class InputGamePadMusic extends AbstractInput implements IAudioInput {
-
 	gamePadManager: GamePadManager
 	state: GamePadMusicState
 	stickDeadzone: number = 0.15
-	
+
 	constructor(options: Record<string, any> = {}) {
 		super(options)
 
@@ -88,7 +88,7 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 			isArpeggioPlaying: false,
 			arpeggioNotes: [],
 			arpeggioIndex: 0,
-			lastButtonPress: null,
+			lastButtonPress: null
 		}
 
 		this.onGamePadEvent = this.onGamePadEvent.bind(this)
@@ -119,7 +119,7 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 	/**
 	 * Main gamepad event handler - routes events based on current mode
 	 */
-	protected onGamePadEvent(button: string, value: number, gamePad: Gamepad, heldFor: number) {
+	protected onGamePadEvent(button: string, value: number, _gamePad: GamePad, heldFor: number) {
 		const isHeld = this.gamePadManager.isHeld(button)
 
 		// Mode switching
@@ -152,7 +152,7 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 	 * MODE 1: Chord Mode
 	 * Intuitive way to play harmonies
 	 */
-	private handleChordMode(button: string, value: number, isHeld: boolean, heldFor: number) {
+	private handleChordMode(button: string, value: number, _isHeld: boolean, _heldFor: number) {
 		// D-Pad: Select root note
 		if (button.startsWith("d")) {
 			this.handleDPadRootSelection(button)
@@ -199,7 +199,7 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 	 * MODE 2: Melodic Mode
 	 * Play individual notes with stick-based pitch control
 	 */
-	private handleMelodicMode(button: string, value: number, isHeld: boolean, heldFor: number) {
+	private handleMelodicMode(button: string, value: number, _isHeld: boolean, _heldFor: number) {
 		// Right stick X: Pitch selection (8 notes per octave)
 		if (button === COMMANDS.RIGHT_STICK_X) {
 			const stickNote = this.getStickBasedNote(value)
@@ -265,7 +265,7 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 	 * MODE 3: Drum Pad Mode
 	 * Percussion and drum samples with velocity sensitivity
 	 */
-	private handleDrumMode(button: string, value: number, isHeld: boolean, heldFor: number) {
+	private handleDrumMode(button: string, value: number, _isHeld: boolean, _heldFor: number) {
 		// Stick pressure affects velocity
 		const velocity = this.calculateStickVelocity()
 
@@ -305,10 +305,10 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 
 		// Triggers: Effects
 		if (button === COMMANDS.LB && value) {
-			this.dispatchControlChange(91, Math.round(value * 127 / 255)) // Reverb
+			this.dispatchControlChange(91, Math.round((value * 127) / 255)) // Reverb
 		}
 		if (button === COMMANDS.RB && value) {
-			this.dispatchControlChange(94, Math.round(value * 127 / 255)) // Delay
+			this.dispatchControlChange(94, Math.round((value * 127) / 255)) // Delay
 		}
 	}
 
@@ -316,7 +316,12 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 	 * MODE 4: Arpeggiator Mode
 	 * Automatic note sequencing with stick-based control
 	 */
-	private handleArpeggiatorMode(button: string, value: number, isHeld: boolean, heldFor: number) {
+	private handleArpeggiatorMode(
+		button: string,
+		value: number,
+		_isHeld: boolean,
+		_heldFor: number
+	) {
 		// A/B/X/Y: Select arpeggio patterns
 		let pattern: ArpeggioPattern | null = null
 
@@ -361,15 +366,15 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 	private handleDPadRootSelection(button: string) {
 		// Map d-pad to notes
 		const noteOffset: Record<string, number> = {
-			[COMMANDS.UP]: 0,      // C
-			[COMMANDS.DOWN]: 3,    // D#
-			[COMMANDS.LEFT]: 5,    // F
-			[COMMANDS.RIGHT]: 7,   // G
+			[COMMANDS.UP]: 0, // C
+			[COMMANDS.DOWN]: 3, // D#
+			[COMMANDS.LEFT]: 5, // F
+			[COMMANDS.RIGHT]: 7 // G
 		}
 
 		const offset = noteOffset[button]
 		if (offset !== undefined) {
-			this.state.currentRootNote = (this.state.currentOctave * 12) + offset
+			this.state.currentRootNote = this.state.currentOctave * 12 + offset
 			this.dispatchInfoCommand(`Root: ${NOTE_NAMES[offset]}${this.state.currentOctave}`)
 		}
 	}
@@ -393,9 +398,7 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 
 	private calculateStickVelocity(): number {
 		// Combine both stick axes for velocity
-		const magnitude = Math.sqrt(
-			this.state.lastStickX ** 2 + this.state.lastStickY ** 2
-		)
+		const magnitude = Math.sqrt(this.state.lastStickX ** 2 + this.state.lastStickY ** 2)
 		return Math.min(127, Math.round(magnitude * 127))
 	}
 
@@ -490,8 +493,8 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 		// Build arpeggio note list based on current chord or scale
 		const baseNotes = [
 			this.state.currentRootNote,
-			this.state.currentRootNote + 4,  // Third
-			this.state.currentRootNote + 7,  // Fifth
+			this.state.currentRootNote + 4, // Third
+			this.state.currentRootNote + 7 // Fifth
 		]
 
 		switch (pattern) {
@@ -519,7 +522,7 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 			"chord",
 			"melodic",
 			"drum",
-			"arpeggiator",
+			"arpeggiator"
 		]
 
 		const currentIndex = modes.indexOf(this.state.currentMode)
@@ -547,7 +550,3 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 		this.dispatch(command)
 	}
 }
-
-
-
-

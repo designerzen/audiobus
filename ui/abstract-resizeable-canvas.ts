@@ -1,4 +1,4 @@
-import { EVENT_RESIZE } from '../event-constants.ts'
+import { EVENT_RESIZE } from "../event-constants.ts"
 /**
  * Maximum canvas size before downscaling
  * Prevents performance issues on very large displays
@@ -13,7 +13,7 @@ interface ResizeableOptions {
 
 const DEFAULT_OPTIONS: ResizeableOptions = {
 	screenBoundary: DEFAULT_PERFORMANCE_BOUNDARY_SIZE,
-	resize: false,
+	resize: false
 }
 
 /**
@@ -35,7 +35,11 @@ export class AbstractResizeable {
 	 * @param workerURI - URI to the worker script or Worker constructor (from ?worker import)
 	 * @param optional - Configuration options
 	 */
-	constructor(canvas: HTMLCanvasElement, workerURI: string | { new(): Worker }, optional: ResizeableOptions = {}) {
+	constructor(
+		canvas: HTMLCanvasElement,
+		workerURI: string | { new (): Worker },
+		optional: ResizeableOptions = {}
+	) {
 		this.element = canvas
 		this.optional = { ...DEFAULT_OPTIONS, ...optional }
 		this.onResize = this.onResize.bind(this)
@@ -43,28 +47,22 @@ export class AbstractResizeable {
 		const canvasWorker = canvas.transferControlToOffscreen()
 		const payload = { canvas: canvasWorker, ...this.optional }
 		// Handle both string URIs and Worker constructors from ?worker imports
-		this.worker = typeof workerURI === 'string' ? new Worker(workerURI) : new workerURI()
+		this.worker = typeof workerURI === "string" ? new Worker(workerURI) : new workerURI()
 		this.worker.postMessage(payload, [canvasWorker])
 
 		// Add error listeners for the worker
 		this.worker.onerror = (error: ErrorEvent) => {
-			console.error(
-				'Worker Error:',
-				error.message,
-				error.filename,
-				error.lineno,
-				error
-			)
+			console.error("Worker Error:", error.message, error.filename, error.lineno, error)
 			// You might want to add logic here to try and recover or display a message
 		}
 
 		this.worker.onmessageerror = (event: MessageEvent) => {
-			console.error('Worker Message Error:', event)
+			console.error("Worker Message Error:", event)
 		}
 
 		if (this.optional.resize) {
 			const resizeObserver = new ResizeObserver(this.onResize)
-			resizeObserver.observe(canvas, { box: 'content-box' })
+			resizeObserver.observe(canvas, { box: "content-box" })
 		} else {
 			// dispatch worker message to resize to known size
 			const payload = {
@@ -72,7 +70,7 @@ export class AbstractResizeable {
 				displayWidth: canvas.width,
 				displayHeight: canvas.height,
 				scaleFactor: 1,
-				...this.optional,
+				...this.optional
 			}
 			this.worker.postMessage(payload)
 		}
@@ -104,7 +102,8 @@ export class AbstractResizeable {
 
 		// Get the size the browser is displaying the canvas in device pixels.
 		// Check if the canvas is not the same size.
-		const needResize = this.element.width !== displayWidth || this.element.height !== displayHeight
+		const needResize =
+			this.element.width !== displayWidth || this.element.height !== displayHeight
 
 		if (needResize) {
 			this.started = true
@@ -115,7 +114,13 @@ export class AbstractResizeable {
 			// NB. Make the canvas the same size via OffscreenCanvas
 			//      this.canvas.width  = displayWidth
 			//      this.canvas.height = displayHeight
-			const payload = { type: EVENT_RESIZE, displayWidth, displayHeight, scaleFactor, ...this.optional }
+			const payload = {
+				type: EVENT_RESIZE,
+				displayWidth,
+				displayHeight,
+				scaleFactor,
+				...this.optional
+			}
 			this.worker.postMessage(payload)
 		}
 
@@ -145,7 +150,7 @@ export class AbstractResizeable {
 					height = entry.contentBoxSize[0].blockSize
 				} else {
 					// legacy
-					const contentBox = entry.contentBoxSize as DOMRectReadOnly
+					const contentBox = entry.contentBoxSize as unknown as ResizeObserverSize
 					width = contentBox.inlineSize
 					height = contentBox.blockSize
 				}

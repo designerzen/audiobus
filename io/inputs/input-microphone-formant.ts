@@ -1,7 +1,7 @@
-import { PITCH_BEND } from '../../commands.ts'
+import { PITCH_BEND } from "../../commands.ts"
 /**
  * Microphone Input with Formant-based Pitch Detection
- * 
+ *
  * Captures audio from the microphone and detects pitch using:
  * - Spectral analysis (FFT) for high-performance formant detection
  * - YIN algorithm fallback for reliable fundamental frequency extraction
@@ -9,7 +9,7 @@ import { PITCH_BEND } from '../../commands.ts'
  */
 import AbstractInput from "./abstract-input.ts"
 import { createAudioCommand } from "../../audio-command-factory.ts"
-import { NOTE_ON, NOTE_OFF } from '../../commands'
+import { NOTE_ON, NOTE_OFF } from "../../commands"
 import { frequencyToNote, frequencyToNoteCents } from "../../conversion/frequency-to-note.ts"
 
 import type { IAudioInput } from "./input-interface.ts"
@@ -30,35 +30,35 @@ const DEFAULT_OPTIONS = {
 	minFrequency: 80,
 	maxFrequency: 1000,
 	confidenceThreshold: 0.9,
-	analyzeInterval: 50, 		// ms
-	audioContext: undefined 	// Required: must be passed from app
+	analyzeInterval: 50, // ms
+	audioContext: undefined // Required: must be passed from app
 }
 
 export const VOCAL_OPTIONS = {
 	smoothing: 0.85,
-	minFrequency: 80,        	// Low soprano
-	maxFrequency: 1000,      	// High soprano/tenor
+	minFrequency: 80, // Low soprano
+	maxFrequency: 1000, // High soprano/tenor
 	confidenceThreshold: 0.85,
-	analyzeInterval: 40,     	// Slightly faster for vocal responsiveness
-	fftSize: 4096            	// Better frequency resolution
+	analyzeInterval: 40, // Slightly faster for vocal responsiveness
+	fftSize: 4096 // Better frequency resolution
 }
 
 export const INSTRUMENT_OPTIONS = {
 	smoothing: 0.8,
-	minFrequency: 60,        	// Low notes
-	maxFrequency: 2000,      	// Extended range
+	minFrequency: 60, // Low notes
+	maxFrequency: 2000, // Extended range
 	confidenceThreshold: 0.8,
-	analyzeInterval: 50,     	// Standard interval
+	analyzeInterval: 50, // Standard interval
 	fftSize: 4096
 }
 
 export const POWER_OPTIONS = {
 	smoothing: 0.9,
 	minFrequency: 50,
-	maxFrequency: 3000,      	// Extended range
+	maxFrequency: 3000, // Extended range
 	confidenceThreshold: 0.92,
-	analyzeInterval: 100,    	// Slower but more stable
-	fftSize: 8192            	// Better frequency resolution
+	analyzeInterval: 100, // Slower but more stable
+	fftSize: 8192 // Better frequency resolution
 }
 
 /**
@@ -67,39 +67,34 @@ export const POWER_OPTIONS = {
  */
 class FormantDetector {
 	#analyser: AnalyserNode
-	#dataArray: Uint8Array
-	#floatData: Float32Array
+	#dataArray: Uint8Array<ArrayBuffer>
 	#fftSize: number
 	#sampleRate: number
 	#minFrequency: number
 	#maxFrequency: number
-	#confidenceThreshold: number
 	#lastFrequency: number = 0
 	#frequencySmoothingFactor: number
 
-	constructor(
-		context: AudioContext,
-		analyser: AnalyserNode,
-		options: Record<string, any>
-	) {
+	constructor(context: AudioContext, analyser: AnalyserNode, options: Record<string, any>) {
 		this.#analyser = analyser
 		this.#fftSize = options.fftSize || 4096
 		this.#sampleRate = context.sampleRate
 		this.#minFrequency = options.minFrequency || 80
 		this.#maxFrequency = options.maxFrequency || 1000
-		this.#confidenceThreshold = options.confidenceThreshold || 0.9
 		this.#frequencySmoothingFactor = options.smoothing || 0.8
 
 		this.#analyser.fftSize = this.#fftSize
 		this.#dataArray = new Uint8Array(this.#analyser.frequencyBinCount)
-		this.#floatData = new Float32Array(this.#fftSize)
 	}
 
 	/**
 	 * Detect pitch using YIN algorithm on time-domain data
 	 * Best for vocal/monophonic sources
 	 */
-	#yinPitchDetection(buffer: Float32Array, threshold: number = 0.1): { frequency: number; confidence: number } {
+	#yinPitchDetection(
+		buffer: Float32Array,
+		_threshold: number = 0.1
+	): { frequency: number; confidence: number } {
 		const size = buffer.length
 		const maxlag = Math.floor(size / 2)
 		const d = new Float32Array(maxlag)
@@ -118,7 +113,7 @@ class FormantDetector {
 				sum += diff * diff
 				normalization += buffer[i] * buffer[i] + buffer[i + lag] * buffer[i + lag]
 			}
-			d[lag] = 2 * sum / (normalization || 1)
+			d[lag] = (2 * sum) / (normalization || 1)
 		}
 
 		// Find the lowest point in the function
@@ -194,7 +189,8 @@ class FormantDetector {
 
 		// Apply frequency smoothing to reduce jitter
 		if (this.#lastFrequency > 0 && Math.abs(result.frequency - this.#lastFrequency) > 20) {
-			result.frequency = this.#frequencySmoothingFactor * result.frequency +
+			result.frequency =
+				this.#frequencySmoothingFactor * result.frequency +
 				(1 - this.#frequencySmoothingFactor) * this.#lastFrequency
 		}
 
@@ -210,21 +206,17 @@ class FormantDetector {
 }
 
 export default class InputMicrophoneFormant extends AbstractInput implements IAudioInput {
-
 	#audioContext: AudioContext | null = null
 	#mediaStream: MediaStream | null = null
 	#sourceNode: MediaStreamAudioSourceNode | null = null
 	#analyser: AnalyserNode | null = null
 	#formantDetector: FormantDetector | null = null
-	#analyzeInterval: number = 0
+	#analyzeInterval: ReturnType<typeof setTimeout> | undefined
 	#isListening: boolean = false
 
 	#currentNote: number = -1
-	#lastNoteTime: number = 0
-	#noteOnThreshold: number = 0.01
-	#noteOffThreshold: number = 0.005
 
-	#timeBuffer: Float32Array | null = null
+	#timeBuffer: Float32Array<ArrayBuffer> | null = null
 
 	get name(): string {
 		return MICROPHONE_INPUT_ID
@@ -254,10 +246,13 @@ export default class InputMicrophoneFormant extends AbstractInput implements IAu
 		try {
 			// AudioContext must be provided from app
 			if (!this.options.audioContext) {
-				throw new Error('InputMicrophoneFormant requires audioContext to be passed via options')
+				throw new Error(
+					"InputMicrophoneFormant requires audioContext to be passed via options"
+				)
 			}
 
-			this.#audioContext = this.options.audioContext
+			const audioContext: AudioContext = this.options.audioContext
+			this.#audioContext = audioContext
 
 			// Get microphone access
 			this.#mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -269,19 +264,15 @@ export default class InputMicrophoneFormant extends AbstractInput implements IAu
 				}
 			})
 
-			this.#sourceNode = this.#audioContext.createMediaStreamSource(this.#mediaStream)
-			this.#analyser = this.#audioContext.createAnalyser()
+			this.#sourceNode = audioContext.createMediaStreamSource(this.#mediaStream)
+			this.#analyser = audioContext.createAnalyser()
 			this.#analyser.smoothingTimeConstant = this.options.smoothing || 0.8
 
 			// Connect nodes
 			this.#sourceNode.connect(this.#analyser)
 
 			// Initialize formant detector
-			this.#formantDetector = new FormantDetector(
-				this.#audioContext,
-				this.#analyser,
-				this.options
-			)
+			this.#formantDetector = new FormantDetector(audioContext, this.#analyser, this.options)
 
 			// Prepare time-domain buffer for YIN
 			this.#timeBuffer = new Float32Array(this.#analyser.fftSize)
@@ -293,9 +284,8 @@ export default class InputMicrophoneFormant extends AbstractInput implements IAu
 			this.setAsConnected()
 
 			console.info("[Microphone Input] Connected and listening", {
-				sampleRate: this.#audioContext.sampleRate
+				sampleRate: audioContext.sampleRate
 			})
-
 		} catch (error: any) {
 			this.setAsDisconnected()
 			console.error("[Microphone Input] Failed to connect", error)
@@ -311,7 +301,7 @@ export default class InputMicrophoneFormant extends AbstractInput implements IAu
 			this.#stopAnalysis()
 
 			if (this.#mediaStream) {
-				this.#mediaStream.getTracks().forEach(track => track.stop())
+				this.#mediaStream.getTracks().forEach((track) => track.stop())
 				this.#mediaStream = null
 			}
 
@@ -325,7 +315,7 @@ export default class InputMicrophoneFormant extends AbstractInput implements IAu
 				this.#analyser = null
 			}
 
-			if (this.#audioContext && this.#audioContext.state !== 'closed') {
+			if (this.#audioContext && this.#audioContext.state !== "closed") {
 				await this.#audioContext.close()
 				this.#audioContext = null
 			}
@@ -336,7 +326,6 @@ export default class InputMicrophoneFormant extends AbstractInput implements IAu
 			this.setAsDisconnected()
 
 			console.info("[Microphone Input] Disconnected")
-
 		} catch (error: any) {
 			console.error("[Microphone Input] Error during disconnect", error)
 		}
@@ -346,12 +335,16 @@ export default class InputMicrophoneFormant extends AbstractInput implements IAu
 	 * Start the pitch detection analysis loop
 	 */
 	#startAnalysis(): void {
-		if (!this.#formantDetector || !this.#analyser) return
+		if (!this.#formantDetector || !this.#analyser) {
+			return
+		}
 
 		const analyzeInterval = this.options.analyzeInterval || 50
 
 		const analyze = () => {
-			if (!this.#isListening) return
+			if (!this.#isListening) {
+				return
+			}
 
 			// Get time-domain data for YIN algorithm
 			if (this.#timeBuffer) {
@@ -380,7 +373,10 @@ export default class InputMicrophoneFormant extends AbstractInput implements IAu
 					const { cents } = frequencyToNoteCents(result.frequency)
 					this.#dispatchPitchBend(cents)
 				}
-			} else if (this.#currentNote >= 0 && result.confidence < (this.options.threshold || 0.01)) {
+			} else if (
+				this.#currentNote >= 0 &&
+				result.confidence < (this.options.threshold || 0.01)
+			) {
 				// Send note off if confidence drops below threshold
 				this.#dispatchNoteOff(this.#currentNote)
 				this.#currentNote = -1
@@ -398,7 +394,7 @@ export default class InputMicrophoneFormant extends AbstractInput implements IAu
 	#stopAnalysis(): void {
 		if (this.#analyzeInterval) {
 			clearTimeout(this.#analyzeInterval)
-			this.#analyzeInterval = 0
+			this.#analyzeInterval = undefined
 		}
 	}
 
@@ -406,12 +402,7 @@ export default class InputMicrophoneFormant extends AbstractInput implements IAu
 	 * Dispatch note on command
 	 */
 	#dispatchNoteOn(noteNumber: number, confidence: number): void {
-		const command: IAudioCommand = createAudioCommand(
-			NOTE_ON,
-			noteNumber,
-			this.now,
-			this.name
-		)
+		const command: IAudioCommand = createAudioCommand(NOTE_ON, noteNumber, this.now, this.name)
 		command.velocity = Math.round(confidence * 127)
 
 		this.dispatch(command)
@@ -421,20 +412,13 @@ export default class InputMicrophoneFormant extends AbstractInput implements IAu
 			velocity: command.velocity,
 			confidence
 		})
-
-		this.#lastNoteTime = this.now
 	}
 
 	/**
 	 * Dispatch note off command
 	 */
 	#dispatchNoteOff(noteNumber: number): void {
-		const command: IAudioCommand = createAudioCommand(
-			NOTE_OFF,
-			noteNumber,
-			this.now,
-			this.name
-		)
+		const command: IAudioCommand = createAudioCommand(NOTE_OFF, noteNumber, this.now, this.name)
 
 		this.dispatch(command)
 
@@ -450,12 +434,7 @@ export default class InputMicrophoneFormant extends AbstractInput implements IAu
 		// Convert cents (-100 to +100) to MIDI pitch bend (0 to 16383, center 8192)
 		const pitchBendValue = Math.round(8192 + (cents / 100) * 8192)
 
-		const command: IAudioCommand = createAudioCommand(
-			PITCH_BEND as any,
-			0,
-			this.now,
-			this.name
-		)
+		const command: IAudioCommand = createAudioCommand(PITCH_BEND as any, 0, this.now, this.name)
 		command.value = Math.max(0, Math.min(16383, pitchBendValue))
 
 		this.dispatch(command)
@@ -470,7 +449,3 @@ export default class InputMicrophoneFormant extends AbstractInput implements IAu
 		}
 	}
 }
-
-
-
-

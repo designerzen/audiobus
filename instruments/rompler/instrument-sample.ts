@@ -3,14 +3,13 @@ import { loadInstrumentFromSoundFont } from "./fetch-audio-data.js"
 import { noteNumberToName } from "../../conversion/note-to-name.ts"
 
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
-import type { SampleInstrumentOptions, ProgressCallback } from "./types.ts"
+import type { SampleInstrumentOptions, ProgressCallback as _ProgressCallback } from "./types.ts"
 // Maximum simultaneous tracks to play (will wait for slot)
 const MAX_TRACKS = 64 * 4 // AKA 4 bars
 
 export const INSTRUMENT_TYPE_SAMPLE = "SamplePlayerInstrument"
 
 export default class SampleInstrument implements IAudioOutput {
-
 	static ID: number = 0
 
 	static get name(): string {
@@ -19,20 +18,20 @@ export default class SampleInstrument implements IAudioOutput {
 
 	#title = "Sample Player"
 	#id = "SampleInstrument"
-	#uuid = this.#id + "-" + (SampleInstrument.ID++)
+	#uuid = this.#id + "-" + SampleInstrument.ID++
 
 	readonly type = "sample"
-		
+
 	audioContext: AudioContext
 	gainNode: GainNode
 
-	// Instrument is an Object where A0:"sampleAudioBuffer" 
+	// Instrument is an Object where A0:"sampleAudioBuffer"
 	audioBuffers: Record<string, AudioBuffer> = {}
-	
+
 	instrumentName: string = "Unloaded"
 	instrumentTitle: string = "Unloaded"
 	instrumentFamily: string = "Unknown"
-	instrumentPack: string = 'Not Loaded'
+	instrumentPack: string = "Not Loaded"
 
 	// do not edit:
 
@@ -50,7 +49,7 @@ export default class SampleInstrument implements IAudioOutput {
 
 	pitchBendValue: number = 1
 	currentVolume: number = 1
-	
+
 	// which samples are currently ongoing
 	activeSamples: Map<number, any> = new Map()
 
@@ -64,7 +63,7 @@ export default class SampleInstrument implements IAudioOutput {
 	get isLoading(): boolean {
 		return this.instrumentLoading
 	}
-	
+
 	set volume(value: number) {
 		this.gainNode.gain.value = value
 		this.currentVolume = value
@@ -75,7 +74,7 @@ export default class SampleInstrument implements IAudioOutput {
 		return this.gainNode
 	}
 
-	get activePreset(){
+	get activePreset() {
 		return this.instrumentName
 	}
 
@@ -103,7 +102,7 @@ export default class SampleInstrument implements IAudioOutput {
 		return false
 	}
 
-	constructor(audioContext: AudioContext, options: SampleInstrumentOptions = {}) {
+	constructor(audioContext: AudioContext, _options: SampleInstrumentOptions = {}) {
 		this.audioContext = audioContext
 		this.gainNode = audioContext.createGain()
 		this.gainNode.gain.value = this.currentVolume
@@ -154,15 +153,13 @@ export default class SampleInstrument implements IAudioOutput {
 	}
 
 	// Actually make a sound with this sample
-	async play(audioBuffer:AudioBuffer, velocity:number){
-
+	async play(audioBuffer: AudioBuffer, velocity: number) {
 		// too many simultaneous samples
-		if (this.polyphony + 1 >= MAX_TRACKS)
-		{
+		if (this.polyphony + 1 >= MAX_TRACKS) {
 			// console.log("Sample skipped due to max tracks reached", this.polyphony )
 			return
 		}
-		
+
 		const simultaneousId = ++this.polyphony
 		// TODO: Send out pitch bend?
 		// if (this.active)
@@ -172,52 +169,58 @@ export default class SampleInstrument implements IAudioOutput {
 
 		this.active = true
 		this.volume = velocity
-		
+
 		//console.error( "PLAYING NOW!" , {audioBuffer}, this.polyphony, this.gainNode )
 
 		// FIXME: Add to active so we can remove it later
-		const track = playTrack( this.audioContext, audioBuffer, 0, this.gainNode, { playbackRate: this.pitchBendValue }, ()=>{
-			this.activeSamples.delete( simultaneousId )
-			// console.info(this.polyphony, this.activeSamples.size, "this.activeSamples REMOVE", this.activeSamples)
-			--this.polyphony
-			
-			if (this.polyphony < 1) {
-				this.active = false
+		const track = playTrack(
+			this.audioContext,
+			audioBuffer,
+			0,
+			this.gainNode,
+			{ playbackRate: this.pitchBendValue },
+			() => {
+				this.activeSamples.delete(simultaneousId)
+				// console.info(this.polyphony, this.activeSamples.size, "this.activeSamples REMOVE", this.activeSamples)
+				--this.polyphony
+
+				if (this.polyphony < 1) {
+					this.active = false
+				}
+
+				// console.log("Sample completed playback.", this.polyphony )
+				return true
 			}
-		
-			// console.log("Sample completed playback.", this.polyphony )
-			return true
-		} )
+		)
 		// .then( ()=>{})
 		// console.info(this.polyphony, this.activeSamples.size, "this.activeSamples ADD", this.activeSamples)
-		
-		this.activeSamples.set( simultaneousId, track )
-			
+
+		this.activeSamples.set(simultaneousId, track)
+
 		return track
 	}
 
 	/**
 	 * Like note on but using names!
-	 * 
-	 * @param {String} noteName 
-	 * @param {Number} velocity 
-	 * @returns 
+	 *
+	 * @param {String} noteName
+	 * @param {Number} velocity
+	 * @returns
 	 */
-	async noteOnByName(noteName:string, velocity:number=1 ){
+	async noteOnByName(noteName: string, velocity: number = 1) {
 		// const audioBuffer = this.instrument[noteName]
 		// audioBuffer && this.play(audioBuffer, velocity)
-		return this.noteOn( convertNoteNameToMIDINoteNumber(noteName), velocity)
+		return this.noteOn(convertNoteNameToMIDINoteNumber(noteName), velocity)
 	}
 
-	async noteOn(noteNumber:string, velocity:number=1){
+	async noteOn(noteNumber: string, velocity: number = 1) {
 		const key = noteNumberToName(noteNumber)
 		const audioBuffer = this.audioBuffers[key]
-		if(audioBuffer)
-		{
-			const track = this.play(audioBuffer, velocity )
-		}else{
+		if (audioBuffer) {
+			const _track = this.play(audioBuffer, velocity)
+		} else {
 			// STILL LOADING THIS BUFFER... What to do?
-			console.log("No buffer for", {noteNumber, velocity, key} , this.audioBuffers )
+			console.log("No buffer for", { noteNumber, velocity, key }, this.audioBuffers)
 		}
 		// console.log("Buffer playing", {audioBuffer,noteNumber, velocity} )
 		return super.noteOn(noteNumber, velocity)
@@ -243,16 +246,15 @@ export default class SampleInstrument implements IAudioOutput {
 		}
 		return programNumber
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @returns {Array<String>} of Instrument Names
 	 */
-	async getPresets(){
+	async getPresets() {
 		return this.instrumentTitles
 	}
 
-	
 	/**
 	 * Pass in an AudioCommand to perform a function...
 
@@ -261,27 +263,35 @@ export default class SampleInstrument implements IAudioOutput {
 	}
 	 */
 	// INTERNAL -------------------------------------------
-	
+
 	/**
 	 * Provide this Person with a random instrument
 	 * @param {Function} progressCallback Method to call once the instrument has loadedNAMES
 	 */
-	 async loadRandomPreset(progressCallback){
+	async loadRandomPreset(progressCallback) {
 		// grab an instrument randomly from the full collection
-		const newIndex = Math.round( Math.random() * this.instrumentFolders.length )
+		const newIndex = Math.round(Math.random() * this.instrumentFolders.length)
 		this.presetIndex = newIndex
-		return await this.loadPreset( this.instrumentFolders[newIndex], this.instrumentPack, progressCallback )
+		return await this.loadPreset(
+			this.instrumentFolders[newIndex],
+			this.instrumentPack,
+			progressCallback
+		)
 	}
 
 	/**
 	 * Load the previous instrument in the list
 	 * @param {Function} progressCallback Method to call once the instrument has loaded
 	 */
-	async loadPreviousPreset(progressCallback){
-		const index = this.presetIndex-1
+	async loadPreviousPreset(progressCallback) {
+		const index = this.presetIndex - 1
 		const newIndex = index < 0 ? this.instrumentFolders.length + index : index
 		this.presetIndex = newIndex
-		return await this.loadPreset( this.instrumentFolders[newIndex], this.instrumentPack, progressCallback )
+		return await this.loadPreset(
+			this.instrumentFolders[newIndex],
+			this.instrumentPack,
+			progressCallback
+		)
 	}
 
 	/**
@@ -289,11 +299,15 @@ export default class SampleInstrument implements IAudioOutput {
 	 * NB. Does NOT wrap around
 	 * @param {Function} progressCallback Method to call once the instrument has loaded
 	 */
-	async loadNextPreset(progressCallback){
-		const index = this.presetIndex+1 
+	async loadNextPreset(progressCallback) {
+		const index = this.presetIndex + 1
 		const newIndex = index >= this.instrumentFolders.length ? 0 : index
 		this.presetIndex = newIndex
-		return await this.loadPreset( this.instrumentFolders[newIndex], this.instrumentPack, progressCallback )
+		return await this.loadPreset(
+			this.instrumentFolders[newIndex],
+			this.instrumentPack,
+			progressCallback
+		)
 	}
 
 	/**
@@ -302,16 +316,20 @@ export default class SampleInstrument implements IAudioOutput {
 	 * to reload the same instrument but with the new samples
 	 * @param {Function} callback Method to call once the instrument has loaded
 	 */
-	async reload(progressCallback){
-		return await this.loadPreset( this.instrumentFolders[this.presetIndex], this.instrumentPack, progressCallback )
+	async reload(progressCallback) {
+		return await this.loadPreset(
+			this.instrumentFolders[this.presetIndex],
+			this.instrumentPack,
+			progressCallback
+		)
 	}
 
 	/**
 	 * Changes all instuments to new pack
-	 * @param {String} instrumentPack 
-	 * @param {Function} onProgress 
+	 * @param {String} instrumentPack
+	 * @param {Function} onProgress
 	 */
-	async loadPack(instrumentPack, onProgress){
+	async loadPack(instrumentPack, onProgress) {
 		this.instrumentPack = instrumentPack
 		return await this.reload(onProgress)
 	}
@@ -323,38 +341,42 @@ export default class SampleInstrument implements IAudioOutput {
 	 * @param {String} instrumentPack Name of the standard instrument to load
 	 * @param {Function} callback Method to call once the instrument has loaded
 	 */
-	 async loadPreset(instrumentName, instrumentPack, progressCallback ){
-		
+	async loadPreset(instrumentName, instrumentPack, progressCallback) {
 		const index = this.instrumentFolders.indexOf(instrumentName)
-		
-		if (index  === -1)
-		{
-			throw Error( `No Preset found with name "${instrumentName}" in pack "${instrumentPack}" with ${ this.instrumentFolders.length} presets available` )
+
+		if (index === -1) {
+			throw Error(
+				`No Preset found with name "${instrumentName}" in pack "${instrumentPack}" with ${this.instrumentFolders.length} presets available`
+			)
 		}
 
 		// check to see if the pack name is valid...
 		this.instrumentLoading = true
 
-		try{
+		try {
 			// FIXME: Send the -mp3 version...
-			this.activeInstrument = await loadInstrumentFromSoundFont( this.audioContext, instrumentName, "./assets/audio/" + instrumentPack, progressCallback )
-		
-		}catch(error){
-
-			if (instrumentPack.indexOf(".json") > -1)
-			{
+			this.activeInstrument = await loadInstrumentFromSoundFont(
+				this.audioContext,
+				instrumentName,
+				"./assets/audio/" + instrumentPack,
+				progressCallback
+			)
+		} catch {
+			if (instrumentPack.indexOf(".json") > -1) {
 				this.instrumentLoading = false
-				throw Error("You tried to load a soundfont with a descriptor uri! "+instrumentPack)
-			}	
+				throw Error(
+					"You tried to load a soundfont with a descriptor uri! " + instrumentPack
+				)
+			}
 		}
 		// Fetch the GM name
 		this.#title = this.instrumentTitles[index]
-		
+
 		this.presetIndex = index ?? 0
 		this.instrumentName = instrumentName
 		this.instrumentPack = instrumentPack
 		this.instrumentTitle = this.#title
-		
+
 		//this.name = "SampleInstrument"
 		this.instrumentFamily = this.activeInstrument.family
 
@@ -364,14 +386,14 @@ export default class SampleInstrument implements IAudioOutput {
 		// for (let i=0; i < 200; ++i){
 		// 	this.instrumentMap[i] = this.instrument
 		// }
-		
+
 		this.instrumentLoading = false
 
 		// this.instrumentOrder = this.instrument
 		return this.activeInstrument
 	}
 
-	clone(){
+	clone() {
 		return new SampleInstrument(this.audioContext, this.options)
 	}
 }

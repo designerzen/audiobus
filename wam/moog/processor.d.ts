@@ -1,1 +1,4 @@
-export default function registerMoogProcessor(moduleId: string, definitions: Record<string, object>): void
+export default function registerMoogProcessor(
+	moduleId: string,
+	definitions: Record<string, object>
+): void

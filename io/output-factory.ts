@@ -1,8 +1,8 @@
 import { OUTPUT_DEFINITIONS } from "./output-definitions.ts"
-import { getAudioDestination } from '../audio-destination'
+import { getAudioDestination } from "../audio-destination"
 import type { DeviceClassification, DeviceAttribution } from "./device-classification.ts"
-import { defineDevice } from './device-definition'
-import wam2Registry, { WAM2_INSTRUMENTS, wam2OutputId } from '../wam/registry'
+import { defineDevice } from "./device-definition"
+import wam2Registry, { WAM2_INSTRUMENTS, wam2OutputId } from "../wam/registry"
 /**
  * Factory for creating audio output instances
  * Handles instantiation of available output types
@@ -29,20 +29,26 @@ export interface OutputFactory extends DeviceClassification {
 const loadSupportingLibrary = async (type: string) => {
 	// Create and return instance based on type
 	switch (type) {
-        case OUTPUT_TYPES.SYNTH_303: return await import('./outputs/output-303')
+		case OUTPUT_TYPES.SYNTH_303:
+			return await import("./outputs/output-303")
 		case OUTPUT_TYPES.DRUM_KIT:
-			return await import('./outputs/output-drum-kit.ts')
-        case OUTPUT_TYPES.SION: return await import("./outputs/output-sion.ts")
-        case OUTPUT_TYPES.NOTE_MONITOR: return await import('./outputs/output-note-monitor')
-        case OUTPUT_TYPES.SAMPLE_PLAYER: return await import('./outputs/output-sample-player')
-        case OUTPUT_TYPES.EVENT_RECORDER: return await import('./outputs/output-event-recorder')
-        case OUTPUT_TYPES.OSC: return await import('./outputs/output-osc')
-        case OUTPUT_TYPES.PERFORMANCE:
-            return await import('./outputs/output-performance.ts')
-        case OUTPUT_TYPES.RECORDER:
-            return await import('./outputs/output-recorder.ts')
+			return await import("./outputs/output-drum-kit.ts")
+		case OUTPUT_TYPES.SION:
+			return await import("./outputs/output-sion.ts")
+		case OUTPUT_TYPES.NOTE_MONITOR:
+			return await import("./outputs/output-note-monitor")
+		case OUTPUT_TYPES.SAMPLE_PLAYER:
+			return await import("./outputs/output-sample-player")
+		case OUTPUT_TYPES.EVENT_RECORDER:
+			return await import("./outputs/output-event-recorder")
+		case OUTPUT_TYPES.OSC:
+			return await import("./outputs/output-osc")
+		case OUTPUT_TYPES.PERFORMANCE:
+			return await import("./outputs/output-performance.ts")
+		case OUTPUT_TYPES.RECORDER:
+			return await import("./outputs/output-recorder.ts")
 		case OUTPUT_TYPES.DRUM_ACCOMPANIMENT:
-			return await import('./outputs/output-drum-accompaniment.ts')
+			return await import("./outputs/output-drum-accompaniment.ts")
 		case OUTPUT_TYPES.CONSOLE:
 			return await import("./outputs/output-console.ts")
 		case OUTPUT_TYPES.DESCRIBE:
@@ -62,7 +68,7 @@ const loadSupportingLibrary = async (type: string) => {
 		case OUTPUT_TYPES.MOOG:
 			return await import("./outputs/output-moog.ts")
 		case OUTPUT_TYPES.TB303:
-			return await import('./outputs/output-tb303.ts')
+			return await import("./outputs/output-tb303.ts")
 		case OUTPUT_TYPES.WAM:
 			return await import("./outputs/output-wam.ts")
 		case OUTPUT_TYPES.YOSHIMI:
@@ -119,39 +125,43 @@ const loadSupportingLibraries = async (type: string): Promise<any> => {
  */
 const createOutput = async (type: string, options?: Record<string, any>): Promise<IAudioOutput> => {
 	const Class = await loadSupportingLibraries(type)
-	
+
 	// Handle special cases that need parameters
 	if (type === OUTPUT_TYPES.SPECTRUM_ANALYSER) {
 		if (!options?.mixer) {
-			throw new Error('SPECTRUM_ANALYSER output requires mixer (GainNode) in options')
+			throw new Error("SPECTRUM_ANALYSER output requires mixer (GainNode) in options")
 		}
 		if (!options?.audioContext) {
-			throw new Error('SPECTRUM_ANALYSER output requires audioContext in options')
+			throw new Error("SPECTRUM_ANALYSER output requires audioContext in options")
 		}
 		return new Class(options.mixer, options.audioContext)
 	} else if (type === OUTPUT_TYPES.BUTTERCHURN) {
 		if (!options?.mixer) {
-			throw new Error('BUTTERCHURN output requires mixer (GainNode) in options')
+			throw new Error("BUTTERCHURN output requires mixer (GainNode) in options")
 		}
 		if (!options?.audioContext) {
-			throw new Error('BUTTERCHURN output requires audioContext in options')
+			throw new Error("BUTTERCHURN output requires audioContext in options")
 		}
 		return new Class(options.mixer, options.audioContext)
 	} else if (type === OUTPUT_TYPES.WAM2 || type === OUTPUT_TYPES.WAM) {
 		if (!options?.audioContext) {
-			throw new Error('WAM2 output requires audioContext in options')
+			throw new Error("WAM2 output requires audioContext in options")
 		}
 		return new Class(options.audioContext, options.pluginUrl, options.name, options.mixer)
 	} else if (type === OUTPUT_TYPES.MOOG || type === OUTPUT_TYPES.TB303) {
-		if (!options?.audioContext) throw new Error(`${type} output requires audioContext in options`)
+		if (!options?.audioContext) {
+			throw new Error(`${type} output requires audioContext in options`)
+		}
 		return new Class(options.audioContext, options.mixer)
 	} else if (type === OUTPUT_TYPES.YOSHIMI) {
 		if (!options?.audioContext) {
-			throw new Error('YOSHIMI output requires audioContext in options')
+			throw new Error("YOSHIMI output requires audioContext in options")
 		}
 		return new Class(options.audioContext, options.name, options.mixer)
 	} else if (type === OUTPUT_TYPES.SUPERSONIC) {
-		const output = new Class(options?.audioContext ? getAudioDestination(options.audioContext) : undefined)
+		const output = new Class(
+			options?.audioContext ? getAudioDestination(options.audioContext) : undefined
+		)
 		output.connect()
 		return output
 	} else if (type === OUTPUT_TYPES.SPEECH_SYNTHESIS) {
@@ -162,7 +172,7 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
 		}
 		return new Class(options.audioContext)
 	}
-	
+
 	return new Class(type === OUTPUT_TYPES.WEBMIDI ? { autoConnect: true, ...options } : options)
 }
 
@@ -172,61 +182,97 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
  * Uses lazy loading for better performance
  */
 export const OUTPUT_FACTORIES: OutputFactory[] = [
-    { ...OUTPUT_DEFINITIONS[OUTPUT_TYPES.SYNTH_303], isAvailable: () => typeof AudioWorkletNode !== 'undefined',
-        create: options => createOutput(OUTPUT_TYPES.SYNTH_303, options) },
+	{
+		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.SYNTH_303],
+		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.SYNTH_303, options)
+	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.DRUM_KIT],
-		isAvailable: () => typeof AudioContext !== 'undefined',
-		create: options => createOutput(OUTPUT_TYPES.DRUM_KIT, options),
+		isAvailable: () => typeof AudioContext !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.DRUM_KIT, options)
 	},
-    { ...OUTPUT_DEFINITIONS[OUTPUT_TYPES.SION], isAvailable: () => typeof AudioWorkletNode !== 'undefined', create: options => createOutput(OUTPUT_TYPES.SION, options) },
-    ...[OUTPUT_TYPES.NOTE_MONITOR, OUTPUT_TYPES.EVENT_RECORDER].map(id => ({
-        ...OUTPUT_DEFINITIONS[id], isAvailable: () => true, create: (options?: Record<string, any>) => createOutput(id, options),
-    })),
-    { ...OUTPUT_DEFINITIONS[OUTPUT_TYPES.SAMPLE_PLAYER], isAvailable: () => typeof AudioContext !== 'undefined', create: options => createOutput(OUTPUT_TYPES.SAMPLE_PLAYER, options) },
-    { ...OUTPUT_DEFINITIONS[OUTPUT_TYPES.OSC], isAvailable: () => typeof WebSocket !== 'undefined', create: options => createOutput(OUTPUT_TYPES.OSC, options) },
-    {
-        ...OUTPUT_DEFINITIONS[OUTPUT_TYPES.PERFORMANCE],
-        isAvailable: () => typeof requestAnimationFrame === 'function',
-        create: options => createOutput(OUTPUT_TYPES.PERFORMANCE, options),
-    },
-    {
-        ...OUTPUT_DEFINITIONS[OUTPUT_TYPES.RECORDER],
-        isAvailable: () => typeof AudioContext !== 'undefined',
-        create: options => createOutput(OUTPUT_TYPES.RECORDER, options),
-    },
+	{
+		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.SION],
+		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.SION, options)
+	},
+	...[OUTPUT_TYPES.NOTE_MONITOR, OUTPUT_TYPES.EVENT_RECORDER].map((id) => ({
+		...OUTPUT_DEFINITIONS[id],
+		isAvailable: () => true,
+		create: (options?: Record<string, any>) => createOutput(id, options)
+	})),
+	{
+		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.SAMPLE_PLAYER],
+		isAvailable: () => typeof AudioContext !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.SAMPLE_PLAYER, options)
+	},
+	{
+		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.OSC],
+		isAvailable: () => typeof WebSocket !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.OSC, options)
+	},
+	{
+		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.PERFORMANCE],
+		isAvailable: () => typeof requestAnimationFrame === "function",
+		create: (options) => createOutput(OUTPUT_TYPES.PERFORMANCE, options)
+	},
+	{
+		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.RECORDER],
+		isAvailable: () => typeof AudioContext !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.RECORDER, options)
+	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.TB303],
-		isAvailable: () => typeof AudioWorkletNode !== 'undefined',
-		create: options => createOutput(OUTPUT_TYPES.TB303, options),
+		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.TB303, options)
 	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.DRUM_ACCOMPANIMENT],
-		isAvailable: () => typeof AudioContext !== 'undefined',
-		create: options => createOutput(OUTPUT_TYPES.DRUM_ACCOMPANIMENT, options),
+		isAvailable: () => typeof AudioContext !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.DRUM_ACCOMPANIMENT, options)
 	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.MOOG],
 		isAvailable: () => typeof AudioWorklet !== "undefined",
-		create: (options) => createOutput(OUTPUT_TYPES.MOOG, options),
+		create: (options) => createOutput(OUTPUT_TYPES.MOOG, options)
 	},
-	...Object.values(OUTPUT_DEFINITIONS).filter(definition => definition.id.startsWith(OUTPUT_TYPES.WEBCLAP_PREFIX)).map(definition => ({
-		...definition,
-		isAvailable: () => typeof AudioWorkletNode !== 'undefined' && typeof WebAssembly !== 'undefined',
-		create: async (options?: Record<string, any>) => {
-			if (!options?.audioContext) throw new Error('WebCLAP requires audioContext in options')
-			const { default: Instrument } = await import('../instruments/clap/clap-instrument')
-			const output = new Instrument(options.audioContext, options.defaultPatchId ?? definition.id.slice(OUTPUT_TYPES.WEBCLAP_PREFIX.length), { ...options, routeAudio: true })
-			try { await output.connect(); return output }
-			catch (error) { await output.disconnect(); output.output.disconnect(); throw error }
-		}
-	})),
-	...WAM2_INSTRUMENTS.map(plugin => ({
+	...Object.values(OUTPUT_DEFINITIONS)
+		.filter((definition) => definition.id.startsWith(OUTPUT_TYPES.WEBCLAP_PREFIX))
+		.map((definition) => ({
+			...definition,
+			isAvailable: () =>
+				typeof AudioWorkletNode !== "undefined" && typeof WebAssembly !== "undefined",
+			create: async (options?: Record<string, any>) => {
+				if (!options?.audioContext) {
+					throw new Error("WebCLAP requires audioContext in options")
+				}
+				const { default: Instrument } = await import("../instruments/clap/clap-instrument")
+				const output = new Instrument(
+					options.audioContext,
+					options.defaultPatchId ??
+						definition.id.slice(OUTPUT_TYPES.WEBCLAP_PREFIX.length),
+					{ ...options, routeAudio: true }
+				)
+				try {
+					await output.connect()
+					return output
+				} catch (error) {
+					await output.disconnect()
+					output.output.disconnect()
+					throw error
+				}
+			}
+		})),
+	...WAM2_INSTRUMENTS.map((plugin) => ({
 		...OUTPUT_DEFINITIONS[wam2OutputId(plugin)],
-		isAvailable: () => typeof AudioWorkletNode !== 'undefined',
-		create: (options?: Record<string, any>) => createOutput(OUTPUT_TYPES.WAM2, {
-			...options, pluginUrl: options?.pluginUrl ?? wam2Registry.getPluginUrl(plugin), name: plugin.name,
-		}),
+		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		create: (options?: Record<string, any>) =>
+			createOutput(OUTPUT_TYPES.WAM2, {
+				...options,
+				pluginUrl: options?.pluginUrl ?? wam2Registry.getPluginUrl(plugin),
+				name: plugin.name
+			})
 	})),
 	{
 		id: OUTPUT_TYPES.DESCRIBE,
@@ -235,7 +281,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		name: "Describe",
 		description: "Describes notes, chords, extensions and inversions in musical language",
 		isAvailable: () => true,
-		create: (options) => createOutput(OUTPUT_TYPES.DESCRIBE, options),
+		create: (options) => createOutput(OUTPUT_TYPES.DESCRIBE, options)
 	},
 	{
 		id: OUTPUT_TYPES.CONSOLE,
@@ -244,7 +290,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		name: "Console",
 		description: "Logs MIDI events to browser console (dev mode only)",
 		isAvailable: () => import.meta.env.DEV,
-		create: (options) => createOutput(OUTPUT_TYPES.CONSOLE, options),
+		create: (options) => createOutput(OUTPUT_TYPES.CONSOLE, options)
 	},
 	{
 		id: OUTPUT_TYPES.PINK_TROMBONE,
@@ -253,7 +299,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		name: "Pink Trombone",
 		description: "Vocal synthesis engine with speech-like sounds",
 		isAvailable: () => true,
-		create: (options) => createOutput(OUTPUT_TYPES.PINK_TROMBONE, options),
+		create: (options) => createOutput(OUTPUT_TYPES.PINK_TROMBONE, options)
 	},
 	{
 		id: OUTPUT_TYPES.NOTATION,
@@ -262,7 +308,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		name: "Notation",
 		description: "Displays notes on a musical staff",
 		isAvailable: () => true,
-		create: (options) => createOutput(OUTPUT_TYPES.NOTATION, options),
+		create: (options) => createOutput(OUTPUT_TYPES.NOTATION, options)
 	},
 	{
 		id: OUTPUT_TYPES.SPECTRUM_ANALYSER,
@@ -271,7 +317,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		name: "Spectrum Analyser",
 		description: "Visualizes audio spectrum using FFT analysis with realtime waveform display",
 		isAvailable: () => true,
-		create: (options) => createOutput(OUTPUT_TYPES.SPECTRUM_ANALYSER, options),
+		create: (options) => createOutput(OUTPUT_TYPES.SPECTRUM_ANALYSER, options)
 	},
 	{
 		id: OUTPUT_TYPES.SPEECH_SYNTHESIS,
@@ -279,10 +325,11 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.SPEECH_SYNTHESIS].subtype,
 		name: "Speech Synthesis",
 		description: "Reads note names with Kokoro, with system voices as a fallback",
-		isAvailable: () => typeof window !== "undefined" && (
-			(typeof Worker !== "undefined" && typeof AudioContext !== "undefined") || !!window.speechSynthesis
-		),
-		create: (options) => createOutput(OUTPUT_TYPES.SPEECH_SYNTHESIS, options),
+		isAvailable: () =>
+			typeof window !== "undefined" &&
+			((typeof Worker !== "undefined" && typeof AudioContext !== "undefined") ||
+				!!window.speechSynthesis),
+		create: (options) => createOutput(OUTPUT_TYPES.SPEECH_SYNTHESIS, options)
 	},
 	{
 		id: OUTPUT_TYPES.VIBRATOR,
@@ -291,7 +338,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		name: "Vibrator",
 		description: "Triggers device vibration when a note within a range is played",
 		isAvailable: () => true, // Available on all platforms - supports mobile vibration API and gamepad vibration
-		create: (options) => createOutput(OUTPUT_TYPES.VIBRATOR, options),
+		create: (options) => createOutput(OUTPUT_TYPES.VIBRATOR, options)
 	},
 	{
 		id: OUTPUT_TYPES.WEBMIDI,
@@ -299,17 +346,21 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.WEBMIDI].subtype,
 		name: "WebMIDI Device",
 		description: "Sends MIDI messages to a connected WebMIDI device",
-		isAvailable: () => typeof navigator !== "undefined" && !!(navigator as any).requestMIDIAccess,
-		create: (options) => createOutput(OUTPUT_TYPES.WEBMIDI, options),
+		isAvailable: () =>
+			typeof navigator !== "undefined" && !!(navigator as any).requestMIDIAccess,
+		create: (options) => createOutput(OUTPUT_TYPES.WEBMIDI, options)
 	},
 	{
 		id: OUTPUT_TYPES.NATIVE_MIDI,
 		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.NATIVE_MIDI].type,
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.NATIVE_MIDI].subtype,
 		name: "Native MIDI Device",
-		description: "Sends MIDI messages to a connected native OS MIDI device (Windows/macOS/Linux)",
-		isAvailable: () => typeof (globalThis as any).process !== "undefined" && (globalThis as any).process.type === "renderer", // Only available in Electron
-		create: (options) => createOutput(OUTPUT_TYPES.NATIVE_MIDI, options),
+		description:
+			"Sends MIDI messages to a connected native OS MIDI device (Windows/macOS/Linux)",
+		isAvailable: () =>
+			typeof (globalThis as any).process !== "undefined" &&
+			(globalThis as any).process.type === "renderer", // Only available in Electron
+		create: (options) => createOutput(OUTPUT_TYPES.NATIVE_MIDI, options)
 	},
 	{
 		id: OUTPUT_TYPES.BLE_MIDI,
@@ -317,8 +368,11 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.BLE_MIDI].subtype,
 		name: "BLE MIDI",
 		description: "BLE MIDI",
-		isAvailable: () => typeof navigator !== "undefined" && !!navigator?.bluetooth && !!navigator?.bluetooth?.requestDevice,
-		create: (options) => createOutput(OUTPUT_TYPES.BLE_MIDI, options),
+		isAvailable: () =>
+			typeof navigator !== "undefined" &&
+			!!navigator?.bluetooth &&
+			!!navigator?.bluetooth?.requestDevice,
+		create: (options) => createOutput(OUTPUT_TYPES.BLE_MIDI, options)
 	},
 	{
 		id: OUTPUT_TYPES.MIDI2,
@@ -326,17 +380,21 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.MIDI2].subtype,
 		name: "MIDI 2.0",
 		description: "MIDI 2.0 device output",
-		isAvailable: () => typeof navigator !== "undefined" && !!(navigator as any).requestMIDIAccess,
-		create: (options) => createOutput(OUTPUT_TYPES.MIDI2, options),
+		isAvailable: () =>
+			typeof navigator !== "undefined" && !!(navigator as any).requestMIDIAccess,
+		create: (options) => createOutput(OUTPUT_TYPES.MIDI2, options)
 	},
 	{
 		id: OUTPUT_TYPES.MIDI2_NATIVE,
 		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.MIDI2_NATIVE].type,
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.MIDI2_NATIVE].subtype,
 		name: "MIDI 2.0 Native",
-		description: "MIDI 2.0 output with per-note controllers via native OS MIDI (16-bit resolution, Windows/macOS/Linux)",
-		isAvailable: () => typeof (globalThis as any).process !== "undefined" && (globalThis as any).process.type === "renderer", // Only available in Electron
-		create: (options) => createOutput(OUTPUT_TYPES.MIDI2_NATIVE, options),
+		description:
+			"MIDI 2.0 output with per-note controllers via native OS MIDI (16-bit resolution, Windows/macOS/Linux)",
+		isAvailable: () =>
+			typeof (globalThis as any).process !== "undefined" &&
+			(globalThis as any).process.type === "renderer", // Only available in Electron
+		create: (options) => createOutput(OUTPUT_TYPES.MIDI2_NATIVE, options)
 	},
 	{
 		id: OUTPUT_TYPES.SUPERSONIC,
@@ -345,7 +403,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		name: "Supersonic",
 		description: "SuperCollider-based sound synthesis engine",
 		isAvailable: () => typeof AudioWorklet !== "undefined",
-		create: (options) => createOutput(OUTPUT_TYPES.SUPERSONIC, options),
+		create: (options) => createOutput(OUTPUT_TYPES.SUPERSONIC, options)
 	},
 	{
 		id: OUTPUT_TYPES.WAM2,
@@ -354,7 +412,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		name: "WAM2",
 		description: "Manages the WAM2 Audio Engine",
 		isAvailable: () => typeof AudioWorkletNode !== "undefined",
-		create: (options) => createOutput(OUTPUT_TYPES.WAM2, options),
+		create: (options) => createOutput(OUTPUT_TYPES.WAM2, options)
 	},
 	{
 		id: OUTPUT_TYPES.WAM,
@@ -363,7 +421,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		name: "WAM",
 		description: OUTPUT_DEFINITIONS[OUTPUT_TYPES.WAM].description,
 		isAvailable: () => typeof AudioWorkletNode !== "undefined",
-		create: (options) => createOutput(OUTPUT_TYPES.WAM, options),
+		create: (options) => createOutput(OUTPUT_TYPES.WAM, options)
 	},
 	{
 		id: OUTPUT_TYPES.YOSHIMI,
@@ -372,7 +430,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		name: "Yoshimi",
 		description: "Free and open source high quality software synthesizer with 700+ presets",
 		isAvailable: () => typeof AudioWorkletNode !== "undefined",
-		create: (options) => createOutput(OUTPUT_TYPES.YOSHIMI, options),
+		create: (options) => createOutput(OUTPUT_TYPES.YOSHIMI, options)
 	},
 	{
 		id: OUTPUT_TYPES.METRONOME,
@@ -380,8 +438,10 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.METRONOME].subtype,
 		name: "Metronome",
 		description: "Produces audible clicks in response to MIDI clock signals",
-		isAvailable: () => typeof AudioContext !== "undefined" || typeof (window as any).webkitAudioContext !== "undefined",
-		create: (options) => createOutput(OUTPUT_TYPES.METRONOME, options),
+		isAvailable: () =>
+			typeof AudioContext !== "undefined" ||
+			typeof (window as any).webkitAudioContext !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.METRONOME, options)
 	},
 	{
 		id: OUTPUT_TYPES.AUDIO_CLICK,
@@ -389,8 +449,10 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.AUDIO_CLICK].subtype,
 		name: "Audio Click",
 		description: "Plays audio click sounds from a selected asset library on every bar",
-		isAvailable: () => typeof AudioContext !== "undefined" || typeof (window as any).webkitAudioContext !== "undefined",
-		create: (options) => createOutput(OUTPUT_TYPES.AUDIO_CLICK, options),
+		isAvailable: () =>
+			typeof AudioContext !== "undefined" ||
+			typeof (window as any).webkitAudioContext !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.AUDIO_CLICK, options)
 	},
 	{
 		id: OUTPUT_TYPES.BUTTERCHURN,
@@ -399,7 +461,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		name: "Butterchurn",
 		description: "WebGL music visualizer with animated psychedelic patterns synced to audio",
 		isAvailable: () => typeof WebGL2RenderingContext !== "undefined",
-		create: (options) => createOutput(OUTPUT_TYPES.BUTTERCHURN, options),
+		create: (options) => createOutput(OUTPUT_TYPES.BUTTERCHURN, options)
 	}
 ]
 
@@ -413,7 +475,10 @@ export function getAvailableOutputFactories(): OutputFactory[] {
 /**
  * Create an output instance by factory ID
  */
-export async function createOutputById(id: string, options?: Record<string, any>): Promise<IAudioOutput> {
+export async function createOutputById(
+	id: string,
+	options?: Record<string, any>
+): Promise<IAudioOutput> {
 	const factory = OUTPUT_FACTORIES.find((f) => f.id === id)
 	if (!factory) {
 		throw new Error(`Output factory not found: ${id}`)
@@ -422,6 +487,5 @@ export async function createOutputById(id: string, options?: Record<string, any>
 	if (!isAvailable) {
 		throw new Error(`Output is not available: ${factory.name}`)
 	}
-	return defineDevice(await factory.create(options), { factory: 'output', type: id, options })
+	return defineDevice(await factory.create(options), { factory: "output", type: id, options })
 }
-

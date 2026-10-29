@@ -1,4 +1,4 @@
-import { EVENT_RESIZE } from '../../event-constants.ts'
+import { EVENT_RESIZE } from "../../event-constants.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 import "./output-butterchurn.css"
 
@@ -16,7 +16,6 @@ export default class OutputButterchurn implements IAudioOutput {
 	#isRunning: boolean = false
 	#resizeObserver: ResizeObserver | null = null
 	#presets: any = null
-	#currentPresetIndex: number = 0
 	#activeNotes: Set<number> = new Set()
 	#presetChangeTimer: NodeJS.Timeout | null = null
 
@@ -44,7 +43,9 @@ export default class OutputButterchurn implements IAudioOutput {
 		this.#gainNode = gainNode
 		this.#audioContext = audioContext || (gainNode as any).context
 		if (!this.#audioContext) {
-			throw new Error('OutputButterchurn requires AudioContext - pass it explicitly or ensure gainNode.context exists')
+			throw new Error(
+				"OutputButterchurn requires AudioContext - pass it explicitly or ensure gainNode.context exists"
+			)
 		}
 
 		// Create analyser for audio input
@@ -59,10 +60,10 @@ export default class OutputButterchurn implements IAudioOutput {
 
 	async createGui(): Promise<HTMLCanvasElement> {
 		// Create canvas
-		this.#canvas = document.createElement('canvas')
+		this.#canvas = document.createElement("canvas")
 		this.#canvas.width = 404
 		this.#canvas.height = 256
-		this.#canvas.className = 'audiobus-butterchurn'
+		this.#canvas.className = "audiobus-butterchurn"
 
 		// Lazy load butterchurn library
 		await this.#loadButterchurn()
@@ -99,72 +100,84 @@ export default class OutputButterchurn implements IAudioOutput {
 	}
 
 	async #loadButterchurn(): Promise<void> {
-		if (this.#visualizer) return
+		if (this.#visualizer) {
+			return
+		}
 
 		try {
 			// Dynamically import butterchurn library
-			const butterchurnModule = await import('butterchurn')
-			const presetsModule = await import('butterchurn-presets')
+			const butterchurnModule = await import("butterchurn")
+			const presetsModule = await import("butterchurn-presets")
 
 			// The CommonJS build can wrap Butterchurn's default export twice.
-			const butterchurn = butterchurnModule.default?.default || butterchurnModule.default || butterchurnModule
+			const butterchurn =
+				butterchurnModule.default?.default || butterchurnModule.default || butterchurnModule
 			const butterchurnPresets = presetsModule.default || presetsModule
 
 			if (!this.#canvas) {
-				throw new Error('Canvas not initialized')
+				throw new Error("Canvas not initialized")
 			}
 
 			// Create visualizer using the factory function
 			this.#visualizer = butterchurn.createVisualizer(this.#audioContext, this.#canvas, {
 				width: this.#canvas.width,
 				height: this.#canvas.height,
-				pixelRatio: 1,
+				pixelRatio: 1
 			})
 
 			// Connect the analyser node to visualizer
 			this.#visualizer.connectAudio(this.#analyser)
 
 			// Load presets
-			const getPresets = butterchurnPresets.getPresets || butterchurnPresets.default?.getPresets
-			if (getPresets && typeof getPresets === 'function') {
+			const getPresets =
+				butterchurnPresets.getPresets || butterchurnPresets.default?.getPresets
+			if (getPresets && typeof getPresets === "function") {
 				this.#presets = Object.values(getPresets())
 				if (this.#presets && this.#presets.length > 0) {
 					const randomIndex = Math.floor(Math.random() * this.#presets.length)
 					this.#visualizer.loadPreset(this.#presets[randomIndex], 0.5)
-					this.#currentPresetIndex = randomIndex
 				}
 			}
 		} catch (error) {
-			console.error('Failed to load Butterchurn library:', error)
-			throw new Error('Butterchurn library failed to load. Ensure butterchurn and butterchurn-presets are installed.')
+			console.error("Failed to load Butterchurn library:", error)
+			throw new Error(
+				"Butterchurn library failed to load. Ensure butterchurn and butterchurn-presets are installed."
+			)
 		}
 	}
 
 	#handleResize = () => {
-		if (!this.#canvas || !this.#visualizer) return
+		if (!this.#canvas || !this.#visualizer) {
+			return
+		}
 		const rect = this.#canvas.getBoundingClientRect()
 		if (rect.width > 0 && rect.height > 0) {
 			this.#canvas.width = Math.round(rect.width * window.devicePixelRatio)
 			this.#canvas.height = Math.round(rect.height * window.devicePixelRatio)
 			// Butterchurn uses these dimensions for the final WebGL viewport.
 			// They must match the drawing buffer; density is already applied above.
-			this.#visualizer.setRendererSize(this.#canvas.width, this.#canvas.height, { pixelRatio: 1 })
+			this.#visualizer.setRendererSize(this.#canvas.width, this.#canvas.height, {
+				pixelRatio: 1
+			})
 		}
 	}
 
 	#changePreset(): void {
-		if (!this.#presets || this.#presets.length === 0 || !this.#visualizer) return
-		
+		if (!this.#presets || this.#presets.length === 0 || !this.#visualizer) {
+			return
+		}
+
 		// Pick a random preset
 		const randomIndex = Math.floor(Math.random() * this.#presets.length)
-		this.#currentPresetIndex = randomIndex
-		
+
 		// Load preset with smooth transition (2 second blend)
 		this.#visualizer.loadPreset(this.#presets[randomIndex], 2.0)
 	}
 
 	#startVisualization(): void {
-		if (this.#isRunning || !this.#visualizer) return
+		if (this.#isRunning || !this.#visualizer) {
+			return
+		}
 		this.#isRunning = true
 		this.#animate()
 	}
@@ -172,17 +185,21 @@ export default class OutputButterchurn implements IAudioOutput {
 	#animate = (): void => {
 		this.#animationFrameId = requestAnimationFrame(this.#animate)
 
-		if (!this.#visualizer) return
+		if (!this.#visualizer) {
+			return
+		}
 
 		try {
 			this.#visualizer.render()
 		} catch (error) {
-			console.error('Error rendering Butterchurn:', error)
+			console.error("Error rendering Butterchurn:", error)
 		}
 	}
 
 	#stopVisualization(): void {
-		if (!this.#isRunning) return
+		if (!this.#isRunning) {
+			return
+		}
 		this.#isRunning = false
 		if (this.#animationFrameId !== null) {
 			cancelAnimationFrame(this.#animationFrameId)
@@ -190,14 +207,13 @@ export default class OutputButterchurn implements IAudioOutput {
 		}
 	}
 
-	noteOn(note: number, velocity: number): void {
+	noteOn(note: number, _velocity: number): void {
 		// Track active notes
 		this.#activeNotes.add(note)
-		
+
 		// Influence visualization based on active note count and velocity
 		if (this.#visualizer) {
 			// Adjust rendering quality/speed based on polyphony
-			const intensity = Math.min(1.0, (this.#activeNotes.size / 8) + (velocity / 127))
 			// Some butterchurn presets respond to audioLevel changes
 			// This indirectly influences the visual intensity
 		}
@@ -206,7 +222,7 @@ export default class OutputButterchurn implements IAudioOutput {
 	noteOff(note: number): void {
 		// Untrack the note
 		this.#activeNotes.delete(note)
-		
+
 		// When all notes end, could trigger visual changes
 		if (this.#activeNotes.size === 0 && this.#presets && this.#presets.length > 1) {
 			// Optional: slowly transition to a new preset when all notes are released

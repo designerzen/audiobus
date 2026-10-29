@@ -7,11 +7,11 @@
 export const GENERAL_MIDI_PERCUSSION_FAMILY_IDS = {
 	0: "standard kit",
 	8: "room kit",
-   16: "power kit",
-   24: "electronic kit",
-   25: "tr-808 kit",
-   32: "jazz kit",
-   40: "brush kit",
-   48: "orchestra kit",
-   56: "sound fx kit",
+	16: "power kit",
+	24: "electronic kit",
+	25: "tr-808 kit",
+	32: "jazz kit",
+	40: "brush kit",
+	48: "orchestra kit",
+	56: "sound fx kit"
 }

@@ -1,7 +1,7 @@
-import { EVENT_NOTE_CLICK, EVENT_CLICK, EVENT_TOGGLE } from '../event-constants.ts'
+import { EVENT_NOTE_CLICK, EVENT_CLICK, EVENT_TOGGLE } from "../event-constants.ts"
 /**
  * Song Visualiser UI Wrapper
- * 
+ *
  * Provides controls and integration for the SongVisualiser component
  */
 
@@ -11,66 +11,68 @@ import type { IAudioCommand } from "../audio-command-interface.ts"
 import type OPFSStorage from "../storage/opfs-storage.ts"
 
 export class SongVisualiserUI extends HTMLElement {
-  private visualiser: SongVisualiser | null = null
-  private storage: OPFSStorage | null = null
-  private darkMode: boolean = false
-  private themeMediaQuery: MediaQueryList | null = null
-  private commandSource: (() => IAudioCommand[] | Promise<IAudioCommand[]>) | null = null
-  private commandPage = 0
-  private refreshTask: Promise<void> | null = null
-  private generation = 0
+	private visualiser: SongVisualiser | null = null
+	private storage: OPFSStorage | null = null
+	private darkMode: boolean = false
+	private themeMediaQuery: MediaQueryList | null = null
+	private commandSource: (() => IAudioCommand[] | Promise<IAudioCommand[]>) | null = null
+	private commandPage = 0
+	private refreshTask: Promise<void> | null = null
+	private generation = 0
 
-  constructor() {
-    super()
-  }
+	constructor() {
+		super()
+	}
 
-  private themeChangeHandler = () => {
-    this.detectAndApplyTheme()
-    this.updateStyles()
-  }
+	private themeChangeHandler = () => {
+		this.detectAndApplyTheme()
+		this.updateStyles()
+	}
 
-  private detectAndApplyTheme() {
-    // Check for explicit theme attribute
-    const themeAttr = this.getAttribute("data-theme")
-    if (themeAttr === "dark") {
-      this.darkMode = true
-    } else if (themeAttr === "light") {
-      this.darkMode = false
-    } else {
-      // Auto-detect system preference
-      this.darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches
-    }
-  }
+	private detectAndApplyTheme() {
+		// Check for explicit theme attribute
+		const themeAttr = this.getAttribute("data-theme")
+		if (themeAttr === "dark") {
+			this.darkMode = true
+		} else if (themeAttr === "light") {
+			this.darkMode = false
+		} else {
+			// Auto-detect system preference
+			this.darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches
+		}
+	}
 
-  private setupThemeListener() {
-    // Listen for system theme changes
-    this.themeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
-    this.themeMediaQuery.addEventListener('change', this.themeChangeHandler)
-  }
+	private setupThemeListener() {
+		// Listen for system theme changes
+		this.themeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+		this.themeMediaQuery.addEventListener("change", this.themeChangeHandler)
+	}
 
-  private updateStyles() {
-    const styleEl = this.shadowRoot?.querySelector("style")
-    if (styleEl) {
-      styleEl.textContent = this.getStyles()
-    }
-  }
+	private updateStyles() {
+		const styleEl = this.shadowRoot?.querySelector("style")
+		if (styleEl) {
+			styleEl.textContent = this.getStyles()
+		}
+	}
 
-  disconnectedCallback() {
-    if (this.themeMediaQuery) {
-      this.themeMediaQuery.removeEventListener('change', this.themeChangeHandler)
-    }
-  }
+	disconnectedCallback() {
+		if (this.themeMediaQuery) {
+			this.themeMediaQuery.removeEventListener("change", this.themeChangeHandler)
+		}
+	}
 
-  connectedCallback() {
-    this.detectAndApplyTheme()
-    if (!this.shadowRoot) this.render()
-    this.setupThemeListener()
-  }
+	connectedCallback() {
+		this.detectAndApplyTheme()
+		if (!this.shadowRoot) {
+			this.render()
+		}
+		this.setupThemeListener()
+	}
 
-  private render() {
-    const template = document.createElement("div")
-    template.className = "song-visualiser-container"
-    template.innerHTML = `
+	private render() {
+		const template = document.createElement("div")
+		template.className = "song-visualiser-container"
+		template.innerHTML = `
       <div class="song-visualiser-controls">
          <div class="song-visualiser-controls__group">
            <label class="song-visualiser-controls__group__label">Layout:</label>
@@ -140,276 +142,346 @@ export class SongVisualiserUI extends HTMLElement {
       </details>
     `
 
-    this.attachShadow({ mode: "open" })
-    const style = document.createElement("style")
-    style.textContent = this.getStyles()
-    this.shadowRoot?.appendChild(style)
-    this.shadowRoot?.appendChild(template)
+		this.attachShadow({ mode: "open" })
+		const style = document.createElement("style")
+		style.textContent = this.getStyles()
+		this.shadowRoot?.appendChild(style)
+		this.shadowRoot?.appendChild(template)
 
-    this.setupElements()
-    this.setupEventListeners()
-    this.updateRefreshButton()
-  }
+		this.setupElements()
+		this.setupEventListeners()
+		this.updateRefreshButton()
+	}
 
-  private setupElements() {
-    const visualiserElement = this.shadowRoot?.querySelector("song-visualiser") as SongVisualiser
-    if (visualiserElement) {
-      this.visualiser = visualiserElement
-    }
-  }
+	private setupElements() {
+		const visualiserElement = this.shadowRoot?.querySelector(
+			"song-visualiser"
+		) as SongVisualiser
+		if (visualiserElement) {
+			this.visualiser = visualiserElement
+		}
+	}
 
-  private setupEventListeners() {
-    const layoutModeSelect = this.shadowRoot?.querySelector(".layout-mode-select") as HTMLSelectElement
-    const pixelsPerSecondSlider = this.shadowRoot?.querySelector(".pixels-per-second-slider") as HTMLInputElement
-    const noteHeightSlider = this.shadowRoot?.querySelector(".note-height-slider") as HTMLInputElement
-    const barHeightSlider = this.shadowRoot?.querySelector(".bar-height-slider") as HTMLInputElement
-    const loadFromOPFSBtn = this.shadowRoot?.querySelector(".load-from-opfs") as HTMLButtonElement
-    const clearBtn = this.shadowRoot?.querySelector(".clear-btn") as HTMLButtonElement
-    const exportBtn = this.shadowRoot?.querySelector(".export-btn") as HTMLButtonElement
+	private setupEventListeners() {
+		const layoutModeSelect = this.shadowRoot?.querySelector(
+			".layout-mode-select"
+		) as HTMLSelectElement
+		const pixelsPerSecondSlider = this.shadowRoot?.querySelector(
+			".pixels-per-second-slider"
+		) as HTMLInputElement
+		const noteHeightSlider = this.shadowRoot?.querySelector(
+			".note-height-slider"
+		) as HTMLInputElement
+		const barHeightSlider = this.shadowRoot?.querySelector(
+			".bar-height-slider"
+		) as HTMLInputElement
+		const loadFromOPFSBtn = this.shadowRoot?.querySelector(
+			".load-from-opfs"
+		) as HTMLButtonElement
+		const clearBtn = this.shadowRoot?.querySelector(".clear-btn") as HTMLButtonElement
+		const exportBtn = this.shadowRoot?.querySelector(".export-btn") as HTMLButtonElement
 
-    if (layoutModeSelect) {
-      layoutModeSelect.addEventListener('change', (e) => {
-        const value = (e.target as HTMLSelectElement).value as "timeline" | "stacked"
-        this.visualiser?.setOptions({ layoutMode: value })
-      })
-    }
+		if (layoutModeSelect) {
+			layoutModeSelect.addEventListener("change", (e) => {
+				const value = (e.target as HTMLSelectElement).value as "timeline" | "stacked"
+				this.visualiser?.setOptions({ layoutMode: value })
+			})
+		}
 
-    if (pixelsPerSecondSlider) {
-      pixelsPerSecondSlider.addEventListener('input', (e) => {
-        const value = parseInt((e.target as HTMLInputElement).value, 10)
-        this.visualiser?.setOptions({ pixelsPerSecond: value })
-      })
-    }
+		if (pixelsPerSecondSlider) {
+			pixelsPerSecondSlider.addEventListener("input", (e) => {
+				const value = parseInt((e.target as HTMLInputElement).value, 10)
+				this.visualiser?.setOptions({ pixelsPerSecond: value })
+			})
+		}
 
-    if (noteHeightSlider) {
-      noteHeightSlider.addEventListener('input', (e) => {
-        const value = parseInt((e.target as HTMLInputElement).value, 10)
-        this.visualiser?.setOptions({ noteHeight: value })
-      })
-    }
+		if (noteHeightSlider) {
+			noteHeightSlider.addEventListener("input", (e) => {
+				const value = parseInt((e.target as HTMLInputElement).value, 10)
+				this.visualiser?.setOptions({ noteHeight: value })
+			})
+		}
 
-    if (barHeightSlider) {
-      barHeightSlider.addEventListener('input', (e) => {
-        const value = parseInt((e.target as HTMLInputElement).value, 10)
-        this.visualiser?.setOptions({ barHeight: value })
-      })
-    }
+		if (barHeightSlider) {
+			barHeightSlider.addEventListener("input", (e) => {
+				const value = parseInt((e.target as HTMLInputElement).value, 10)
+				this.visualiser?.setOptions({ barHeight: value })
+			})
+		}
 
-    if (loadFromOPFSBtn) {
-      loadFromOPFSBtn.addEventListener(EVENT_CLICK, () => { void this.refresh() })
-    }
+		if (loadFromOPFSBtn) {
+			loadFromOPFSBtn.addEventListener(EVENT_CLICK, () => {
+				void this.refresh()
+			})
+		}
 
-    if (clearBtn) {
-      clearBtn.addEventListener('click', () => this.clear())
-    }
+		if (clearBtn) {
+			clearBtn.addEventListener("click", () => this.clear())
+		}
 
-    if (exportBtn) {
-      exportBtn.addEventListener('click', () => this.exportJSON())
-    }
+		if (exportBtn) {
+			exportBtn.addEventListener("click", () => this.exportJSON())
+		}
 
-    // Listen for note clicks
-    this.visualiser?.addEventListener(EVENT_NOTE_CLICK, (e: any) => {
-      this.dispatchEvent(new CustomEvent(EVENT_NOTE_CLICK, { detail: e.detail }))
-    })
-    this.shadowRoot?.querySelector('.recorded-commands')?.addEventListener(EVENT_TOGGLE, () => this.renderCommandPage())
-    this.shadowRoot?.querySelector('.commands-previous')?.addEventListener(EVENT_CLICK, () => {
-      this.commandPage--
-      this.renderCommandPage()
-    })
-    this.shadowRoot?.querySelector('.commands-next')?.addEventListener(EVENT_CLICK, () => {
-      this.commandPage++
-      this.renderCommandPage()
-    })
-  }
+		// Listen for note clicks
+		this.visualiser?.addEventListener(EVENT_NOTE_CLICK, (e: any) => {
+			this.dispatchEvent(new CustomEvent(EVENT_NOTE_CLICK, { detail: e.detail }))
+		})
+		this.shadowRoot
+			?.querySelector(".recorded-commands")
+			?.addEventListener(EVENT_TOGGLE, () => this.renderCommandPage())
+		this.shadowRoot?.querySelector(".commands-previous")?.addEventListener(EVENT_CLICK, () => {
+			this.commandPage--
+			this.renderCommandPage()
+		})
+		this.shadowRoot?.querySelector(".commands-next")?.addEventListener(EVENT_CLICK, () => {
+			this.commandPage++
+			this.renderCommandPage()
+		})
+	}
 
-  /**
-   * Load commands from OPFS storage
-   */
-  refresh(): Promise<void> {
-    if (this.refreshTask) return this.refreshTask
-    if (!this.storage && !this.commandSource) return Promise.resolve()
-    const generation = this.generation
-    this.refreshTask = Promise.resolve().then(async () => {
-      const commands = this.storage ? await this.storage.readAll() as unknown as IAudioCommand[] : await this.commandSource!()
-      if (generation === this.generation) await this.loadCommands(commands)
-    }).then(() => {
-      if (generation === this.generation) this.setStatus('Recording refreshed.')
-    }).catch(() => {
-      if (generation === this.generation) this.setStatus('Unable to load the recording. Try refreshing again.')
-    }).finally(() => {
-      this.refreshTask = null
-      this.updateRefreshButton()
-    })
-    this.updateRefreshButton()
-    return this.refreshTask
-  }
+	/**
+	 * Load commands from OPFS storage
+	 */
+	refresh(): Promise<void> {
+		if (this.refreshTask) {
+			return this.refreshTask
+		}
+		if (!this.storage && !this.commandSource) {
+			return Promise.resolve()
+		}
+		const generation = this.generation
+		this.refreshTask = Promise.resolve()
+			.then(async () => {
+				const commands = this.storage
+					? ((await this.storage.readAll()) as unknown as IAudioCommand[])
+					: await this.commandSource!()
+				if (generation === this.generation) {
+					await this.loadCommands(commands)
+				}
+			})
+			.then(() => {
+				if (generation === this.generation) {
+					this.setStatus("Recording refreshed.")
+				}
+			})
+			.catch(() => {
+				if (generation === this.generation) {
+					this.setStatus("Unable to load the recording. Try refreshing again.")
+				}
+			})
+			.finally(() => {
+				this.refreshTask = null
+				this.updateRefreshButton()
+			})
+		this.updateRefreshButton()
+		return this.refreshTask
+	}
 
-  async showCommands(): Promise<void> {
-    const details = this.shadowRoot?.querySelector<HTMLDetailsElement>('.recorded-commands')
-    if (details) details.open = true
-    await this.refresh()
-    this.renderCommandPage()
-  }
+	async showCommands(): Promise<void> {
+		const details = this.shadowRoot?.querySelector<HTMLDetailsElement>(".recorded-commands")
+		if (details) {
+			details.open = true
+		}
+		await this.refresh()
+		this.renderCommandPage()
+	}
 
-  private setStatus(message: string): void {
-    const status = this.shadowRoot?.querySelector('.recording-status')
-    if (status) status.textContent = message
-  }
+	private setStatus(message: string): void {
+		const status = this.shadowRoot?.querySelector(".recording-status")
+		if (status) {
+			status.textContent = message
+		}
+	}
 
-  private updateRefreshButton(): void {
-    const button = this.shadowRoot?.querySelector<HTMLButtonElement>('.load-from-opfs')
-    if (!button) return
-    button.disabled = this.refreshTask !== null || (!this.storage && !this.commandSource)
-    button.textContent = this.refreshTask ? 'Loading…' : 'Refresh recording'
-  }
+	private updateRefreshButton(): void {
+		const button = this.shadowRoot?.querySelector<HTMLButtonElement>(".load-from-opfs")
+		if (!button) {
+			return
+		}
+		button.disabled = this.refreshTask !== null || (!this.storage && !this.commandSource)
+		button.textContent = this.refreshTask ? "Loading…" : "Refresh recording"
+	}
 
-  private renderCommandPage(): void {
-    const details = this.shadowRoot?.querySelector<HTMLDetailsElement>('.recorded-commands')
-    const body = details?.querySelector('tbody')
-    if (!details?.open || !body || !this.visualiser) return
-    const count = this.visualiser.commandCount
-    const pages = Math.max(1, Math.ceil(count / 100))
-    this.commandPage = Math.max(0, Math.min(this.commandPage, pages - 1))
-    const fragment = document.createDocumentFragment()
-    for (const command of this.visualiser.getCommandPage(this.commandPage * 100, 100)) {
-      const row = document.createElement('tr')
-      const bytes = command.raw?.length ? Array.from(command.raw).map(byte => byte.toString(16).padStart(2, '0')).join(' ') : command.ump?.map(word => word.toString(16).padStart(8, '0')).join(' ')
-      for (const value of [command.startAt ?? command.time, command.type, command.channel, command.number,
-        command.velocity, command.value, command.from, command.chainName ?? command.chainId, bytes]) {
-        const cell = document.createElement('td')
-        cell.textContent = value === undefined || value === null ? '—' : String(value)
-        row.append(cell)
-      }
-      fragment.append(row)
-    }
-    body.replaceChildren(fragment)
-    details.querySelector('.commands-page')!.textContent = `${count} commands · Page ${this.commandPage + 1} of ${pages}`
-    details.querySelector<HTMLButtonElement>('.commands-previous')!.disabled = this.commandPage === 0
-    details.querySelector<HTMLButtonElement>('.commands-next')!.disabled = this.commandPage + 1 >= pages
-  }
+	private renderCommandPage(): void {
+		const details = this.shadowRoot?.querySelector<HTMLDetailsElement>(".recorded-commands")
+		const body = details?.querySelector("tbody")
+		if (!details?.open || !body || !this.visualiser) {
+			return
+		}
+		const count = this.visualiser.commandCount
+		const pages = Math.max(1, Math.ceil(count / 100))
+		this.commandPage = Math.max(0, Math.min(this.commandPage, pages - 1))
+		const fragment = document.createDocumentFragment()
+		for (const command of this.visualiser.getCommandPage(this.commandPage * 100, 100)) {
+			const row = document.createElement("tr")
+			const bytes = command.raw?.length
+				? Array.from(command.raw)
+						.map((byte) => byte.toString(16).padStart(2, "0"))
+						.join(" ")
+				: command.ump?.map((word) => word.toString(16).padStart(8, "0")).join(" ")
+			for (const value of [
+				command.startAt ?? command.time,
+				command.type,
+				command.channel,
+				command.number,
+				command.velocity,
+				command.value,
+				command.from,
+				command.chainName ?? command.chainId,
+				bytes
+			]) {
+				const cell = document.createElement("td")
+				cell.textContent = value === undefined || value === null ? "—" : String(value)
+				row.append(cell)
+			}
+			fragment.append(row)
+		}
+		body.replaceChildren(fragment)
+		details.querySelector(".commands-page")!.textContent =
+			`${count} commands · Page ${this.commandPage + 1} of ${pages}`
+		details.querySelector<HTMLButtonElement>(".commands-previous")!.disabled =
+			this.commandPage === 0
+		details.querySelector<HTMLButtonElement>(".commands-next")!.disabled =
+			this.commandPage + 1 >= pages
+	}
 
-  reset(): void {
-    this.generation++
-    this.commandPage = 0
-    this.visualiser?.reset()
-    this.updateInfo()
-    this.renderCommandPage()
-  }
+	reset(): void {
+		this.generation++
+		this.commandPage = 0
+		this.visualiser?.reset()
+		this.updateInfo()
+		this.renderCommandPage()
+	}
 
-  /**
-   * Clear all data
-   */
-  private clear() {
-    this.reset()
-  }
+	/**
+	 * Clear all data
+	 */
+	private clear() {
+		this.reset()
+	}
 
-  /**
-   * Export commands as JSON
-   */
-  private exportJSON() {
-    const json = this.visualiser?.exportAsJSON()
-    if (json) {
-      const blob = new Blob([json], { type: "application/json" })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = `song-${Date.now()}.json`
-      a.click()
-      URL.revokeObjectURL(url)
-    }
-  }
+	/**
+	 * Export commands as JSON
+	 */
+	private exportJSON() {
+		const json = this.visualiser?.exportAsJSON()
+		if (json) {
+			const blob = new Blob([json], { type: "application/json" })
+			const url = URL.createObjectURL(blob)
+			const a = document.createElement("a")
+			a.href = url
+			a.download = `song-${Date.now()}.json`
+			a.click()
+			URL.revokeObjectURL(url)
+		}
+	}
 
-  /**
-   * Update info display
-   */
-  private updateInfo() {
-    const noteBars = this.visualiser?.getNoteBars() ?? []
+	/**
+	 * Update info display
+	 */
+	private updateInfo() {
+		const noteBars = this.visualiser?.getNoteBars() ?? []
 
-    const commandCountEl = this.shadowRoot?.querySelector(".command-count")
-    const noteBarCountEl = this.shadowRoot?.querySelector(".note-bar-count")
-    const durationEl = this.shadowRoot?.querySelector(".duration-value")
-    const maxNoteEl = this.shadowRoot?.querySelector(".max-note-value")
+		const commandCountEl = this.shadowRoot?.querySelector(".command-count")
+		const noteBarCountEl = this.shadowRoot?.querySelector(".note-bar-count")
+		const durationEl = this.shadowRoot?.querySelector(".duration-value")
+		const maxNoteEl = this.shadowRoot?.querySelector(".max-note-value")
 
-    if (commandCountEl) commandCountEl.textContent = String(this.visualiser?.commandCount ?? 0)
-    if (noteBarCountEl) noteBarCountEl.textContent = String(noteBars.length)
+		if (commandCountEl) {
+			commandCountEl.textContent = String(this.visualiser?.commandCount ?? 0)
+		}
+		if (noteBarCountEl) {
+			noteBarCountEl.textContent = String(noteBars.length)
+		}
 
-    if (noteBars.length > 0) {
-      let minTime = Infinity, maxTime = -Infinity, maxNote = 0
-      for (const bar of noteBars) {
-        minTime = Math.min(minTime, bar.startTime)
-        maxTime = Math.max(maxTime, bar.endTime)
-        maxNote = Math.max(maxNote, bar.noteNumber)
-      }
-      if (durationEl) durationEl.textContent = `${(maxTime - minTime).toFixed(2)}s`
-      if (maxNoteEl) maxNoteEl.textContent = String(maxNote)
-    } else {
-      if (durationEl) durationEl.textContent = "0s"
-      if (maxNoteEl) maxNoteEl.textContent = "-"
-    }
-  }
+		if (noteBars.length > 0) {
+			let minTime = Infinity,
+				maxTime = -Infinity,
+				maxNote = 0
+			for (const bar of noteBars) {
+				minTime = Math.min(minTime, bar.startTime)
+				maxTime = Math.max(maxTime, bar.endTime)
+				maxNote = Math.max(maxNote, bar.noteNumber)
+			}
+			if (durationEl) {
+				durationEl.textContent = `${(maxTime - minTime).toFixed(2)}s`
+			}
+			if (maxNoteEl) {
+				maxNoteEl.textContent = String(maxNote)
+			}
+		} else {
+			if (durationEl) {
+				durationEl.textContent = "0s"
+			}
+			if (maxNoteEl) {
+				maxNoteEl.textContent = "-"
+			}
+		}
+	}
 
-  /**
-   * Load audio commands to visualise
-   */
-  async loadCommands(commands: IAudioCommand[]) {
-    // Wait for visualiser to be initialized if not ready yet
-    if (!this.visualiser) {
-      await new Promise(resolve => {
-        const checkVisualiser = setInterval(() => {
-          if (this.visualiser) {
-            clearInterval(checkVisualiser)
-            resolve(undefined)
-          }
-        }, 10)
-      })
-    }
-    
-    if (this.visualiser) {
-      await this.visualiser.loadCommands(commands as IAudioCommand[])
-      this.commandPage = 0
-      this.updateInfo()
-      this.renderCommandPage()
-    }
-  }
+	/**
+	 * Load audio commands to visualise
+	 */
+	async loadCommands(commands: IAudioCommand[]) {
+		// Wait for visualiser to be initialized if not ready yet
+		if (!this.visualiser) {
+			await new Promise((resolve) => {
+				const checkVisualiser = setInterval(() => {
+					if (this.visualiser) {
+						clearInterval(checkVisualiser)
+						resolve(undefined)
+					}
+				}, 10)
+			})
+		}
 
-  /**
-   * Set OPFS storage instance
-   */
-  setStorage(storage: OPFSStorage) {
-    this.storage = storage
-    this.updateRefreshButton()
-  }
+		if (this.visualiser) {
+			await this.visualiser.loadCommands(commands as IAudioCommand[])
+			this.commandPage = 0
+			this.updateInfo()
+			this.renderCommandPage()
+		}
+	}
 
-  setCommandSource(source: () => IAudioCommand[] | Promise<IAudioCommand[]>): void {
-    this.commandSource = source
-    this.updateRefreshButton()
-  }
+	/**
+	 * Set OPFS storage instance
+	 */
+	setStorage(storage: OPFSStorage) {
+		this.storage = storage
+		this.updateRefreshButton()
+	}
 
-  /**
-   * Set visualiser options
-   */
-  setOptions(options: any) {
-    this.visualiser?.setOptions(options)
-  }
+	setCommandSource(source: () => IAudioCommand[] | Promise<IAudioCommand[]>): void {
+		this.commandSource = source
+		this.updateRefreshButton()
+	}
 
-  /**
-   * Get the visualiser instance
-   */
-  getVisualiser(): SongVisualiser | null {
-    return this.visualiser
-  }
+	/**
+	 * Set visualiser options
+	 */
+	setOptions(options: any) {
+		this.visualiser?.setOptions(options)
+	}
 
-  private getStyles(): string {
-    const bgSecondary = this.darkMode ? "#2d2d2d" : "#f5f5f5"
-    const textPrimary = this.darkMode ? "#ffffff" : "#333333"
-    const textSecondary = this.darkMode ? "#aaaaaa" : "#666666"
-    const borderColor = this.darkMode ? "#444444" : "#dddddd"
-    const inputBg = this.darkMode ? "#333333" : "#ffffff"
-    const inputBorder = this.darkMode ? "#555555" : "#dddddd"
-    const hoverBg = this.darkMode ? "#3d3d3d" : "#eeeeee"
-    const labelColor = this.darkMode ? "#999999" : "#999999"
+	/**
+	 * Get the visualiser instance
+	 */
+	getVisualiser(): SongVisualiser | null {
+		return this.visualiser
+	}
 
-    return `
+	private getStyles(): string {
+		const bgSecondary = this.darkMode ? "#2d2d2d" : "#f5f5f5"
+		const textPrimary = this.darkMode ? "#ffffff" : "#333333"
+		const textSecondary = this.darkMode ? "#aaaaaa" : "#666666"
+		const borderColor = this.darkMode ? "#444444" : "#dddddd"
+		const inputBg = this.darkMode ? "#333333" : "#ffffff"
+		const inputBorder = this.darkMode ? "#555555" : "#dddddd"
+		const hoverBg = this.darkMode ? "#3d3d3d" : "#eeeeee"
+		const labelColor = this.darkMode ? "#999999" : "#999999"
+
+		return `
       :host {
         display: block;
         width: 100%;
@@ -544,12 +616,10 @@ export class SongVisualiserUI extends HTMLElement {
         font-family: monospace;
       }
     `
-  }
+	}
 }
 
 // Register as custom element
 if (!customElements.get("song-visualiser-ui")) {
-  customElements.define("song-visualiser-ui", SongVisualiserUI)
+	customElements.define("song-visualiser-ui", SongVisualiserUI)
 }
-
-

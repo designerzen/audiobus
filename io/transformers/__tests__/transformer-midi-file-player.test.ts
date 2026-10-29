@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest"
-import { TransformerMIDIFilePlayer } from "../robots/transformer-midi-file-player.ts"
-import AudioCommand from "../../audio-command.ts"
-import * as Commands from '../../../commands'
-import Timer from "../../timing/timer.ts"
+import { TransformerMIDIFilePlayer } from "../transformer-midi-file-player.ts"
+import AudioCommand from "../../../audio-command.ts"
+import * as Commands from "../../../commands"
+import { Timer } from "netronome"
 
 describe("TransformerMIDIFilePlayer", () => {
 	let transformer: TransformerMIDIFilePlayer
@@ -67,7 +67,3 @@ describe("TransformerMIDIFilePlayer", () => {
 		expect(true).toBe(true)
 	})
 })
-
-
-
-

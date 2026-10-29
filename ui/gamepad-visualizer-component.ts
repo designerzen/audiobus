@@ -9,8 +9,6 @@ import "./gamepad-visualizer.css"
 
 export class GamepadVisualizerComponent {
 	#containerElement: HTMLElement | null = null
-	#svgElement: SVGSVGElement | null = null
-	#placeholderElement: HTMLElement | null = null
 	#buttonElements: Map<string, SVGElement> = new Map()
 	#isVisible: boolean = false
 
@@ -25,7 +23,9 @@ export class GamepadVisualizerComponent {
 	}
 
 	public showPlaceholder(): void {
-		if (!this.#containerElement) return
+		if (!this.#containerElement) {
+			return
+		}
 
 		const placeholder = document.createElement("div")
 		placeholder.className = "gamepad-placeholder"
@@ -48,13 +48,14 @@ export class GamepadVisualizerComponent {
 
 		this.#containerElement.innerHTML = ""
 		this.#containerElement.appendChild(placeholder)
-		this.#placeholderElement = placeholder
 		this.#isVisible = false
 		this.#buttonElements.clear()
 	}
 
 	public createGamepadSVG(): void {
-		if (!this.#containerElement) return
+		if (!this.#containerElement) {
+			return
+		}
 
 		const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
 		svg.setAttribute("viewBox", "0 0 800 500")
@@ -132,7 +133,6 @@ export class GamepadVisualizerComponent {
 
 		this.#containerElement.innerHTML = ""
 		this.#containerElement.appendChild(svg)
-		this.#svgElement = svg
 		this.#isVisible = true
 	}
 
@@ -344,10 +344,14 @@ export class GamepadVisualizerComponent {
 	}
 
 	public updateButtonVisual(buttonName: string, isActive: boolean): void {
-		if (!this.#isVisible) return
+		if (!this.#isVisible) {
+			return
+		}
 
 		const element = this.#buttonElements.get(buttonName)
-		if (!element) return
+		if (!element) {
+			return
+		}
 
 		if (isActive) {
 			element.classList.add("active")
@@ -357,10 +361,14 @@ export class GamepadVisualizerComponent {
 	}
 
 	public updateStickPosition(side: "left" | "right", x: number, y: number): void {
-		if (!this.#isVisible) return
+		if (!this.#isVisible) {
+			return
+		}
 
 		const stickElement = document.getElementById(`stick-${side}`)
-		if (!stickElement) return
+		if (!stickElement) {
+			return
+		}
 
 		const deadzone = 0.1
 		const absX = Math.abs(x) > deadzone ? x : 0

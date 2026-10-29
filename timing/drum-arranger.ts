@@ -9,17 +9,17 @@ import type {
 	DrumSubHit,
 	DrumSubdivisionStyle,
 	PercussionEnvelope,
-	IDrumArranger,
-} from './percussion-types.ts'
+	IDrumArranger
+} from "./percussion-types.ts"
 import {
 	kickSequences,
 	snareSequences,
 	hatSequences,
 	drumRollSequence,
 	DRUM_GROOVES,
-	AUXILIARY_DRUM_LANES,
-} from './drum-patterns.ts'
-const CORE_LANES = ['kick', 'snare', 'hat', 'clap']
+	AUXILIARY_DRUM_LANES
+} from "./drum-patterns.ts"
+const CORE_LANES = ["kick", "snare", "hat", "clap"]
 const DEFAULT_INTENT: DrumIntent = {
 	energy: 0.5,
 	density: 0.5,
@@ -30,17 +30,17 @@ const DEFAULT_INTENT: DrumIntent = {
 	muteKick: false,
 	muteSnare: false,
 	muteHat: false,
-	muteClap: false,
+	muteClap: false
 }
 export const DRUM_PERFORMANCE_PRESETS = Object.freeze({
-	steady: Object.freeze({ id: 'steady', title: 'Steady' }),
-	crescendo: Object.freeze({ id: 'crescendo', title: 'Crescendo' }),
-	bridge: Object.freeze({ id: 'bridge', title: 'Bridge' }),
-	'snare-roll': Object.freeze({ id: 'snare-roll', title: 'Snare Roll' }),
-	breakdown: Object.freeze({ id: 'breakdown', title: 'Breakdown' }),
-	drop: Object.freeze({ id: 'drop', title: 'Drop' }),
+	steady: Object.freeze({ id: "steady", title: "Steady" }),
+	crescendo: Object.freeze({ id: "crescendo", title: "Crescendo" }),
+	bridge: Object.freeze({ id: "bridge", title: "Bridge" }),
+	"snare-roll": Object.freeze({ id: "snare-roll", title: "Snare Roll" }),
+	breakdown: Object.freeze({ id: "breakdown", title: "Breakdown" }),
+	drop: Object.freeze({ id: "drop", title: "Drop" })
 })
-const PERFORMANCE_PRESET_IDS = new Set(['auto', ...Object.keys(DRUM_PERFORMANCE_PRESETS)])
+const PERFORMANCE_PRESET_IDS = new Set(["auto", ...Object.keys(DRUM_PERFORMANCE_PRESETS)])
 const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value))
 const clampVelocity = (value: number) => Math.round(Math.min(255, Math.max(0, value)))
 const wrap = (index: number, length: number) => ((index % length) + length) % length
@@ -52,15 +52,15 @@ export const createDrumSubHits = ({
 	stepInPhrase,
 	bpm,
 	intent,
-	style = 'auto',
+	style = "auto",
 	random = Math.random,
-	stepDuration,
+	stepDuration
 }: {
 	inFill: boolean
 	inRoll: boolean
 	stepInPhrase: number
 	bpm: number
-	intent: Pick<DrumIntent, 'density' | 'energy' | 'tension'>
+	intent: Pick<DrumIntent, "density" | "energy" | "tension">
 	style?: DrumSubdivisionStyle
 	random?: () => number
 	stepDuration?: number
@@ -77,36 +77,36 @@ export const createDrumSubHits = ({
 				lane,
 				offset: (beat * position) / division,
 				velocity: clampVelocity(strength * accent),
-				division,
+				division
 			})
 		})
 	if (inFill) {
 		// Alternate straight rapid bursts with true triplets/sextuplets so fills
 		// do not collapse into the same machine-gun rhythm every phrase.
 		const tripletFill =
-			style === 'triplet' ||
-			style === 'sextuplet' ||
-			(style === 'auto' && stepInPhrase % 2 === 0)
+			style === "triplet" ||
+			style === "sextuplet" ||
+			(style === "auto" && stepInPhrase % 2 === 0)
 		const density = intent.density + intent.energy + intent.tension
 		if (tripletFill) {
-			const hatDivision = style === 'triplet' ? 3 : 6
+			const hatDivision = style === "triplet" ? 3 : 6
 			add(
-				'hat',
+				"hat",
 				hatDivision,
 				Array.from({ length: hatDivision - 1 }, (_, index) => index + 1),
-				105 + intent.energy * 100,
+				105 + intent.energy * 100
 			)
 		} else {
-			const division = style === 'rapid' || density > 1.75 ? 8 : 4
+			const division = style === "rapid" || density > 1.75 ? 8 : 4
 			add(
-				'hat',
+				"hat",
 				division,
 				Array.from({ length: division - 1 }, (_, index) => index + 1),
-				100 + intent.energy * 105,
+				100 + intent.energy * 105
 			)
 		}
 	} else if (inRoll) {
-		add('hat', 3, [1, 2], 95 + intent.energy * 105)
+		add("hat", 3, [1, 2], 95 + intent.energy * 105)
 	}
 	// Equal-power density compensation prevents tuplets from becoming several
 	// times louder simply because more voices occur inside one beat.
@@ -116,18 +116,18 @@ export const createDrumSubHits = ({
 			...event,
 			velocity: clampVelocity(event.velocity * densityGain),
 			lengthScale:
-				event.lane === 'hat'
+				event.lane === "hat"
 					? Math.min(0.55, 1.8 / event.division)
-					: Math.min(0.65, 2.4 / event.division),
+					: Math.min(0.65, 2.4 / event.division)
 		}))
 		.sort((a, b) => a.offset - b.offset)
 }
 export const applyDrumSubHitEnvelope = (
 	options: PercussionEnvelope,
 	event: DrumSubHit,
-	output?: Partial<PercussionEnvelope>,
+	output?: Partial<PercussionEnvelope>
 ): PercussionEnvelope => {
-	const minimumLength = event.lane === 'hat' ? 0.025 : 0.04
+	const minimumLength = event.lane === "hat" ? 0.025 : 0.04
 	const length = Math.max(minimumLength, options.length * (event.lengthScale ?? 1))
 	const scaled: PercussionEnvelope = Object.assign(output ?? {}, options)
 	scaled.length = length
@@ -141,7 +141,7 @@ export const applyDrumSubHitEnvelope = (
 	return scaled
 }
 const hashSeed = (value: unknown) => {
-	const text = String(value ?? 'photosynth-drums')
+	const text = String(value ?? "photosynth-drums")
 	let hash = 2166136261
 	for (let i = 0; i < text.length; i++) {
 		hash ^= text.charCodeAt(i)
@@ -176,12 +176,12 @@ const createCells = (lane: string, sequences: readonly (readonly number[])[]) =>
 		sequence,
 		density: sequenceDensity(sequence),
 		energy: sequenceEnergy(sequence),
-		length: sequence.length,
+		length: sequence.length
 	}))
 const chooseWeighted = <T>(
 	items: readonly T[],
 	score: (item: T) => number,
-	random: () => number,
+	random: () => number
 ): T => {
 	let total = 0
 	const weighted = items.map((item) => {
@@ -200,40 +200,40 @@ const chooseWeighted = <T>(
 }
 const TEMPO_PROFILES = Object.freeze({
 	unknown: Object.freeze({
-		name: 'unknown',
+		name: "unknown",
 		density: 0.5,
 		fillChance: 0.9,
 		rollChance: 0.8,
-		stability: 0.9,
+		stability: 0.9
 	}),
 	slow: Object.freeze({
-		name: 'slow',
+		name: "slow",
 		density: 0.7,
 		fillChance: 1.2,
 		rollChance: 1.1,
-		stability: 0.75,
+		stability: 0.75
 	}),
 	medium: Object.freeze({
-		name: 'medium',
+		name: "medium",
 		density: 0.55,
 		fillChance: 1,
 		rollChance: 0.9,
-		stability: 0.9,
+		stability: 0.9
 	}),
 	fast: Object.freeze({
-		name: 'fast',
+		name: "fast",
 		density: 0.42,
 		fillChance: 0.75,
 		rollChance: 0.65,
-		stability: 1.05,
+		stability: 1.05
 	}),
 	veryFast: Object.freeze({
-		name: 'very-fast',
+		name: "very-fast",
 		density: 0.32,
 		fillChance: 0.55,
 		rollChance: 0.45,
-		stability: 1.2,
-	}),
+		stability: 1.2
+	})
 })
 const getTempoProfile = (bpm: number) => {
 	if (!Number.isFinite(bpm) || bpm <= 0) {
@@ -255,10 +255,10 @@ const createFill = (
 	stepInPhrase: number,
 	phraseLength: number,
 	tempoProfile: TempoProfile,
-	intent: DrumIntent,
+	intent: DrumIntent
 ) => {
 	const remaining = phraseLength - stepInPhrase
-	const fillWindow = tempoProfile.name === 'very-fast' ? 4 : 8
+	const fillWindow = tempoProfile.name === "very-fast" ? 4 : 8
 	if (remaining > fillWindow) {
 		return 0
 	}
@@ -266,14 +266,14 @@ const createFill = (
 	const ramp = (fillStep + 1) / fillWindow
 	const energy = clamp(0.45 + intent.energy * 0.55)
 	switch (lane) {
-		case 'snare':
-		case 'clap':
+		case "snare":
+		case "clap":
 			return fillStep % 2 === 0 || ramp > 0.75
 				? clampVelocity((120 + ramp * 135) * energy)
 				: 0
-		case 'hat':
+		case "hat":
 			return clampVelocity((80 + ramp * 150) * energy)
-		case 'kick':
+		case "kick":
 			return remaining <= 3 && fillStep % 2 === 0 ? clampVelocity(150 + ramp * 90) : 0
 		default:
 			return 0
@@ -283,13 +283,13 @@ const shouldKeepMutedHit = (lane: string, step: number, velocity: number, intent
 	if (velocity <= 0) {
 		return false
 	}
-	if (lane === 'kick' && intent.muteKick) {
+	if (lane === "kick" && intent.muteKick) {
 		return step % 4 === 0 && velocity > 220 && intent.energy > 0.65
 	}
-	if ((lane === 'snare' || lane === 'clap') && (intent.muteSnare || intent.muteClap)) {
+	if ((lane === "snare" || lane === "clap") && (intent.muteSnare || intent.muteClap)) {
 		return false
 	}
-	if (lane === 'hat' && intent.muteHat) {
+	if (lane === "hat" && intent.muteHat) {
 		return step % 8 === 0 && intent.tension > 0.65
 	}
 	return true
@@ -332,35 +332,36 @@ export class DrumArranger implements IDrumArranger {
 	constructor(private readonly options: DrumArrangerOptions = {}) {
 		if (
 			![options.phraseBars ?? 8, options.stepsPerBar ?? 4].every(
-				(value) => Number.isInteger(value) && value > 0,
+				(value) => Number.isInteger(value) && value > 0
 			)
-		)
-			throw new RangeError('Phrase and bar lengths must be positive integers')
+		) {
+			throw new RangeError("Phrase and bar lengths must be positive integers")
+		}
 		this.random = createRandom(this.options.seed)
 		this.selectedGroove =
-			typeof this.options.groove === 'string'
+			typeof this.options.groove === "string"
 				? DRUM_GROOVES[this.options.groove]
 				: this.options.groove
 		this.auxiliaryLanes = this.selectedGroove
 			? AUXILIARY_DRUM_LANES.filter((lane) => Array.isArray(this.selectedGroove?.[lane]))
 			: []
 		this.activeLanes = [...CORE_LANES, ...this.auxiliaryLanes]
-		this.exposedActiveLanes = Object.freeze([...this.activeLanes, 'cowbell'])
+		this.exposedActiveLanes = Object.freeze([...this.activeLanes, "cowbell"])
 		this.beatSequenceCache = new Map()
 		this.cells = {
 			kick: createCells(
-				'kick',
-				this.selectedGroove ? [this.selectedGroove.kick] : kickSequences,
+				"kick",
+				this.selectedGroove ? [this.selectedGroove.kick] : kickSequences
 			),
 			snare: createCells(
-				'snare',
-				this.selectedGroove ? [this.selectedGroove.snare] : snareSequences,
+				"snare",
+				this.selectedGroove ? [this.selectedGroove.snare] : snareSequences
 			),
-			hat: createCells('hat', this.selectedGroove ? [this.selectedGroove.hat] : hatSequences),
+			hat: createCells("hat", this.selectedGroove ? [this.selectedGroove.hat] : hatSequences),
 			clap: createCells(
-				'clap',
-				this.selectedGroove ? [this.selectedGroove.clap] : snareSequences,
-			),
+				"clap",
+				this.selectedGroove ? [this.selectedGroove.clap] : snareSequences
+			)
 		}
 		for (const lane of this.auxiliaryLanes) {
 			this.cells[lane] = createCells(lane, [this.selectedGroove![lane] as readonly number[]])
@@ -372,7 +373,7 @@ export class DrumArranger implements IDrumArranger {
 			stepsPerBar: this.options.stepsPerBar ?? 4,
 			bpm: this.options.bpm ?? 0,
 			lastTriggerAt: 0,
-			intent: { ...DEFAULT_INTENT, ...(this.options.intent ?? {}) },
+			intent: { ...DEFAULT_INTENT, ...this.options.intent },
 			current: {},
 			recentFills: [],
 			fillUntilStep: -1,
@@ -381,18 +382,18 @@ export class DrumArranger implements IDrumArranger {
 			phrase: -1,
 			rapidPercussion: this.options.rapidPercussion === true,
 			performanceControl: this.options.performanceControl !== false,
-			performancePreset: PERFORMANCE_PRESET_IDS.has(this.options.performancePreset ?? 'auto')
-				? (this.options.performancePreset ?? 'auto')
-				: 'auto',
+			performancePreset: PERFORMANCE_PRESET_IDS.has(this.options.performancePreset ?? "auto")
+				? (this.options.performancePreset ?? "auto")
+				: "auto",
 			performanceTechnique:
-				this.options.performancePreset && this.options.performancePreset !== 'auto'
+				this.options.performancePreset && this.options.performancePreset !== "auto"
 					? this.options.performancePreset
-					: 'steady',
+					: "steady",
 			techniqueStartedAtStep: 0,
 			lastActivity: clamp(this.options.intent?.energy ?? DEFAULT_INTENT.energy),
 			activityReserve: 0,
 			lastPersonUpdateAt: null,
-			lastParts: {},
+			lastParts: {}
 		}
 	}
 	private phraseLength() {
@@ -412,8 +413,8 @@ export class DrumArranger implements IDrumArranger {
 				const densityDistance = Math.abs(cell.density - targetDensity)
 				const energyDistance = Math.abs(cell.energy - targetEnergy)
 				const repeatPenalty = previous && previous.id === cell.id ? 0.3 : 1
-				const busyFastPenalty = tempo.name === 'very-fast' && cell.density > 0.6 ? 0.35 : 1
-				const sparseSlowPenalty = tempo.name === 'slow' && cell.density < 0.18 ? 0.6 : 1
+				const busyFastPenalty = tempo.name === "very-fast" && cell.density > 0.6 ? 0.35 : 1
+				const sparseSlowPenalty = tempo.name === "slow" && cell.density < 0.18 ? 0.6 : 1
 				return (
 					(1.4 - densityDistance - energyDistance * 0.7) *
 					repeatPenalty *
@@ -421,14 +422,14 @@ export class DrumArranger implements IDrumArranger {
 					sparseSlowPenalty
 				)
 			},
-			this.random,
+			this.random
 		)
 	}
 	private choosePhrase() {
 		this.state.phrase++
 		const tempo = this.currentTempoProfile()
 		this.activeLanes.forEach(
-			(lane) => (this.state.current[lane] = this.selectCell(lane, tempo)),
+			(lane) => (this.state.current[lane] = this.selectCell(lane, tempo))
 		)
 		const phraseDistance = this.state.phrase - this.state.lastFillPhrase
 		const phraseAccent =
@@ -436,7 +437,7 @@ export class DrumArranger implements IDrumArranger {
 		const fillChance = clamp(
 			0.08 * phraseAccent * tempo.fillChance +
 				this.state.intent.fillChance * 0.18 +
-				this.state.intent.tension * 0.08,
+				this.state.intent.tension * 0.08
 		)
 		const rollChance = clamp(0.04 * tempo.rollChance + this.state.intent.rollChance * 0.12)
 		const canFill = phraseDistance > 1
@@ -468,12 +469,12 @@ export class DrumArranger implements IDrumArranger {
 		velocity: number,
 		stepInPhrase: number,
 		tempo: TempoProfile,
-		phraseLengthValue: number,
+		phraseLengthValue: number
 	) {
 		const intent = this.state.intent
 		const cell = this.state.current[lane]
 		const phraseEndWindow =
-			phraseLengthValue - stepInPhrase <= (tempo.name === 'very-fast' ? 4 : 8)
+			phraseLengthValue - stepInPhrase <= (tempo.name === "very-fast" ? 4 : 8)
 		const inFill = this.state.step < this.state.fillUntilStep && phraseEndWindow
 		const inRoll = this.state.step < this.state.rollUntilStep && phraseEndWindow
 		if (!shouldKeepMutedHit(lane, this.state.step, velocity, intent)) {
@@ -483,27 +484,27 @@ export class DrumArranger implements IDrumArranger {
 		if (inFill) {
 			output = Math.max(
 				output,
-				createFill(lane, stepInPhrase, phraseLengthValue, tempo, intent),
+				createFill(lane, stepInPhrase, phraseLengthValue, tempo, intent)
 			)
 		}
-		if (inRoll && (lane === 'hat' || lane === 'snare')) {
+		if (inRoll && (lane === "hat" || lane === "snare")) {
 			const roll = drumRollSequence[wrap(stepInPhrase, drumRollSequence.length)] ?? 0
-			output = Math.max(output, roll * (lane === 'hat' ? 0.9 : 0.75))
+			output = Math.max(output, roll * (lane === "hat" ? 0.9 : 0.75))
 		}
 		const isStrongStep = this.state.step % 4 === 0
-		const ghostChance = tempo.name === 'very-fast' ? 0.02 : 0.04 + intent.chaos * 0.08
+		const ghostChance = tempo.name === "very-fast" ? 0.02 : 0.04 + intent.chaos * 0.08
 		if (output <= 0 && !inFill && this.random() < ghostChance) {
-			if (lane === 'hat' && cell.density < tempo.density + 0.25) {
+			if (lane === "hat" && cell.density < tempo.density + 0.25) {
 				output = 35 + this.random() * 70
 			}
-			if ((lane === 'snare' || lane === 'clap') && !isStrongStep && intent.energy > 0.35) {
+			if ((lane === "snare" || lane === "clap") && !isStrongStep && intent.energy > 0.35) {
 				output = 25 + this.random() * 55
 			}
 			if (
-				lane === 'kick' &&
+				lane === "kick" &&
 				!isStrongStep &&
 				intent.energy > 0.75 &&
-				tempo.name !== 'very-fast'
+				tempo.name !== "very-fast"
 			) {
 				output = 65 + this.random() * 75
 			}
@@ -517,7 +518,7 @@ export class DrumArranger implements IDrumArranger {
 	}
 	private setPerformanceTechnique(technique: DrumPerformancePreset) {
 		if (
-			technique === 'auto' ||
+			technique === "auto" ||
 			!DRUM_PERFORMANCE_PRESETS[technique] ||
 			this.state.performanceTechnique === technique
 		) {
@@ -535,10 +536,10 @@ export class DrumArranger implements IDrumArranger {
 		const stepInBar = wrap(this.state.step, this.state.stepsPerBar)
 		const techniqueProgress = clamp(
 			(this.state.step - this.state.techniqueStartedAtStep) /
-				Math.max(1, this.state.stepsPerBar - 1),
+				Math.max(1, this.state.stepsPerBar - 1)
 		)
 		const scalePart = (lane: string, multiplier: number) => {
-			if (typeof parts[lane] === 'number' && (parts[lane] as number) > 0) {
+			if (typeof parts[lane] === "number" && (parts[lane] as number) > 0) {
 				parts[lane] = clampVelocity((parts[lane] as number) * multiplier)
 			}
 		}
@@ -547,69 +548,71 @@ export class DrumArranger implements IDrumArranger {
 		const accent = (lane: string, velocity: number) => {
 			parts[lane] = Math.max(
 				(parts[lane] as number | undefined) ?? 0,
-				clampVelocity(velocity),
+				clampVelocity(velocity)
 			)
 		}
 		// Every groove follows the performer dynamically before a technique adds
 		// its own arrangement. Disabling Performance bypasses this entire layer.
 		scaleAll(0.5 + this.state.intent.energy * 0.5)
 		switch (technique) {
-			case 'crescendo':
+			case "crescendo":
 				scaleAll(0.45 + techniqueProgress * 0.75)
 				if (stepInBar >= this.state.stepsPerBar - 3) {
 					accent(
-						['tomFloorLow', 'tomFloorHigh', 'tomMidHigh'][
+						["tomFloorLow", "tomFloorHigh", "tomMidHigh"][
 							stepInBar - (this.state.stepsPerBar - 3)
 						],
-						105 + techniqueProgress * 100,
+						105 + techniqueProgress * 100
 					)
 				}
 				break
-			case 'bridge':
-				scalePart('hat', 0.55)
+			case "bridge":
+				scalePart("hat", 0.55)
 				if (stepInBar % Math.max(1, Math.floor(this.state.stepsPerBar / 4)) === 0) {
-					accent('ride', 105 + this.state.intent.energy * 75)
+					accent("ride", 105 + this.state.intent.energy * 75)
 				}
 				if (stepInBar >= this.state.stepsPerBar - 3) {
 					accent(
-						['tomFloorLow', 'tomFloorHigh', 'tomMidHigh'][
+						["tomFloorLow", "tomFloorHigh", "tomMidHigh"][
 							stepInBar - (this.state.stepsPerBar - 3)
 						],
-						130 + this.state.intent.tension * 80,
+						130 + this.state.intent.tension * 80
 					)
 				}
 				break
-			case 'snare-roll':
-				scalePart('kick', 0.82)
-				scalePart('hat', 0.68)
-				scalePart('clap', 0.6)
+			case "snare-roll":
+				scalePart("kick", 0.82)
+				scalePart("hat", 0.68)
+				scalePart("clap", 0.6)
 				if (!this.state.intent.muteSnare) {
-					accent('snare', 80 + techniqueProgress * 175)
+					accent("snare", 80 + techniqueProgress * 175)
 				}
 				break
-			case 'breakdown': {
+			case "breakdown": {
 				const halfBar = Math.max(1, Math.floor(this.state.stepsPerBar / 2))
 				const quarterBar = Math.max(1, Math.floor(this.state.stepsPerBar / 4))
 				for (const lane of Object.keys(parts)) {
-					if (typeof parts[lane] !== 'number') continue
+					if (typeof parts[lane] !== "number") {
+						continue
+					}
 					const keep =
-						lane === 'kick'
+						lane === "kick"
 							? stepInBar % halfBar === 0
-							: lane === 'snare' || lane === 'clap'
+							: lane === "snare" || lane === "clap"
 								? stepInBar === quarterBar || stepInBar === quarterBar * 3
-								: lane === 'hat'
+								: lane === "hat"
 									? stepInBar % quarterBar === 0
 									: false
 					parts[lane] = keep ? clampVelocity((parts[lane] as number) * 0.72) : 0
 				}
 				break
 			}
-			case 'drop':
+			case "drop":
 				if (this.state.step === this.state.techniqueStartedAtStep) {
-					accent('kick', 255)
-					accent('snare', 230)
-					accent('hat', 205)
-					accent('crash', 255)
+					accent("kick", 255)
+					accent("snare", 230)
+					accent("hat", 205)
+					accent("crash", 255)
 				}
 				break
 		}
@@ -618,7 +621,9 @@ export class DrumArranger implements IDrumArranger {
 	next(context: DrumStepContext = {}): DrumParts {
 		if (Number.isFinite(context.bpm) && context.bpm! > 0) {
 			this.state.bpm = context.bpm!
-		} else this.maybeEstimateTempo(context.triggerAt)
+		} else {
+			this.maybeEstimateTempo(context.triggerAt)
+		}
 		this.state.step++
 		const phraseLengthValue = this.phraseLength()
 		const stepInPhrase = wrap(this.state.step, phraseLengthValue)
@@ -636,7 +641,7 @@ export class DrumArranger implements IDrumArranger {
 				velocity,
 				stepInPhrase,
 				tempo,
-				phraseLengthValue,
+				phraseLengthValue
 			)
 		}
 		// Closed hats choke the shared voice; an occasional offbeat open hat is
@@ -661,13 +666,14 @@ export class DrumArranger implements IDrumArranger {
 			const stepInBar = wrap(this.state.step, this.state.stepsPerBar)
 			const barInPhrase = Math.floor(stepInPhrase / this.state.stepsPerBar)
 			const addColour = (lane: string, velocity: number) => {
-				if (!parts[lane] && !this.selectedGroove?.[lane])
+				if (!parts[lane] && !this.selectedGroove?.[lane]) {
 					parts[lane] = clampVelocity(velocity)
+				}
 			}
 			if (stepInPhrase === 0) {
 				addColour(
-					this.state.phrase % 2 === 0 ? 'crash' : 'crash2',
-					150 + this.state.intent.energy * 70,
+					this.state.phrase % 2 === 0 ? "crash" : "crash2",
+					150 + this.state.intent.energy * 70
 				)
 			}
 			// A short ride passage in the latter half of alternate phrases makes
@@ -676,12 +682,12 @@ export class DrumArranger implements IDrumArranger {
 				this.state.phrase % 2 === 1 && barInPhrase >= Math.floor(this.state.phraseBars / 2)
 			if (ridePassage && stepInBar % 4 === 0) {
 				addColour(
-					this.state.phrase % 4 === 1 ? 'ride' : 'ride2',
-					76 + this.state.intent.energy * 48,
+					this.state.phrase % 4 === 1 ? "ride" : "ride2",
+					76 + this.state.intent.energy * 48
 				)
 			}
 			if (ridePassage && stepInBar === Math.max(1, this.state.stepsPerBar - 4)) {
-				addColour('rideBell', 92 + this.state.intent.tension * 55)
+				addColour("rideBell", 92 + this.state.intent.tension * 55)
 			}
 			// Rotate dry backbeat colours so rimshots, claves and snaps appear in
 			// every normal session without all three cluttering the same bar.
@@ -689,27 +695,37 @@ export class DrumArranger implements IDrumArranger {
 				stepInBar === Math.max(1, Math.floor(this.state.stepsPerBar / 4)) ||
 				stepInBar === Math.max(1, Math.floor((this.state.stepsPerBar * 3) / 4))
 			if (backbeat) {
-				const dryColours = ['rimshot', 'claves', 'fingerSnap', 'snareElectric']
+				const dryColours = ["rimshot", "claves", "fingerSnap", "snareElectric"]
 				addColour(
 					dryColours[wrap(this.state.bar, dryColours.length)],
-					82 + this.state.intent.energy * 58,
+					82 + this.state.intent.energy * 58
 				)
 			}
 			if (stepInBar === Math.max(1, Math.floor((this.state.stepsPerBar * 3) / 8))) {
-				addColour('hatPedal', 58 + this.state.intent.density * 42)
+				addColour("hatPedal", 58 + this.state.intent.density * 42)
 			}
 			// GM tom articulations form a compact phrase-end fill. The two novelty
 			// colours are deliberately much rarer than the time-keeping voices.
 			const stepsRemaining = phraseLengthValue - stepInPhrase
-			if (stepsRemaining === 3) addColour('tomFloorLow', 105 + this.state.intent.energy * 55)
-			if (stepsRemaining === 2) addColour('tomFloorHigh', 112 + this.state.intent.energy * 55)
-			if (stepsRemaining === 1) addColour('tomMidHigh', 120 + this.state.intent.energy * 60)
-			if (this.state.phrase % 4 === 3 && stepsRemaining === 2) addColour('vibraslap', 92)
-			if (this.state.phrase % 4 === 3 && stepsRemaining === 1) addColour('jingleBell', 84)
+			if (stepsRemaining === 3) {
+				addColour("tomFloorLow", 105 + this.state.intent.energy * 55)
+			}
+			if (stepsRemaining === 2) {
+				addColour("tomFloorHigh", 112 + this.state.intent.energy * 55)
+			}
+			if (stepsRemaining === 1) {
+				addColour("tomMidHigh", 120 + this.state.intent.energy * 60)
+			}
+			if (this.state.phrase % 4 === 3 && stepsRemaining === 2) {
+				addColour("vibraslap", 92)
+			}
+			if (this.state.phrase % 4 === 3 && stepsRemaining === 1) {
+				addColour("jingleBell", 84)
+			}
 		}
 		this.applyPerformanceTechnique(parts)
 		const phraseEndWindow =
-			phraseLengthValue - stepInPhrase <= (tempo.name === 'very-fast' ? 4 : 8)
+			phraseLengthValue - stepInPhrase <= (tempo.name === "very-fast" ? 4 : 8)
 		const presetTiming = this.selectedGroove?.timing
 		const presetSubdivisionStep =
 			presetTiming &&
@@ -723,9 +739,9 @@ export class DrumArranger implements IDrumArranger {
 					stepInPhrase,
 					bpm: this.state.bpm,
 					intent: this.state.intent,
-					style: presetSubdivisionStep ? presetTiming.style : 'auto',
+					style: presetSubdivisionStep ? presetTiming.style : "auto",
 					random: this.random,
-					stepDuration: context.stepDuration,
+					stepDuration: context.stepDuration
 				})
 			: []
 		this.state.lastParts = parts
@@ -735,7 +751,9 @@ export class DrumArranger implements IDrumArranger {
 	getBeatSequence(count = this.state.stepsPerBar) {
 		const beatCount = Math.max(1, Math.floor(count))
 		const cached = this.beatSequenceCache.get(beatCount)
-		if (cached) return cached
+		if (cached) {
+			return cached
+		}
 		const firstStep = Math.floor(Math.max(0, this.state.step) / beatCount) * beatCount
 		const sequence = Array.from({ length: beatCount }, (_, index) => {
 			const step = firstStep + index
@@ -745,9 +763,9 @@ export class DrumArranger implements IDrumArranger {
 					const velocity = cell?.sequence?.[wrap(step, cell.length)] ?? 0
 					return [
 						lane,
-						shouldKeepMutedHit(lane, step, velocity, this.state.intent) ? velocity : 0,
+						shouldKeepMutedHit(lane, step, velocity, this.state.intent) ? velocity : 0
 					]
-				}),
+				})
 			)
 			return step === this.state.step ? { ...beat, ...this.state.lastParts } : beat
 		})
@@ -786,9 +804,9 @@ export class DrumArranger implements IDrumArranger {
 		this.beatSequenceCache.clear()
 	}
 	setPerformancePreset(preset: DrumPerformancePreset) {
-		this.state.performancePreset = PERFORMANCE_PRESET_IDS.has(preset) ? preset : 'auto'
+		this.state.performancePreset = PERFORMANCE_PRESET_IDS.has(preset) ? preset : "auto"
 		const technique = this.setPerformanceTechnique(
-			this.state.performancePreset === 'auto' ? 'steady' : this.state.performancePreset,
+			this.state.performancePreset === "auto" ? "steady" : this.state.performancePreset
 		)
 		this.beatSequenceCache.clear()
 		return technique
@@ -798,7 +816,7 @@ export class DrumArranger implements IDrumArranger {
 			this.state.bpm = bpm
 		}
 	}
-	setMutedParts(mutes: Partial<Record<'kick' | 'snare' | 'hat' | 'clap', boolean>> = {}) {
+	setMutedParts(mutes: Partial<Record<"kick" | "snare" | "hat" | "clap", boolean>> = {}) {
 		this.state.intent.muteKick = !!mutes.kick
 		this.state.intent.muteSnare = !!mutes.snare
 		this.state.intent.muteHat = !!mutes.hat
@@ -826,7 +844,7 @@ export class DrumArranger implements IDrumArranger {
 			this.state.activityReserve > 0.02
 				? Math.max(
 						inputActivity,
-						this.state.intent.energy * Math.exp(-elapsed / releaseSeconds),
+						this.state.intent.energy * Math.exp(-elapsed / releaseSeconds)
 					)
 				: inputActivity
 		const reserveSeconds = reserveTarget > this.state.activityReserve ? 2 : 4
@@ -840,26 +858,26 @@ export class DrumArranger implements IDrumArranger {
 			density: clamp(0.25 + activity * 0.65),
 			tension,
 			fillChance: clamp(0.15 + activity * 0.6),
-			rollChance: clamp(0.08 + activity * 0.45),
+			rollChance: clamp(0.08 + activity * 0.45)
 		}
-		if (this.state.performancePreset === 'auto') {
+		if (this.state.performancePreset === "auto") {
 			const techniqueAge = this.state.step - this.state.techniqueStartedAtStep
 			if (activity <= 0.18) {
-				this.setPerformanceTechnique('breakdown')
+				this.setPerformanceTechnique("breakdown")
 			} else if (previousActivity <= 0.3 && activity >= 0.72) {
-				this.setPerformanceTechnique('drop')
+				this.setPerformanceTechnique("drop")
 			} else if (tension >= 0.72 && activity >= 0.5) {
-				this.setPerformanceTechnique('snare-roll')
+				this.setPerformanceTechnique("snare-roll")
 			} else if (tension >= 0.36) {
-				this.setPerformanceTechnique('bridge')
+				this.setPerformanceTechnique("bridge")
 			} else if (
 				activity > previousActivity + 0.06 ||
-				(this.state.performanceTechnique === 'crescendo' &&
+				(this.state.performanceTechnique === "crescendo" &&
 					techniqueAge < this.state.stepsPerBar)
 			) {
-				this.setPerformanceTechnique('crescendo')
+				this.setPerformanceTechnique("crescendo")
 			} else {
-				this.setPerformanceTechnique('steady')
+				this.setPerformanceTechnique("steady")
 			}
 		}
 		this.state.lastActivity = inputActivity

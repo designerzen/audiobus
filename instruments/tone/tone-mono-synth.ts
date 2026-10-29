@@ -5,19 +5,16 @@ import { linearToDb } from "../../conversion/linear-to-decibels.ts"
 
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
 
-const SILENCE = 0.00000000009
-
 /**
  * Tone.js MonoSynth Instrument
  * Monophonic synthesizer with glide/portamento capability
  * Lazy loads Tone.js library only when instantiated
  */
 export default class ToneMonoSynth implements IAudioOutput {
-
 	static ID: number = 0
 
 	options = {
-		title:"Tone.js MonoSynth Instrument",
+		title: "Tone.js MonoSynth Instrument",
 		// Default amplitude
 		gain: 0.2, // ratio 0-1
 		attack: 0.4, // in s
@@ -44,7 +41,7 @@ export default class ToneMonoSynth implements IAudioOutput {
 
 		// Tone.js MonoSynth specific
 		oscillator: {
-			type: "square"
+			type: "square" as const
 		},
 		envelope: {
 			attack: 0.4,
@@ -54,8 +51,8 @@ export default class ToneMonoSynth implements IAudioOutput {
 		},
 		filter: {
 			Q: 6,
-			type: "lowpass",
-			rolloff: -24
+			type: "lowpass" as const,
+			rolloff: -24 as const
 		},
 		filterEnvelope: {
 			attack: 0.2,
@@ -68,7 +65,7 @@ export default class ToneMonoSynth implements IAudioOutput {
 	#id = "ToneMonoSynth"
 	#uuid = this.#id + "-" + ToneMonoSynth.ID++
 
-	activeNote = null
+	activeNote: number | null = null
 	#synth: any
 	#audioContext: BaseAudioContext
 	#initialized = false
@@ -165,15 +162,16 @@ export default class ToneMonoSynth implements IAudioOutput {
 	}
 
 	private async ensureInitialized() {
-		if (this.#initialized) return
-		
+		if (this.#initialized) {
+			return
+		}
+
 		const Tone = await import("tone")
 		const { MonoSynth } = Tone
-		
+
 		// Tell Tone.js to use the shared AudioContext
 		Tone.setContext(this.#audioContext as any)
-		
-		
+
 		// Initialize Tone.js MonoSynth and connect to our gain node
 		this.#synth = new MonoSynth({
 			oscillator: this.options.oscillator,
@@ -182,10 +180,10 @@ export default class ToneMonoSynth implements IAudioOutput {
 			filterEnvelope: this.options.filterEnvelope,
 			volume: 0 // Tone volume is 0, use our gainNode instead
 		})
-		
+
 		// Connect the synth's output to our gain node for routing through the app's audio graph
 		this.#synth.connect(this.#gainNode)
-		
+
 		this.#initialized = true
 	}
 
@@ -217,14 +215,13 @@ export default class ToneMonoSynth implements IAudioOutput {
 	 * Note ON
 	 * @param {Number} noteNumber - MIDI note number
 	 * @param {Number} velocity - strength of the note (0-127)
-	 * @param {Array<Number>} arp - intervals (currently unused)
+	 * @param {Array<Number>} _arp - intervals (currently unused)
 	 * @param {Number} delay - number to pause before playing
 	 */
-	async noteOn(noteNumber: number, velocity: number = 127, arp = null, delay: number = 0) {
+	async noteOn(noteNumber: number, velocity: number = 127, _arp = null, _delay: number = 0) {
 		await this.ensureInitialized()
-		
+
 		const frequency = noteNumberToFrequency(noteNumber)
-		const startTime = this.now + delay
 		const amplitude = velocityToGain(velocity)
 
 		this.activeNote = noteNumber

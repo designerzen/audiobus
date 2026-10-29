@@ -1,5 +1,5 @@
 import type { DeviceClassification, DeviceAttribution } from "./device-classification.ts"
-import { AI_MODELS, type AIInputId } from './inputs/ai-model-catalogue'
+import { AI_MODELS, type AIInputId } from "./inputs/ai-model-catalogue"
 /**
  * Input Definitions
  *
@@ -13,7 +13,7 @@ import { AI_MODELS, type AIInputId } from './inputs/ai-model-catalogue'
 
 import { UI_INPUT_COMPONENTS } from "../ui/input-components.ts"
 import * as INPUT_TYPES from "./inputs/input-types.ts"
-import { MIDI_DEVICE_PROFILES, onMidiDeviceProfilesChanged } from '../midi/hardware/device-profiles'
+import { MIDI_DEVICE_PROFILES, onMidiDeviceProfilesChanged } from "../midi/hardware/device-profiles"
 
 export interface InputDefinition extends DeviceClassification {
 	attribution?: DeviceAttribution
@@ -25,46 +25,114 @@ export interface InputDefinition extends DeviceClassification {
 }
 
 export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
-    ...Object.fromEntries(Object.values(AI_MODELS).map(model => [model.id, {
-        id: model.id, name: model.name, description: model.description, attribution: model.attribution,
-        type: 'generator', subtype: 'ai', category: 'AI', icon: '/icons/input-prompt-ai.svg',
-    }])) as Record<AIInputId, InputDefinition>,
-    [INPUT_TYPES.STEP_SEQUENCER]: {
-        id: INPUT_TYPES.STEP_SEQUENCER, name: 'Step Sequencer', description: 'Edit a repeating sixteen-step melody or drum pattern on the shared transport',
-        type: 'generator', subtype: 'sequencer', category: 'Sequencing', icon: '/icons/preset-melodic-sequencer.svg',
-    },
-    [INPUT_TYPES.PADS]: {
-        id: INPUT_TYPES.PADS, name: 'Chord / Drum Pads', description: 'Eight accessible touch and keyboard pads for chords or drums',
-        type: 'controller', subtype: 'pads', category: 'UI', icon: '/icons/device-drums.svg',
-    },
-    [INPUT_TYPES.MICROPHONE_TRIGGER]: {
-        id: INPUT_TYPES.MICROPHONE_TRIGGER, name: 'Microphone Triggers', description: 'Turn claps and taps into notes using an adjustable amplitude threshold',
-        type: 'audio', subtype: 'trigger', category: 'Audio', icon: '/icons/device-microphone.svg',
-    },
-    [INPUT_TYPES.CAMERA_GESTURES]: {
-        id: INPUT_TYPES.CAMERA_GESTURES, name: 'Camera Gestures', description: 'Pinch to play and move your hand to select pitch; requires camera permission and model download',
-        type: 'controller', subtype: 'gesture', category: 'Gesture', icon: '/icons/input-leap-motion.svg',
-    },
-    [INPUT_TYPES.EVENT_LOOP]: {
-        id: INPUT_TYPES.EVENT_LOOP, name: 'Event Loop', description: 'Load a captured event loop and replay its notes and controllers through this chain',
-        type: 'generator', subtype: 'sequencer', category: 'Sequencing', icon: '/icons/transformer-midi-file-player.svg',
-    },
-    [INPUT_TYPES.OSC]: {
-        id: INPUT_TYPES.OSC, name: 'OSC Bridge', description: 'Receive notes and controllers from a binary OSC WebSocket bridge',
-        type: 'midi', subtype: 'device', category: 'Network', icon: '/icons/input-webmidi.svg',
-    },
-    ...Object.fromEntries(Object.entries(UI_INPUT_COMPONENTS).map(([id, component]) => [id, {
-        id, name: component.name, description: component.description, type: "controller",
-        subtype: component.subtype, category: "UI", icon: "/icons/input-onscreen-keyboard.svg",
-    }])),
-    [INPUT_TYPES.MIDI_FILE]: {
-        id: INPUT_TYPES.MIDI_FILE, name: 'MIDI File', description: 'Drop a MIDI file to load a tune for transport playback',
-        type: 'midi', subtype: 'device', category: 'MIDI', icon: '/icons/transformer-midi-file-player.svg',
-    },
-    ...Object.fromEntries(Object.entries(MIDI_DEVICE_PROFILES).map(([id, profile]) => [id, {
-        id, name: profile.name, description: profile.description,
-        type: 'midi', subtype: 'device', category: 'MIDI', icon: profile.icon ?? '/icons/input-webmidi.svg'
-    }])),
+	...(Object.fromEntries(
+		Object.values(AI_MODELS).map((model) => [
+			model.id,
+			{
+				id: model.id,
+				name: model.name,
+				description: model.description,
+				attribution: model.attribution,
+				type: "generator",
+				subtype: "ai",
+				category: "AI",
+				icon: "/icons/input-prompt-ai.svg"
+			}
+		])
+	) as Record<AIInputId, InputDefinition>),
+	[INPUT_TYPES.STEP_SEQUENCER]: {
+		id: INPUT_TYPES.STEP_SEQUENCER,
+		name: "Step Sequencer",
+		description: "Edit a repeating sixteen-step melody or drum pattern on the shared transport",
+		type: "generator",
+		subtype: "sequencer",
+		category: "Sequencing",
+		icon: "/icons/preset-melodic-sequencer.svg"
+	},
+	[INPUT_TYPES.PADS]: {
+		id: INPUT_TYPES.PADS,
+		name: "Chord / Drum Pads",
+		description: "Eight accessible touch and keyboard pads for chords or drums",
+		type: "controller",
+		subtype: "pads",
+		category: "UI",
+		icon: "/icons/device-drums.svg"
+	},
+	[INPUT_TYPES.MICROPHONE_TRIGGER]: {
+		id: INPUT_TYPES.MICROPHONE_TRIGGER,
+		name: "Microphone Triggers",
+		description: "Turn claps and taps into notes using an adjustable amplitude threshold",
+		type: "audio",
+		subtype: "trigger",
+		category: "Audio",
+		icon: "/icons/device-microphone.svg"
+	},
+	[INPUT_TYPES.CAMERA_GESTURES]: {
+		id: INPUT_TYPES.CAMERA_GESTURES,
+		name: "Camera Gestures",
+		description:
+			"Pinch to play and move your hand to select pitch; requires camera permission and model download",
+		type: "controller",
+		subtype: "gesture",
+		category: "Gesture",
+		icon: "/icons/input-leap-motion.svg"
+	},
+	[INPUT_TYPES.EVENT_LOOP]: {
+		id: INPUT_TYPES.EVENT_LOOP,
+		name: "Event Loop",
+		description:
+			"Load a captured event loop and replay its notes and controllers through this chain",
+		type: "generator",
+		subtype: "sequencer",
+		category: "Sequencing",
+		icon: "/icons/transformer-midi-file-player.svg"
+	},
+	[INPUT_TYPES.OSC]: {
+		id: INPUT_TYPES.OSC,
+		name: "OSC Bridge",
+		description: "Receive notes and controllers from a binary OSC WebSocket bridge",
+		type: "midi",
+		subtype: "device",
+		category: "Network",
+		icon: "/icons/input-webmidi.svg"
+	},
+	...Object.fromEntries(
+		Object.entries(UI_INPUT_COMPONENTS).map(([id, component]) => [
+			id,
+			{
+				id,
+				name: component.name,
+				description: component.description,
+				type: "controller",
+				subtype: component.subtype,
+				category: "UI",
+				icon: "/icons/input-onscreen-keyboard.svg"
+			}
+		])
+	),
+	[INPUT_TYPES.MIDI_FILE]: {
+		id: INPUT_TYPES.MIDI_FILE,
+		name: "MIDI File",
+		description: "Drop a MIDI file to load a tune for transport playback",
+		type: "midi",
+		subtype: "device",
+		category: "MIDI",
+		icon: "/icons/transformer-midi-file-player.svg"
+	},
+	...Object.fromEntries(
+		Object.entries(MIDI_DEVICE_PROFILES).map(([id, profile]) => [
+			id,
+			{
+				id,
+				name: profile.name,
+				description: profile.description,
+				type: "midi",
+				subtype: "device",
+				category: "MIDI",
+				icon: profile.icon ?? "/icons/input-webmidi.svg"
+			}
+		])
+	),
 	[INPUT_TYPES.KEYBOARD]: {
 		id: INPUT_TYPES.KEYBOARD,
 		type: "controller",
@@ -72,7 +140,7 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		name: "Keyboard",
 		description: "QWERTY keyboard input for playing notes",
 		icon: "/icons/input-keyboard.svg",
-		category: "Device",
+		category: "Device"
 	},
 
 	[INPUT_TYPES.GAMEPAD]: {
@@ -82,7 +150,7 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		name: "Gamepad",
 		description: "Game controller / joystick input",
 		icon: "/icons/input-gamepad.svg",
-		category: "Device",
+		category: "Device"
 	},
 
 	[INPUT_TYPES.GAMEPAD_MUSIC]: {
@@ -90,9 +158,10 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		type: "controller",
 		subtype: "gamepad",
 		name: "Gamepad Music Controller",
-		description: "Advanced gamepad input with multiple music modes: Chord, Melodic, Drum, Arpeggiator",
+		description:
+			"Advanced gamepad input with multiple music modes: Chord, Melodic, Drum, Arpeggiator",
 		icon: "/icons/input-gamepad-music.svg",
-		category: "Device",
+		category: "Device"
 	},
 
 	[INPUT_TYPES.WEBMIDI]: {
@@ -102,7 +171,7 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		name: "WebMIDI Device",
 		description: "MIDI input from external devices via WebMIDI API",
 		icon: "/icons/input-webmidi.svg",
-		category: "MIDI",
+		category: "MIDI"
 	},
 
 	[INPUT_TYPES.NATIVE_MIDI]: {
@@ -112,7 +181,7 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		name: "Native MIDI Device",
 		description: "MIDI input from external devices via native OS APIs (Windows/macOS/Linux)",
 		icon: "/icons/input-native-midi.svg",
-		category: "MIDI",
+		category: "MIDI"
 	},
 
 	[INPUT_TYPES.MIDI2_NATIVE]: {
@@ -120,9 +189,10 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		type: "midi",
 		subtype: "device",
 		name: "MIDI 2.0 Native",
-		description: "MIDI 2.0 input with per-note controllers via native OS MIDI (16-bit resolution, Windows/macOS/Linux)",
+		description:
+			"MIDI 2.0 input with per-note controllers via native OS MIDI (16-bit resolution, Windows/macOS/Linux)",
 		icon: "/icons/input-midi2-native.svg",
-		category: "MIDI",
+		category: "MIDI"
 	},
 
 	[INPUT_TYPES.BLE_MIDI]: {
@@ -132,7 +202,7 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		name: "BLE MIDI",
 		description: "Bluetooth MIDI input",
 		icon: "/icons/input-ble-midi.svg",
-		category: "MIDI",
+		category: "MIDI"
 	},
 
 	[INPUT_TYPES.MICROPHONE_FORMANT]: {
@@ -142,7 +212,7 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		name: "Microphone Formant",
 		description: "Microphone input for formant analysis",
 		icon: "/icons/input-microphone-formant.svg",
-		category: "Audio",
+		category: "Audio"
 	},
 
 	[INPUT_TYPES.LEAP_MOTION]: {
@@ -152,7 +222,7 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		name: "Leap Motion",
 		description: "Hand gesture tracking via Leap Motion device",
 		icon: "/icons/input-leap-motion.svg",
-		category: "Gesture",
+		category: "Gesture"
 	},
 
 	[INPUT_TYPES.ONSCREEN_KEYBOARD]: {
@@ -162,7 +232,7 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		name: "Onscreen Keyboard",
 		description: "Mouse-based virtual keyboard input",
 		icon: "/icons/input-onscreen-keyboard.svg",
-		category: "UI",
+		category: "UI"
 	},
 
 	[INPUT_TYPES.PROMPT_AI]: {
@@ -170,9 +240,10 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		type: "generator",
 		subtype: "ai",
 		name: "PromptAI Generator",
-		description: "Generate melodies, bass lines, drums and chords with built-in browser AI; no API key required",
+		description:
+			"Generate melodies, bass lines, drums and chords with built-in browser AI; no API key required",
 		icon: "/icons/input-prompt-ai.svg",
-		category: "AI",
+		category: "AI"
 	},
 
 	[INPUT_TYPES.PROMPT_AI_SPEECH]: {
@@ -180,9 +251,10 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		type: "generator",
 		subtype: "ai",
 		name: "PromptAI Speech",
-		description: "Speak a musical idea, then generate it with built-in browser AI; speech recognition may use an online service",
+		description:
+			"Speak a musical idea, then generate it with built-in browser AI; speech recognition may use an online service",
 		icon: "/icons/input-prompt-ai.svg",
-		category: "AI",
+		category: "AI"
 	},
 
 	[INPUT_TYPES.MIDI_TRANSPORT_CLOCK]: {
@@ -190,9 +262,10 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		type: "sync",
 		subtype: "clock",
 		name: "MIDI Transport Clock",
-		description: "MIDI transport clock input for timing synchronization (24 clocks per quarter note)",
+		description:
+			"MIDI transport clock input for timing synchronization (24 clocks per quarter note)",
 		icon: "/icons/input-midi-transport-clock.svg",
-		category: "Sync",
+		category: "Sync"
 	},
 
 	[INPUT_TYPES.MUSIC_MOUSE]: {
@@ -200,9 +273,10 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		type: "controller",
 		subtype: "pointer",
 		name: "Music Mouse",
-		description: "Cursor-controlled musical instrument inspired by Laurie Spiegel's classic Music Mouse",
+		description:
+			"Cursor-controlled musical instrument inspired by Laurie Spiegel's classic Music Mouse",
 		icon: "/icons/input-music-mouse.svg",
-		category: "UI",
+		category: "UI"
 	},
 
 	[INPUT_TYPES.MICROPHONE_PITCH]: {
@@ -210,9 +284,10 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		type: "audio",
 		subtype: "pitch",
 		name: "Microphone Pitch (ML)",
-		description: "Polyphonic pitch detection from microphone using Spotify's Basic Pitch neural network",
+		description:
+			"Polyphonic pitch detection from microphone using Spotify's Basic Pitch neural network",
 		icon: "/icons/input-microphone-pitch.svg",
-		category: "Audio",
+		category: "Audio"
 	},
 	[INPUT_TYPES.DVS_CONTROL_VINYL]: {
 		id: INPUT_TYPES.DVS_CONTROL_VINYL,
@@ -221,13 +296,21 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		name: "DVS Control Vinyl",
 		description: "Control vinyl clock input for relative playback speed",
 		icon: "/icons/input-default.svg",
-		category: "Sync",
-	},
+		category: "Sync"
+	}
 } satisfies Record<INPUT_TYPES.InputId, InputDefinition>
 onMidiDeviceProfilesChanged(() => {
-    for (const [id, profile] of Object.entries(MIDI_DEVICE_PROFILES)) INPUT_DEFINITIONS[id] = {
-        id, name: profile.name, description: profile.description, type: 'midi', subtype: 'device', category: 'MIDI', icon: profile.icon ?? '/icons/input-webmidi.svg'
-    }
+	for (const [id, profile] of Object.entries(MIDI_DEVICE_PROFILES)) {
+		INPUT_DEFINITIONS[id] = {
+			id,
+			name: profile.name,
+			description: profile.description,
+			type: "midi",
+			subtype: "device",
+			category: "MIDI",
+			icon: profile.icon ?? "/icons/input-webmidi.svg"
+		}
+	}
 })
 
 /**

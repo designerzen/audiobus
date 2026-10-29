@@ -1,10 +1,14 @@
 import { UI_INPUT_COMPONENTS } from "../ui/input-components.ts"
 import { INPUT_DEFINITIONS } from "./input-definitions.ts"
-import { browserAI } from './browser-ai'
-import { AI_MODELS } from './inputs/ai-model-catalogue'
+import { browserAI } from "./browser-ai"
+import { AI_MODELS } from "./inputs/ai-model-catalogue"
 import type { DeviceClassification, DeviceAttribution } from "./device-classification.ts"
-import { defineDevice } from './device-definition'
-import { MIDI_DEVICE_PROFILES, ensureMidiDeviceProfile, onMidiDeviceProfilesChanged } from '../midi/hardware/device-profiles'
+import { defineDevice } from "./device-definition"
+import {
+	MIDI_DEVICE_PROFILES,
+	ensureMidiDeviceProfile,
+	onMidiDeviceProfilesChanged
+} from "../midi/hardware/device-profiles"
 /**
  * Factory for creating audio input instances
  * Handles instantiation of available input types
@@ -22,19 +26,31 @@ export interface InputFactory extends DeviceClassification {
 }
 
 const loadSupportingLibrary = async (type: string) => {
-    if (Object.hasOwn(AI_MODELS, type)) return await import('./inputs/input-ai-music')
-    if (Object.hasOwn(UI_INPUT_COMPONENTS, type)) return await import("./inputs/input-web-component.ts")
-    if (Object.hasOwn(MIDI_DEVICE_PROFILES, type)) return await import('./inputs/input-profiled-midi-device')
+	if (Object.hasOwn(AI_MODELS, type)) {
+		return await import("./inputs/input-ai-music")
+	}
+	if (Object.hasOwn(UI_INPUT_COMPONENTS, type)) {
+		return await import("./inputs/input-web-component.ts")
+	}
+	if (Object.hasOwn(MIDI_DEVICE_PROFILES, type)) {
+		return await import("./inputs/input-profiled-midi-device")
+	}
 	// Create and return instance based on type
 	switch (type) {
-        case INPUT_TYPES.STEP_SEQUENCER: return await import('./inputs/input-step-sequencer')
-        case INPUT_TYPES.PADS: return await import('./inputs/input-pads')
-        case INPUT_TYPES.MICROPHONE_TRIGGER: return await import('./inputs/input-microphone-trigger')
-        case INPUT_TYPES.CAMERA_GESTURES: return await import('./inputs/input-camera-gestures')
-        case INPUT_TYPES.EVENT_LOOP: return await import('./inputs/input-event-loop')
-        case INPUT_TYPES.OSC: return await import('./inputs/input-osc')
+		case INPUT_TYPES.STEP_SEQUENCER:
+			return await import("./inputs/input-step-sequencer")
+		case INPUT_TYPES.PADS:
+			return await import("./inputs/input-pads")
+		case INPUT_TYPES.MICROPHONE_TRIGGER:
+			return await import("./inputs/input-microphone-trigger")
+		case INPUT_TYPES.CAMERA_GESTURES:
+			return await import("./inputs/input-camera-gestures")
+		case INPUT_TYPES.EVENT_LOOP:
+			return await import("./inputs/input-event-loop")
+		case INPUT_TYPES.OSC:
+			return await import("./inputs/input-osc")
 		case INPUT_TYPES.MIDI_FILE:
-			return await import('./inputs/input-midi-file')
+			return await import("./inputs/input-midi-file")
 		case INPUT_TYPES.KEYBOARD:
 			return await import("./inputs/input-keyboard.ts")
 		case INPUT_TYPES.GAMEPAD:
@@ -53,7 +69,7 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./inputs/input-microphone-formant.ts")
 		case INPUT_TYPES.LEAP_MOTION:
 			return await import("./inputs/input-leap-motion.ts")
-		case INPUT_TYPES.ONSCREEN_KEYBOARD: 
+		case INPUT_TYPES.ONSCREEN_KEYBOARD:
 			return await import("./inputs/input-onscreen-keyboard.ts")
 		case INPUT_TYPES.PROMPT_AI:
 			return await import("./inputs/input-prompt-ai.ts")
@@ -81,7 +97,6 @@ const loadSupportingLibrary = async (type: string) => {
  */
 const loadedLibraries = new Map<string, any>()
 const loadSupportingLibraries = async (type: string): Promise<any> => {
-
 	if (loadedLibraries.has(type)) {
 		return loadedLibraries.get(type)
 	}
@@ -89,7 +104,7 @@ const loadSupportingLibraries = async (type: string): Promise<any> => {
 	// Mark library as loaded
 	const libWrapper = await loadSupportingLibrary(type)
 	const lib = libWrapper.default
-	loadedLibraries.set( type, lib )
+	loadedLibraries.set(type, lib)
 	return lib
 }
 
@@ -99,12 +114,19 @@ const loadSupportingLibraries = async (type: string): Promise<any> => {
  * @param options Optional configuration for the input
  * @returns A new instance of the requested input type
  */
-const createInput = async (type: string, options={} ): Promise<IAudioInput> => {
+const createInput = async (type: string, options = {}): Promise<IAudioInput> => {
 	const Class = await loadSupportingLibraries(type)
-	return new Class(Object.hasOwn(MIDI_DEVICE_PROFILES, type) ? { ...options, profileId: type }
-        : Object.hasOwn(AI_MODELS, type) ? { ...options, modelId: type }
-        : Object.hasOwn(UI_INPUT_COMPONENTS, type) ? { ...options, component: type }
-        : type === INPUT_TYPES.WEBMIDI ? { autoConnect: true, ...options } : options)
+	return new Class(
+		Object.hasOwn(MIDI_DEVICE_PROFILES, type)
+			? { ...options, profileId: type }
+			: Object.hasOwn(AI_MODELS, type)
+				? { ...options, modelId: type }
+				: Object.hasOwn(UI_INPUT_COMPONENTS, type)
+					? { ...options, component: type }
+					: type === INPUT_TYPES.WEBMIDI
+						? { autoConnect: true, ...options }
+						: options
+	)
 }
 
 /**
@@ -114,35 +136,63 @@ const createInput = async (type: string, options={} ): Promise<IAudioInput> => {
  * then uses the loaded imports in future requests
  */
 export const INPUT_FACTORIES: InputFactory[] = [
-    ...Object.keys(AI_MODELS).map(id => ({
-        ...INPUT_DEFINITIONS[id], isAvailable: () => typeof Worker !== 'undefined',
-        create: (options?: Record<string, any>) => createInput(id, options),
-    })),
-    ...[INPUT_TYPES.STEP_SEQUENCER, INPUT_TYPES.PADS, INPUT_TYPES.EVENT_LOOP].map(id => ({
-        ...INPUT_DEFINITIONS[id], isAvailable: () => true, create: (options?: Record<string, any>) => createInput(id, options),
-    })),
-    { ...INPUT_DEFINITIONS[INPUT_TYPES.MICROPHONE_TRIGGER],
-        isAvailable: () => typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia && typeof AudioContext !== 'undefined',
-        create: options => createInput(INPUT_TYPES.MICROPHONE_TRIGGER, options) },
-    { ...INPUT_DEFINITIONS[INPUT_TYPES.CAMERA_GESTURES],
-        isAvailable: () => typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia && typeof Worker !== 'undefined' && typeof createImageBitmap === 'function' && typeof OffscreenCanvas !== 'undefined',
-        create: options => createInput(INPUT_TYPES.CAMERA_GESTURES, options) },
-    { ...INPUT_DEFINITIONS[INPUT_TYPES.OSC], isAvailable: () => typeof WebSocket !== 'undefined', create: options => createInput(INPUT_TYPES.OSC, options) },
-    ...Object.keys(UI_INPUT_COMPONENTS).map((id): InputFactory => ({
-        ...INPUT_DEFINITIONS[id],
-        isAvailable: () => typeof document !== "undefined" && typeof customElements !== "undefined",
-        create: options => createInput(id, options),
-    })),
-    {
-        ...INPUT_DEFINITIONS[INPUT_TYPES.MIDI_FILE],
-        isAvailable: () => true,
-        create: options => createInput(INPUT_TYPES.MIDI_FILE, options),
-    },
-    ...Object.entries(MIDI_DEVICE_PROFILES).map(([id, profile]): InputFactory => ({
-        id, name: profile.name, description: profile.description, type: 'midi', subtype: 'device',
-        isAvailable: () => typeof document !== 'undefined',
-        create: options => createInput(id, options)
-    })),
+	...Object.keys(AI_MODELS).map((id) => ({
+		...INPUT_DEFINITIONS[id],
+		isAvailable: () => typeof Worker !== "undefined",
+		create: (options?: Record<string, any>) => createInput(id, options)
+	})),
+	...[INPUT_TYPES.STEP_SEQUENCER, INPUT_TYPES.PADS, INPUT_TYPES.EVENT_LOOP].map((id) => ({
+		...INPUT_DEFINITIONS[id],
+		isAvailable: () => true,
+		create: (options?: Record<string, any>) => createInput(id, options)
+	})),
+	{
+		...INPUT_DEFINITIONS[INPUT_TYPES.MICROPHONE_TRIGGER],
+		isAvailable: () =>
+			typeof navigator !== "undefined" &&
+			!!navigator.mediaDevices?.getUserMedia &&
+			typeof AudioContext !== "undefined",
+		create: (options) => createInput(INPUT_TYPES.MICROPHONE_TRIGGER, options)
+	},
+	{
+		...INPUT_DEFINITIONS[INPUT_TYPES.CAMERA_GESTURES],
+		isAvailable: () =>
+			typeof navigator !== "undefined" &&
+			!!navigator.mediaDevices?.getUserMedia &&
+			typeof Worker !== "undefined" &&
+			typeof createImageBitmap === "function" &&
+			typeof OffscreenCanvas !== "undefined",
+		create: (options) => createInput(INPUT_TYPES.CAMERA_GESTURES, options)
+	},
+	{
+		...INPUT_DEFINITIONS[INPUT_TYPES.OSC],
+		isAvailable: () => typeof WebSocket !== "undefined",
+		create: (options) => createInput(INPUT_TYPES.OSC, options)
+	},
+	...Object.keys(UI_INPUT_COMPONENTS).map(
+		(id): InputFactory => ({
+			...INPUT_DEFINITIONS[id],
+			isAvailable: () =>
+				typeof document !== "undefined" && typeof customElements !== "undefined",
+			create: (options) => createInput(id, options)
+		})
+	),
+	{
+		...INPUT_DEFINITIONS[INPUT_TYPES.MIDI_FILE],
+		isAvailable: () => true,
+		create: (options) => createInput(INPUT_TYPES.MIDI_FILE, options)
+	},
+	...Object.entries(MIDI_DEVICE_PROFILES).map(
+		([id, profile]): InputFactory => ({
+			id,
+			name: profile.name,
+			description: profile.description,
+			type: "midi",
+			subtype: "device",
+			isAvailable: () => typeof document !== "undefined",
+			create: (options) => createInput(id, options)
+		})
+	),
 	{
 		id: INPUT_TYPES.KEYBOARD,
 		type: INPUT_DEFINITIONS[INPUT_TYPES.KEYBOARD].type,
@@ -166,7 +216,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		type: INPUT_DEFINITIONS[INPUT_TYPES.GAMEPAD_MUSIC].type,
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.GAMEPAD_MUSIC].subtype,
 		name: "Gamepad Music Controller",
-		description: "Advanced gamepad input with multiple music modes: Chord, Melodic, Drum, Arpeggiator",
+		description:
+			"Advanced gamepad input with multiple music modes: Chord, Melodic, Drum, Arpeggiator",
 		isAvailable: () => typeof navigator !== "undefined" && !!navigator.getGamepads,
 		create: (options) => createInput(INPUT_TYPES.GAMEPAD_MUSIC, options)
 	},
@@ -176,7 +227,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.WEBMIDI].subtype,
 		name: "WebMIDI Device",
 		description: "MIDI input from external devices via WebMIDI API",
-		isAvailable: () => typeof navigator !== "undefined" && !!(navigator as any).requestMIDIAccess,
+		isAvailable: () =>
+			typeof navigator !== "undefined" && !!(navigator as any).requestMIDIAccess,
 		create: (options) => createInput(INPUT_TYPES.WEBMIDI, options)
 	},
 	{
@@ -193,7 +245,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		type: INPUT_DEFINITIONS[INPUT_TYPES.MIDI2_NATIVE].type,
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.MIDI2_NATIVE].subtype,
 		name: "MIDI 2.0 Native",
-		description: "MIDI 2.0 input with per-note controllers via native OS MIDI (16-bit resolution, Windows/macOS/Linux)",
+		description:
+			"MIDI 2.0 input with per-note controllers via native OS MIDI (16-bit resolution, Windows/macOS/Linux)",
 		isAvailable: () => true, // Native MIDI available on all platforms
 		create: (options) => createInput(INPUT_TYPES.MIDI2_NATIVE, options)
 	},
@@ -204,7 +257,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		name: "BLE MIDI",
 		description: "Bluetooth MIDI input",
 		isAvailable: () => typeof navigator !== "undefined" && !!navigator.bluetooth,
-		create: (options) => createInput(INPUT_TYPES.BLE_MIDI, options),
+		create: (options) => createInput(INPUT_TYPES.BLE_MIDI, options)
 	},
 	{
 		id: INPUT_TYPES.MICROPHONE_FORMANT,
@@ -213,7 +266,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		name: "Microphone Formant",
 		description: "Microphone input for formant analysis",
 		isAvailable: () => typeof navigator !== "undefined" && !!navigator.mediaDevices,
-		create: (options) => createInput(INPUT_TYPES.MICROPHONE_FORMANT, options),
+		create: (options) => createInput(INPUT_TYPES.MICROPHONE_FORMANT, options)
 	},
 	{
 		id: INPUT_TYPES.LEAP_MOTION,
@@ -222,7 +275,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		name: "Leap Motion",
 		description: "Hand gesture tracking via Leap Motion device",
 		isAvailable: () => typeof window !== "undefined" && !!(window as any).Leap,
-		create: (options) => createInput(INPUT_TYPES.LEAP_MOTION, options),
+		create: (options) => createInput(INPUT_TYPES.LEAP_MOTION, options)
 	},
 	{
 		id: INPUT_TYPES.ONSCREEN_KEYBOARD,
@@ -231,70 +284,87 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		name: "Onscreen Keyboard",
 		description: "Mouse-based virtual keyboard input",
 		isAvailable: () => true,
-		create: (options) => createInput(INPUT_TYPES.ONSCREEN_KEYBOARD, options),
+		create: (options) => createInput(INPUT_TYPES.ONSCREEN_KEYBOARD, options)
 	},
 	{
 		id: INPUT_TYPES.PROMPT_AI,
 		type: INPUT_DEFINITIONS[INPUT_TYPES.PROMPT_AI].type,
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.PROMPT_AI].subtype,
 		name: "PromptAI Generator",
-		description: "Generate melodies, bass lines, drums and chords with built-in browser AI; no API key required",
+		description:
+			"Generate melodies, bass lines, drums and chords with built-in browser AI; no API key required",
 		isAvailable: () => !!browserAI(),
-		create: (options) => createInput(INPUT_TYPES.PROMPT_AI, options),
+		create: (options) => createInput(INPUT_TYPES.PROMPT_AI, options)
 	},
 	{
 		id: INPUT_TYPES.PROMPT_AI_SPEECH,
 		type: INPUT_DEFINITIONS[INPUT_TYPES.PROMPT_AI_SPEECH].type,
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.PROMPT_AI_SPEECH].subtype,
 		name: "PromptAI Speech",
-		description: "AI-powered input with speech recognition for generating note sequences via voice",
-		isAvailable: () => !!browserAI() && typeof window !== "undefined" && (!!(window as any).SpeechRecognition || !!(window as any).webkitSpeechRecognition),
-		create: (options) => createInput(INPUT_TYPES.PROMPT_AI_SPEECH, options),
+		description:
+			"AI-powered input with speech recognition for generating note sequences via voice",
+		isAvailable: () =>
+			!!browserAI() &&
+			typeof window !== "undefined" &&
+			(!!(window as any).SpeechRecognition || !!(window as any).webkitSpeechRecognition),
+		create: (options) => createInput(INPUT_TYPES.PROMPT_AI_SPEECH, options)
 	},
 	{
 		id: INPUT_TYPES.MIDI_TRANSPORT_CLOCK,
 		type: INPUT_DEFINITIONS[INPUT_TYPES.MIDI_TRANSPORT_CLOCK].type,
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.MIDI_TRANSPORT_CLOCK].subtype,
 		name: "MIDI Transport Clock",
-		description: "MIDI transport clock input for timing synchronization (24 clocks per quarter note)",
+		description:
+			"MIDI transport clock input for timing synchronization (24 clocks per quarter note)",
 		isAvailable: () => true, // Available on all platforms with MIDI support
-		create: (options) => createInput(INPUT_TYPES.MIDI_TRANSPORT_CLOCK, options),
+		create: (options) => createInput(INPUT_TYPES.MIDI_TRANSPORT_CLOCK, options)
 	},
 	{
 		id: INPUT_TYPES.MUSIC_MOUSE,
 		type: INPUT_DEFINITIONS[INPUT_TYPES.MUSIC_MOUSE].type,
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.MUSIC_MOUSE].subtype,
 		name: "Music Mouse",
-		description: "Cursor-controlled musical instrument inspired by Laurie Spiegel's classic Music Mouse",
+		description:
+			"Cursor-controlled musical instrument inspired by Laurie Spiegel's classic Music Mouse",
 		isAvailable: () => true,
-		create: (options) => createInput(INPUT_TYPES.MUSIC_MOUSE, options),
+		create: (options) => createInput(INPUT_TYPES.MUSIC_MOUSE, options)
 	},
 	{
 		id: INPUT_TYPES.MICROPHONE_PITCH,
 		type: INPUT_DEFINITIONS[INPUT_TYPES.MICROPHONE_PITCH].type,
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.MICROPHONE_PITCH].subtype,
 		name: "Microphone Pitch (ML)",
-		description: "Polyphonic pitch detection from microphone using Spotify's Basic Pitch neural network",
+		description:
+			"Polyphonic pitch detection from microphone using Spotify's Basic Pitch neural network",
 		isAvailable: () => typeof navigator !== "undefined" && !!navigator.mediaDevices,
-		create: (options) => createInput(INPUT_TYPES.MICROPHONE_PITCH, options),
+		create: (options) => createInput(INPUT_TYPES.MICROPHONE_PITCH, options)
 	},
 	{
 		id: INPUT_TYPES.DVS_CONTROL_VINYL,
 		type: INPUT_DEFINITIONS[INPUT_TYPES.DVS_CONTROL_VINYL].type,
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.DVS_CONTROL_VINYL].subtype,
 		name: "DVS Control Vinyl",
-		description: "Control vinyl pilot-tone clock - estimates relative speed and generates DVS_CLOCK or MIDI_CLOCK (no direction or absolute position decoding)",
+		description:
+			"Control vinyl pilot-tone clock - estimates relative speed and generates DVS_CLOCK or MIDI_CLOCK (no direction or absolute position decoding)",
 		isAvailable: () => typeof navigator !== "undefined" && !!navigator.mediaDevices,
-		create: (options) => createInput(INPUT_TYPES.DVS_CONTROL_VINYL, options),
-	},
+		create: (options) => createInput(INPUT_TYPES.DVS_CONTROL_VINYL, options)
+	}
 ]
 onMidiDeviceProfilesChanged(() => {
-    for (const [id, profile] of Object.entries(MIDI_DEVICE_PROFILES)) {
-        if (INPUT_FACTORIES.some(factory => factory.id === id)) continue
-        INPUT_FACTORIES.push({ id, name: profile.name, description: profile.description, type: 'midi', subtype: 'device',
-            isAvailable: () => typeof document !== 'undefined',
-            create: options => createInput(id, options) })
-    }
+	for (const [id, profile] of Object.entries(MIDI_DEVICE_PROFILES)) {
+		if (INPUT_FACTORIES.some((factory) => factory.id === id)) {
+			continue
+		}
+		INPUT_FACTORIES.push({
+			id,
+			name: profile.name,
+			description: profile.description,
+			type: "midi",
+			subtype: "device",
+			isAvailable: () => typeof document !== "undefined",
+			create: (options) => createInput(id, options)
+		})
+	}
 })
 
 /**
@@ -307,8 +377,13 @@ export function getAvailableInputFactories(): InputFactory[] {
 /**
  * Create an input instance by factory ID
  */
-export async function createInputById(id: string, options?: Record<string, any>): Promise<IAudioInput> {
-    if (!INPUT_FACTORIES.some(factory => factory.id === id)) await ensureMidiDeviceProfile(id)
+export async function createInputById(
+	id: string,
+	options?: Record<string, any>
+): Promise<IAudioInput> {
+	if (!INPUT_FACTORIES.some((factory) => factory.id === id)) {
+		await ensureMidiDeviceProfile(id)
+	}
 	const factory = INPUT_FACTORIES.find((f) => f.id === id)
 	if (!factory) {
 		throw new Error(`Input factory not found: ${id}`)
@@ -316,5 +391,5 @@ export async function createInputById(id: string, options?: Record<string, any>)
 	if (!factory.isAvailable()) {
 		throw new Error(`Input is not available: ${factory.name}`)
 	}
-	return defineDevice(await factory.create(options), { factory: 'input', type: id, options })
+	return defineDevice(await factory.create(options), { factory: "input", type: id, options })
 }

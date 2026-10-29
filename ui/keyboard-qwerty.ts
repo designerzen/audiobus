@@ -1,14 +1,31 @@
-import AbstractInteractive from './abstract-interactive.ts'
+import AbstractInteractive from "./abstract-interactive.ts"
 import {
-	EVENT_KEY_DOWN, EVENT_KEY_UP, EVENT_POINTER_DOWN, EVENT_POINTER_UP,
-	EVENT_POINTER_CANCEL, EVENT_LOST_POINTER_CAPTURE, EVENT_BLUR, EVENT_VISIBILITY_CHANGE,
-} from '../event-constants.ts'
+	EVENT_KEY_DOWN,
+	EVENT_KEY_UP,
+	EVENT_POINTER_DOWN,
+	EVENT_POINTER_UP,
+	EVENT_POINTER_CANCEL,
+	EVENT_LOST_POINTER_CAPTURE,
+	EVENT_BLUR,
+	EVENT_VISIBILITY_CHANGE
+} from "../event-constants.ts"
 
 const KEY_CODES: Record<string, string> = {
-	' ': 'Space', '`': 'Backquote', '-': 'Minus', '=': 'Equal',
-	'[': 'BracketLeft', ']': 'BracketRight', '\\': 'Backslash',
-	';': 'Semicolon', "'": 'Quote', ',': 'Comma', '.': 'Period', '/': 'Slash',
-	Shift: 'ShiftLeft', Control: 'ControlLeft', Alt: 'AltLeft',
+	" ": "Space",
+	"`": "Backquote",
+	"-": "Minus",
+	"=": "Equal",
+	"[": "BracketLeft",
+	"]": "BracketRight",
+	"\\": "Backslash",
+	";": "Semicolon",
+	"'": "Quote",
+	",": "Comma",
+	".": "Period",
+	"/": "Slash",
+	Shift: "ShiftLeft",
+	Control: "ControlLeft",
+	Alt: "AltLeft"
 }
 
 interface QwertyKeyInfo {
@@ -23,72 +40,72 @@ interface QwertyKeyInfo {
 
 const QWERTY_LAYOUT: QwertyKeyInfo[] = [
 	// Number row
-	{ keyCode: '`', display: '`', row: 0, col: 0, width: 1 },
-	{ keyCode: '1', display: '1', row: 0, col: 1, width: 1 },
-	{ keyCode: '2', display: '2', row: 0, col: 2, width: 1 },
-	{ keyCode: '3', display: '3', row: 0, col: 3, width: 1 },
-	{ keyCode: '4', display: '4', row: 0, col: 4, width: 1 },
-	{ keyCode: '5', display: '5', row: 0, col: 5, width: 1 },
-	{ keyCode: '6', display: '6', row: 0, col: 6, width: 1 },
-	{ keyCode: '7', display: '7', row: 0, col: 7, width: 1 },
-	{ keyCode: '8', display: '8', row: 0, col: 8, width: 1 },
-	{ keyCode: '9', display: '9', row: 0, col: 9, width: 1 },
-	{ keyCode: '0', display: '0', row: 0, col: 10, width: 1 },
-	{ keyCode: '-', display: '-', row: 0, col: 11, width: 1 },
-	{ keyCode: '=', display: '=', row: 0, col: 12, width: 1 },
-	{ keyCode: 'Backspace', display: 'Backspace', row: 0, col: 13, width: 2, special: true },
+	{ keyCode: "`", display: "`", row: 0, col: 0, width: 1 },
+	{ keyCode: "1", display: "1", row: 0, col: 1, width: 1 },
+	{ keyCode: "2", display: "2", row: 0, col: 2, width: 1 },
+	{ keyCode: "3", display: "3", row: 0, col: 3, width: 1 },
+	{ keyCode: "4", display: "4", row: 0, col: 4, width: 1 },
+	{ keyCode: "5", display: "5", row: 0, col: 5, width: 1 },
+	{ keyCode: "6", display: "6", row: 0, col: 6, width: 1 },
+	{ keyCode: "7", display: "7", row: 0, col: 7, width: 1 },
+	{ keyCode: "8", display: "8", row: 0, col: 8, width: 1 },
+	{ keyCode: "9", display: "9", row: 0, col: 9, width: 1 },
+	{ keyCode: "0", display: "0", row: 0, col: 10, width: 1 },
+	{ keyCode: "-", display: "-", row: 0, col: 11, width: 1 },
+	{ keyCode: "=", display: "=", row: 0, col: 12, width: 1 },
+	{ keyCode: "Backspace", display: "Backspace", row: 0, col: 13, width: 2, special: true },
 
 	// QWERTY row
-	{ keyCode: 'Tab', display: 'Tab', row: 1, col: 0, width: 1.5, special: true },
-	{ keyCode: 'q', display: 'Q', row: 1, col: 1.5, width: 1 },
-	{ keyCode: 'w', display: 'W', row: 1, col: 2.5, width: 1 },
-	{ keyCode: 'e', display: 'E', row: 1, col: 3.5, width: 1 },
-	{ keyCode: 'r', display: 'R', row: 1, col: 4.5, width: 1 },
-	{ keyCode: 't', display: 'T', row: 1, col: 5.5, width: 1 },
-	{ keyCode: 'y', display: 'Y', row: 1, col: 6.5, width: 1 },
-	{ keyCode: 'u', display: 'U', row: 1, col: 7.5, width: 1 },
-	{ keyCode: 'i', display: 'I', row: 1, col: 8.5, width: 1 },
-	{ keyCode: 'o', display: 'O', row: 1, col: 9.5, width: 1 },
-	{ keyCode: 'p', display: 'P', row: 1, col: 10.5, width: 1 },
-	{ keyCode: '[', display: '[', row: 1, col: 11.5, width: 1 },
-	{ keyCode: ']', display: ']', row: 1, col: 12.5, width: 1 },
-	{ keyCode: '\\', display: '\\', row: 1, col: 13.5, width: 1.5, special: true },
+	{ keyCode: "Tab", display: "Tab", row: 1, col: 0, width: 1.5, special: true },
+	{ keyCode: "q", display: "Q", row: 1, col: 1.5, width: 1 },
+	{ keyCode: "w", display: "W", row: 1, col: 2.5, width: 1 },
+	{ keyCode: "e", display: "E", row: 1, col: 3.5, width: 1 },
+	{ keyCode: "r", display: "R", row: 1, col: 4.5, width: 1 },
+	{ keyCode: "t", display: "T", row: 1, col: 5.5, width: 1 },
+	{ keyCode: "y", display: "Y", row: 1, col: 6.5, width: 1 },
+	{ keyCode: "u", display: "U", row: 1, col: 7.5, width: 1 },
+	{ keyCode: "i", display: "I", row: 1, col: 8.5, width: 1 },
+	{ keyCode: "o", display: "O", row: 1, col: 9.5, width: 1 },
+	{ keyCode: "p", display: "P", row: 1, col: 10.5, width: 1 },
+	{ keyCode: "[", display: "[", row: 1, col: 11.5, width: 1 },
+	{ keyCode: "]", display: "]", row: 1, col: 12.5, width: 1 },
+	{ keyCode: "\\", display: "\\", row: 1, col: 13.5, width: 1.5, special: true },
 
 	// ASDF row
-	{ keyCode: 'CapsLock', display: 'Caps', row: 2, col: 0, width: 1.8, special: true },
-	{ keyCode: 'a', display: 'A', row: 2, col: 1.8, width: 1 },
-	{ keyCode: 's', display: 'S', row: 2, col: 2.8, width: 1 },
-	{ keyCode: 'd', display: 'D', row: 2, col: 3.8, width: 1 },
-	{ keyCode: 'f', display: 'F', row: 2, col: 4.8, width: 1 },
-	{ keyCode: 'g', display: 'G', row: 2, col: 5.8, width: 1 },
-	{ keyCode: 'h', display: 'H', row: 2, col: 6.8, width: 1 },
-	{ keyCode: 'j', display: 'J', row: 2, col: 7.8, width: 1 },
-	{ keyCode: 'k', display: 'K', row: 2, col: 8.8, width: 1 },
-	{ keyCode: 'l', display: 'L', row: 2, col: 9.8, width: 1 },
-	{ keyCode: ';', display: ';', row: 2, col: 10.8, width: 1 },
+	{ keyCode: "CapsLock", display: "Caps", row: 2, col: 0, width: 1.8, special: true },
+	{ keyCode: "a", display: "A", row: 2, col: 1.8, width: 1 },
+	{ keyCode: "s", display: "S", row: 2, col: 2.8, width: 1 },
+	{ keyCode: "d", display: "D", row: 2, col: 3.8, width: 1 },
+	{ keyCode: "f", display: "F", row: 2, col: 4.8, width: 1 },
+	{ keyCode: "g", display: "G", row: 2, col: 5.8, width: 1 },
+	{ keyCode: "h", display: "H", row: 2, col: 6.8, width: 1 },
+	{ keyCode: "j", display: "J", row: 2, col: 7.8, width: 1 },
+	{ keyCode: "k", display: "K", row: 2, col: 8.8, width: 1 },
+	{ keyCode: "l", display: "L", row: 2, col: 9.8, width: 1 },
+	{ keyCode: ";", display: ";", row: 2, col: 10.8, width: 1 },
 	{ keyCode: "'", display: "'", row: 2, col: 11.8, width: 1 },
-	{ keyCode: 'Enter', display: 'Enter', row: 2, col: 12.8, width: 2.2, special: true },
+	{ keyCode: "Enter", display: "Enter", row: 2, col: 12.8, width: 2.2, special: true },
 
 	// ZXCV row
-	{ keyCode: 'Shift', display: 'Shift', row: 3, col: 0, width: 2.3, special: true },
-	{ keyCode: 'z', display: 'Z', row: 3, col: 2.3, width: 1 },
-	{ keyCode: 'x', display: 'X', row: 3, col: 3.3, width: 1 },
-	{ keyCode: 'c', display: 'C', row: 3, col: 4.3, width: 1 },
-	{ keyCode: 'v', display: 'V', row: 3, col: 5.3, width: 1 },
-	{ keyCode: 'b', display: 'B', row: 3, col: 6.3, width: 1 },
-	{ keyCode: 'n', display: 'N', row: 3, col: 7.3, width: 1 },
-	{ keyCode: 'm', display: 'M', row: 3, col: 8.3, width: 1 },
-	{ keyCode: ',', display: ',', row: 3, col: 9.3, width: 1 },
-	{ keyCode: '.', display: '.', row: 3, col: 10.3, width: 1 },
-	{ keyCode: '/', display: '/', row: 3, col: 11.3, width: 1 },
-	{ keyCode: 'Shift', display: 'Shift', row: 3, col: 12.3, width: 2.7, special: true },
+	{ keyCode: "Shift", display: "Shift", row: 3, col: 0, width: 2.3, special: true },
+	{ keyCode: "z", display: "Z", row: 3, col: 2.3, width: 1 },
+	{ keyCode: "x", display: "X", row: 3, col: 3.3, width: 1 },
+	{ keyCode: "c", display: "C", row: 3, col: 4.3, width: 1 },
+	{ keyCode: "v", display: "V", row: 3, col: 5.3, width: 1 },
+	{ keyCode: "b", display: "B", row: 3, col: 6.3, width: 1 },
+	{ keyCode: "n", display: "N", row: 3, col: 7.3, width: 1 },
+	{ keyCode: "m", display: "M", row: 3, col: 8.3, width: 1 },
+	{ keyCode: ",", display: ",", row: 3, col: 9.3, width: 1 },
+	{ keyCode: ".", display: ".", row: 3, col: 10.3, width: 1 },
+	{ keyCode: "/", display: "/", row: 3, col: 11.3, width: 1 },
+	{ keyCode: "Shift", display: "Shift", row: 3, col: 12.3, width: 2.7, special: true },
 
 	// Space row
-	{ keyCode: 'Control', display: 'Ctrl', row: 4, col: 0, width: 1.2, special: true },
-	{ keyCode: 'Alt', display: 'Alt', row: 4, col: 1.2, width: 1.2, special: true },
-	{ keyCode: ' ', display: 'Space', row: 4, col: 2.4, width: 5.2 },
-	{ keyCode: 'Alt', display: 'Alt', row: 4, col: 7.6, width: 1.2, special: true },
-	{ keyCode: 'Control', display: 'Ctrl', row: 4, col: 8.8, width: 1.2, special: true },
+	{ keyCode: "Control", display: "Ctrl", row: 4, col: 0, width: 1.2, special: true },
+	{ keyCode: "Alt", display: "Alt", row: 4, col: 1.2, width: 1.2, special: true },
+	{ keyCode: " ", display: "Space", row: 4, col: 2.4, width: 5.2 },
+	{ keyCode: "Alt", display: "Alt", row: 4, col: 7.6, width: 1.2, special: true },
+	{ keyCode: "Control", display: "Ctrl", row: 4, col: 8.8, width: 1.2, special: true }
 ]
 
 export default class QwertyKeyboard extends AbstractInteractive {
@@ -114,7 +131,7 @@ export default class QwertyKeyboard extends AbstractInteractive {
 	}
 
 	get description(): string {
-		return 'QWERTY Keyboard'
+		return "QWERTY Keyboard"
 	}
 
 	constructor() {
@@ -122,16 +139,16 @@ export default class QwertyKeyboard extends AbstractInteractive {
 		const { svg } = this.createKeyboard()
 
 		this.htmlElement = document.createDocumentFragment()
-		const keyboardElement = this.htmlElement.appendChild(document.createElement('div'))
-		keyboardElement.className = 'qwerty-keyboard'
-		keyboardElement.setAttribute('data-keyboard', 'qwerty')
+		const keyboardElement = this.htmlElement.appendChild(document.createElement("div"))
+		keyboardElement.className = "qwerty-keyboard"
+		keyboardElement.setAttribute("data-keyboard", "qwerty")
 		keyboardElement.tabIndex = -1
 		keyboardElement.innerHTML = svg
-		this.keyElements = Array.from(keyboardElement.querySelectorAll('.qwerty-key'))
+		this.keyElements = Array.from(keyboardElement.querySelectorAll(".qwerty-key"))
 
 		this.keyMap = new Map()
 		this.keyElements.forEach((value) => {
-			const keyCode = value.getAttribute('data-key-code')
+			const keyCode = value.getAttribute("data-key-code")
 			if (keyCode) {
 				this.keyMap.set(this.normalizeKeyCode(keyCode), value)
 			}
@@ -146,50 +163,87 @@ export default class QwertyKeyboard extends AbstractInteractive {
 		const pointers = new Map<number, string>()
 		const dispatch = (type: string, key: string) => {
 			const held = new Set(pointers.values())
-			window.dispatchEvent(new KeyboardEvent(type, {
-				key, code: KEY_CODES[key] ?? (/^[a-z]$/.test(key) ? `Key${key.toUpperCase()}` : /^[0-9]$/.test(key) ? `Digit${key}` : key),
-				bubbles: true, cancelable: true,
-				shiftKey: held.has('Shift'), ctrlKey: held.has('Control'), altKey: held.has('Alt'),
-			}))
+			window.dispatchEvent(
+				new KeyboardEvent(type, {
+					key,
+					code:
+						KEY_CODES[key] ??
+						(/^[a-z]$/.test(key)
+							? `Key${key.toUpperCase()}`
+							: /^[0-9]$/.test(key)
+								? `Digit${key}`
+								: key),
+					bubbles: true,
+					cancelable: true,
+					shiftKey: held.has("Shift"),
+					ctrlKey: held.has("Control"),
+					altKey: held.has("Alt")
+				})
+			)
 		}
 		const release = (id: number) => {
 			const key = pointers.get(id)
-			if (key === undefined) return
+			if (key === undefined) {
+				return
+			}
 			pointers.delete(id)
 			if (!Array.from(pointers.values()).includes(key)) {
 				this.setKeyAsInactive(key)
 				dispatch(EVENT_KEY_UP, key)
 			}
-			if (root.hasPointerCapture?.(id)) root.releasePointerCapture(id)
+			if (root.hasPointerCapture?.(id)) {
+				root.releasePointerCapture(id)
+			}
 		}
 		this.releasePointers = () => {
-			for (const id of Array.from(pointers.keys())) release(id)
-		}
-		root.addEventListener(EVENT_POINTER_DOWN, (event: PointerEvent) => {
-			const keyElement = event.target instanceof Element ? event.target.closest('.qwerty-key-group') : null
-			const key = keyElement?.getAttribute('data-key-code')
-			if (key == null || event.button !== 0 || pointers.has(event.pointerId)) return
-			event.preventDefault()
-			root.focus({ preventScroll: true })
-			const alreadyHeld = Array.from(pointers.values()).includes(key)
-			pointers.set(event.pointerId, key)
-			root.setPointerCapture?.(event.pointerId)
-			if (!alreadyHeld) {
-				this.setKeyAsActive(key)
-				dispatch(EVENT_KEY_DOWN, key)
+			for (const id of Array.from(pointers.keys())) {
+				release(id)
 			}
-		}, options)
+		}
+		root.addEventListener(
+			EVENT_POINTER_DOWN,
+			(event: PointerEvent) => {
+				const keyElement =
+					event.target instanceof Element
+						? event.target.closest(".qwerty-key-group")
+						: null
+				const key = keyElement?.getAttribute("data-key-code")
+				if (key == null || event.button !== 0 || pointers.has(event.pointerId)) {
+					return
+				}
+				event.preventDefault()
+				root.focus({ preventScroll: true })
+				const alreadyHeld = Array.from(pointers.values()).includes(key)
+				pointers.set(event.pointerId, key)
+				root.setPointerCapture?.(event.pointerId)
+				if (!alreadyHeld) {
+					this.setKeyAsActive(key)
+					dispatch(EVENT_KEY_DOWN, key)
+				}
+			},
+			options
+		)
 		const endPointer = (event: PointerEvent) => release(event.pointerId)
 		document.addEventListener(EVENT_POINTER_UP, endPointer, options)
 		document.addEventListener(EVENT_POINTER_CANCEL, endPointer, options)
 		root.addEventListener(EVENT_LOST_POINTER_CAPTURE, endPointer, options)
 		window.addEventListener(EVENT_BLUR, this.releasePointers, options)
-		document.addEventListener(EVENT_VISIBILITY_CHANGE, () => {
-			if (document.hidden) this.releasePointers()
-		}, options)
+		document.addEventListener(
+			EVENT_VISIBILITY_CHANGE,
+			() => {
+				if (document.hidden) {
+					this.releasePointers()
+				}
+			},
+			options
+		)
 	}
 
-	private createKeyboard(keySize: number = 40, keySpacing: number = 2, rowSpacing: number = 8): { svg: string } {
+	private createKeyboard(
+		keySize: number = 40,
+		keySpacing: number = 2,
+		rowSpacing: number = 8
+	): { svg: string } {
 		const rows: { [key: number]: QwertyKeyInfo[] } = {}
 
 		// Group keys by row
@@ -216,7 +270,8 @@ export default class QwertyKeyboard extends AbstractInteractive {
 		QWERTY_LAYOUT.forEach((key) => {
 			const x = 10 + key.col * (keySize + keySpacing)
 			const y = 10 + key.row * (keySize + rowSpacing)
-			const width = (key.width || 1) * keySize + (key.width ? (key.width - 1) * keySpacing : 0)
+			const width =
+				(key.width || 1) * keySize + (key.width ? (key.width - 1) * keySpacing : 0)
 
 			keyElements.push(this.createKey(key, x, y, width, keySize))
 		})
@@ -226,7 +281,7 @@ export default class QwertyKeyboard extends AbstractInteractive {
 					class="qwerty-keys" 
 					viewBox="0 0 ${totalWidth} ${totalHeight}" 
 					draggable="false">
-					${keyElements.join('')}
+					${keyElements.join("")}
 				</svg>`
 
 		return { svg }
@@ -235,17 +290,31 @@ export default class QwertyKeyboard extends AbstractInteractive {
 	private normalizeKeyCode(keyCode: string): string {
 		// Normalize key codes for matching
 		const lowerCode = keyCode.toLowerCase()
-		if (lowerCode === ' ') return ' '
-		if (lowerCode === 'control') return 'Control'
-		if (lowerCode === 'alt') return 'Alt'
-		if (lowerCode === 'shift') return 'Shift'
+		if (lowerCode === " ") {
+			return " "
+		}
+		if (lowerCode === "control") {
+			return "Control"
+		}
+		if (lowerCode === "alt") {
+			return "Alt"
+		}
+		if (lowerCode === "shift") {
+			return "Shift"
+		}
 		return lowerCode
 	}
 
-	private createKey(key: QwertyKeyInfo, x: number, y: number, width: number, height: number): string {
+	private createKey(
+		key: QwertyKeyInfo,
+		x: number,
+		y: number,
+		width: number,
+		height: number
+	): string {
 		const isSpecial = key.special || false
-		const fillColor = isSpecial ? '#555' : '#ccc'
-		const textColor = isSpecial ? '#fff' : '#000'
+		const fillColor = isSpecial ? "#555" : "#ccc"
+		const textColor = isSpecial ? "#fff" : "#000"
 
 		return `<g class="qwerty-key-group" data-key-code="${key.keyCode}">
 					<rect 
@@ -281,8 +350,11 @@ export default class QwertyKeyboard extends AbstractInteractive {
 	 */
 	setKeyAsActive(keyCode: string): void {
 		const normalizedKeyCode = this.normalizeKeyCode(keyCode)
-		for (const key of this.keyElements.filter(element => this.normalizeKeyCode(element.getAttribute('data-key-code')!) === normalizedKeyCode)) {
-			key.classList.add('active')
+		for (const key of this.keyElements.filter(
+			(element) =>
+				this.normalizeKeyCode(element.getAttribute("data-key-code")!) === normalizedKeyCode
+		)) {
+			key.classList.add("active")
 		}
 	}
 
@@ -292,8 +364,11 @@ export default class QwertyKeyboard extends AbstractInteractive {
 	 */
 	setKeyAsInactive(keyCode: string): void {
 		const normalizedKeyCode = this.normalizeKeyCode(keyCode)
-		for (const key of this.keyElements.filter(element => this.normalizeKeyCode(element.getAttribute('data-key-code')!) === normalizedKeyCode)) {
-			key.classList.remove('active')
+		for (const key of this.keyElements.filter(
+			(element) =>
+				this.normalizeKeyCode(element.getAttribute("data-key-code")!) === normalizedKeyCode
+		)) {
+			key.classList.remove("active")
 		}
 	}
 
@@ -302,9 +377,12 @@ export default class QwertyKeyboard extends AbstractInteractive {
 	 */
 	clearAllKeys(): void {
 		this.keyElements.forEach((element) => {
-			const rect = element instanceof SVGElement ? element : (element as any).querySelector('.qwerty-key')
+			const rect =
+				element instanceof SVGElement
+					? element
+					: (element as any).querySelector(".qwerty-key")
 			if (rect) {
-				rect.classList.remove('active')
+				rect.classList.remove("active")
 			}
 		})
 	}

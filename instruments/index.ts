@@ -4,40 +4,40 @@
  */
 
 export {
-  // Constants
-  INSTRUMENT_TYPE_SYNTH_OSCILLATOR,
-  INSTRUMENT_TYPE_TONE_SYNTH,
-  INSTRUMENT_TYPE_TONE_MONO_SYNTH,
-  INSTRUMENT_TYPE_TONE_FM_SYNTH,
-  INSTRUMENT_TYPE_TONE_PLUCK_STRING,
-  INSTRUMENT_TYPE_TONE_SAMPLER,
-  INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT,
-  INSTRUMENT_TYPE_WAM2,
-  INSTRUMENT_CATEGORY_WAM2,
-  INSTRUMENT_CATEGORY_OSCILLATOR,
-  INSTRUMENT_CATEGORY_SYNTHESIS,
-  INSTRUMENT_CATEGORY_FM,
-  INSTRUMENT_CATEGORY_PHYSICAL,
-  INSTRUMENT_CATEGORY_SAMPLING,
-  INSTRUMENT_CATEGORY_SUPERCOLLIDER,
-  EXTERNAL_DATA_KEY_SCSYNTH,
-  EXTERNAL_DATA_KEY_SAMPLE_URLS,
-  INSTRUMENTS,
-  // Types
-  type InstrumentMetadata,
-} from './instrument-types.ts'
+	// Constants
+	INSTRUMENT_TYPE_SYNTH_OSCILLATOR,
+	INSTRUMENT_TYPE_TONE_SYNTH,
+	INSTRUMENT_TYPE_TONE_MONO_SYNTH,
+	INSTRUMENT_TYPE_TONE_FM_SYNTH,
+	INSTRUMENT_TYPE_TONE_PLUCK_STRING,
+	INSTRUMENT_TYPE_TONE_SAMPLER,
+	INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT,
+	INSTRUMENT_TYPE_WAM2,
+	INSTRUMENT_CATEGORY_WAM2,
+	INSTRUMENT_CATEGORY_OSCILLATOR,
+	INSTRUMENT_CATEGORY_SYNTHESIS,
+	INSTRUMENT_CATEGORY_FM,
+	INSTRUMENT_CATEGORY_PHYSICAL,
+	INSTRUMENT_CATEGORY_SAMPLING,
+	INSTRUMENT_CATEGORY_SUPERCOLLIDER,
+	EXTERNAL_DATA_KEY_SCSYNTH,
+	EXTERNAL_DATA_KEY_SAMPLE_URLS,
+	INSTRUMENTS,
+	// Types
+	type InstrumentMetadata
+} from "./instrument-types.ts"
 
 export {
-  InstrumentFactory,
-  createInstrument,
-  getAvailableInstruments,
-  getInstrumentMetadata,
-} from './instrument-factory.ts'
+	InstrumentFactory,
+	createInstrument,
+	getAvailableInstruments,
+	getInstrumentMetadata
+} from "./instrument-factory.ts"
 
 export {
-  getAvailableInstrumentFactories,
-  getInstrumentFactoriesByCategory,
-  createInstrumentById,
-  getInstrumentCategories,
-  type InstrumentUIFactory,
-} from './instrument-factory-ui.ts'
+	getAvailableInstrumentFactories,
+	getInstrumentFactoriesByCategory,
+	createInstrumentById,
+	getInstrumentCategories,
+	type InstrumentUIFactory
+} from "./instrument-factory-ui.ts"

@@ -3,45 +3,25 @@
  * Reverb, delay, filters, and other signal processors
  */
 
-export { BT_PEQ, BT_BPF, cookBiquadVoxengo, createVoxengoBiquadFilter } from './biquad-voxengo.ts'
-export type { BiquadCoefficients, VoxengoBiquadType, VoxengoBiquadOptions } from './biquad-voxengo.ts'
+export { BT_PEQ, BT_BPF, cookBiquadVoxengo, createVoxengoBiquadFilter } from "./biquad-voxengo.ts"
+export type {
+	BiquadCoefficients,
+	VoxengoBiquadType,
+	VoxengoBiquadOptions
+} from "./biquad-voxengo.ts"
 
-export {
-  Effect,
-  AudioEffect,
-} from './effect.ts'
+export { Effect, AudioEffect } from "./effect.ts"
 
-export {
-  Reverb,
-  ReverbParams,
-} from './reverb.ts'
+export { Reverb, ReverbParams } from "./reverb.ts"
 
-export {
-  Delay,
-  DelayParams,
-} from './delay.ts'
+export { Delay, DelayParams } from "./delay.ts"
 
-export {
-  Distortion,
-  DistortionParams,
-} from './distortion.ts'
+export { Distortion, DistortionParams } from "./distortion.ts"
 
-export {
-  Compressor,
-  CompressorParams,
-} from './compressor.ts'
+export { Compressor, CompressorParams } from "./compressor.ts"
 
-export {
-  EQ,
-  EQBand,
-} from './eq.ts'
+export { EQ, EQBand } from "./eq.ts"
 
-export {
-  EffectFactory,
-  createEffect,
-  getAvailableEffects,
-} from './effect-factory.ts'
+export { EffectFactory, createEffect, getAvailableEffects } from "./effect-factory.ts"
 
-export {
-  EffectChain,
-} from './effect-chain.ts'
+export { EffectChain } from "./effect-chain.ts"

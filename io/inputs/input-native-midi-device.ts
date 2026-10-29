@@ -1,12 +1,21 @@
-import { EVENT_CONFIGURATION_CHANGED, EVENT_NOTEON, EVENT_NOTEOFF, EVENT_CONTROLCHANGE, EVENT_PITCHBEND, EVENT_PROGRAMCHANGE, EVENT_POLYAFTERTOUCH, EVENT_CHANNELAFTERTOUCH } from '../../event-constants.ts'
-import { midiToCommand } from '../../midi/midi-command-conversion.ts'
+import {
+	EVENT_CONFIGURATION_CHANGED,
+	EVENT_NOTEON,
+	EVENT_NOTEOFF,
+	EVENT_CONTROLCHANGE,
+	EVENT_PITCHBEND,
+	EVENT_PROGRAMCHANGE,
+	EVENT_POLYAFTERTOUCH,
+	EVENT_CHANNELAFTERTOUCH
+} from "../../event-constants.ts"
+import { midiToCommand } from "../../midi/midi-command-conversion.ts"
 /**
  * Native OS MIDI Device Input Adapter
  * Uses Windows MIDI Services, CoreMIDI (macOS), or ALSA (Linux)
  * Receives MIDI events from native OS MIDI APIs
  */
 
-import { acceptsMidiInput, createMidiInputControls } from './midi-input-controls.ts'
+import { acceptsMidiInput, createMidiInputControls } from "./midi-input-controls.ts"
 import AbstractInput from "./abstract-input.ts"
 import type { IAudioInput } from "./input-interface.ts"
 import { ALL_MIDI_CHANNELS } from "../../midi/midi-channels.ts"
@@ -22,23 +31,23 @@ let nativeMIDI: any = null
 
 // Try to load native MIDI module (dynamically loaded in constructor)
 async function loadNativeMIDI(): Promise<any> {
-	if (nativeMIDI !== null){ 
+	if (nativeMIDI !== null) {
 		return nativeMIDI
 	}
-		
+
 	// Native module only available in Electron/Node.js, not in browser
-	if (typeof window !== 'undefined') {
-		console.warn('[OutputMIDI2Native] Native MIDI module not available in browser environment')
+	if (typeof window !== "undefined") {
+		console.warn("[OutputMIDI2Native] Native MIDI module not available in browser environment")
 		return null
 	}
 
 	try {
 		// Use import() for ES modules compatibility
-		const mod = await import('../../../build/Release/midi2-native.node' as any)
+		const mod = await import("../../../build/Release/midi2-native.node" as any)
 		nativeMIDI = mod
 		return nativeMIDI
 	} catch (e) {
-		console.warn('[InputNativeMIDIDevice] Native MIDI module not available:', e)
+		console.warn("[InputNativeMIDIDevice] Native MIDI module not available:", e)
 		return null
 	}
 }
@@ -49,7 +58,6 @@ const DEFAULT_OPTIONS = {
 }
 
 export default class InputNativeMIDIDevice extends AbstractInput implements IAudioInput {
-	
 	#devices: NativeDevice[] = []
 	#gui?: ReturnType<typeof createMidiInputControls>
 	#activeDevices: Set<number> = new Set()
@@ -76,23 +84,33 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 		super({ ...DEFAULT_OPTIONS, ...options })
 	}
 
-    async createGui(): Promise<HTMLElement> {
-        if (!this.#gui) this.#gui = createMidiInputControls(this.options,
-            () => this.#devices.map(device => ({ id: String(device.index), name: device.name })),
-            () => this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED)))
-        return this.#gui.element
-    }
+	async createGui(): Promise<HTMLElement> {
+		if (!this.#gui) {
+			this.#gui = createMidiInputControls(
+				this.options,
+				() =>
+					this.#devices.map((device) => ({
+						id: String(device.index),
+						name: device.name
+					})),
+				() => this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
+			)
+		}
+		return this.#gui.element
+	}
 
-    async destroyGui(): Promise<void> {
-        this.#gui?.destroy()
-        this.#gui = undefined
-    }
+	async destroyGui(): Promise<void> {
+		this.#gui?.destroy()
+		this.#gui = undefined
+	}
 
 	/**
 	 * Initialize and enumerate available MIDI input devices
 	 */
 	async connect(): Promise<void> {
-		if (this.#nativeMIDIEnabled) return
+		if (this.#nativeMIDIEnabled) {
+			return
+		}
 		// Load native module if not already loaded
 		if (nativeMIDI === null) {
 			await loadNativeMIDI()
@@ -100,16 +118,16 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 
 		if (!nativeMIDI) {
 			this.setAsDisconnected()
-			throw new Error('[InputNativeMIDIDevice] Native MIDI module not available')
+			throw new Error("[InputNativeMIDIDevice] Native MIDI module not available")
 		}
 
 		try {
 			this.#devices = nativeMIDI.getUmpInputs()
 			this.#gui?.refresh()
-			console.log('[InputNativeMIDIDevice] Available MIDI inputs:', this.#devices)
+			console.log("[InputNativeMIDIDevice] Available MIDI inputs:", this.#devices)
 
 			if (this.#devices.length === 0) {
-				console.warn('[InputNativeMIDIDevice] No MIDI input devices found')
+				console.warn("[InputNativeMIDIDevice] No MIDI input devices found")
 				this.setAsConnected()
 				this.#nativeMIDIEnabled = true
 				return
@@ -122,10 +140,14 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 
 			this.setAsConnected()
 			this.#nativeMIDIEnabled = true
-			console.info('[InputNativeMIDIDevice] Connected to', this.#devices.length, 'MIDI input device(s)')
+			console.info(
+				"[InputNativeMIDIDevice] Connected to",
+				this.#devices.length,
+				"MIDI input device(s)"
+			)
 		} catch (error) {
 			this.setAsDisconnected()
-			console.error('[InputNativeMIDIDevice] Failed to connect:', error)
+			console.error("[InputNativeMIDIDevice] Failed to connect:", error)
 			throw error
 		}
 	}
@@ -147,10 +169,16 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 	 * Start listening to a specific MIDI device
 	 */
 	async #listenToDevice(deviceIndex: number): Promise<void> {
-		if (!nativeMIDI) return
+		if (!nativeMIDI) {
+			return
+		}
 
 		const listener = (inDeviceIndex: number, umpPacket: number) => {
-			if (this.#nativeMIDIEnabled && this.#listeners.get(deviceIndex) === listener && inDeviceIndex === deviceIndex) {
+			if (
+				this.#nativeMIDIEnabled &&
+				this.#listeners.get(deviceIndex) === listener &&
+				inDeviceIndex === deviceIndex
+			) {
 				this.#handleUmpPacket(deviceIndex, umpPacket)
 			}
 		}
@@ -159,9 +187,9 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 			this.#listeners.set(deviceIndex, listener)
 			this.#activeDevices.add(deviceIndex)
 			nativeMIDI.onUmpInput(listener)
-			console.info('[InputNativeMIDIDevice] Listening to device', deviceIndex)
+			console.info("[InputNativeMIDIDevice] Listening to device", deviceIndex)
 		} catch (error) {
-			console.error('[InputNativeMIDIDevice] Error listening to device:', error)
+			console.error("[InputNativeMIDIDevice] Error listening to device:", error)
 		}
 	}
 
@@ -169,13 +197,15 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 	 * Stop listening to a specific MIDI device
 	 */
 	#stopListeningToDevice(deviceIndex: number): void {
-		if (!nativeMIDI) return
+		if (!nativeMIDI) {
+			return
+		}
 
 		try {
 			this.#listeners.delete(deviceIndex)
-			console.info('[InputNativeMIDIDevice] Stopped listening to device', deviceIndex)
+			console.info("[InputNativeMIDIDevice] Stopped listening to device", deviceIndex)
 		} catch (error) {
-			console.error('[InputNativeMIDIDevice] Error stopping listener:', error)
+			console.error("[InputNativeMIDIDevice] Error stopping listener:", error)
 		}
 	}
 
@@ -183,14 +213,18 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 	 * Handle incoming UMP packet
 	 */
 	#handleUmpPacket(deviceIndex: number, packet: number): void {
-		const status = packet & 0xFF
-		const data1 = (packet >> 8) & 0xFF
-		const data2 = (packet >> 16) & 0xFF
-		const channel = status < 0xf0 ? (status & 0x0F) + 1 : 0
-		if (!acceptsMidiInput(this.options, String(deviceIndex), channel)) return
+		const status = packet & 0xff
+		const data1 = (packet >> 8) & 0xff
+		const data2 = (packet >> 16) & 0xff
+		const channel = status < 0xf0 ? (status & 0x0f) + 1 : 0
+		if (!acceptsMidiInput(this.options, String(deviceIndex), channel)) {
+			return
+		}
 
-        const audioCommand = midiToCommand([status, data1, data2], this.now, String(deviceIndex))
-        if (audioCommand) this.dispatch(audioCommand)
+		const audioCommand = midiToCommand([status, data1, data2], this.now, String(deviceIndex))
+		if (audioCommand) {
+			this.dispatch(audioCommand)
+		}
 
 		const command = status >> 4
 
@@ -215,7 +249,7 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 				})
 				break
 
-			case 0xB: // Control Change
+			case 0xb: // Control Change
 				this.emit(EVENT_CONTROLCHANGE, {
 					controller: data1,
 					value: data2,
@@ -225,7 +259,7 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 				})
 				break
 
-			case 0xE: // Pitch Bend
+			case 0xe: // Pitch Bend
 				this.emit(EVENT_PITCHBEND, {
 					value: (data2 << 7) | data1,
 					channel,
@@ -234,7 +268,7 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 				})
 				break
 
-			case 0xC: // Program Change
+			case 0xc: // Program Change
 				this.emit(EVENT_PROGRAMCHANGE, {
 					program: data1,
 					channel,
@@ -243,7 +277,7 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 				})
 				break
 
-			case 0xA: // Polyphonic Aftertouch
+			case 0xa: // Polyphonic Aftertouch
 				this.emit(EVENT_POLYAFTERTOUCH, {
 					note: data1,
 					pressure: data2,
@@ -253,7 +287,7 @@ export default class InputNativeMIDIDevice extends AbstractInput implements IAud
 				})
 				break
 
-			case 0xD: // Channel Aftertouch
+			case 0xd: // Channel Aftertouch
 				this.emit(EVENT_CHANNELAFTERTOUCH, {
 					pressure: data1,
 					channel,

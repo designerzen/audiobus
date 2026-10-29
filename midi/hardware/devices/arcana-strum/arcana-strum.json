@@ -1,159 +1,155 @@
 {
-  "name": "Arcana Strum",
-  "manufacturer": "Arcana Instruments",
-  "description": "Adaptive guitar controller with a strum handle and five-key or three-key playing.",
-  "ids": [
-    "arcana-strum"
-  ],
-  "portNames": [
-    "Arcana Strum"
-  ],
-  "icon": "icon.svg",
-  "documentation": [
-    {
-      "title": "Arcana support and playing guides",
-      "url": "https://arcanainstruments.com/support/"
-    },
-    {
-      "title": "Advanced features",
-      "url": "https://arcanainstruments.com/wp-content/uploads/Advanced-features.pdf"
-    }
-  ],
-  "abilities": [
-    "Strumming",
-    "Melody and harmony",
-    "Septachords",
-    "Transpose",
-    "Dynamics",
-    "Three-key and five-key layouts"
-  ],
-  "hardwareControls": [
-    "Melody / harmony",
-    "Septachords",
-    "Transpose down / up",
-    "Note duration",
-    "Dynamics",
-    "Skill 1 / 2",
-    "Left-handed playing",
-    "Three-key / five-key layout"
-  ],
-  "notice": "The published Arcana guides do not specify CC or SysEx assignments. Use the instrument's physical controls to change its settings; incoming MIDI is passed through unchanged. Configurable surface controls use virtual defaults; match your hardware preset with MIDI learn or edit note/CC/channel mappings. Keyboard surfaces start at MIDI note 48.",
-  "controls": [],
-  "modes": [],
-  "schemaVersion": 1,
-  "gui": {
-    "type": "column",
-    "gap": "0.65rem",
-    "children": [
-      {
-        "type": "status"
-      },
-      {
-        "type": "image",
-        "alt": "Arcana Strum instrument controls",
-        "src": "panel.svg"
-      },
-      {
-        "type": "notes"
-      },
-      {
-        "type": "channel"
-      },
-      {
-        "type": "guide",
-        "label": "Instrument controls and guide"
-      }
-    ]
-  },
-  "$schema": "../profile.schema.json",
-  "id": "arcana-strum",
-  "manufacturerUrl": "https://arcanainstruments.com/",
-  "productUrl": "https://arcanainstruments.com/product/arcana-instrument/",
-  "surface": {
-    "src": "panel.svg",
-    "width": 480,
-    "height": 200,
-    "elements": [
-      {
-        "id": "strum-key-1",
-        "label": "Playing key 1",
-        "kind": "key",
-        "position": {
-          "x": 9.5833,
-          "y": 30.0,
-          "width": 8.3333,
-          "height": 40.0
-        },
-        "message": {
-          "type": "note",
-          "number": 60
-        },
-        "learnable": true
-      },
-      {
-        "id": "strum-key-2",
-        "label": "Playing key 2",
-        "kind": "key",
-        "position": {
-          "x": 20.8333,
-          "y": 30.0,
-          "width": 8.3333,
-          "height": 40.0
-        },
-        "message": {
-          "type": "note",
-          "number": 62
-        },
-        "learnable": true
-      },
-      {
-        "id": "strum-key-3",
-        "label": "Playing key 3",
-        "kind": "key",
-        "position": {
-          "x": 32.0833,
-          "y": 30.0,
-          "width": 8.3333,
-          "height": 40.0
-        },
-        "message": {
-          "type": "note",
-          "number": 64
-        },
-        "learnable": true
-      },
-      {
-        "id": "strum-key-4",
-        "label": "Playing key 4",
-        "kind": "key",
-        "position": {
-          "x": 43.3333,
-          "y": 30.0,
-          "width": 8.3333,
-          "height": 40.0
-        },
-        "message": {
-          "type": "note",
-          "number": 65
-        },
-        "learnable": true
-      },
-      {
-        "id": "strum-key-5",
-        "label": "Playing key 5",
-        "kind": "key",
-        "position": {
-          "x": 54.5833,
-          "y": 30.0,
-          "width": 8.3333,
-          "height": 40.0
-        },
-        "message": {
-          "type": "note",
-          "number": 67
-        },
-        "learnable": true
-      }
-    ]
-  }
+	"name": "Arcana Strum",
+	"manufacturer": "Arcana Instruments",
+	"description": "Adaptive guitar controller with a strum handle and five-key or three-key playing.",
+	"ids": ["arcana-strum"],
+	"portNames": ["Arcana Strum"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Arcana support and playing guides",
+			"url": "https://arcanainstruments.com/support/"
+		},
+		{
+			"title": "Advanced features",
+			"url": "https://arcanainstruments.com/wp-content/uploads/Advanced-features.pdf"
+		}
+	],
+	"abilities": [
+		"Strumming",
+		"Melody and harmony",
+		"Septachords",
+		"Transpose",
+		"Dynamics",
+		"Three-key and five-key layouts"
+	],
+	"hardwareControls": [
+		"Melody / harmony",
+		"Septachords",
+		"Transpose down / up",
+		"Note duration",
+		"Dynamics",
+		"Skill 1 / 2",
+		"Left-handed playing",
+		"Three-key / five-key layout"
+	],
+	"notice": "The published Arcana guides do not specify CC or SysEx assignments. Use the instrument's physical controls to change its settings; incoming MIDI is passed through unchanged. Configurable surface controls use virtual defaults; match your hardware preset with MIDI learn or edit note/CC/channel mappings. Keyboard surfaces start at MIDI note 48.",
+	"controls": [],
+	"modes": [],
+	"schemaVersion": 1,
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"alt": "Arcana Strum instrument controls",
+				"src": "panel.svg"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "guide",
+				"label": "Instrument controls and guide"
+			}
+		]
+	},
+	"$schema": "../profile.schema.json",
+	"id": "arcana-strum",
+	"manufacturerUrl": "https://arcanainstruments.com/",
+	"productUrl": "https://arcanainstruments.com/product/arcana-instrument/",
+	"surface": {
+		"src": "panel.svg",
+		"width": 480,
+		"height": 200,
+		"elements": [
+			{
+				"id": "strum-key-1",
+				"label": "Playing key 1",
+				"kind": "key",
+				"position": {
+					"x": 9.5833,
+					"y": 30.0,
+					"width": 8.3333,
+					"height": 40.0
+				},
+				"message": {
+					"type": "note",
+					"number": 60
+				},
+				"learnable": true
+			},
+			{
+				"id": "strum-key-2",
+				"label": "Playing key 2",
+				"kind": "key",
+				"position": {
+					"x": 20.8333,
+					"y": 30.0,
+					"width": 8.3333,
+					"height": 40.0
+				},
+				"message": {
+					"type": "note",
+					"number": 62
+				},
+				"learnable": true
+			},
+			{
+				"id": "strum-key-3",
+				"label": "Playing key 3",
+				"kind": "key",
+				"position": {
+					"x": 32.0833,
+					"y": 30.0,
+					"width": 8.3333,
+					"height": 40.0
+				},
+				"message": {
+					"type": "note",
+					"number": 64
+				},
+				"learnable": true
+			},
+			{
+				"id": "strum-key-4",
+				"label": "Playing key 4",
+				"kind": "key",
+				"position": {
+					"x": 43.3333,
+					"y": 30.0,
+					"width": 8.3333,
+					"height": 40.0
+				},
+				"message": {
+					"type": "note",
+					"number": 65
+				},
+				"learnable": true
+			},
+			{
+				"id": "strum-key-5",
+				"label": "Playing key 5",
+				"kind": "key",
+				"position": {
+					"x": 54.5833,
+					"y": 30.0,
+					"width": 8.3333,
+					"height": 40.0
+				},
+				"message": {
+					"type": "note",
+					"number": 67
+				},
+				"learnable": true
+			}
+		]
+	}
 }

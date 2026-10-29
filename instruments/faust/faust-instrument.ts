@@ -12,7 +12,7 @@
  */
 
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
-import type { FAUSTDSPModule, FAUSTDSPInstance, FAUSTParameter } from "./faust-types.ts"
+import type { FAUSTDSPModule } from "./faust-types.ts"
 import { faustRegistry, initializeFAUSTRegistry } from "./faust-registry.ts"
 
 const POLYPHONIC_VOICES = 16
@@ -24,18 +24,15 @@ export default class FAUSTInstrument implements IAudioOutput {
 	#uuid: string = "FAUST-Instrument-" + FAUSTInstrument.ID++
 	#audioContext: AudioContext | null = null
 	#activeNotes: Map<number, FAUSTVoice> = new Map() // noteNumber -> voice
-	#isInitialized: boolean = false
 	#isConnected: boolean = false
 	#registryInitialized: boolean = false
 
 	// FAUST module state
 	#currentModule: FAUSTDSPModule | null = null
-	#dspInstances: FAUSTDSPInstance[] = []
 	#availableVoices: FAUSTVoice[] = []
-	#audioNode: AudioWorkletNode | null = null
 	#scriptProcessor: ScriptProcessorNode | null = null
 
-	constructor(audioContext: BaseAudioContext, defaultModuleId: string | null = null) {
+	constructor(audioContext: BaseAudioContext, _defaultModuleId: string | null = null) {
 		this.#audioContext = audioContext as AudioContext
 	}
 
@@ -114,7 +111,6 @@ export default class FAUSTInstrument implements IAudioOutput {
 			this.#scriptProcessor.onaudioprocess = null
 		}
 
-		this.#dspInstances = []
 		this.#activeNotes.clear()
 		this.#availableVoices = []
 		this.#isConnected = false
@@ -135,8 +131,7 @@ export default class FAUSTInstrument implements IAudioOutput {
 
 			// Load the WASM module
 			const response = await fetch(module.url)
-			const arrayBuffer = await response.arrayBuffer()
-			const wasmModule = await WebAssembly.instantiate(arrayBuffer)
+			await response.arrayBuffer()
 
 			// Store module info
 			this.#currentModule = module
@@ -200,7 +195,10 @@ export default class FAUSTInstrument implements IAudioOutput {
 			voice.release()
 		})
 		this.#activeNotes.clear()
-		this.#availableVoices = Array.from({ length: POLYPHONIC_VOICES }, (_, i) => new FAUSTVoice(i))
+		this.#availableVoices = Array.from(
+			{ length: POLYPHONIC_VOICES },
+			(_, i) => new FAUSTVoice(i)
+		)
 	}
 
 	/**
@@ -255,9 +253,7 @@ export default class FAUSTInstrument implements IAudioOutput {
  * Represents a single polyphonic voice
  */
 class FAUSTVoice {
-	private voiceIndex: number
-	private note: number = -1
-	private velocity: number = 0
+	public note: number = -1
 	private isActive: boolean = false
 	private phase: number = 0
 	private amplitude: number = 0
@@ -273,16 +269,13 @@ class FAUSTVoice {
 	private decayTime: number = 0.1
 	private sustainLevel: number = 0.7
 
-	constructor(voiceIndex: number) {
-		this.voiceIndex = voiceIndex
-	}
+	constructor(_voiceIndex: number) {}
 
 	/**
 	 * Attack a note
 	 */
 	attack(note: number, velocity: number): void {
 		this.note = note
-		this.velocity = velocity
 		this.isActive = true
 		this.envelopeStage = "attack"
 		this.envelopeTime = 0
@@ -304,7 +297,7 @@ class FAUSTVoice {
 	/**
 	 * Set a parameter value
 	 */
-	setParameter(paramName: string, value: number): void {
+	setParameter(_paramName: string, _value: number): void {
 		// This would interface with the DSP instance parameters
 		// Implementation depends on FAUST DSP module structure
 	}
@@ -336,7 +329,9 @@ class FAUSTVoice {
 
 			case "decay":
 				const decayProgress = Math.max(0, 1 - this.envelopeTime / this.decayTime)
-				this.amplitude = this.targetAmplitude * (this.sustainLevel + decayProgress * (1 - this.sustainLevel))
+				this.amplitude =
+					this.targetAmplitude *
+					(this.sustainLevel + decayProgress * (1 - this.sustainLevel))
 				if (this.envelopeTime >= this.decayTime) {
 					this.envelopeStage = "sustain"
 					this.amplitude = this.targetAmplitude * this.sustainLevel

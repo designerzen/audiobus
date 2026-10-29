@@ -1,4 +1,3 @@
-
 /**
  * Convert dB to linear (0-1)
  */

@@ -1,19 +1,19 @@
-import type { IAudioCommand } from '../../audio-command-interface.ts'
-import type { IAudioOutput } from './output-interface.ts'
-import type { IPercussionOutput } from '../../timing/percussion-types.ts'
-import type { AudioClockTick } from '../../timing/audio-clock-tick.ts'
-import { NOTE_ON, MIDI_STOP, PLAYBACK_STOP } from '../../commands.ts'
-import { EVENT_CONFIGURATION_CHANGED } from '../../event-constants.ts'
-import { DRUM_GROOVES } from '../../timing/drum-patterns.ts'
-import { DrumBreakPlayer } from '../../timing/drum-break-player.ts'
-import { PercussionSynth } from '../../instruments/percussion/percussion-synth.ts'
-import { DRUM_COMPRESSOR_PARAMETERS } from '../../effects/drum-compressor.ts'
-import { createDrumAccompanimentGui, type DrumAccompanimentGui } from './drum-accompaniment-gui.ts'
+import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioOutput } from "./output-interface.ts"
+import type { IPercussionOutput } from "../../timing/percussion-types.ts"
+import type { AudioClockTick } from "../../timing/audio-clock-tick.ts"
+import { NOTE_ON, MIDI_STOP, PLAYBACK_STOP } from "../../commands.ts"
+import { EVENT_CONFIGURATION_CHANGED } from "../../event-constants.ts"
+import { DRUM_GROOVES } from "../../timing/drum-patterns.ts"
+import { DrumBreakPlayer } from "../../timing/drum-break-player.ts"
+import { PercussionSynth } from "../../instruments/percussion/percussion-synth.ts"
+import { DRUM_COMPRESSOR_PARAMETERS } from "../../effects/drum-compressor.ts"
+import { createDrumAccompanimentGui, type DrumAccompanimentGui } from "./drum-accompaniment-gui.ts"
 import {
 	DEFAULT_DRUM_ACCOMPANIMENT_SETTINGS,
 	DRUM_GENRES,
-	type DrumAccompanimentSettings,
-} from './drum-accompaniment-settings.ts'
+	type DrumAccompanimentSettings
+} from "./drum-accompaniment-settings.ts"
 
 export interface DrumAccompanimentOptions extends Partial<DrumAccompanimentSettings> {
 	audioContext: AudioContext
@@ -23,7 +23,7 @@ export interface DrumAccompanimentOptions extends Partial<DrumAccompanimentSetti
 
 export default class OutputDrumAccompaniment extends EventTarget implements IAudioOutput {
 	private static nextId = 0
-	readonly uuid = 'Output-DrumAccompaniment-' + OutputDrumAccompaniment.nextId++
+	readonly uuid = "Output-DrumAccompaniment-" + OutputDrumAccompaniment.nextId++
 	readonly requiresConnectionControl = false
 	readonly configurationAffectsNoteRouting = false
 	private settings: DrumAccompanimentSettings = { ...DEFAULT_DRUM_ACCOMPANIMENT_SETTINGS }
@@ -35,10 +35,10 @@ export default class OutputDrumAccompaniment extends EventTarget implements IAud
 	private playing = false
 	private gui?: DrumAccompanimentGui
 	get name(): string {
-		return 'Drum Accompaniment'
+		return "Drum Accompaniment"
 	}
 	get description(): string {
-		return 'A continuous break on the global clock, with subtle activity-driven variations'
+		return "A continuous break on the global clock, with subtle activity-driven variations"
 	}
 	get isConnected(): boolean {
 		return this.connected
@@ -63,7 +63,9 @@ export default class OutputDrumAccompaniment extends EventTarget implements IAud
 	}
 	constructor(options: DrumAccompanimentOptions) {
 		super()
-		if (!options?.audioContext) throw new Error('Drum Accompaniment requires an audio context')
+		if (!options?.audioContext) {
+			throw new Error("Drum Accompaniment requires an audio context")
+		}
 		this.context = options.audioContext
 		this.synth = options.percussionOutput
 			? undefined
@@ -74,12 +76,15 @@ export default class OutputDrumAccompaniment extends EventTarget implements IAud
 	configure(patch: Partial<DrumAccompanimentSettings>): void {
 		const previous = this.settings
 		const next = { ...previous }
-		if (patch.genre !== undefined && Object.hasOwn(DRUM_GENRES, patch.genre))
+		if (patch.genre !== undefined && Object.hasOwn(DRUM_GENRES, patch.genre)) {
 			next.genre = patch.genre
+		}
 		const grooves: readonly string[] = DRUM_GENRES[next.genre].grooves
-		if (patch.groove && grooves.includes(patch.groove) && DRUM_GROOVES[patch.groove])
+		if (patch.groove && grooves.includes(patch.groove) && DRUM_GROOVES[patch.groove]) {
 			next.groove = patch.groove
-		else if (!grooves.includes(next.groove)) next.groove = grooves[0]
+		} else if (!grooves.includes(next.groove)) {
+			next.groove = grooves[0]
+		}
 		const ranges = {
 			tuningNote: [0, 127],
 			volume: [0, 1],
@@ -88,30 +93,34 @@ export default class OutputDrumAccompaniment extends EventTarget implements IAud
 			density: [0, 1],
 			tension: [0, 1],
 			fillChance: [0, 1],
-			chaos: [0, 1],
+			chaos: [0, 1]
 		} as const
 		for (const key of Object.keys(ranges) as (keyof typeof ranges)[]) {
 			const value = patch[key]
-			if (value !== undefined && Number.isFinite(value))
+			if (value !== undefined && Number.isFinite(value)) {
 				next[key] = Math.max(ranges[key][0], Math.min(ranges[key][1], value))
+			}
 		}
 		for (const key of [
-			'compressorEnabled',
-			'rapidPercussion',
-			'muteKick',
-			'muteSnare',
-			'muteHat',
-			'muteClap',
+			"compressorEnabled",
+			"rapidPercussion",
+			"muteKick",
+			"muteSnare",
+			"muteHat",
+			"muteClap"
 		] as const) {
-			if (typeof patch[key] === 'boolean') next[key] = patch[key]
+			if (typeof patch[key] === "boolean") {
+				next[key] = patch[key]
+			}
 		}
 		for (const key of Object.keys(
-			DRUM_COMPRESSOR_PARAMETERS,
+			DRUM_COMPRESSOR_PARAMETERS
 		) as (keyof typeof DRUM_COMPRESSOR_PARAMETERS)[]) {
 			const value = patch[key]
 			const { min, max } = DRUM_COMPRESSOR_PARAMETERS[key]
-			if (value !== undefined && Number.isFinite(value))
+			if (value !== undefined && Number.isFinite(value)) {
 				next[key] = Math.max(min, Math.min(max, value))
+			}
 		}
 		this.settings = next
 		this.synth?.setVolume(next.volume)
@@ -123,32 +132,38 @@ export default class OutputDrumAccompaniment extends EventTarget implements IAud
 	onClockTick(tick: Readonly<AudioClockTick>): void {
 		if (
 			!this.connected ||
-			this.context.state === 'suspended' ||
-			this.context.state === 'closed'
-		)
+			this.context.state === "suspended" ||
+			this.context.state === "closed"
+		) {
 			return
+		}
 		this.playing = true
 		for (const hit of this.player.render(
 			tick,
 			DRUM_GROOVES[this.settings.groove],
-			this.settings,
+			this.settings
 		)) {
 			this.percussion.trigger({
 				...hit,
-				velocity: hit.velocity * (this.synth ? 1 : this.settings.volume),
+				velocity: hit.velocity * (this.synth ? 1 : this.settings.volume)
 			})
 		}
 	}
 	noteOn(_note: number, velocity = 100): void {
-		if (this.connected) this.player.recordActivity(velocity)
+		if (this.connected) {
+			this.player.recordActivity(velocity)
+		}
 	}
 	noteOff(_note: number): void {}
 	getNoteKey(command: IAudioCommand): string {
-		return command.channel + ':' + command.number
+		return command.channel + ":" + command.number
 	}
 	sendCommand(command: IAudioCommand): void {
-		if (command.type === NOTE_ON) this.noteOn(command.number, command.velocity)
-		else if (command.type === MIDI_STOP || command.type === PLAYBACK_STOP) this.stopClock()
+		if (command.type === NOTE_ON) {
+			this.noteOn(command.number, command.velocity)
+		} else if (command.type === MIDI_STOP || command.type === PLAYBACK_STOP) {
+			this.stopClock()
+		}
 	}
 	requestFill(): void {
 		this.player.requestFill()

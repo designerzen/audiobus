@@ -1,78 +1,78 @@
 import {
 	DEFAULT_DRUM_COMPRESSOR_SETTINGS,
-	type DrumCompressorSettings,
-} from '../../effects/drum-compressor.ts'
+	type DrumCompressorSettings
+} from "../../effects/drum-compressor.ts"
 
 export const DRUM_GENRES = {
 	percussion: {
-		title: 'Percussion ensembles',
-		grooves: ['percussion-colours', 'electronic-percussion'],
+		title: "Percussion ensembles",
+		grooves: ["percussion-colours", "electronic-percussion"]
 	},
 	funk: {
-		title: 'Funk & soul',
+		title: "Funk & soul",
 		grooves: [
-			'funky-drummer',
-			'think',
-			'hot-pants',
-			'impeach-president',
-			'synthetic-substitution',
-			'soul-pride',
-			'cold-sweat',
-			'ashleys-roachclip',
-			'motown',
-			'back-to-life',
-			'bo-diddley',
-			'purdie-shuffle',
-			'mardi-gras',
-			'simple-song',
-			'handclapping-song',
-			'funky-mule',
-		],
+			"funky-drummer",
+			"think",
+			"hot-pants",
+			"impeach-president",
+			"synthetic-substitution",
+			"soul-pride",
+			"cold-sweat",
+			"ashleys-roachclip",
+			"motown",
+			"back-to-life",
+			"bo-diddley",
+			"purdie-shuffle",
+			"mardi-gras",
+			"simple-song",
+			"handclapping-song",
+			"funky-mule"
+		]
 	},
-	breaks: { title: 'Breakbeats', grooves: ['amen', 'apache-break', 'levee-break'] },
+	breaks: { title: "Breakbeats", grooves: ["amen", "apache-break", "levee-break"] },
 	electronic: {
-		title: 'Electronic & dance',
+		title: "Electronic & dance",
 		grooves: [
-			'electro',
-			'disco',
-			'uk-garage',
-			'dubstep',
-			'breakstep',
-			'trap',
-			'footwork',
-			'garage-triplets',
-			'trap-sextuplets',
-			'jungle-32-fill',
-			'dubstep-triplet-roll',
-		],
+			"electro",
+			"disco",
+			"uk-garage",
+			"dubstep",
+			"breakstep",
+			"trap",
+			"footwork",
+			"garage-triplets",
+			"trap-sextuplets",
+			"jungle-32-fill",
+			"dubstep-triplet-roll"
+		]
 	},
 	latin: {
-		title: 'Latin & Brazilian',
+		title: "Latin & Brazilian",
 		grooves: [
-			'samba',
-			'bossa-nova',
-			'salsa-mambo',
-			'son-montuno',
-			'cha-cha',
-			'rumba-guaguanco',
-			'cumbia',
-			'latin-electro',
-			'727-latin-box',
-		],
+			"samba",
+			"bossa-nova",
+			"salsa-mambo",
+			"son-montuno",
+			"cha-cha",
+			"rumba-guaguanco",
+			"cumbia",
+			"latin-electro",
+			"727-latin-box"
+		]
 	},
-	jazz: { title: 'Jazz', grooves: ['jazz-swing'] },
-	rock: { title: 'Rock', grooves: ['punk-rock'] },
-	reggae: { title: 'Reggae & Afrobeat', grooves: ['reggae', 'afrobeat'] },
+	jazz: { title: "Jazz", grooves: ["jazz-swing"] },
+	rock: { title: "Rock", grooves: ["punk-rock"] },
+	reggae: { title: "Reggae & Afrobeat", grooves: ["reggae", "afrobeat"] },
 	transitions: {
-		title: 'Builds & transitions',
+		title: "Builds & transitions",
 		grooves: [
-			'performance-crescendo',
-			'performance-bridge',
-			'performance-snare-roll',
-			'performance-breakdown',
-			'performance-drop',
-		],
-	},
+			"performance-crescendo",
+			"performance-bridge",
+			"performance-snare-roll",
+			"performance-breakdown",
+			"performance-drop"
+		]
+	}
 } as const
 
 export type DrumGenre = keyof typeof DRUM_GENRES
@@ -97,8 +97,8 @@ export interface DrumAccompanimentSettings extends DrumCompressorSettings {
 
 export const DEFAULT_DRUM_ACCOMPANIMENT_SETTINGS: Readonly<DrumAccompanimentSettings> = {
 	...DEFAULT_DRUM_COMPRESSOR_SETTINGS,
-	genre: 'funk',
-	groove: 'funky-drummer',
+	genre: "funk",
+	groove: "funky-drummer",
 	tuningNote: 36,
 	volume: 0.55,
 	activityResponse: 0.35,
@@ -111,5 +111,5 @@ export const DEFAULT_DRUM_ACCOMPANIMENT_SETTINGS: Readonly<DrumAccompanimentSett
 	muteKick: false,
 	muteSnare: false,
 	muteHat: false,
-	muteClap: false,
+	muteClap: false
 }

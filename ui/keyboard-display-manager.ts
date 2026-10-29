@@ -1,5 +1,5 @@
-import { EVENT_KEYBOARD_KEY_DOWN, EVENT_KEYBOARD_KEY_UP } from '../event-constants.ts'
-import QwertyKeyboard from './keyboard-qwerty.ts'
+import { EVENT_KEYBOARD_KEY_DOWN, EVENT_KEYBOARD_KEY_UP } from "../event-constants.ts"
+import QwertyKeyboard from "./keyboard-qwerty.ts"
 
 /**
  * Manages the display and interaction of the QWERTY keyboard visualization
@@ -30,10 +30,10 @@ export default class KeyboardDisplayManager {
 		}
 
 		window.addEventListener(EVENT_KEYBOARD_KEY_DOWN, this.keyDownListener, {
-			signal: this.abortController.signal,
+			signal: this.abortController.signal
 		})
 		window.addEventListener(EVENT_KEYBOARD_KEY_UP, this.keyUpListener, {
-			signal: this.abortController.signal,
+			signal: this.abortController.signal
 		})
 	}
 

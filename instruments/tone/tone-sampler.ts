@@ -1,5 +1,5 @@
 import { velocityToGain } from "../../conversion/velocity-to-gain.ts"
-import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
+import "../../conversion/note-to-frequency.ts"
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
 import { linearToDb } from "../../conversion/linear-to-decibels.ts"
 import { dbToLinear } from "../../conversion/decibels-to-linear.ts"
@@ -14,6 +14,7 @@ export default class ToneSampler implements IAudioOutput {
 	static ID: number = 0
 
 	options = {
+		title: "Tone.js Instrument",
 		// Default amplitude
 		gain: 0.2, // ratio 0-1
 		attack: 0.1, // in s
@@ -47,7 +48,7 @@ export default class ToneSampler implements IAudioOutput {
 			G4: "path/to/sample-G4.wav",
 			A4: "path/to/sample-A4.wav",
 			B4: "path/to/sample-B4.wav"
-		},
+		} as Record<string, string>,
 		baseUrl: "./samples/"
 	}
 
@@ -141,25 +142,26 @@ export default class ToneSampler implements IAudioOutput {
 	}
 
 	private async ensureInitialized() {
-		if (this.#initialized) return
-		
+		if (this.#initialized) {
+			return
+		}
+
 		const Tone = await import("tone")
 		const { Sampler } = Tone
-		
+
 		// Tell Tone.js to use the shared AudioContext
 		Tone.setContext(this.#audioContext as any)
-		
-		
+
 		// Initialize Tone.js Sampler and connect to our gain node
 		this.#sampler = new Sampler({
 			urls: this.options.urls,
 			baseUrl: this.options.baseUrl,
 			volume: 0 // Tone volume is 0, use our gainNode instead
 		})
-		
+
 		// Connect the sampler's output to our gain node for routing through the app's audio graph
 		this.#sampler.connect(this.#gainNode)
-		
+
 		this.#initialized = true
 	}
 
@@ -191,12 +193,12 @@ export default class ToneSampler implements IAudioOutput {
 	 * Note ON
 	 * @param {Number} noteNumber - MIDI note number
 	 * @param {Number} velocity - strength of the note (0-127)
-	 * @param {Array<Number>} arp - intervals (currently unused)
-	 * @param {Number} delay - number to pause before playing
+	 * @param {Array<Number>} _arp - intervals (currently unused)
+	 * @param {Number} _delay - number to pause before playing
 	 */
-	async noteOn(noteNumber: number, velocity: number = 127, arp = null, delay: number = 0) {
+	async noteOn(noteNumber: number, velocity: number = 127, _arp = null, _delay: number = 0) {
 		await this.ensureInitialized()
-		
+
 		const noteName = noteNumberToName(noteNumber)
 		const amplitude = velocityToGain(velocity)
 

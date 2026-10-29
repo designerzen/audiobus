@@ -1,334 +1,293 @@
 {
-  "name": "DIGIT CMPSR",
-  "manufacturer": "Digit Music",
-  "description": "Accessible joystick instrument with directional MIDI CC expression.",
-  "ids": [
-    "digit-cmpsr"
-  ],
-  "portNames": [
-    "CMPSR",
-    "DIGIT CMPSR"
-  ],
-  "icon": "icon.svg",
-  "documentation": [
-    {
-      "title": "CMPSR owner's manual, pages 5\u20138",
-      "url": "https://www.digitmusic.co.uk/wp-content/uploads/2025/07/CMPSR-Owners-Manual_V2.pdf"
-    },
-    {
-      "title": "CMPSR CC chart, page 10",
-      "url": "https://www.digitmusic.co.uk/wp-content/uploads/2025/07/CMPSR-Cheat-Sheet.pdf"
-    }
-  ],
-  "abilities": [
-    "Velocity-sensitive joystick",
-    "Smart sustain",
-    "Chords and inversions",
-    "Octave shift",
-    "Major and natural minor scales",
-    "Directional CC expression"
-  ],
-  "hardwareControls": [
-    "1: Settings",
-    "2: MIDI CC",
-    "3: Smart sustain",
-    "4: Chords",
-    "5: Chord extensions",
-    "6: Inversions",
-    "7: Octave down",
-    "8: Octave up"
-  ],
-  "notice": "Set the CC mode on CMPSR (hold pad 1, then cycle pad 2). The mode selector below changes this display only. Sliders perform MIDI CC into this chain; they do not configure the hardware. Yellow mode's two CC numbers are not specified in the published chart.",
-  "controls": [
-    {
-      "id": "expression",
-      "label": "All directions",
-      "cc": 102,
-      "widget": "slider"
-    },
-    {
-      "id": "up",
-      "label": "Up",
-      "cc": 111,
-      "widget": "slider"
-    },
-    {
-      "id": "up-right",
-      "label": "Up-right",
-      "cc": 112,
-      "widget": "slider"
-    },
-    {
-      "id": "right",
-      "label": "Right",
-      "cc": 113,
-      "widget": "slider"
-    },
-    {
-      "id": "down-right",
-      "label": "Down-right",
-      "cc": 114,
-      "widget": "slider"
-    },
-    {
-      "id": "down",
-      "label": "Down",
-      "cc": 115,
-      "widget": "slider"
-    },
-    {
-      "id": "down-left",
-      "label": "Down-left",
-      "cc": 116,
-      "widget": "slider"
-    },
-    {
-      "id": "left",
-      "label": "Left",
-      "cc": 117,
-      "widget": "slider"
-    },
-    {
-      "id": "up-left",
-      "label": "Up-left",
-      "cc": 118,
-      "widget": "slider"
-    }
-  ],
-  "modes": [
-    {
-      "id": "all",
-      "label": "All documented CCs",
-      "cc": [
-        102,
-        111,
-        112,
-        113,
-        114,
-        115,
-        116,
-        117,
-        118
-      ]
-    },
-    {
-      "id": "blue",
-      "label": "Blue \u2014 one CC",
-      "cc": [
-        102
-      ]
-    },
-    {
-      "id": "red",
-      "label": "Red \u2014 eight directions",
-      "cc": [
-        111,
-        112,
-        113,
-        114,
-        115,
-        116,
-        117,
-        118
-      ]
-    },
-    {
-      "id": "purple",
-      "label": "Purple \u2014 combined",
-      "cc": [
-        102,
-        111,
-        112,
-        113,
-        114,
-        115,
-        116,
-        117,
-        118
-      ]
-    },
-    {
-      "id": "green",
-      "label": "Green \u2014 nested XY",
-      "cc": [
-        111,
-        113,
-        115,
-        117
-      ]
-    },
-    {
-      "id": "yellow",
-      "label": "Yellow \u2014 CC numbers undocumented",
-      "cc": []
-    },
-    {
-      "id": "off",
-      "label": "No CC",
-      "cc": []
-    }
-  ],
-  "schemaVersion": 1,
-  "gui": {
-    "type": "column",
-    "gap": "0.65rem",
-    "children": [
-      {
-        "type": "status"
-      },
-      {
-        "type": "image",
-        "alt": "DIGIT CMPSR instrument controls",
-        "src": "panel.svg"
-      },
-      {
-        "type": "notes"
-      },
-      {
-        "type": "channel"
-      },
-      {
-        "type": "mode",
-        "label": "Display CC mode"
-      },
-      {
-        "label": "Joystick expression",
-        "type": "section",
-        "children": [
-          {
-            "columns": 2,
-            "type": "grid",
-            "children": [
-              {
-                "type": "controls"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "type": "guide",
-        "label": "Instrument controls and guide"
-      }
-    ]
-  },
-  "$schema": "../profile.schema.json",
-  "id": "digit-cmpsr",
-  "manufacturerUrl": "https://www.digitmusic.co.uk/",
-  "productUrl": "https://www.digitmusic.co.uk/cmpsr/",
-  "surface": {
-    "src": "panel.svg",
-    "width": 480,
-    "height": 200,
-    "elements": [
-      {
-        "id": "expression",
-        "label": "All directions",
-        "kind": "knob",
-        "position": {
-          "x": 20.0,
-          "y": 11.0,
-          "width": 14.1667,
-          "height": 34.0
-        },
-        "control": "expression"
-      },
-      {
-        "id": "up",
-        "label": "Up",
-        "kind": "pad",
-        "position": {
-          "x": 54.1667,
-          "y": 9.0,
-          "width": 11.25,
-          "height": 16.0
-        },
-        "control": "up"
-      },
-      {
-        "id": "up-right",
-        "label": "Up-right",
-        "kind": "pad",
-        "position": {
-          "x": 70.0,
-          "y": 9.0,
-          "width": 11.25,
-          "height": 16.0
-        },
-        "control": "up-right"
-      },
-      {
-        "id": "right",
-        "label": "Right",
-        "kind": "pad",
-        "position": {
-          "x": 54.1667,
-          "y": 32.0,
-          "width": 11.25,
-          "height": 16.0
-        },
-        "control": "right"
-      },
-      {
-        "id": "down-right",
-        "label": "Down-right",
-        "kind": "pad",
-        "position": {
-          "x": 70.0,
-          "y": 32.0,
-          "width": 11.25,
-          "height": 16.0
-        },
-        "control": "down-right"
-      },
-      {
-        "id": "down",
-        "label": "Down",
-        "kind": "pad",
-        "position": {
-          "x": 54.1667,
-          "y": 55.0,
-          "width": 11.25,
-          "height": 16.0
-        },
-        "control": "down"
-      },
-      {
-        "id": "down-left",
-        "label": "Down-left",
-        "kind": "pad",
-        "position": {
-          "x": 70.0,
-          "y": 55.0,
-          "width": 11.25,
-          "height": 16.0
-        },
-        "control": "down-left"
-      },
-      {
-        "id": "left",
-        "label": "Left",
-        "kind": "pad",
-        "position": {
-          "x": 54.1667,
-          "y": 78.0,
-          "width": 11.25,
-          "height": 16.0
-        },
-        "control": "left"
-      },
-      {
-        "id": "up-left",
-        "label": "Up-left",
-        "kind": "pad",
-        "position": {
-          "x": 70.0,
-          "y": 78.0,
-          "width": 11.25,
-          "height": 16.0
-        },
-        "control": "up-left"
-      }
-    ]
-  }
+	"name": "DIGIT CMPSR",
+	"manufacturer": "Digit Music",
+	"description": "Accessible joystick instrument with directional MIDI CC expression.",
+	"ids": ["digit-cmpsr"],
+	"portNames": ["CMPSR", "DIGIT CMPSR"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "CMPSR owner's manual, pages 5\u20138",
+			"url": "https://www.digitmusic.co.uk/wp-content/uploads/2025/07/CMPSR-Owners-Manual_V2.pdf"
+		},
+		{
+			"title": "CMPSR CC chart, page 10",
+			"url": "https://www.digitmusic.co.uk/wp-content/uploads/2025/07/CMPSR-Cheat-Sheet.pdf"
+		}
+	],
+	"abilities": [
+		"Velocity-sensitive joystick",
+		"Smart sustain",
+		"Chords and inversions",
+		"Octave shift",
+		"Major and natural minor scales",
+		"Directional CC expression"
+	],
+	"hardwareControls": [
+		"1: Settings",
+		"2: MIDI CC",
+		"3: Smart sustain",
+		"4: Chords",
+		"5: Chord extensions",
+		"6: Inversions",
+		"7: Octave down",
+		"8: Octave up"
+	],
+	"notice": "Set the CC mode on CMPSR (hold pad 1, then cycle pad 2). The mode selector below changes this display only. Sliders perform MIDI CC into this chain; they do not configure the hardware. Yellow mode's two CC numbers are not specified in the published chart.",
+	"controls": [
+		{
+			"id": "expression",
+			"label": "All directions",
+			"cc": 102,
+			"widget": "slider"
+		},
+		{
+			"id": "up",
+			"label": "Up",
+			"cc": 111,
+			"widget": "slider"
+		},
+		{
+			"id": "up-right",
+			"label": "Up-right",
+			"cc": 112,
+			"widget": "slider"
+		},
+		{
+			"id": "right",
+			"label": "Right",
+			"cc": 113,
+			"widget": "slider"
+		},
+		{
+			"id": "down-right",
+			"label": "Down-right",
+			"cc": 114,
+			"widget": "slider"
+		},
+		{
+			"id": "down",
+			"label": "Down",
+			"cc": 115,
+			"widget": "slider"
+		},
+		{
+			"id": "down-left",
+			"label": "Down-left",
+			"cc": 116,
+			"widget": "slider"
+		},
+		{
+			"id": "left",
+			"label": "Left",
+			"cc": 117,
+			"widget": "slider"
+		},
+		{
+			"id": "up-left",
+			"label": "Up-left",
+			"cc": 118,
+			"widget": "slider"
+		}
+	],
+	"modes": [
+		{
+			"id": "all",
+			"label": "All documented CCs",
+			"cc": [102, 111, 112, 113, 114, 115, 116, 117, 118]
+		},
+		{
+			"id": "blue",
+			"label": "Blue \u2014 one CC",
+			"cc": [102]
+		},
+		{
+			"id": "red",
+			"label": "Red \u2014 eight directions",
+			"cc": [111, 112, 113, 114, 115, 116, 117, 118]
+		},
+		{
+			"id": "purple",
+			"label": "Purple \u2014 combined",
+			"cc": [102, 111, 112, 113, 114, 115, 116, 117, 118]
+		},
+		{
+			"id": "green",
+			"label": "Green \u2014 nested XY",
+			"cc": [111, 113, 115, 117]
+		},
+		{
+			"id": "yellow",
+			"label": "Yellow \u2014 CC numbers undocumented",
+			"cc": []
+		},
+		{
+			"id": "off",
+			"label": "No CC",
+			"cc": []
+		}
+	],
+	"schemaVersion": 1,
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"alt": "DIGIT CMPSR instrument controls",
+				"src": "panel.svg"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "mode",
+				"label": "Display CC mode"
+			},
+			{
+				"label": "Joystick expression",
+				"type": "section",
+				"children": [
+					{
+						"columns": 2,
+						"type": "grid",
+						"children": [
+							{
+								"type": "controls"
+							}
+						]
+					}
+				]
+			},
+			{
+				"type": "guide",
+				"label": "Instrument controls and guide"
+			}
+		]
+	},
+	"$schema": "../profile.schema.json",
+	"id": "digit-cmpsr",
+	"manufacturerUrl": "https://www.digitmusic.co.uk/",
+	"productUrl": "https://www.digitmusic.co.uk/cmpsr/",
+	"surface": {
+		"src": "panel.svg",
+		"width": 480,
+		"height": 200,
+		"elements": [
+			{
+				"id": "expression",
+				"label": "All directions",
+				"kind": "knob",
+				"position": {
+					"x": 20.0,
+					"y": 11.0,
+					"width": 14.1667,
+					"height": 34.0
+				},
+				"control": "expression"
+			},
+			{
+				"id": "up",
+				"label": "Up",
+				"kind": "pad",
+				"position": {
+					"x": 54.1667,
+					"y": 9.0,
+					"width": 11.25,
+					"height": 16.0
+				},
+				"control": "up"
+			},
+			{
+				"id": "up-right",
+				"label": "Up-right",
+				"kind": "pad",
+				"position": {
+					"x": 70.0,
+					"y": 9.0,
+					"width": 11.25,
+					"height": 16.0
+				},
+				"control": "up-right"
+			},
+			{
+				"id": "right",
+				"label": "Right",
+				"kind": "pad",
+				"position": {
+					"x": 54.1667,
+					"y": 32.0,
+					"width": 11.25,
+					"height": 16.0
+				},
+				"control": "right"
+			},
+			{
+				"id": "down-right",
+				"label": "Down-right",
+				"kind": "pad",
+				"position": {
+					"x": 70.0,
+					"y": 32.0,
+					"width": 11.25,
+					"height": 16.0
+				},
+				"control": "down-right"
+			},
+			{
+				"id": "down",
+				"label": "Down",
+				"kind": "pad",
+				"position": {
+					"x": 54.1667,
+					"y": 55.0,
+					"width": 11.25,
+					"height": 16.0
+				},
+				"control": "down"
+			},
+			{
+				"id": "down-left",
+				"label": "Down-left",
+				"kind": "pad",
+				"position": {
+					"x": 70.0,
+					"y": 55.0,
+					"width": 11.25,
+					"height": 16.0
+				},
+				"control": "down-left"
+			},
+			{
+				"id": "left",
+				"label": "Left",
+				"kind": "pad",
+				"position": {
+					"x": 54.1667,
+					"y": 78.0,
+					"width": 11.25,
+					"height": 16.0
+				},
+				"control": "left"
+			},
+			{
+				"id": "up-left",
+				"label": "Up-left",
+				"kind": "pad",
+				"position": {
+					"x": 70.0,
+					"y": 78.0,
+					"width": 11.25,
+					"height": 16.0
+				},
+				"control": "up-left"
+			}
+		]
+	}
 }

@@ -1,8 +1,8 @@
-import RecorderAudioEvent from '../audio-event-recorder.ts'
-import AudioEvent from '../audio-event.ts'
-import { NOTE_ON } from '../commands'
+import RecorderAudioEvent from "../audio-event-recorder.ts"
+import AudioEvent from "../audio-event.ts"
+import { NOTE_ON } from "../commands"
 
-import type { ITimerControl as Timer } from "netronome"
+import type { Timer } from "netronome"
 
 /**
  * Create a .dawProject XML file from audio event recording
@@ -23,11 +23,11 @@ export const createDawProjectFromAudioEventRecording = async (
 			note: event.noteNumber,
 			velocity: event.velocity ?? 100,
 			time: event.startAt,
-			duration: event.duration,
+			duration: event.duration
 		}))
 
 	// Build notes XML
-	let notesXML = ''
+	let notesXML = ""
 	notes.forEach((note) => {
 		notesXML += `    <Note start="${note.time}" duration="${note.duration}" pitch="${note.note}" velocity="${note.velocity}"/>\n`
 	})
@@ -35,7 +35,7 @@ export const createDawProjectFromAudioEventRecording = async (
 	// Create .dawProject XML structure
 	const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <DAWP version="1.0">
-  <Project name="${escapeXml(recording.name ?? 'New Harmoneasy Project')}" tempo="${BPM}" duration="${duration}" timeSignatureNumerator="4" timeSignatureDenominator="4">
+  <Project name="${escapeXml(recording.name ?? "New Harmoneasy Project")}" tempo="${BPM}" duration="${duration}" timeSignatureNumerator="4" timeSignatureDenominator="4">
     <Timeline>
       <Track id="track-0" name="Piano Roll" type="MIDI">
         <Region start="0" duration="${duration}">
@@ -50,7 +50,7 @@ ${notesXML}        </Region>
 </DAWP>`
 
 	// Create blob with XML content
-	const blob = new Blob([xml], { type: 'application/xml' })
+	const blob = new Blob([xml], { type: "application/xml" })
 	return blob
 }
 
@@ -59,11 +59,11 @@ ${notesXML}        </Region>
  */
 const escapeXml = (str: string): string => {
 	return str
-		.replace(/&/g, '&amp;')
-		.replace(/</g, '&lt;')
-		.replace(/>/g, '&gt;')
-		.replace(/"/g, '&quot;')
-		.replace(/'/g, '&apos;')
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&apos;")
 }
 
 /**
@@ -71,16 +71,14 @@ const escapeXml = (str: string): string => {
  */
 export const saveDawProjectToLocalFileSystem = async (
 	blob: Blob,
-	filename: string = 'project.dawProject'
+	filename: string = "project.dawProject"
 ): Promise<void> => {
 	const url = URL.createObjectURL(blob)
-	const link = document.createElement('a')
+	const link = document.createElement("a")
 	link.href = url
-	link.download = filename.endsWith('.dawProject') ? filename : `${filename}.dawProject`
+	link.download = filename.endsWith(".dawProject") ? filename : `${filename}.dawProject`
 	document.body.appendChild(link)
 	link.click()
 	document.body.removeChild(link)
 	URL.revokeObjectURL(url)
 }
-
-

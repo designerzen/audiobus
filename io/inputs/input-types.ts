@@ -5,12 +5,12 @@
 
 export const KEYBOARD = "keyboard" as const
 export const MIDI_FILE = "midi-file" as const
-export const STEP_SEQUENCER = 'step-sequencer' as const
-export const PADS = 'pads' as const
-export const MICROPHONE_TRIGGER = 'microphone-trigger' as const
-export const CAMERA_GESTURES = 'camera-gestures' as const
-export const EVENT_LOOP = 'event-loop' as const
-export const OSC = 'osc' as const
+export const STEP_SEQUENCER = "step-sequencer" as const
+export const PADS = "pads" as const
+export const MICROPHONE_TRIGGER = "microphone-trigger" as const
+export const CAMERA_GESTURES = "camera-gestures" as const
+export const EVENT_LOOP = "event-loop" as const
+export const OSC = "osc" as const
 export const GAMEPAD = "gamepad" as const
 export const GAMEPAD_MUSIC = "gamepad-music" as const
 export const WEBMIDI = "webmidi" as const
@@ -21,18 +21,19 @@ export const MICROPHONE_FORMANT = "microphone-formant" as const
 export const LEAP_MOTION = "leap-motion" as const
 export const ONSCREEN_KEYBOARD = "onscreen-keyboard" as const
 export const PROMPT_AI = "prompt-ai" as const
-export const AI_IMPROV = 'ai-improv' as const
-export const AI_MELODY = 'ai-melody' as const
-export const AI_DRUMS = 'ai-drums' as const
-export const AI_MUSIC_VAE = 'ai-music-vae' as const
-export const AI_TRIO = 'ai-trio' as const
+export const AI_IMPROV = "ai-improv" as const
+export const AI_MELODY = "ai-melody" as const
+export const AI_DRUMS = "ai-drums" as const
+export const AI_MUSIC_VAE = "ai-music-vae" as const
+export const AI_TRIO = "ai-trio" as const
 export const PROMPT_AI_SPEECH = "prompt-ai-speech" as const
 export const MIDI_TRANSPORT_CLOCK = "midi-transport-clock" as const
 export const MUSIC_MOUSE = "music-mouse" as const
 export const MICROPHONE_PITCH = "microphone-pitch" as const
 export const DVS_CONTROL_VINYL = "dvs-control-vinyl" as const
 
-export type InputId = (string & {})
+export type InputId =
+	| (string & {})
 	| typeof AI_IMPROV
 	| typeof AI_MELODY
 	| typeof AI_DRUMS

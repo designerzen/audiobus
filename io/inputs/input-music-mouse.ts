@@ -13,7 +13,7 @@ const DEFAULT_OPTIONS = {
 	scale: [0, 2, 4, 5, 7, 9, 11, 12], // Major scale (C D E F G A B C)
 	octaves: 3, // Number of octaves in vertical axis
 	containerSelector: "body",
-	onlyWhileMouseDown: false,
+	onlyWhileMouseDown: false
 }
 
 interface MusicMouseOptions extends Record<string, any> {
@@ -36,7 +36,6 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 	#scale: number[]
 	#rootNote: number
 	#octaves: number
-	#containerSelector: string
 	#isActive: boolean = false
 	#lastNoteNumber: number = -1
 	#lastVelocity: number = 0
@@ -63,7 +62,6 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 		this.#scale = this.options.scale
 		this.#rootNote = this.options.rootNote
 		this.#octaves = this.options.octaves
-		this.#containerSelector = this.options.containerSelector
 
 		this.onMouseMove = this.onMouseMove.bind(this)
 		this.onMouseEnter = this.onMouseEnter.bind(this)
@@ -73,7 +71,9 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 	}
 
 	async createGui(): Promise<HTMLElement> {
-		if (this.#containerElement) return this.#containerElement
+		if (this.#containerElement) {
+			return this.#containerElement
+		}
 		this.#guiEvents = new AbortController()
 		const { signal } = this.#guiEvents
 		const container = document.createElement("div")
@@ -82,11 +82,15 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 		const toggle = document.createElement("input")
 		toggle.type = "checkbox"
 		toggle.checked = this.options.onlyWhileMouseDown
-		toggle.addEventListener("change", () => {
-			this.options.onlyWhileMouseDown = toggle.checked
-			this.allNotesOff()
-			this.draw()
-		}, { signal })
+		toggle.addEventListener(
+			"change",
+			() => {
+				this.options.onlyWhileMouseDown = toggle.checked
+				this.allNotesOff()
+				this.draw()
+			},
+			{ signal }
+		)
 		label.append(toggle, " Play only while mouse button is held")
 		container.appendChild(label)
 		// Create canvas
@@ -111,15 +115,27 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 		this.#canvas.addEventListener("mousemove", this.onMouseMove, { signal })
 		this.#canvas.addEventListener("mouseenter", this.onMouseEnter, { signal })
 		this.#canvas.addEventListener("mouseleave", this.onMouseLeave, { signal })
-		this.#canvas.addEventListener("mousedown", event => {
-			if (event.button !== 0) return
-			event.preventDefault()
-			this.#isActive = true
-			this.onMouseMove(event)
-		}, { signal })
-		window.addEventListener("mouseup", () => {
-			if (this.options.onlyWhileMouseDown) this.allNotesOff()
-		}, { signal })
+		this.#canvas.addEventListener(
+			"mousedown",
+			(event) => {
+				if (event.button !== 0) {
+					return
+				}
+				event.preventDefault()
+				this.#isActive = true
+				this.onMouseMove(event)
+			},
+			{ signal }
+		)
+		window.addEventListener(
+			"mouseup",
+			() => {
+				if (this.options.onlyWhileMouseDown) {
+					this.allNotesOff()
+				}
+			},
+			{ signal }
+		)
 		window.addEventListener("blur", this.onMouseLeave, { signal })
 
 		// Initial draw
@@ -164,12 +180,16 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 	}
 
 	private onMouseMove(event: MouseEvent): void {
-		if (!this.#canvas || !this.#isActive) return
+		if (!this.#canvas || !this.#isActive) {
+			return
+		}
 
 		const rect = this.#canvas.getBoundingClientRect()
-		if (!rect.width || !rect.height) return
-		this.#mouseX = (event.clientX - rect.left) / rect.width * this.#gridWidth
-		this.#mouseY = (event.clientY - rect.top) / rect.height * this.#gridHeight
+		if (!rect.width || !rect.height) {
+			return
+		}
+		this.#mouseX = ((event.clientX - rect.left) / rect.width) * this.#gridWidth
+		this.#mouseY = ((event.clientY - rect.top) / rect.height) * this.#gridHeight
 
 		// Clamp to canvas bounds
 		this.#mouseX = Math.max(0, Math.min(this.#gridWidth, this.#mouseX))
@@ -213,7 +233,7 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 		return Math.max(0, Math.min(127, this.#rootNote + noteInScale + constrainedOctave * 12))
 	}
 
-	private calculateVelocityFromPosition(x: number, y: number): number {
+	private calculateVelocityFromPosition(x: number, _y: number): number {
 		// Use horizontal distance from left/right edges for velocity
 		const distanceFromLeft = x
 		const distanceFromRight = this.#gridWidth - x
@@ -255,7 +275,9 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 	}
 
 	private draw(): void {
-		if (!this.#context || !this.#canvas) return
+		if (!this.#context || !this.#canvas) {
+			return
+		}
 
 		const ctx = this.#context
 		const width = this.#gridWidth
@@ -326,7 +348,13 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 			ctx.fillStyle = "#999"
 			ctx.font = "14px sans-serif"
 			ctx.textAlign = "center"
-			ctx.fillText(this.options.onlyWhileMouseDown ? "Hold mouse button and move to play" : "Move mouse to play", width / 2, height / 2)
+			ctx.fillText(
+				this.options.onlyWhileMouseDown
+					? "Hold mouse button and move to play"
+					: "Move mouse to play",
+				width / 2,
+				height / 2
+			)
 		}
 
 		// Draw scale name
@@ -334,7 +362,7 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 			"0,2,4,5,7,9,11,12": "Major",
 			"0,2,3,5,7,8,10,12": "Natural Minor",
 			"0,2,3,5,7,8,11,12": "Harmonic Minor",
-			"0,3,5,6,7,10,12": "Pentatonic",
+			"0,3,5,6,7,10,12": "Pentatonic"
 		}
 
 		const scaleKey = this.#scale.join(",")
@@ -343,6 +371,10 @@ export default class InputMusicMouse extends AbstractInput implements IAudioInpu
 		ctx.fillStyle = "#666"
 		ctx.font = "12px sans-serif"
 		ctx.textAlign = "left"
-		ctx.fillText(`Scale: ${scaleName} | Root: ${noteNumberToKeyName(this.#rootNote)}`, 10, height - 10)
+		ctx.fillText(
+			`Scale: ${scaleName} | Root: ${noteNumberToKeyName(this.#rootNote)}`,
+			10,
+			height - 10
+		)
 	}
 }

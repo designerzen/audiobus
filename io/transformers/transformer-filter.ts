@@ -9,7 +9,7 @@
 
 import type { IAudioCommand } from "../../audio-command-interface.ts"
 import { Transformer } from "./abstract-transformer.ts"
-import * as Commands from '../../commands'
+import * as Commands from "../../commands"
 import type { ITransformer } from "./interface-transformer.ts"
 import { TRANSFORMER_CATEGORY_TUNING } from "./transformer-categories.ts"
 
@@ -28,7 +28,7 @@ const DEFAULT_OPTIONS: Config = {
 }
 
 export class TransformerFilter extends Transformer<Config> implements ITransformer {
-	protected type = ID_FILTER
+	type = ID_FILTER
 
 	category = TRANSFORMER_CATEGORY_TUNING
 
@@ -85,14 +85,14 @@ export class TransformerFilter extends Transformer<Config> implements ITransform
 		super({ ...DEFAULT_OPTIONS, ...config })
 	}
 
-	transform(commands: IAudioCommand[], timer?: any): IAudioCommand[] {
+	transform(commands: IAudioCommand[], _timer?: any): IAudioCommand[] {
 		if (!this.config.enabled || commands.length === 0) {
 			return commands
 		}
 
 		const { mode, lower, upper } = this.config
 
-		return commands.filter(command => {
+		return commands.filter((command) => {
 			// Only filter NOTE_ON and NOTE_OFF commands
 			if (command.type !== Commands.NOTE_ON && command.type !== Commands.NOTE_OFF) {
 				return true
@@ -115,7 +115,3 @@ export class TransformerFilter extends Transformer<Config> implements ITransform
 		// No state to reset
 	}
 }
-
-
-
-

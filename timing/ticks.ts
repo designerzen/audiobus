@@ -1,1 +1,1 @@
-export { Ticks } from '../conversion/constants.ts'
+export { Ticks } from "../conversion/constants.ts"

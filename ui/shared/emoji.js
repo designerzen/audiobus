@@ -1,4 +1,12 @@
-import { TUNING_MODE_AEOLIAN, TUNING_MODE_DORIAN, TUNING_MODE_IONIAN, TUNING_MODE_LOCRIAN, TUNING_MODE_LYDIAN, TUNING_MODE_MIXOLYDIAN, TUNING_MODE_PHRYGIAN } from "./chords.js"
+import {
+	TUNING_MODE_AEOLIAN,
+	TUNING_MODE_DORIAN,
+	TUNING_MODE_IONIAN,
+	TUNING_MODE_LOCRIAN,
+	TUNING_MODE_LYDIAN,
+	TUNING_MODE_MIXOLYDIAN,
+	TUNING_MODE_PHRYGIAN
+} from "./chords.js"
 
 export const EMOJI_NEUTRAL = "😐"
 export const EMOJI_NEUTRAL_EYES_CLOSED = "😑"
@@ -132,91 +140,91 @@ export const EMOJI_HEART_WHITE = "🤍"
 export const EMOJI_HEART_CLASSIC = "♥︎"
 
 export const EMOJI_SEQUENCE = [
-    // Happiest
-    EMOJI_STAR_STRUCK,
-    EMOJI_HEARTS,
-    EMOJI_HEART_EYES,
-    EMOJI_PARTY,
-    EMOJI_SMILING_BIG_TEETH_GRIN,
-    EMOJI_SMILING_BIG_GRIN,
-    EMOJI_SMILING_GRIN_SQUINT,
-    EMOJI_SMILING_GRIN,
-    EMOJI_SMILING_EYES_CLOSED,
-    EMOJI_SMILING_SLIGHTLY,
-    EMOJI_NEUTRAL,
-    EMOJI_NEUTRAL_EYES_CLOSED,
-    EMOJI_CONFUSED,
-    EMOJI_WORRIED,
-    EMOJI_FROWNING,
-    EMOJI_ANNOYED,
-    EMOJI_FROWN_EYES_CLOSED_RAISED_EYEBROWS,
-    EMOJI_FROWN_EYES_CLOSED,
-    EMOJI_PERSEVERING,
-    EMOJI_TIRED,
-    EMOJI_WAIL,
-    EMOJI_CRYING,
-    // Unhappiest
+	// Happiest
+	EMOJI_STAR_STRUCK,
+	EMOJI_HEARTS,
+	EMOJI_HEART_EYES,
+	EMOJI_PARTY,
+	EMOJI_SMILING_BIG_TEETH_GRIN,
+	EMOJI_SMILING_BIG_GRIN,
+	EMOJI_SMILING_GRIN_SQUINT,
+	EMOJI_SMILING_GRIN,
+	EMOJI_SMILING_EYES_CLOSED,
+	EMOJI_SMILING_SLIGHTLY,
+	EMOJI_NEUTRAL,
+	EMOJI_NEUTRAL_EYES_CLOSED,
+	EMOJI_CONFUSED,
+	EMOJI_WORRIED,
+	EMOJI_FROWNING,
+	EMOJI_ANNOYED,
+	EMOJI_FROWN_EYES_CLOSED_RAISED_EYEBROWS,
+	EMOJI_FROWN_EYES_CLOSED,
+	EMOJI_PERSEVERING,
+	EMOJI_TIRED,
+	EMOJI_WAIL,
+	EMOJI_CRYING
+	// Unhappiest
 ]
 
 // Major Emojis
 
 export const TUNING_MODE_EMOJIS_MAJOR = [
-    EMOJI_NEUTRAL,			        // Same as major
-    EMOJI_HOLDING_TEARS,			// Start from second degree of major
-    EMOJI_SMIRK,	            	// Start from third degree of major
-    EMOJI_KISS_EYES_CLOSED,			// Start from fourth degree of major
-    EMOJI_SMILING_EYES_CLOSED,		// Start from fifth degree of major
-    EMOJI_SHOCKED,			        // Start from sixth degree (same as natural minor)
-    EMOJI_TONGUE			        // Start from seventh degree
+	EMOJI_NEUTRAL, // Same as major
+	EMOJI_HOLDING_TEARS, // Start from second degree of major
+	EMOJI_SMIRK, // Start from third degree of major
+	EMOJI_KISS_EYES_CLOSED, // Start from fourth degree of major
+	EMOJI_SMILING_EYES_CLOSED, // Start from fifth degree of major
+	EMOJI_SHOCKED, // Start from sixth degree (same as natural minor)
+	EMOJI_TONGUE // Start from seventh degree
 ]
 
 export const TUNING_MODE_EMOJIS_DICTIONARY_MAJOR = {
-    [TUNING_MODE_IONIAN]:TUNING_MODE_EMOJIS_MAJOR[0],			// Same as major
-    [TUNING_MODE_DORIAN]:TUNING_MODE_EMOJIS_MAJOR[1],			// Start from second degree of major
-    [TUNING_MODE_PHRYGIAN]:TUNING_MODE_EMOJIS_MAJOR[2],		    // Start from third degree of major
-    [TUNING_MODE_LYDIAN]:TUNING_MODE_EMOJIS_MAJOR[3],			// Start from fourth degree of major
-    [TUNING_MODE_MIXOLYDIAN]:TUNING_MODE_EMOJIS_MAJOR[4],		// Start from fifth degree of major
-    [TUNING_MODE_AEOLIAN]:TUNING_MODE_EMOJIS_MAJOR[5],			// Start from sixth degree (same as natural minor)
-    [TUNING_MODE_LOCRIAN]:TUNING_MODE_EMOJIS_MAJOR[6]			// Start from seventh degree
+	[TUNING_MODE_IONIAN]: TUNING_MODE_EMOJIS_MAJOR[0], // Same as major
+	[TUNING_MODE_DORIAN]: TUNING_MODE_EMOJIS_MAJOR[1], // Start from second degree of major
+	[TUNING_MODE_PHRYGIAN]: TUNING_MODE_EMOJIS_MAJOR[2], // Start from third degree of major
+	[TUNING_MODE_LYDIAN]: TUNING_MODE_EMOJIS_MAJOR[3], // Start from fourth degree of major
+	[TUNING_MODE_MIXOLYDIAN]: TUNING_MODE_EMOJIS_MAJOR[4], // Start from fifth degree of major
+	[TUNING_MODE_AEOLIAN]: TUNING_MODE_EMOJIS_MAJOR[5], // Start from sixth degree (same as natural minor)
+	[TUNING_MODE_LOCRIAN]: TUNING_MODE_EMOJIS_MAJOR[6] // Start from seventh degree
 }
 
 // MINOR Emojis
 
 export const TUNING_MODE_EMOJIS_MINOR = [
-    EMOJI_NEUTRAL,			        // Same as minor
-    EMOJI_PLEADING,			        // Start from second degree of minor
-    EMOJI_CONFUSED,	            	// Start from third degree of minor
-    EMOJI_FLUSHED,			        // Start from fourth degree of minor
-    EMOJI_ANNOYED,		            // Start from fifth degree of minor
-    EMOJI_SCREAMING,			    // Start from sixth degree (same as natural minor)
-    EMOJI_GRIMACING			        // Start from seventh degree
+	EMOJI_NEUTRAL, // Same as minor
+	EMOJI_PLEADING, // Start from second degree of minor
+	EMOJI_CONFUSED, // Start from third degree of minor
+	EMOJI_FLUSHED, // Start from fourth degree of minor
+	EMOJI_ANNOYED, // Start from fifth degree of minor
+	EMOJI_SCREAMING, // Start from sixth degree (same as natural minor)
+	EMOJI_GRIMACING // Start from seventh degree
 ]
 
 export const TUNING_MODE_EMOJIS_DICTIONARY_MINOR = {
-    [TUNING_MODE_IONIAN]:TUNING_MODE_EMOJIS_MINOR[0],			// Same as major
-    [TUNING_MODE_DORIAN]:TUNING_MODE_EMOJIS_MINOR[1],			// Start from second degree of major
-    [TUNING_MODE_PHRYGIAN]:TUNING_MODE_EMOJIS_MINOR[2],		    // Start from third degree of major
-    [TUNING_MODE_LYDIAN]:TUNING_MODE_EMOJIS_MINOR[3],			// Start from fourth degree of major
-    [TUNING_MODE_MIXOLYDIAN]:TUNING_MODE_EMOJIS_MINOR[4],		// Start from fifth degree of major
-    [TUNING_MODE_AEOLIAN]:TUNING_MODE_EMOJIS_MINOR[5],			// Start from sixth degree (same as natural minor)
-    [TUNING_MODE_LOCRIAN]:TUNING_MODE_EMOJIS_MINOR[6]			// Start from seventh degree
+	[TUNING_MODE_IONIAN]: TUNING_MODE_EMOJIS_MINOR[0], // Same as major
+	[TUNING_MODE_DORIAN]: TUNING_MODE_EMOJIS_MINOR[1], // Start from second degree of major
+	[TUNING_MODE_PHRYGIAN]: TUNING_MODE_EMOJIS_MINOR[2], // Start from third degree of major
+	[TUNING_MODE_LYDIAN]: TUNING_MODE_EMOJIS_MINOR[3], // Start from fourth degree of major
+	[TUNING_MODE_MIXOLYDIAN]: TUNING_MODE_EMOJIS_MINOR[4], // Start from fifth degree of major
+	[TUNING_MODE_AEOLIAN]: TUNING_MODE_EMOJIS_MINOR[5], // Start from sixth degree (same as natural minor)
+	[TUNING_MODE_LOCRIAN]: TUNING_MODE_EMOJIS_MINOR[6] // Start from seventh degree
 }
 
 /**
  * Find the emoji for the specified scale and mode
- * @param {Number|String} scale 
- * @param {Number} mode 
+ * @param {Number|String} scale
+ * @param {Number} mode
  * @returns String Emoji
  */
-export const getEmojiForScaleAndMode = (scale,mode) => {
-    switch(scale){
-        case "Minor":
-        case 1:
-            return TUNING_MODE_EMOJIS_MINOR[mode%TUNING_MODE_EMOJIS_MINOR.length]
-        
-        case "Major":
-        case 0:
-        default:
-            return TUNING_MODE_EMOJIS_MAJOR[mode%TUNING_MODE_EMOJIS_MAJOR.length]
-    }
+export const getEmojiForScaleAndMode = (scale, mode) => {
+	switch (scale) {
+		case "Minor":
+		case 1:
+			return TUNING_MODE_EMOJIS_MINOR[mode % TUNING_MODE_EMOJIS_MINOR.length]
+
+		case "Major":
+		case 0:
+		default:
+			return TUNING_MODE_EMOJIS_MAJOR[mode % TUNING_MODE_EMOJIS_MAJOR.length]
+	}
 }

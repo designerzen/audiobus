@@ -4,8 +4,6 @@ import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
 import { dbToLinear } from "../../conversion/decibels-to-linear.ts"
 import { linearToDb } from "../../conversion/linear-to-decibels.ts"
 
-const SILENCE = 0.00000000009
-
 /**
  * Tone.js FMSynth Instrument
  * Frequency modulation synthesizer
@@ -15,7 +13,7 @@ export default class ToneFMSynth implements IAudioOutput {
 	static ID: number = 0
 
 	options = {
-		title:"Tone.js FMSynth Instrument",
+		title: "Tone.js FMSynth Instrument",
 		// Default amplitude
 		gain: 0.8, // compensate Tone's quieter FM carrier
 		attack: 0.4, // in s
@@ -44,7 +42,7 @@ export default class ToneFMSynth implements IAudioOutput {
 		harmonicity: 3.0, // ratio of modulator to carrier frequency
 		modulationIndex: 40, // strength of modulation
 		oscillator: {
-			type: "triangle"
+			type: "triangle" as const
 		},
 		envelope: {
 			attack: 0.4,
@@ -53,7 +51,7 @@ export default class ToneFMSynth implements IAudioOutput {
 			release: 0.3
 		},
 		modulation: {
-			type: "triangle"
+			type: "triangle" as const
 		},
 		modulationEnvelope: {
 			attack: 0.5,
@@ -153,15 +151,16 @@ export default class ToneFMSynth implements IAudioOutput {
 	}
 
 	private async ensureInitialized() {
-		if (this.#initialized) return
-		
+		if (this.#initialized) {
+			return
+		}
+
 		const Tone = await import("tone")
 		const { FMSynth } = Tone
-		
+
 		// Tell Tone.js to use the shared AudioContext
 		Tone.setContext(this.#audioContext as any)
-		
-		
+
 		// Initialize Tone.js FMSynth and connect to our gain node
 		this.#synth = new FMSynth({
 			harmonicity: this.options.harmonicity,
@@ -172,10 +171,10 @@ export default class ToneFMSynth implements IAudioOutput {
 			modulationEnvelope: this.options.modulationEnvelope,
 			volume: 0 // Tone volume is 0, use our gainNode instead
 		})
-		
+
 		// Connect the synth's output to our gain node for routing through the app's audio graph
 		this.#synth.connect(this.#gainNode)
-		
+
 		this.#initialized = true
 	}
 
@@ -207,12 +206,12 @@ export default class ToneFMSynth implements IAudioOutput {
 	 * Note ON
 	 * @param {Number} noteNumber - MIDI note number
 	 * @param {Number} velocity - strength of the note (0-127)
-	 * @param {Array<Number>} arp - intervals (currently unused)
+	 * @param {Array<Number>} _arp - intervals (currently unused)
 	 * @param {Number} delay - number to pause before playing
 	 */
-	async noteOn(noteNumber: number, velocity: number = 127, arp = null, delay: number = 0) {
+	async noteOn(noteNumber: number, velocity: number = 127, _arp = null, delay: number = 0) {
 		await this.ensureInitialized()
-		
+
 		const frequency = noteNumberToFrequency(noteNumber)
 		const startTime = this.now + delay
 		const amplitude = velocityToGain(velocity)

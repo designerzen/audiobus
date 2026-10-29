@@ -11,9 +11,9 @@ import type { DeviceClassification, DeviceAttribution } from "./device-classific
  */
 
 import * as OUTPUT_TYPES from "./outputs/output-types.ts"
-import { CLAP_PATCHES } from '../instruments/clap/clap-catalog'
-import { WAM2_INSTRUMENTS, wam2OutputId } from '../wam/registry'
-import { OUTPUT_PREVIEWS } from './output-previews'
+import { CLAP_PATCHES } from "../instruments/clap/clap-catalog"
+import { WAM2_INSTRUMENTS, wam2OutputId } from "../wam/registry"
+import { OUTPUT_PREVIEWS } from "./output-previews"
 
 export interface OutputDefinition extends DeviceClassification {
 	id: string
@@ -27,63 +27,117 @@ export interface OutputDefinition extends DeviceClassification {
 }
 
 export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
-    [OUTPUT_TYPES.SYNTH_303]: {
-        id: OUTPUT_TYPES.SYNTH_303, name: '303',
-        description: 'Original AudioBus wavetable bass synthesis with slide, accent, foldback distortion and delay',
-        type: 'engine', subtype: 'instrument', category: 'Synthesis', icon: '/icons/output-tb303.svg',
-        attribution: { author: 'Emil Loer; AudioBus port by designerzen',
-            sourceUrl: 'https://github.com/designerzen/audiobus/blob/ts2wp2es6pug/source/code/typescript/audiobus/instruments/TB303/TB303.ts',
-            license: 'GPL-3.0-or-later', licenseUrls: ['https://www.gnu.org/licenses/gpl-3.0.html'] },
-    },
-	[OUTPUT_TYPES.DRUM_KIT]: {
-		id: OUTPUT_TYPES.DRUM_KIT, name: 'Drum Kit',
-		description: 'Play synthesized drums, hi-hats, toms, cowbells and congas from MIDI notes or touch pads; no samples required',
-		type: 'engine', subtype: 'instrument', category: 'Synthesis', icon: '/icons/device-drums.svg',
+	[OUTPUT_TYPES.SYNTH_303]: {
+		id: OUTPUT_TYPES.SYNTH_303,
+		name: "303",
+		description:
+			"Original AudioBus wavetable bass synthesis with slide, accent, foldback distortion and delay",
+		type: "engine",
+		subtype: "instrument",
+		category: "Synthesis",
+		icon: "/icons/output-tb303.svg",
+		attribution: {
+			author: "Emil Loer; AudioBus port by designerzen",
+			sourceUrl:
+				"https://github.com/designerzen/audiobus/blob/ts2wp2es6pug/source/code/typescript/audiobus/instruments/TB303/TB303.ts",
+			license: "GPL-3.0-or-later",
+			licenseUrls: ["https://www.gnu.org/licenses/gpl-3.0.html"]
+		}
 	},
-    [OUTPUT_TYPES.SION]: {
-        id: OUTPUT_TYPES.SION, name: 'SiON', description: 'Polyphonic SiON synthesizer with FM, chip and acoustic instrument presets',
-        type: 'engine', subtype: 'instrument', category: 'Synthesis', icon: '/icons/device-piano.svg',
-    },
-    [OUTPUT_TYPES.NOTE_MONITOR]: {
-        id: OUTPUT_TYPES.NOTE_MONITOR, name: 'Piano Roll / Note Monitor', description: 'View transformed pitches, channels, velocities and note durations',
-        type: 'visual', subtype: 'visualiser', category: 'Visual', icon: '/icons/device-piano.svg',
-    },
-    [OUTPUT_TYPES.SAMPLE_PLAYER]: {
-        id: OUTPUT_TYPES.SAMPLE_PLAYER, name: 'Sample Player', description: 'Load your own audio sample and play it across the keyboard; samples persist with the workspace',
-        type: 'engine', subtype: 'instrument', category: 'Audio', icon: '/icons/output-recorder.svg',
-    },
-    [OUTPUT_TYPES.EVENT_RECORDER]: {
-        id: OUTPUT_TYPES.EVENT_RECORDER, name: 'Event Recorder / Looper', description: 'Record this chain’s musical commands and download a replayable event loop',
-        type: 'midi', subtype: 'device', category: 'Recording', icon: '/icons/output-recorder.svg',
-    },
-    [OUTPUT_TYPES.OSC]: {
-        id: OUTPUT_TYPES.OSC, name: 'OSC Bridge', description: 'Send notes and controllers to a binary OSC WebSocket bridge',
-        type: 'midi', subtype: 'device', category: 'Network', icon: '/icons/output-webmidi.svg',
-    },
-    [OUTPUT_TYPES.PERFORMANCE]: {
-        id: OUTPUT_TYPES.PERFORMANCE, type: 'visual', subtype: 'visualiser', name: 'Performance',
-        description: 'Monitor IOChain event load, processing delays, FPS, main-thread pressure and Netronome timing with lag markers.',
-        icon: '/icons/output-performance.svg', category: 'Monitoring',
-    },
-    [OUTPUT_TYPES.RECORDER]: {
-        id: OUTPUT_TYPES.RECORDER, type: 'audio', subtype: 'utility', name: 'Recorder',
-        description: 'Record the app’s master audio, review the last take and export WAV. All Recorder outputs share the recording session.',
-        icon: '/icons/output-recorder.svg', category: 'Audio',
-    },
+	[OUTPUT_TYPES.DRUM_KIT]: {
+		id: OUTPUT_TYPES.DRUM_KIT,
+		name: "Drum Kit",
+		description:
+			"Play synthesized drums, hi-hats, toms, cowbells and congas from MIDI notes or touch pads; no samples required",
+		type: "engine",
+		subtype: "instrument",
+		category: "Synthesis",
+		icon: "/icons/device-drums.svg"
+	},
+	[OUTPUT_TYPES.SION]: {
+		id: OUTPUT_TYPES.SION,
+		name: "SiON",
+		description: "Polyphonic SiON synthesizer with FM, chip and acoustic instrument presets",
+		type: "engine",
+		subtype: "instrument",
+		category: "Synthesis",
+		icon: "/icons/device-piano.svg"
+	},
+	[OUTPUT_TYPES.NOTE_MONITOR]: {
+		id: OUTPUT_TYPES.NOTE_MONITOR,
+		name: "Piano Roll / Note Monitor",
+		description: "View transformed pitches, channels, velocities and note durations",
+		type: "visual",
+		subtype: "visualiser",
+		category: "Visual",
+		icon: "/icons/device-piano.svg"
+	},
+	[OUTPUT_TYPES.SAMPLE_PLAYER]: {
+		id: OUTPUT_TYPES.SAMPLE_PLAYER,
+		name: "Sample Player",
+		description:
+			"Load your own audio sample and play it across the keyboard; samples persist with the workspace",
+		type: "engine",
+		subtype: "instrument",
+		category: "Audio",
+		icon: "/icons/output-recorder.svg"
+	},
+	[OUTPUT_TYPES.EVENT_RECORDER]: {
+		id: OUTPUT_TYPES.EVENT_RECORDER,
+		name: "Event Recorder / Looper",
+		description: "Record this chain’s musical commands and download a replayable event loop",
+		type: "midi",
+		subtype: "device",
+		category: "Recording",
+		icon: "/icons/output-recorder.svg"
+	},
+	[OUTPUT_TYPES.OSC]: {
+		id: OUTPUT_TYPES.OSC,
+		name: "OSC Bridge",
+		description: "Send notes and controllers to a binary OSC WebSocket bridge",
+		type: "midi",
+		subtype: "device",
+		category: "Network",
+		icon: "/icons/output-webmidi.svg"
+	},
+	[OUTPUT_TYPES.PERFORMANCE]: {
+		id: OUTPUT_TYPES.PERFORMANCE,
+		type: "visual",
+		subtype: "visualiser",
+		name: "Performance",
+		description:
+			"Monitor IOChain event load, processing delays, FPS, main-thread pressure and Netronome timing with lag markers.",
+		icon: "/icons/output-performance.svg",
+		category: "Monitoring"
+	},
+	[OUTPUT_TYPES.RECORDER]: {
+		id: OUTPUT_TYPES.RECORDER,
+		type: "audio",
+		subtype: "utility",
+		name: "Recorder",
+		description:
+			"Record the app’s master audio, review the last take and export WAV. All Recorder outputs share the recording session.",
+		icon: "/icons/output-recorder.svg",
+		category: "Audio"
+	},
 	[OUTPUT_TYPES.TB303]: {
 		id: OUTPUT_TYPES.TB303,
-		type: 'engine', subtype: 'instrument', name: 'TB-303',
-		description: 'Monophonic acid bass with a nonlinear diode ladder, pitch slide and accents',
-		icon: '/icons/output-tb303.svg', category: 'Synthesis',
+		type: "engine",
+		subtype: "instrument",
+		name: "TB-303",
+		description: "Monophonic acid bass with a nonlinear diode ladder, pitch slide and accents",
+		icon: "/icons/output-tb303.svg",
+		category: "Synthesis"
 	},
 	[OUTPUT_TYPES.DRUM_ACCOMPANIMENT]: {
 		id: OUTPUT_TYPES.DRUM_ACCOMPANIMENT,
-		type: 'engine',
-		subtype: 'instrument',
-		name: 'Drum Accompaniment',
-		description: 'Plays a steady break on the global clock with note activity variations, tuning and compression',
-		icon: '/icons/device-drums.svg',
-		category: 'Synthesis',
+		type: "engine",
+		subtype: "instrument",
+		name: "Drum Accompaniment",
+		description:
+			"Plays a steady break on the global clock with note activity variations, tuning and compression",
+		icon: "/icons/device-drums.svg",
+		category: "Synthesis"
 	},
 	[OUTPUT_TYPES.MOOG]: {
 		id: OUTPUT_TYPES.MOOG,
@@ -92,24 +146,40 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "Moog",
 		description: "Photosynth MoogFF ladder synthesizer with MIDI and WAM2 controls",
 		icon: "/icons/output-wam2.svg",
-		category: "Synthesis",
+		category: "Synthesis"
 	},
-	...Object.fromEntries(CLAP_PATCHES.filter(patch => patch.features?.includes('instrument')).map(patch => [OUTPUT_TYPES.webclapOutputId(patch.id), {
-		id: OUTPUT_TYPES.webclapOutputId(patch.id),
-		type: patch.type ?? (patch.features?.includes('instrument') ? 'engine' : 'audio'),
-		subtype: patch.subtype ?? (patch.features?.includes('instrument') ? 'instrument' : 'effect'),
-		name: `WebCLAP: ${patch.name}`,
-		title: patch.title,
-		description: patch.description ?? `WebCLAP plugin by ${patch.author}`,
-		attribution: patch.attribution,
-		icon: '/icons/output-webclap.svg',
-		category: patch.category ?? 'WebCLAP',
-	} satisfies OutputDefinition])),
-	...Object.fromEntries(WAM2_INSTRUMENTS.map(plugin => [wam2OutputId(plugin), {
-		id: wam2OutputId(plugin), type: 'engine', subtype: 'instrument',
-		name: `${plugin.name} (WAM2)`, description: plugin.description,
-		icon: '/icons/output-wam2.svg', category: 'Audio',
-	}])),
+	...Object.fromEntries(
+		CLAP_PATCHES.filter((patch) => patch.features?.includes("instrument")).map((patch) => [
+			OUTPUT_TYPES.webclapOutputId(patch.id),
+			{
+				id: OUTPUT_TYPES.webclapOutputId(patch.id),
+				type: patch.type ?? (patch.features?.includes("instrument") ? "engine" : "audio"),
+				subtype:
+					patch.subtype ??
+					(patch.features?.includes("instrument") ? "instrument" : "effect"),
+				name: `WebCLAP: ${patch.name}`,
+				title: patch.title,
+				description: patch.description ?? `WebCLAP plugin by ${patch.author}`,
+				attribution: patch.attribution,
+				icon: "/icons/output-webclap.svg",
+				category: patch.category ?? "WebCLAP"
+			} satisfies OutputDefinition
+		])
+	),
+	...Object.fromEntries(
+		WAM2_INSTRUMENTS.map((plugin) => [
+			wam2OutputId(plugin),
+			{
+				id: wam2OutputId(plugin),
+				type: "engine",
+				subtype: "instrument",
+				name: `${plugin.name} (WAM2)`,
+				description: plugin.description,
+				icon: "/icons/output-wam2.svg",
+				category: "Audio"
+			}
+		])
+	),
 	[OUTPUT_TYPES.DESCRIBE]: {
 		id: OUTPUT_TYPES.DESCRIBE,
 		type: "visual",
@@ -117,7 +187,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "Describe",
 		description: "Describes notes, chords, extensions and inversions in musical language",
 		icon: "/icons/output-describe.svg",
-		category: "Visual",
+		category: "Visual"
 	},
 	[OUTPUT_TYPES.CONSOLE]: {
 		id: OUTPUT_TYPES.CONSOLE,
@@ -126,7 +196,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "Console",
 		description: "Logs MIDI events to browser console (dev mode only)",
 		icon: "/icons/output-console.svg",
-		category: "Debug",
+		category: "Debug"
 	},
 
 	[OUTPUT_TYPES.PINK_TROMBONE]: {
@@ -136,7 +206,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "Pink Trombone",
 		description: "Vocal synthesis engine with speech-like sounds",
 		icon: "/icons/output-pink-trombone.svg",
-		category: "Synthesis",
+		category: "Synthesis"
 	},
 
 	[OUTPUT_TYPES.NOTATION]: {
@@ -146,7 +216,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "Notation",
 		description: "Displays notes on a musical staff",
 		icon: "/icons/output-notation.svg",
-		category: "Visual",
+		category: "Visual"
 	},
 
 	[OUTPUT_TYPES.SPECTRUM_ANALYSER]: {
@@ -156,7 +226,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "Spectrum Analyser",
 		description: "Visualizes audio spectrum using FFT analysis with realtime waveform display",
 		icon: "/icons/output-spectrum-analyser.svg",
-		category: "Visualizer",
+		category: "Visualizer"
 	},
 
 	[OUTPUT_TYPES.SPEECH_SYNTHESIS]: {
@@ -166,7 +236,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "Speech Synthesis",
 		description: "Uses the Web Speech Synthesis API to sing note names",
 		icon: "/icons/output-speech-synthesis.svg",
-		category: "Audio",
+		category: "Audio"
 	},
 
 	[OUTPUT_TYPES.VIBRATOR]: {
@@ -176,7 +246,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "Vibrator",
 		description: "Triggers device vibration when a note within a range is played",
 		icon: "/icons/output-vibrator.svg",
-		category: "Haptic",
+		category: "Haptic"
 	},
 
 	[OUTPUT_TYPES.WAM2]: {
@@ -186,7 +256,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "WAM2",
 		description: "Manages the WAM2 Audio Engine",
 		icon: "/icons/output-wam2.svg",
-		category: "Audio",
+		category: "Audio"
 	},
 	[OUTPUT_TYPES.WAM]: {
 		id: OUTPUT_TYPES.WAM,
@@ -195,7 +265,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "WAM",
 		description: "Legacy Web Audio Modules: Yoshimi and webDX7",
 		icon: "/icons/output-wam2.svg",
-		category: "Audio",
+		category: "Audio"
 	},
 
 	[OUTPUT_TYPES.WEBMIDI]: {
@@ -205,7 +275,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "WebMIDI Device",
 		description: "Sends MIDI messages to a connected WebMIDI device",
 		icon: "/icons/output-webmidi.svg",
-		category: "MIDI",
+		category: "MIDI"
 	},
 
 	[OUTPUT_TYPES.NATIVE_MIDI]: {
@@ -213,9 +283,10 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		type: "midi",
 		subtype: "device",
 		name: "Native MIDI Device",
-		description: "Sends MIDI messages to a connected native OS MIDI device (Windows/macOS/Linux)",
+		description:
+			"Sends MIDI messages to a connected native OS MIDI device (Windows/macOS/Linux)",
 		icon: "/icons/output-native-midi.svg",
-		category: "MIDI",
+		category: "MIDI"
 	},
 
 	[OUTPUT_TYPES.BLE_MIDI]: {
@@ -225,7 +296,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "BLE MIDI",
 		description: "BLE MIDI",
 		icon: "/icons/output-ble-midi.svg",
-		category: "MIDI",
+		category: "MIDI"
 	},
 
 	[OUTPUT_TYPES.MIDI2]: {
@@ -235,7 +306,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "MIDI 2.0",
 		description: "MIDI 2.0 device output",
 		icon: "/icons/output-midi2.svg",
-		category: "MIDI",
+		category: "MIDI"
 	},
 
 	[OUTPUT_TYPES.MIDI2_NATIVE]: {
@@ -243,9 +314,10 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		type: "midi",
 		subtype: "device",
 		name: "MIDI 2.0 Native",
-		description: "MIDI 2.0 output with per-note controllers via native OS MIDI (16-bit resolution, Windows/macOS/Linux)",
+		description:
+			"MIDI 2.0 output with per-note controllers via native OS MIDI (16-bit resolution, Windows/macOS/Linux)",
 		icon: "/icons/output-midi2-native.svg",
-		category: "MIDI",
+		category: "MIDI"
 	},
 
 	[OUTPUT_TYPES.SUPERSONIC]: {
@@ -255,7 +327,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "Supersonic",
 		description: "SuperCollider-based sound synthesis engine",
 		icon: "/icons/output-supersonic.svg",
-		category: "Synthesis",
+		category: "Synthesis"
 	},
 
 	[OUTPUT_TYPES.METRONOME]: {
@@ -265,7 +337,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "Metronome",
 		description: "Produces audible clicks in response to MIDI clock signals",
 		icon: "/icons/output-metronome.svg",
-		category: "Utility",
+		category: "Utility"
 	},
 
 	[OUTPUT_TYPES.AUDIO_CLICK]: {
@@ -275,7 +347,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "Audio Click",
 		description: "Plays audio click sounds from a selected asset library on every bar",
 		icon: "/icons/output-audio-click.svg",
-		category: "Utility",
+		category: "Utility"
 	},
 	[OUTPUT_TYPES.BUTTERCHURN]: {
 		id: OUTPUT_TYPES.BUTTERCHURN,
@@ -284,7 +356,7 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "Butterchurn",
 		description: "WebGL music visualiser with animated patterns synced to audio",
 		icon: "/icons/output-butterchurn.svg",
-		category: "Visualizer",
+		category: "Visualizer"
 	},
 	[OUTPUT_TYPES.YOSHIMI]: {
 		id: OUTPUT_TYPES.YOSHIMI,
@@ -293,8 +365,8 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		name: "Yoshimi",
 		description: "Software synthesizer with instrument presets",
 		icon: "/icons/output-yoshimi.svg",
-		category: "Synthesis",
-	},
+		category: "Synthesis"
+	}
 } satisfies Record<OUTPUT_TYPES.OutputId, OutputDefinition>
 
 for (const definition of Object.values(OUTPUT_DEFINITIONS)) {

@@ -59,5 +59,5 @@ export const GENERAL_MIDI_PERCUSSION_NOTES: Readonly<Record<string, number>> = O
 	fingerSnap: 39,
 	syndrum: 47,
 	laserTom: 48,
-	metalHit: 53,
+	metalHit: 53
 })

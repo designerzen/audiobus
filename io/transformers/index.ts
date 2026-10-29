@@ -3,25 +3,25 @@
  * Effects and signal processors for the audio pipeline
  */
 
-export type { ITransformer } from './interface-transformer.ts'
-export { default as Transformer } from './abstract-transformer.ts'
-export { TransformerVelocityShaper } from './transformer-velocity-shaper.ts'
-export { TransformerStrummer } from './transformer-strummer.ts'
-export { TransformerProbabilityGate } from './transformer-probability-gate.ts'
-export { TransformerNoteMapper } from './transformer-note-mapper.ts'
-export { TransformerLatch } from './transformer-latch.ts'
-export { TransformerEuclideanGate } from './transformer-euclidean-gate.ts'
-export { TransformerVoiceLeader } from './transformer-voice-leader.ts'
-export { TransformerCCAnimator } from './transformer-cc-animator.ts'
-export { TransformerOrnamenter } from './transformer-ornamenter.ts'
-export { TransformerPhraseRecombiner } from './transformer-phrase-recombiner.ts'
-export { TransformerLegato } from './transformer-legato.ts'
-export { TransformerCCMapper } from './transformer-cc-mapper.ts'
-export { TransformerPitchMirror } from './transformer-pitch-mirror.ts'
-export { TransformerIntervalStack } from './transformer-interval-stack.ts'
-export { TransformerNoteBouncer } from './transformer-note-bouncer.ts'
-export { TransformerReleaseTrigger } from './transformer-release-trigger.ts'
-export { TransformerPolyphonyLimiter } from './transformer-polyphony-limiter.ts'
-export { TransformerNoteRouter } from './transformer-note-router.ts'
-export { TransformerChannelAllocator } from './transformer-channel-allocator.ts'
-export { TransformerCCStepper } from './transformer-cc-stepper.ts'
+export type { ITransformer } from "./interface-transformer.ts"
+export { default as Transformer } from "./abstract-transformer.ts"
+export { TransformerVelocityShaper } from "./transformer-velocity-shaper.ts"
+export { TransformerStrummer } from "./transformer-strummer.ts"
+export { TransformerProbabilityGate } from "./transformer-probability-gate.ts"
+export { TransformerNoteMapper } from "./transformer-note-mapper.ts"
+export { TransformerLatch } from "./transformer-latch.ts"
+export { TransformerEuclideanGate } from "./transformer-euclidean-gate.ts"
+export { TransformerVoiceLeader } from "./transformer-voice-leader.ts"
+export { TransformerCCAnimator } from "./transformer-cc-animator.ts"
+export { TransformerOrnamenter } from "./transformer-ornamenter.ts"
+export { TransformerPhraseRecombiner } from "./transformer-phrase-recombiner.ts"
+export { TransformerLegato } from "./transformer-legato.ts"
+export { TransformerCCMapper } from "./transformer-cc-mapper.ts"
+export { TransformerPitchMirror } from "./transformer-pitch-mirror.ts"
+export { TransformerIntervalStack } from "./transformer-interval-stack.ts"
+export { TransformerNoteBouncer } from "./transformer-note-bouncer.ts"
+export { TransformerReleaseTrigger } from "./transformer-release-trigger.ts"
+export { TransformerPolyphonyLimiter } from "./transformer-polyphony-limiter.ts"
+export { TransformerNoteRouter } from "./transformer-note-router.ts"
+export { TransformerChannelAllocator } from "./transformer-channel-allocator.ts"
+export { TransformerCCStepper } from "./transformer-cc-stepper.ts"

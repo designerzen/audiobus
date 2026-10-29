@@ -1,163 +1,163 @@
 :host {
-    display: block;
-    width: var(--width, 100%);
-    max-width: var(--max-width, 42rem);
-    margin-inline: var(--margin-inline, auto);
-    color: var(--color, var(--col-plum, #6f263d));
-    background: var(--background-color, var(--background, #f5f3ed));
-    border-radius: var(--border-radius, 1rem);
-    font: var(
-        --font,
-        var(--font-size, 1rem)/var(--line-height, 1.5) var(--font-family, system-ui, sans-serif)
-    );
+	display: block;
+	width: var(--width, 100%);
+	max-width: var(--max-width, 42rem);
+	margin-inline: var(--margin-inline, auto);
+	color: var(--color, var(--col-plum, #6f263d));
+	background: var(--background-color, var(--background, #f5f3ed));
+	border-radius: var(--border-radius, 1rem);
+	font: var(
+		--font,
+		var(--font-size, 1rem)/var(--line-height, 1.5) var(--font-family, system-ui, sans-serif)
+	);
 }
 * {
-    box-sizing: border-box;
+	box-sizing: border-box;
 }
 figure {
-    margin: var(--margin, 0);
+	margin: var(--margin, 0);
 }
 svg {
-    display: block;
-    width: var(--width, 100%);
-    height: var(--height, auto);
-    user-select: none;
-    touch-action: none;
+	display: block;
+	width: var(--width, 100%);
+	height: var(--height, auto);
+	user-select: none;
+	touch-action: none;
 }
 [data-pad] {
-    cursor: var(--cursor, pointer);
-    transition: var(--transition, filter 90ms, fill 90ms);
+	cursor: var(--cursor, pointer);
+	transition: var(--transition, filter 90ms, fill 90ms);
 }
 [data-pad]:hover {
-    filter: var(--filter, brightness(1.1));
+	filter: var(--filter, brightness(1.1));
 }
 [data-pad][data-active] {
-    fill: var(--fill, var(--controller-active, #ffe277));
+	fill: var(--fill, var(--controller-active, #ffe277));
 }
 [data-pad][aria-pressed="true"] {
-    stroke: var(--stroke, #6f263d);
-    stroke-width: var(--stroke-width, 2px);
-    stroke-dasharray: 3 1;
+	stroke: var(--stroke, #6f263d);
+	stroke-width: var(--stroke-width, 2px);
+	stroke-dasharray: 3 1;
 }
 /* Pointer gestures focus pads too: suppress the native rectangular SVG ring. */
 [data-pad]:focus {
-    outline: none;
-    stroke: var(--stroke, var(--controller-focus, #141421));
-    stroke-width: var(--stroke-width, 4px);
+	outline: none;
+	stroke: var(--stroke, var(--controller-focus, #141421));
+	stroke-width: var(--stroke-width, 4px);
 }
 circle {
-    pointer-events: none;
+	pointer-events: none;
 }
 figcaption {
-    text-align: var(--text-align, center);
+	text-align: var(--text-align, center);
 }
 .controls {
-    display: flex;
-    flex-wrap: var(--flex-wrap, wrap);
-    gap: var(--gap, 0.8rem);
-    margin-top: var(--margin-top, 0.75rem);
+	display: flex;
+	flex-wrap: var(--flex-wrap, wrap);
+	gap: var(--gap, 0.8rem);
+	margin-top: var(--margin-top, 0.75rem);
 }
 label {
-    display: grid;
-    gap: var(--gap, 0.25rem);
-    flex: var(--flex, 1 1 8rem);
+	display: grid;
+	gap: var(--gap, 0.25rem);
+	flex: var(--flex, 1 1 8rem);
 }
 select,
 input,
 button {
-    font: var(--font, inherit);
-    min-height: max(44px, var(--min-height, 44px));
-    min-width: var(--min-width, 0);
-    width: var(--width, 100%);
-    border: var(
-        --border,
-        var(--border-width, 1px) var(--border-style, solid) var(--border-color, #aaa5a0)
-    );
-    border-radius: var(--border-radius, 0.4rem);
-    padding: var(--padding, 0.4rem);
-    background: var(--background-color, var(--background, #fff));
-    color: var(--color, #242329);
+	font: var(--font, inherit);
+	min-height: max(44px, var(--min-height, 44px));
+	min-width: var(--min-width, 0);
+	width: var(--width, 100%);
+	border: var(
+		--border,
+		var(--border-width, 1px) var(--border-style, solid) var(--border-color, #aaa5a0)
+	);
+	border-radius: var(--border-radius, 0.4rem);
+	padding: var(--padding, 0.4rem);
+	background: var(--background-color, var(--background, #fff));
+	color: var(--color, #242329);
 }
 select:focus-visible,
 input:focus-visible,
 button:focus-visible,
 summary:focus-visible {
-    outline: var(
-        --outline,
-        var(--outline-width, 3px) var(--outline-style, solid) var(--outline-color, #9c1844)
-    );
-    outline-offset: var(--outline-offset, 2px);
+	outline: var(
+		--outline,
+		var(--outline-width, 3px) var(--outline-style, solid) var(--outline-color, #9c1844)
+	);
+	outline-offset: var(--outline-offset, 2px);
 }
 p {
-    font-size: var(--font-size, 0.9rem);
-    margin: var(--margin, 0.8rem 0 0);
+	font-size: var(--font-size, 0.9rem);
+	margin: var(--margin, 0.8rem 0 0);
 }
 .actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-block: 0.8rem;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-block: 0.8rem;
 }
 button {
-    cursor: pointer;
-    width: auto;
+	cursor: pointer;
+	width: auto;
 }
 button[data-action="release"] {
-    background: #6f263d;
-    color: #fff;
+	background: #6f263d;
+	color: #fff;
 }
 button:disabled,
 input:disabled,
 select:disabled {
-    opacity: 0.6;
-    cursor: default;
+	opacity: 0.6;
+	cursor: default;
 }
 details {
-    border-top: 1px solid #aaa5a0;
-    margin-top: 0.8rem;
+	border-top: 1px solid #aaa5a0;
+	margin-top: 0.8rem;
 }
 summary {
-    cursor: pointer;
-    padding-block: 0.75rem;
-    min-height: 44px;
+	cursor: pointer;
+	padding-block: 0.75rem;
+	min-height: 44px;
 }
 .controls > label {
-    min-width: 0;
+	min-width: 0;
 }
 .custom-roots {
-    flex-basis: 100%;
+	flex-basis: 100%;
 }
 output {
-    display: block;
-    padding: 0.6rem;
-    background: #eee8dc;
-    color: #242329;
-    border-radius: 0.4rem;
+	display: block;
+	padding: 0.6rem;
+	background: #eee8dc;
+	color: #242329;
+	border-radius: 0.4rem;
 }
 .mapping {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
-    gap: 0.8rem;
-    font-size: 0.85rem;
-    overflow-wrap: anywhere;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+	gap: 0.8rem;
+	font-size: 0.85rem;
+	overflow-wrap: anywhere;
 }
 .mapping strong {
-    text-transform: capitalize;
+	text-transform: capitalize;
 }
 .mapping ol {
-    padding-left: 1.5rem;
+	padding-left: 1.5rem;
 }
 [data-status]:empty {
-    display: none;
+	display: none;
 }
 :host([disabled]) {
-    opacity: var(--opacity, 0.55);
+	opacity: var(--opacity, 0.55);
 }
 :host([disabled]) svg {
-    pointer-events: none;
+	pointer-events: none;
 }
 @media (prefers-reduced-motion: reduce) {
-    [data-pad] {
-        transition: none;
-    }
+	[data-pad] {
+		transition: none;
+	}
 }

@@ -1,4 +1,4 @@
-import { defineDevice, deviceId } from './device-definition'
+import { defineDevice, deviceId } from "./device-definition"
 /**
  * Factory for creating IOChain instances
  * Handles creation with optional predefined configurations
@@ -7,7 +7,7 @@ import IOChain from "./IO-chain"
 import * as INPUT_TYPES from "./inputs/input-types"
 import * as OUTPUT_TYPES from "./outputs/output-types"
 
-import type { ITimerControl as Timer } from "netronome"
+import type { Timer } from "netronome"
 import type { IAudioInput } from "./inputs/input-interface"
 import type { IAudioOutput } from "./outputs/output-interface"
 
@@ -102,7 +102,7 @@ export class IOChainFactory {
 	 * Get a preset by ID
 	 */
 	static getPreset(id: string): IOChainPreset | null {
-		return IOChainFactory.DEFAULT_PRESETS.find(p => p.id === id) || null
+		return IOChainFactory.DEFAULT_PRESETS.find((p) => p.id === id) || null
 	}
 
 	/**
@@ -121,13 +121,16 @@ export class IOChainFactory {
 		// Dynamically import factories
 		const { createInputById } = await import("./input-factory")
 		const { default: InputOnScreenKeyboard } = await import("./inputs/input-onscreen-keyboard")
-		const { default: OutputOnScreenKeyboard } = await import("./outputs/output-onscreen-keyboard")
+		const { default: OutputOnScreenKeyboard } =
+			await import("./outputs/output-onscreen-keyboard")
 		const { default: PolySynth } = await import("../instruments/polyphonic")
 
 		// Inputs
 		const inputKeyboard = await createInputById(INPUT_TYPES.KEYBOARD, createOptions)
 		const inputGamePad = await createInputById(INPUT_TYPES.GAMEPAD, createOptions)
-		const inputSVGKeyboard = defineDevice(new InputOnScreenKeyboard(createOptions), { factory: 'keyboard-input' })
+		const inputSVGKeyboard = defineDevice(new InputOnScreenKeyboard(createOptions), {
+			factory: "keyboard-input"
+		})
 
 		const inputs: IAudioInput[] = [inputKeyboard, inputGamePad, inputSVGKeyboard]
 
@@ -138,8 +141,11 @@ export class IOChainFactory {
 
 		// Add special inputs if available
 		try {
-			if (navigator.mediaDevices?.getUserMedia && options.autoConnect) {
-				const inputMicrophone = await createInputById(INPUT_TYPES.MICROPHONE_FORMANT, createOptions)
+			if (navigator.mediaDevices && options.autoConnect) {
+				const inputMicrophone = await createInputById(
+					INPUT_TYPES.MICROPHONE_FORMANT,
+					createOptions
+				)
 				inputs.push(inputMicrophone)
 			}
 		} catch (e) {
@@ -176,7 +182,12 @@ export class IOChainFactory {
 		// Outputs
 		const outputs: IAudioOutput[] = []
 		if (!options.outputDevices) {
-			outputs.push(defineDevice(new OutputOnScreenKeyboard(inputSVGKeyboard.keyboard), { factory: 'keyboard-output', inputId: deviceId(inputSVGKeyboard) }))
+			outputs.push(
+				defineDevice(new OutputOnScreenKeyboard(inputSVGKeyboard.keyboard), {
+					factory: "keyboard-output",
+					inputId: deviceId(inputSVGKeyboard)
+				})
+			)
 		}
 
 		// Add optional outputs
@@ -186,7 +197,9 @@ export class IOChainFactory {
 
 		// Add synthesizer if audioContext available
 		if (options.audioContext && !options.outputDevices) {
-			const musicalOutput = defineDevice(new PolySynth(options.audioContext), { factory: 'polyphonic' })
+			const musicalOutput = defineDevice(new PolySynth(options.audioContext), {
+				factory: "polyphonic"
+			})
 			musicalOutput.output.connect(options.outputMixer)
 			outputs.push(musicalOutput)
 		}
@@ -200,7 +213,10 @@ export class IOChainFactory {
 	/**
 	 * Create an IOChain from a preset configuration
 	 */
-	static async createFromPreset(preset: IOChainPreset, options: IOChainFactoryOptions): Promise<IOChain> {
+	static async createFromPreset(
+		preset: IOChainPreset,
+		options: IOChainFactoryOptions
+	): Promise<IOChain> {
 		const chain = new IOChain(options.timer)
 
 		const createOptions = {
@@ -234,13 +250,32 @@ export class IOChainFactory {
 			try {
 				let output: IAudioOutput
 
-				if (outputId === OUTPUT_TYPES.SPECTRUM_ANALYSER || outputId === OUTPUT_TYPES.BUTTERCHURN) {
-					output = await createOutputById(outputId, { 
+				if (
+					outputId === OUTPUT_TYPES.SPECTRUM_ANALYSER ||
+					outputId === OUTPUT_TYPES.BUTTERCHURN
+				) {
+					output = await createOutputById(outputId, {
 						mixer: options.outputMixer,
-						audioContext: options.audioContext 
+						audioContext: options.audioContext
 					})
-				} else if ([OUTPUT_TYPES.PINK_TROMBONE, OUTPUT_TYPES.WAM, OUTPUT_TYPES.WAM2, OUTPUT_TYPES.MOOG, OUTPUT_TYPES.TB303, OUTPUT_TYPES.YOSHIMI, OUTPUT_TYPES.DRUM_ACCOMPANIMENT, OUTPUT_TYPES.DRUM_KIT, OUTPUT_TYPES.SYNTH_303].includes(outputId as any) || outputId.startsWith('wam2:')) {
-					output = await createOutputById(outputId, { audioContext: options.audioContext, mixer: options.outputMixer })
+				} else if (
+					[
+						OUTPUT_TYPES.PINK_TROMBONE,
+						OUTPUT_TYPES.WAM,
+						OUTPUT_TYPES.WAM2,
+						OUTPUT_TYPES.MOOG,
+						OUTPUT_TYPES.TB303,
+						OUTPUT_TYPES.YOSHIMI,
+						OUTPUT_TYPES.DRUM_ACCOMPANIMENT,
+						OUTPUT_TYPES.DRUM_KIT,
+						OUTPUT_TYPES.SYNTH_303
+					].includes(outputId as any) ||
+					outputId.startsWith("wam2:")
+				) {
+					output = await createOutputById(outputId, {
+						audioContext: options.audioContext,
+						mixer: options.outputMixer
+					})
 				} else {
 					output = await createOutputById(outputId)
 				}
@@ -292,7 +327,7 @@ export class IOChainFactory {
 	 */
 	static async createMinimal(options: IOChainFactoryOptions): Promise<IOChain> {
 		return IOChainFactory.createFromPreset(
-			IOChainFactory.DEFAULT_PRESETS.find(p => p.id === "minimal")!,
+			IOChainFactory.DEFAULT_PRESETS.find((p) => p.id === "minimal")!,
 			options
 		)
 	}

@@ -1,5 +1,16 @@
-import { EVENT_READY, EVENT_ERROR, EVENT_LOADING_START, EVENT_LOADING_COMPLETE, EVENT_DEBUG, EVENT_SHUTDOWN, EVENT_DESTROY, EVENT_AUDIOCONTEXT_SUSPENDED, EVENT_AUDIOCONTEXT_RESUMED, EVENT_AUDIOCONTEXT_INTERRUPTED } from '../../event-constants.ts'
-import { SuperSonic } from "supersonic-scsynth"
+import {
+	EVENT_READY,
+	EVENT_ERROR,
+	EVENT_LOADING_START,
+	EVENT_LOADING_COMPLETE,
+	EVENT_DEBUG,
+	EVENT_SHUTDOWN,
+	EVENT_DESTROY,
+	EVENT_AUDIOCONTEXT_SUSPENDED,
+	EVENT_AUDIOCONTEXT_RESUMED,
+	EVENT_AUDIOCONTEXT_INTERRUPTED
+} from "../../event-constants.ts"
+import { SuperSonic, type SuperSonicEventMap, type SuperSonicMetrics } from "supersonic-scsynth"
 import type { IAudioOutput } from "./output-interface.ts"
 import { midiNoteToFrequency } from "../../conversion/note-to-frequency.ts"
 
@@ -14,106 +25,104 @@ import { midiNoteToFrequency } from "../../conversion/note-to-frequency.ts"
  * Preset configurations for common SuperCollider synthesizers
  */
 interface SynthPreset {
-    name: string
-    synthdef: string
-    description: string
-    defaultParams?: Record<string, number>
+	name: string
+	synthdef: string
+	description: string
+	defaultParams?: Record<string, number>
 }
 
 const BUILT_IN_PRESETS: SynthPreset[] = [
-    {
-        name: "Basic Sine",
-        synthdef: "default",
-        description: "Simple sine wave oscillator",
-        defaultParams: { amp: 0.2, pan: 0 }
-    },
-    {
-        name: "Bright Bell",
-        synthdef: "bell",
-        description: "Resonant bell-like tone",
-        defaultParams: { amp: 0.15, pan: 0, decay: 2 }
-    },
-    {
-        name: "Warm Pad",
-        synthdef: "pad",
-        description: "Warm, sustained pad sound",
-        defaultParams: { amp: 0.1, pan: 0, sustain: 4 }
-    },
-    {
-        name: "Bright Pluck",
-        synthdef: "pluck",
-        description: "Plucked string synthesis",
-        defaultParams: { amp: 0.2, pan: 0, decay: 1 }
-    },
-    {
-        name: "Ambient Texture",
-        synthdef: "ambient",
-        description: "Ambient pad with modulation",
-        defaultParams: { amp: 0.08, pan: 0, filterFreq: 2000 }
-    }
+	{
+		name: "Basic Sine",
+		synthdef: "default",
+		description: "Simple sine wave oscillator",
+		defaultParams: { amp: 0.2, pan: 0 }
+	},
+	{
+		name: "Bright Bell",
+		synthdef: "bell",
+		description: "Resonant bell-like tone",
+		defaultParams: { amp: 0.15, pan: 0, decay: 2 }
+	},
+	{
+		name: "Warm Pad",
+		synthdef: "pad",
+		description: "Warm, sustained pad sound",
+		defaultParams: { amp: 0.1, pan: 0, sustain: 4 }
+	},
+	{
+		name: "Bright Pluck",
+		synthdef: "pluck",
+		description: "Plucked string synthesis",
+		defaultParams: { amp: 0.2, pan: 0, decay: 1 }
+	},
+	{
+		name: "Ambient Texture",
+		synthdef: "ambient",
+		description: "Ambient pad with modulation",
+		defaultParams: { amp: 0.08, pan: 0, filterFreq: 2000 }
+	}
 ]
 
 export default class OutputSuperSonic implements IAudioOutput {
+	static ID: number = 0
 
-    static ID: number = 0
+	private supersonic: SuperSonic | null = null
+	private currentPreset: SynthPreset = BUILT_IN_PRESETS[0]
+	private activeNotes: Map<number, number> = new Map() // noteNumber -> nodeId
+	private nodeIdCounter: number = 1000
+	private metricsTimer?: ReturnType<typeof setInterval>
+	private bridge: MediaStreamAudioSourceNode | null = null
 
-    private supersonic: SuperSonic | null = null
-    private currentPreset: SynthPreset = BUILT_IN_PRESETS[0]
-    private activeNotes: Map<number, number> = new Map() // noteNumber -> nodeId
-    private nodeIdCounter: number = 1000
-    private bridge: MediaStreamAudioSourceNode | null = null
+	#uuid: string = "Output-SuperSonic-" + OutputSuperSonic.ID++
+	#connected: boolean = false
 
-    #uuid: string = "Output-SuperSonic-" + (OutputSuperSonic.ID++)
-    #connected: boolean = false
+	get uuid(): string {
+		return this.#uuid
+	}
 
-    get uuid(): string {
-        return this.#uuid
-    }
+	get name(): string {
+		return "OutputSuperSonic"
+	}
 
-    get name(): string {
-        return "OutputSuperSonic"
-    }
+	get description(): string {
+		return "SuperSonic SC Synth"
+	}
 
-    get description(): string {
-        return "SuperSonic SC Synth"
-    }
+	/**
+	 * Get the Web Audio AudioContext
+	 */
+	get audioContext(): AudioContext {
+		const ctx = this.getSupersonic().audioContext
+		if (!ctx) {
+			throw new Error("AudioContext not available")
+		}
+		return ctx
+	}
 
-    /**
-     * Get the Web Audio AudioContext
-     */
-    get audioContext(): AudioContext {
-        const ctx = this.getSupersonic().audioContext
-        if (!ctx) {
-            throw new Error("AudioContext not available")
-        }
-        return ctx
-    }
+	/**
+	 * Check if engine is initialized and ready (read-only property)
+	 */
+	get isInitialised(): boolean {
+		return this.supersonic !== null && this.supersonic.initialized
+	}
 
-    /**
-     * Check if engine is initialized and ready (read-only property)
-     */
-    get isInitialised(): boolean {
-        return this.supersonic !== null && this.supersonic.initialized
-    }
+	/**
+	 * Check if engine is currently initializing (read-only property)
+	 */
+	get isInitialising(): boolean {
+		return this.supersonic !== null && this.supersonic.initializing
+	}
 
-    /**
-     * Check if engine is currently initializing (read-only property)
-     */
-    get isInitialising(): boolean {
-        return this.supersonic !== null && this.supersonic.initializing
-    }
+	get isHidden(): boolean {
+		return false
+	}
 
-    get isHidden(): boolean {
-        return false
-    }
+	get isConnected(): boolean {
+		return this.#connected
+	}
 
-    get isConnected(): boolean {
-        return this.#connected
-    }
-
-    constructor(private destination?: AudioNode) {
-        
-    }
+	constructor(private destination?: AudioNode) {}
 
 	hasMidiOutput(): boolean {
 		return false
@@ -134,504 +143,534 @@ export default class OutputSuperSonic implements IAudioOutput {
 		return false
 	}
 
-    /**
-     * Initialize the SuperSonic audio engine
-     * Must be called after user interaction (click, tap, keypress)
-     * Requires COOP/COEP headers for SharedArrayBuffer support
-     * @throws Error if initialization fails or if already initializing
-     */
-    async connect(): Promise<SuperSonic> {
-        // Return early if already initialized
-        if (this.isInitialised) {
-            return this.supersonic!
-        }
+	/**
+	 * Initialize the SuperSonic audio engine
+	 * Must be called after user interaction (click, tap, keypress)
+	 * Requires COOP/COEP headers for SharedArrayBuffer support
+	 * @throws Error if initialization fails or if already initializing
+	 */
+	async connect(): Promise<SuperSonic> {
+		// Return early if already initialized
+		if (this.isInitialised) {
+			return this.supersonic!
+		}
 
-        // Return existing init if already in progress
-        if (this.isInitialising) {
-            // Wait for existing initialization to complete
-            return new Promise((resolve, reject) => {
-                const checkReady = setInterval(() => {
-                    if (this.isInitialised) {
-                        clearInterval(checkReady)
-                        resolve(this.supersonic!)
-                    }
-                }, 100)
-                // Timeout after 30s
-                setTimeout(() => {
-                    clearInterval(checkReady)
-                    reject(new Error("SuperSonic initialization timeout"))
-                }, 30000)
-            })
-        }
+		// Return existing init if already in progress
+		if (this.isInitialising) {
+			// Wait for existing initialization to complete
+			return new Promise((resolve, reject) => {
+				const checkReady = setInterval(() => {
+					if (this.isInitialised) {
+						clearInterval(checkReady)
+						resolve(this.supersonic!)
+					}
+				}, 100)
+				// Timeout after 30s
+				setTimeout(() => {
+					clearInterval(checkReady)
+					reject(new Error("SuperSonic initialization timeout"))
+				}, 30000)
+			})
+		}
 
-        try {
-            // Create SuperSonic instance with base URL for assets
-            this.supersonic = new SuperSonic({
-                baseURL: new URL(`${import.meta.env.BASE_URL}supersonic/`, document.baseURI).href,
-                audioContextOptions: {
-                    latencyHint: "playback",
-                },
-                scsynthOptions: {
-                    numBuffers: 4096,
-                },
-            })
+		try {
+			// Create SuperSonic instance with base URL for assets
+			this.supersonic = new SuperSonic({
+				baseURL: new URL(`${import.meta.env.BASE_URL}supersonic/`, document.baseURI).href,
+				audioContextOptions: {
+					latencyHint: "playback"
+				},
+				scsynthOptions: {
+					numBuffers: 4096
+				}
+			})
 
-            // Subscribe to detailed lifecycle events
-            this.setupAudioEngineListeners()
+			// Subscribe to detailed lifecycle events
+			this.setupAudioEngineListeners()
 
-            // Initialize the engine
-            await this.supersonic.init()
-            if (this.destination) {
-                // SuperSonic closes its context on shutdown, so keep ownership
-                // separate and bridge its stream into the application's final mix.
-                const context = this.supersonic.audioContext!
-                const stream = context.createMediaStreamDestination()
-                this.supersonic.node.disconnect()
-                this.supersonic.node.connect(stream)
-                this.bridge?.disconnect()
-                this.bridge = (this.destination.context as AudioContext).createMediaStreamSource(stream.stream)
-                this.bridge.connect(this.destination)
-            }
+			// Initialize the engine
+			await this.supersonic.init()
+			if (this.destination) {
+				// SuperSonic closes its context on shutdown, so keep ownership
+				// separate and bridge its stream into the application's final mix.
+				const context = this.supersonic.audioContext!
+				const stream = context.createMediaStreamDestination()
+				const node = this.supersonic.node as Pick<
+					AudioNode,
+					"connect" | "disconnect"
+				> | null
+				if (!node) {
+					throw new Error("SuperSonic audio node is unavailable")
+				}
+				node.disconnect()
+				node.connect(stream)
+				this.bridge?.disconnect()
+				this.bridge = (this.destination.context as AudioContext).createMediaStreamSource(
+					stream.stream
+				)
+				this.bridge.connect(this.destination)
+			}
 
-            this.#connected = true
-            return this.supersonic
-        } catch (error) {
-            console.error("Failed to initialize SuperSonic:", error)
-            this.bridge?.disconnect()
-            this.bridge = null
-            await this.supersonic?.destroy()
-            this.supersonic = null
-            this.#connected = false
-            throw error
-        }
-    }
+			this.#connected = true
+			return this.supersonic
+		} catch (error) {
+			console.error("Failed to initialize SuperSonic:", error)
+			this.bridge?.disconnect()
+			this.bridge = null
+			await this.supersonic?.destroy()
+			this.supersonic = null
+			this.#connected = false
+			throw error
+		}
+	}
 
 	async disconnect(): Promise<void> {
 		this.destroy()
 	}
 
-    /**
-     * Get the initialized SuperSonic instance
-     * @throws Error if not initialized
-     */
-    getSupersonic(): SuperSonic {
-        if (!this.supersonic) {
-            throw new Error("SuperSonic not initialised. Call init() first.")
-        }
-        return this.supersonic
-    }
+	/**
+	 * Get the initialized SuperSonic instance
+	 * @throws Error if not initialized
+	 */
+	getSupersonic(): SuperSonic {
+		if (!this.supersonic) {
+			throw new Error("SuperSonic not initialised. Call init() first.")
+		}
+		return this.supersonic
+	}
 
+	/**
+	 * Get set of loaded SynthDef names
+	 */
+	getLoadedSynthDefs(): Set<string> {
+		return new Set(this.getSupersonic().loadedSynthDefs.keys())
+	}
 
-    /**
-     * Get set of loaded SynthDef names
-     */
-    getLoadedSynthDefs(): Set<string> {
-        return this.getSupersonic().loadedSynthDefs
-    }
+	/**
+	 * Get boot statistics
+	 */
+	getBootStats(): Record<string, any> {
+		return this.getSupersonic().bootStats
+	}
 
-    /**
-     * Get boot statistics
-     */
-    getBootStats(): Record<string, any> {
-        return this.getSupersonic().bootStats
-    }
+	/**
+	 * Get static engine configuration
+	 */
+	getInfo(): Record<string, any> {
+		return this.getSupersonic().getInfo()
+	}
 
-    /**
-     * Get static engine configuration
-     */
-    getInfo(): Record<string, any> {
-        return this.getSupersonic().getInfo()
-    }
+	/**
+	 * Get available presets
+	 */
+	getPresets(): SynthPreset[] {
+		return BUILT_IN_PRESETS
+	}
 
-    /**
-     * Get available presets
-     */
-    getPresets(): SynthPreset[] {
-        return BUILT_IN_PRESETS
-    }
+	/**
+	 * Get current active preset
+	 */
+	getCurrentPreset(): SynthPreset {
+		return this.currentPreset
+	}
 
-    /**
-     * Get current active preset
-     */
-    getCurrentPreset(): SynthPreset {
-        return this.currentPreset
-    }
+	/**
+	 * Select a preset by name
+	 * @param presetName - Name of the preset to activate
+	 * @throws Error if preset not found
+	 */
+	selectPreset(presetName: string): void {
+		const preset = BUILT_IN_PRESETS.find((p) => p.name === presetName)
+		if (!preset) {
+			throw new Error(`Preset "${presetName}" not found`)
+		}
+		this.currentPreset = preset
+		console.info(`Switched to preset: ${preset.name} (${preset.synthdef})`)
+	}
 
-    /**
-     * Select a preset by name
-     * @param presetName - Name of the preset to activate
-     * @throws Error if preset not found
-     */
-    selectPreset(presetName: string): void {
-        const preset = BUILT_IN_PRESETS.find(p => p.name === presetName)
-        if (!preset) {
-            throw new Error(`Preset "${presetName}" not found`)
-        }
-        this.currentPreset = preset
-        console.info(`Switched to preset: ${preset.name} (${preset.synthdef})`)
-    }
+	/**
+	 * Play a note using the current preset
+	 * @param noteNumber - MIDI note number (0-127)
+	 * @param velocity - MIDI velocity (0-127)
+	 */
+	noteOn(noteNumber: number, velocity: number): void {
+		if (!this.isInitialised) {
+			console.warn("SuperSonic not initialized. Call init() first.")
+			return
+		}
 
-    /**
-     * Play a note using the current preset
-     * @param noteNumber - MIDI note number (0-127)
-     * @param velocity - MIDI velocity (0-127)
-     */
-    noteOn(noteNumber: number, velocity: number): void {
-        if (!this.isInitialised) {
-            console.warn("SuperSonic not initialized. Call init() first.")
-            return
-        }
+		const ss = this.getSupersonic()
+		const midiNote = Math.round(noteNumber)
+		const midiVelocity = Math.max(0, Math.min(127, Math.round(velocity)))
 
-        const ss = this.getSupersonic()
-        const midiNote = Math.round(noteNumber)
-        const midiVelocity = Math.max(0, Math.min(127, Math.round(velocity)))
+		try {
+			// Convert MIDI note to frequency
+			const frequency = midiNoteToFrequency(midiNote)
 
-        try {
-            // Convert MIDI note to frequency
-            const frequency = midiNoteToFrequency(midiNote)
+			// Get velocity as 0-1 range for amplitude
+			const amp = (midiVelocity / 127) * 0.2 // Scale to avoid clipping
 
-            // Get velocity as 0-1 range for amplitude
-            const amp = (midiVelocity / 127) * 0.2 // Scale to avoid clipping
+			// Build synth parameters
+			const params = {
+				freq: frequency,
+				amp: amp,
+				...this.currentPreset.defaultParams
+			}
 
-            // Build synth parameters
-            const params = {
-                freq: frequency,
-                amp: amp,
-                ...(this.currentPreset.defaultParams || {})
-            }
+			// Generate unique node ID for this note
+			const nodeId = this.nodeIdCounter++
 
-            // Generate unique node ID for this note
-            const nodeId = this.nodeIdCounter++
+			// Send OSC message to create synth instance
+			// /s_new synthname, nodeId, action, target, [param, value, ...]
+			ss.send(
+				"/s_new",
+				this.currentPreset.synthdef,
+				nodeId,
+				0,
+				1,
+				...this.flattenParams(params)
+			)
 
-            // Send OSC message to create synth instance
-            // /s_new synthname, nodeId, action, target, [param, value, ...]
-            ss.send("/s_new", this.currentPreset.synthdef, nodeId, 0, 1, ...this.flattenParams(params))
+			// Track the active note
+			this.activeNotes.set(midiNote, nodeId)
 
-            // Track the active note
-            this.activeNotes.set(midiNote, nodeId)
+			console.debug(
+				`Synth triggered: ${this.currentPreset.synthdef} (note: ${midiNote}, freq: ${frequency.toFixed(2)}Hz)`
+			)
+		} catch (error) {
+			console.error("Failed to trigger synth on noteOn:", error)
+		}
+	}
 
-            console.debug(`Synth triggered: ${this.currentPreset.synthdef} (note: ${midiNote}, freq: ${frequency.toFixed(2)}Hz)`)
-        } catch (error) {
-            console.error("Failed to trigger synth on noteOn:", error)
-        }
-    }
+	/**
+	 * Stop playing a note
+	 * @param noteNumber - MIDI note number to stop
+	 */
+	noteOff(noteNumber: number): void {
+		if (!this.isInitialised) {
+			return
+		}
 
-    /**
-     * Stop playing a note
-     * @param noteNumber - MIDI note number to stop
-     */
-    noteOff(noteNumber: number): void {
-        if (!this.isInitialised) {
-            return
-        }
+		const ss = this.getSupersonic()
+		const midiNote = Math.round(noteNumber)
+		const nodeId = this.activeNotes.get(midiNote)
 
-        const ss = this.getSupersonic()
-        const midiNote = Math.round(noteNumber)
-        const nodeId = this.activeNotes.get(midiNote)
+		if (nodeId === undefined) {
+			return // Note was not playing
+		}
 
-        if (nodeId === undefined) {
-            return // Note was not playing
-        }
+		try {
+			// Send OSC message to release synth
+			// /n_release nodeId, releaseTime
+			ss.send("/n_release", nodeId, 0.1) // 100ms release
 
-        try {
-            // Send OSC message to release synth
-            // /n_release nodeId, releaseTime
-            ss.send("/n_release", nodeId, 0.1) // 100ms release
+			this.activeNotes.delete(midiNote)
+			console.debug(`Synth released: node ${nodeId}`)
+		} catch (error) {
+			console.error("Failed to release synth on noteOff:", error)
+		}
+	}
 
-            this.activeNotes.delete(midiNote)
-            console.debug(`Synth released: node ${nodeId}`)
-        } catch (error) {
-            console.error("Failed to release synth on noteOff:", error)
-        }
-    }
+	/**
+	 * Stop all currently playing notes
+	 */
+	allNotesOff(): void {
+		if (!this.isInitialised) {
+			return
+		}
 
-    /**
-     * Stop all currently playing notes
-     */
-    allNotesOff(): void {
-        if (!this.isInitialised) {
-            return
-        }
+		const ss = this.getSupersonic()
 
-        const ss = this.getSupersonic()
+		try {
+			// Release all active notes
+			for (const [, nodeId] of this.activeNotes.entries()) {
+				ss.send("/n_release", nodeId, 0.05) // 50ms release
+			}
 
-        try {
-            // Release all active notes
-            for (const [noteNumber, nodeId] of this.activeNotes.entries()) {
-                ss.send("/n_release", nodeId, 0.05) // 50ms release
-            }
+			this.activeNotes.clear()
+			console.debug("All synths released")
+		} catch (error) {
+			console.error("Failed to release all synths:", error)
+		}
+	}
 
-            this.activeNotes.clear()
-            console.debug("All synths released")
-        } catch (error) {
-            console.error("Failed to release all synths:", error)
-        }
-    }
+	/**
+	 * Flatten parameter object to OSC argument list
+	 * Converts { freq: 440, amp: 0.2 } to ["freq", 440, "amp", 0.2]
+	 */
+	private flattenParams(params: Record<string, number>): (string | number)[] {
+		const args: (string | number)[] = []
+		for (const [key, value] of Object.entries(params)) {
+			args.push(key, value)
+		}
+		return args
+	}
 
-    /**
-     * Flatten parameter object to OSC argument list
-     * Converts { freq: 440, amp: 0.2 } to ["freq", 440, "amp", 0.2]
-     */
-    private flattenParams(params: Record<string, number>): (string | number)[] {
-        const args: (string | number)[] = []
-        for (const [key, value] of Object.entries(params)) {
-            args.push(key, value)
-        }
-        return args
-    }
+	/**
+	 * Load a SynthDef for use
+	 * @param nameOrPath - Synthdef name (uses synthdefBaseURL) or full path
+	 * @throws Error if synthdef fails to load
+	 */
+	async loadSynthDef(nameOrPath: string): Promise<{ name: string; size: number }> {
+		const ss = this.getSupersonic()
 
-    /**
-     * Load a SynthDef for use
-     * @param nameOrPath - Synthdef name (uses synthdefBaseURL) or full path
-     * @throws Error if synthdef fails to load
-     */
-    async loadSynthDef(nameOrPath: string): Promise<{ name: string; size: number }> {
-        const ss = this.getSupersonic()
+		try {
+			const info = await ss.loadSynthDef(nameOrPath)
+			console.info(`Loaded synthdef: ${info.name} (${info.size} bytes)`)
+			return info
+		} catch (error) {
+			console.error(`Failed to load synthdef ${nameOrPath}:`, error)
+			throw error
+		}
+	}
 
-        try {
-            const info = await ss.loadSynthDef(nameOrPath)
-            console.info(`Loaded synthdef: ${info.name} (${info.size} bytes)`)
-            return info
-        } catch (error) {
-            console.error(`Failed to load synthdef ${nameOrPath}:`, error)
-            throw error
-        }
-    }
+	/**
+	 * Load multiple SynthDefs in parallel
+	 * @param names - Array of synthdef names
+	 * @returns Results map with success status for each synthdef
+	 */
+	async loadSynthDefs(names: string[]): Promise<Record<string, any>> {
+		const ss = this.getSupersonic()
 
-    /**
-     * Load multiple SynthDefs in parallel
-     * @param names - Array of synthdef names
-     * @returns Results map with success status for each synthdef
-     */
-    async loadSynthDefs(names: string[]): Promise<Record<string, any>> {
-        const ss = this.getSupersonic()
+		const results = await ss.loadSynthDefs(names)
 
-        const results = await ss.loadSynthDefs(names)
+		// Log results and validate
+		let successCount = 0
+		for (const [name, result] of Object.entries(results)) {
+			if (result.success) {
+				console.info(`Loaded synthdef: ${name}`)
+				successCount++
+			} else {
+				console.error(`Failed to load synthdef ${name}:`, result.error)
+			}
+		}
 
-        // Log results and validate
-        let successCount = 0
-        for (const [name, result] of Object.entries(results)) {
-            if (result.success) {
-                console.info(`Loaded synthdef: ${name}`)
-                successCount++
-            } else {
-                console.error(`Failed to load synthdef ${name}:`, result.error)
-            }
-        }
+		console.info(`Loaded ${successCount}/${names.length} synthdefs`)
+		return results
+	}
 
-        console.info(`Loaded ${successCount}/${names.length} synthdefs`)
-        return results
-    }
+	/**
+	 * Sync - Wait for all async commands to complete
+	 * @param syncId - Optional unique identifier for this sync command
+	 */
+	async sync(syncId?: number): Promise<void> {
+		const ss = this.getSupersonic()
+		await ss.sync(syncId)
+	}
 
-    /**
-     * Sync - Wait for all async commands to complete
-     * @param syncId - Optional unique identifier for this sync command
-     */
-    async sync(syncId?: number): Promise<void> {
-        const ss = this.getSupersonic()
-        await ss.sync(syncId)
-    }
+	/**
+	 * Send an OSC message to the server
+	 * Types are auto-detected from JavaScript values
+	 * @param address - OSC address (e.g., '/s_new')
+	 * @param args - Variable arguments
+	 */
+	send(address: string, ...args: any[]): void {
+		const ss = this.getSupersonic()
+		ss.send(address, ...args)
+	}
 
-    /**
-     * Send an OSC message to the server
-     * Types are auto-detected from JavaScript values
-     * @param address - OSC address (e.g., '/s_new')
-     * @param args - Variable arguments
-     */
-    send(address: string, ...args: any[]): void {
-        const ss = this.getSupersonic()
-        ss.send(address, ...args)
-    }
+	/**
+	 * Get node tree snapshot (all running synths and groups)
+	 */
+	getTree(): Record<string, any> {
+		const ss = this.getSupersonic()
+		return ss.getTree()
+	}
 
-    /**
-     * Get node tree snapshot (all running synths and groups)
-     */
-    getTree(): Record<string, any> {
-        const ss = this.getSupersonic()
-        return ss.getTree()
-    }
+	/**
+	 * Get metrics snapshot on demand
+	 */
+	getMetrics(): Record<string, any> {
+		const ss = this.getSupersonic()
+		return ss.getMetrics()
+	}
 
-    /**
-     * Get metrics snapshot on demand
-     */
-    getMetrics(): Record<string, any> {
-        const ss = this.getSupersonic()
-        return ss.getMetrics()
-    }
+	/**
+	 * Set metrics polling interval
+	 * @param ms - Interval in milliseconds
+	 */
+	setMetricsInterval(
+		ms: number,
+		callback: (metrics: SuperSonicMetrics) => void = () => {}
+	): void {
+		if (!Number.isFinite(ms) || ms <= 0) {
+			throw new RangeError("Metrics interval must be positive")
+		}
+		const ss = this.getSupersonic()
+		this.stopMetricsPolling()
+		this.metricsTimer = setInterval(() => callback(ss.getMetrics()), ms)
+	}
 
-    /**
-     * Set metrics polling interval
-     * @param ms - Interval in milliseconds
-     */
-    setMetricsInterval(ms: number): void {
-        const ss = this.getSupersonic()
-        ss.setMetricsInterval(ms)
-    }
+	/**
+	 * Stop metrics polling
+	 */
+	stopMetricsPolling(): void {
+		clearInterval(this.metricsTimer)
+		this.metricsTimer = undefined
+	}
 
-    /**
-     * Stop metrics polling
-     */
-    stopMetricsPolling(): void {
-        const ss = this.getSupersonic()
-        ss.stopMetricsPolling()
-    }
+	/**
+	 * Subscribe to an event
+	 * @returns Unsubscribe function
+	 */
+	on<E extends keyof SuperSonicEventMap>(event: E, callback: SuperSonicEventMap[E]): () => void {
+		const ss = this.getSupersonic()
+		return ss.on(event, callback)
+	}
 
-    /**
-     * Subscribe to an event
-     * @returns Unsubscribe function
-     */
-    on(event: string, callback: (data: any) => void): () => void {
-        const ss = this.getSupersonic()
-        return ss.on(event, callback)
-    }
+	/**
+	 * Unsubscribe from an event
+	 */
+	off<E extends keyof SuperSonicEventMap>(event: E, callback: SuperSonicEventMap[E]): void {
+		const ss = this.getSupersonic()
+		ss.off(event, callback)
+	}
 
-    /**
-     * Unsubscribe from an event
-     */
-    off(event: string, callback: (data: any) => void): void {
-        const ss = this.getSupersonic()
-        ss.off(event, callback)
-    }
+	/**
+	 * Subscribe to an event once
+	 * @returns Unsubscribe function
+	 */
+	once<E extends keyof SuperSonicEventMap>(
+		event: E,
+		callback: SuperSonicEventMap[E]
+	): () => void {
+		const ss = this.getSupersonic()
+		return ss.once(event, callback)
+	}
 
-    /**
-     * Subscribe to an event once
-     * @returns Unsubscribe function
-     */
-    once(event: string, callback: (data: any) => void): () => void {
-        const ss = this.getSupersonic()
-        return ss.once(event, callback)
-    }
+	/**
+	 * Remove all listeners for an event (or all events)
+	 */
+	removeAllListeners(event?: keyof SuperSonicEventMap): void {
+		const ss = this.getSupersonic()
+		ss.removeAllListeners(event)
+	}
 
-    /**
-     * Remove all listeners for an event (or all events)
-     */
-    removeAllListeners(event?: string): void {
-        const ss = this.getSupersonic()
-        ss.removeAllListeners(event)
-    }
+	/**
+	 * Shutdown the audio engine (preserves listeners, can reinit)
+	 */
+	async shutdown(): Promise<void> {
+		this.stopMetricsPolling()
+		this.bridge?.disconnect()
+		this.bridge = null
+		if (this.supersonic) {
+			this.allNotesOff()
+			await this.supersonic.shutdown()
+			this.#connected = false
+		}
+	}
 
-    /**
-     * Shutdown the audio engine (preserves listeners, can reinit)
-     */
-    async shutdown(): Promise<void> {
-        this.bridge?.disconnect()
-        this.bridge = null
-        if (this.supersonic) {
-            this.allNotesOff()
-            await this.supersonic.shutdown()
-            this.#connected = false
-        }
-    }
+	/**
+	 * Permanently destroy the audio engine
+	 */
+	async destroy(): Promise<void> {
+		this.stopMetricsPolling()
+		this.bridge?.disconnect()
+		this.bridge = null
+		if (this.supersonic) {
+			this.allNotesOff()
+			await this.supersonic.destroy()
+			this.supersonic = null
+			this.#connected = false
+			this.activeNotes.clear()
+		}
+	}
 
-    /**
-     * Permanently destroy the audio engine
-     */
-    async destroy(): Promise<void> {
-        this.bridge?.disconnect()
-        this.bridge = null
-        if (this.supersonic) {
-            this.allNotesOff()
-            await this.supersonic.destroy()
-            this.supersonic = null
-            this.#connected = false
-            this.activeNotes.clear()
-        }
-    }
+	/**
+	 * Recover from audio interruption (browser suspension, etc)
+	 */
+	async recover(): Promise<boolean> {
+		if (!this.supersonic) {
+			throw new Error("SuperSonic not initialised. Call init() first.")
+		}
 
-    /**
-     * Recover from audio interruption (browser suspension, etc)
-     */
-    async recover(): Promise<boolean> {
-        if (!this.supersonic) {
-            throw new Error("SuperSonic not initialised. Call init() first.")
-        }
+		const isRunning = await this.supersonic.recover()
+		console.info("Audio recovery:", isRunning ? "successful" : "failed")
+		return isRunning
+	}
 
-        const isRunning = await this.supersonic.recover()
-        console.info("Audio recovery:", isRunning ? "successful" : "failed")
-        return isRunning
-    }
+	/**
+	 * Setup SuperSonic engine event listeners
+	 */
+	private setupAudioEngineListeners(): void {
+		if (!this.supersonic) {
+			return
+		}
 
-    /**
-     * Setup SuperSonic engine event listeners
-     */
-    private setupAudioEngineListeners(): void {
-        if (!this.supersonic) return
+		// Engine ready
+		this.supersonic.on(EVENT_READY, (info) => {
+			console.info("SuperSonic ready", {
+				sampleRate: this.supersonic?.audioContext?.sampleRate,
+				bootTime: info.bootStats.initDuration
+			})
+		})
 
-        // Engine ready
-        this.supersonic.on(EVENT_READY, (info) => {
-            console.info("SuperSonic ready", {
-                sampleRate: info.sampleRate,
-                bootTime: info.bootTimeMs,
-            })
-        })
+		// Error handling
+		this.supersonic.on(EVENT_ERROR, (error: any) => {
+			console.error("SuperSonic error:", error)
+		})
 
-        // Error handling
-        this.supersonic.on(EVENT_ERROR, (error) => {
-            console.error("SuperSonic error:", error)
-        })
+		// Asset loading progress
+		this.supersonic.on(EVENT_LOADING_START, ({ type, name }) => {
+			console.info(`Loading ${type}: ${name}`)
+		})
 
-        // Asset loading progress
-        this.supersonic.on(EVENT_LOADING_START, ({ type, name }) => {
-            console.info(`Loading ${type}: ${name}`)
-        })
+		this.supersonic.on(EVENT_LOADING_COMPLETE, ({ type, name, size }) => {
+			console.info(`Loaded ${type}: ${name} (${size} bytes)`)
+		})
 
-        this.supersonic.on(EVENT_LOADING_COMPLETE, ({ type, name, size }) => {
-            console.info(`Loaded ${type}: ${name} (${size} bytes)`)
-        })
+		// Debug output from scsynth
+		this.supersonic.on(EVENT_DEBUG, ({ text }) => {
+			console.debug("[scsynth]", text)
+		})
 
-        // Debug output from scsynth
-        this.supersonic.on(EVENT_DEBUG, ({ text }) => {
-            console.debug("[scsynth]", text)
-        })
+		// Lifecycle events
+		this.supersonic.on(EVENT_SHUTDOWN, () => {
+			console.info("SuperSonic shutdown")
+		})
 
-        // Lifecycle events
-        this.supersonic.on(EVENT_SHUTDOWN, () => {
-            console.info("SuperSonic shutdown")
-        })
+		this.supersonic.on(EVENT_DESTROY, () => {
+			console.info("SuperSonic destroyed")
+			this.supersonic = null
+		})
 
-        this.supersonic.on(EVENT_DESTROY, () => {
-            console.info("SuperSonic destroyed")
-            this.supersonic = null
-        })
+		// AudioContext state changes
+		this.supersonic.on(EVENT_AUDIOCONTEXT_SUSPENDED, () => {
+			console.warn("Audio suspended - user interaction needed to resume")
+		})
 
-        // AudioContext state changes
-        this.supersonic.on(EVENT_AUDIOCONTEXT_SUSPENDED, () => {
-            console.warn("Audio suspended - user interaction needed to resume")
-        })
+		this.supersonic.on(EVENT_AUDIOCONTEXT_RESUMED, () => {
+			console.info("Audio resumed")
+		})
 
-        this.supersonic.on(EVENT_AUDIOCONTEXT_RESUMED, () => {
-            console.info("Audio resumed")
-        })
+		this.supersonic.on(EVENT_AUDIOCONTEXT_INTERRUPTED, () => {
+			console.warn("Audio interrupted by system")
+		})
 
-        this.supersonic.on(EVENT_AUDIOCONTEXT_INTERRUPTED, () => {
-            console.warn("Audio interrupted by system")
-        })
+		this.setupGlobalEventListeners()
+	}
 
-        this.setupGlobalEventListeners()
-    }
+	/**
+	 * Setup global DOM event listeners
+	 */
+	private setupGlobalEventListeners(): void {
+		// Handle audio context suspension (browser tab backgrounded)
+		document.addEventListener("visibilitychange", async () => {
+			if (!document.hidden && this.supersonic?.initialized) {
+				console.info("Tab became visible, recovering audio...")
+				try {
+					await this.recover()
+				} catch (error) {
+					console.error("Audio recovery failed:", error)
+				}
+			}
+		})
 
-    /**
-     * Setup global DOM event listeners
-     */
-    private setupGlobalEventListeners(): void {
-        // Handle audio context suspension (browser tab backgrounded)
-        document.addEventListener('visibilitychange', async () => {
-            if (!document.hidden && this.supersonic?.initialized) {
-                console.info("Tab became visible, recovering audio...")
-                try {
-                    await this.recover()
-                } catch (error) {
-                    console.error("Audio recovery failed:", error)
-                }
-            }
-        })
-
-        // Handle page unload
-        window.addEventListener('beforeunload', async () => {
-            if (this.supersonic) {
-                await this.shutdown()
-            }
-        })
-    }
+		// Handle page unload
+		window.addEventListener("beforeunload", async () => {
+			if (this.supersonic) {
+				await this.shutdown()
+			}
+		})
+	}
 }
-

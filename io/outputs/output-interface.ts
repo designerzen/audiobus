@@ -1,16 +1,19 @@
-import type { IAudioCommand } from '../../audio-command-interface.ts'
-import type { AudioClockTick } from '../../timing/audio-clock-tick.ts'
-import type { ChainPerformanceMeasurement, TimerPerformanceMeasurement } from './performance-metrics.ts'
+import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { AudioClockTick } from "../../timing/audio-clock-tick.ts"
+import type {
+	ChainPerformanceMeasurement,
+	TimerPerformanceMeasurement
+} from "./performance-metrics.ts"
 
-export interface IAudioOutput{
+export interface IAudioOutput {
 	get uuid(): string
-	get name():string
-	get description():string
-	get isConnected():boolean
-	get isHidden():boolean
-	
+	get name(): string
+	get description(): string
+	get isConnected(): boolean
+	get isHidden(): boolean
+
 	// TODO: implement pitchBend etc
-	noteOn(noteNumber: number, velocity: number): void | Promise<void>
+	noteOn(noteNumber: number, velocity: number): unknown
 	noteOff(noteNumber: number): void
 	allNotesOff(): void
 
@@ -21,16 +24,16 @@ export interface IAudioOutput{
 	readonly configurationAffectsNoteRouting?: boolean
 	onClockTick?(tick: Readonly<AudioClockTick>): void
 	stopClock?(): void
-    recordChainPerformance?(measurement: Readonly<ChainPerformanceMeasurement>): void
-    recordTimerPerformance?(measurement: Readonly<TimerPerformanceMeasurement>): void
+	recordChainPerformance?(measurement: Readonly<ChainPerformanceMeasurement>): void
+	recordTimerPerformance?(measurement: Readonly<TimerPerformanceMeasurement>): void
 
 	// optional
 	readonly requiresConnectionControl?: boolean
-	readonly output?: AudioNode
-	connect?():Promise<void|Function>|Function
-	disconnect?():Promise<void|Function>|Function
-	createGui?():Promise<HTMLElement>
-	destroyGui?():Promise<void>
+	readonly output?: AudioNode | import("webmidi").Output
+	connect?(): unknown
+	disconnect?(): Promise<void | Function> | Function
+	createGui?(): Promise<HTMLElement>
+	destroyGui?(): Promise<void>
 
 	hasMidiOutput?(): boolean
 	hasAudioOutput?(): boolean

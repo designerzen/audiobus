@@ -1,5 +1,5 @@
 import type { CLAPPatch } from "./clap-types.ts"
-import { CLAP_PATCHES } from './clap-catalog'
+import { CLAP_PATCHES } from "./clap-catalog"
 
 /**
  * CLAP Registry Manager
@@ -14,9 +14,11 @@ export class CLAPRegistry {
 	private initialized: boolean = false
 
 	private constructor() {
-		for (const patch of CLAP_PATCHES) this.patches.set(patch.id, patch)
+		for (const patch of CLAP_PATCHES) {
+			this.patches.set(patch.id, patch)
+		}
 		// Add default local registry
-		this.registryUrls.add(`${import.meta.env.BASE_URL ?? '/'}clap-registry.json`)
+		this.registryUrls.add(`${import.meta.env.BASE_URL ?? "/"}clap-registry.json`)
 	}
 
 	/**
@@ -56,7 +58,10 @@ export class CLAPRegistry {
 		try {
 			const response = await fetch(registryUrl)
 			if (!response.ok) {
-				console.warn(`[CLAPRegistry] Failed to load registry from ${registryUrl}:`, response.statusText)
+				console.warn(
+					`[CLAPRegistry] Failed to load registry from ${registryUrl}:`,
+					response.statusText
+				)
 				return
 			}
 

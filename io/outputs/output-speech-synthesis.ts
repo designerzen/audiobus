@@ -1,8 +1,8 @@
 import { noteNumberToName } from "../../conversion/note-to-name.ts"
 import type { IAudioOutput } from "./output-interface.ts"
-import { KokoroSpeech } from './kokoro-speech.ts'
-import { chordSpeechName } from './speech-vocabulary.ts'
-import { getAudioDestination } from '../../audio-destination'
+import { KokoroSpeech } from "./kokoro-speech.ts"
+import { chordSpeechName } from "./speech-vocabulary.ts"
+import { getAudioDestination } from "../../audio-destination"
 
 interface Config {
 	enabled: number // 1 for on, 0 for off
@@ -27,10 +27,9 @@ const DEFAULT_OPTIONS: Config = {
  * The note number affects the speech rate - higher notes are spoken faster.
  */
 export default class OutputSpeechSynthesis extends EventTarget implements IAudioOutput {
+	static ID: number = 0
 
-	static ID:number = 0
-
-	#uuid:string = "Output-Speech-Synthesis-"+(OutputSpeechSynthesis.ID++)
+	#uuid: string = "Output-Speech-Synthesis-" + OutputSpeechSynthesis.ID++
 	config: Config
 	synth: SpeechSynthesis | null = null
 	currentUtterances: SpeechSynthesisUtterance[] = []
@@ -47,11 +46,11 @@ export default class OutputSpeechSynthesis extends EventTarget implements IAudio
 	}
 
 	get name(): string {
-		return 'Readout'
+		return "Readout"
 	}
 
-	get description():string{
-		return 'Speech Synthesis'
+	get description(): string {
+		return "Speech Synthesis"
 	}
 
 	get isConnected(): boolean {
@@ -62,13 +61,25 @@ export default class OutputSpeechSynthesis extends EventTarget implements IAudio
 		return false
 	}
 
-	constructor(config: Partial<Config> = DEFAULT_OPTIONS, private sharedContext?: AudioContext, private destination?: AudioNode) {
+	constructor(
+		config: Partial<Config> = DEFAULT_OPTIONS,
+		private sharedContext?: AudioContext,
+		private destination?: AudioNode
+	) {
 		super()
 		this.context = sharedContext ?? null
 		this.config = { ...DEFAULT_OPTIONS, ...config }
 		this.initialise()
-		if (this.config.enabled && typeof Worker !== 'undefined' && typeof AudioContext !== 'undefined') {
-			try { this.neural.preload() } catch { /* Live speech can still use system voices. */ }
+		if (
+			this.config.enabled &&
+			typeof Worker !== "undefined" &&
+			typeof AudioContext !== "undefined"
+		) {
+			try {
+				this.neural.preload()
+			} catch {
+				/* Live speech can still use system voices. */
+			}
 		}
 	}
 
@@ -95,14 +106,14 @@ export default class OutputSpeechSynthesis extends EventTarget implements IAudio
 	 * Initialize Web Speech Synthesis API
 	 */
 	private initialise(): void {
-		if (typeof window === 'undefined') {
+		if (typeof window === "undefined") {
 			return
 		}
 
 		try {
 			this.synth = window.speechSynthesis
 		} catch (error) {
-			console.debug('[SPEECH] Speech Synthesis API not available:', error)
+			console.debug("[SPEECH] Speech Synthesis API not available:", error)
 		}
 	}
 
@@ -121,15 +132,26 @@ export default class OutputSpeechSynthesis extends EventTarget implements IAudio
 	 * Speak a note name
 	 */
 	private async speak(text: string, noteNumber: number): Promise<void> {
-		if (!this.config.enabled || this.disposed) return
+		if (!this.config.enabled || this.disposed) {
+			return
+		}
 		this.cancelSpeech()
 		const generation = this.generation
-		if (!this.neuralFailed && typeof Worker !== 'undefined' && typeof AudioContext !== 'undefined') {
+		if (
+			!this.neuralFailed &&
+			typeof Worker !== "undefined" &&
+			typeof AudioContext !== "undefined"
+		) {
 			try {
 				this.context ??= new AudioContext()
 				// Resume during the initiating user gesture, before model loading.
-				const [audio] = await Promise.all([this.neural.generate(text), this.context.resume()])
-				if (generation !== this.generation || !this.config.enabled || this.disposed) return
+				const [audio] = await Promise.all([
+					this.neural.generate(text),
+					this.context.resume()
+				])
+				if (generation !== this.generation || !this.config.enabled || this.disposed) {
+					return
+				}
 				const buffer = this.context.createBuffer(1, audio.audio.length, audio.sampling_rate)
 				buffer.copyToChannel(new Float32Array(audio.audio), 0)
 				this.gain ??= this.context.createGain()
@@ -143,19 +165,25 @@ export default class OutputSpeechSynthesis extends EventTarget implements IAudio
 				source.connect(this.gain)
 				source.onended = () => {
 					source.disconnect()
-					if (this.source === source) this.source = null
+					if (this.source === source) {
+						this.source = null
+					}
 				}
 				this.source = source
 				source.start()
 				return
 			} catch (error) {
-				if (generation !== this.generation || !this.config.enabled || this.disposed) return
+				if (generation !== this.generation || !this.config.enabled || this.disposed) {
+					return
+				}
 				this.neuralFailed = true
 				this.neural.dispose()
-				console.debug('[SPEECH] Kokoro unavailable, using system voice:', error)
+				console.debug("[SPEECH] Kokoro unavailable, using system voice:", error)
 			}
 		}
-		if (!this.synth) return
+		if (!this.synth) {
+			return
+		}
 
 		try {
 			const utterance = new SpeechSynthesisUtterance(text)
@@ -174,7 +202,7 @@ export default class OutputSpeechSynthesis extends EventTarget implements IAudio
 			this.currentUtterances.push(utterance)
 			this.synth.speak(utterance)
 		} catch (error) {
-			console.debug('[SPEECH] Speech synthesis failed:', error)
+			console.debug("[SPEECH] Speech synthesis failed:", error)
 		}
 	}
 
@@ -196,15 +224,15 @@ export default class OutputSpeechSynthesis extends EventTarget implements IAudio
 			this.synth.cancel()
 			this.currentUtterances = []
 		} catch (error) {
-			console.debug('[SPEECH] Failed to cancel speech:', error)
+			console.debug("[SPEECH] Failed to cancel speech:", error)
 		}
 	}
 
 	/**
 	 * Activate a voice that reads out the suplied
 	 * note name and key
-	 * @param noteNumber 
-	 * @param velocity 
+	 * @param noteNumber
+	 * @param velocity
 	 */
 	noteOn(noteNumber: number, _velocity?: number): void {
 		const noteName = noteNumberToName(noteNumber)
@@ -214,13 +242,13 @@ export default class OutputSpeechSynthesis extends EventTarget implements IAudio
 	/**
 	 * Deactivate the voice that reads out the suplied
 	 * note name and key if interuption is specified
-	 * @param noteNumber 
+	 * @param noteNumber
 	 */
 	speakChord(root: string, quality: string): void {
 		void this.speak(chordSpeechName(root, quality), 60)
 	}
 
-	noteOff(_noteNumber:number): void {
+	noteOff(_noteNumber: number): void {
 		// Cancel speech if interruption is enabled
 		if (this.config.interruption) {
 			this.cancelSpeech()
@@ -239,6 +267,8 @@ export default class OutputSpeechSynthesis extends EventTarget implements IAudio
 		this.cancelSpeech()
 		this.neural.dispose()
 		this.gain?.disconnect()
-		if (!this.sharedContext) await this.context?.close()
+		if (!this.sharedContext) {
+			await this.context?.close()
+		}
 	}
 }

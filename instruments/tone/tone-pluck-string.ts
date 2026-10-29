@@ -14,7 +14,7 @@ export default class TonePluckString implements IAudioOutput {
 
 	options = {
 		// custom title if required
-		titls:"Tone.js PluckString Instrument",
+		title: "Tone.js PluckString Instrument",
 
 		// Default amplitude
 		gain: 0.5, // match the other instruments over the pluck's decay
@@ -43,13 +43,13 @@ export default class TonePluckString implements IAudioOutput {
 		// Tone.js PluckString specific
 		dampening: 4000, // lowpass cutoff in Hz, not a normalized decay amount
 		attackNoise: 8,
-		resonance: 0.98,
+		resonance: 0.98
 	}
 
 	#id = "TonePluckString"
 	#uuid = this.#id + "-" + TonePluckString.ID++
 
-	activeNote = null
+	activeNote: number | null = null
 	#synth: any
 	#audioContext: BaseAudioContext
 	#gainNode: GainNode
@@ -145,15 +145,16 @@ export default class TonePluckString implements IAudioOutput {
 	}
 
 	private async ensureInitialized() {
-		if (this.#initialized) return
-		
+		if (this.#initialized) {
+			return
+		}
+
 		const Tone = await import("tone")
 		const { PluckSynth } = Tone
-		
+
 		// Tell Tone.js to use the shared AudioContext
 		Tone.setContext(this.#audioContext as any)
-		
-		
+
 		// Initialize Tone.js PluckSynth and connect to our gain node
 		this.#synth = new PluckSynth({
 			dampening: this.options.dampening,
@@ -162,10 +163,10 @@ export default class TonePluckString implements IAudioOutput {
 			release: this.options.release,
 			volume: 0 // Tone volume is 0, use our gainNode instead
 		})
-		
+
 		// Connect the synth's output to our gain node for routing through the app's audio graph
 		this.#synth.connect(this.#gainNode)
-		
+
 		this.#initialized = true
 	}
 
@@ -197,12 +198,12 @@ export default class TonePluckString implements IAudioOutput {
 	 * Note ON - Plucks the string
 	 * @param {Number} noteNumber - MIDI note number
 	 * @param {Number} velocity - strength of the pluck (0-127)
-	 * @param {Array<Number>} arp - intervals (currently unused)
+	 * @param {Array<Number>} _arp - intervals (currently unused)
 	 * @param {Number} delay - number to pause before playing
 	 */
-	async noteOn(noteNumber: number, velocity: number = 127, arp = null, delay: number = 0) {
+	async noteOn(noteNumber: number, velocity: number = 127, _arp = null, delay: number = 0) {
 		await this.ensureInitialized()
-		
+
 		const frequency = noteNumberToFrequency(noteNumber)
 		const amplitude = velocityToGain(velocity)
 

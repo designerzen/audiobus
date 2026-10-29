@@ -3,10 +3,15 @@ import AudioCommand from "../audio-command"
 const regex = /([a-g])([#b])?(\d+)?(\.*)/gi
 
 export const MMLtoAudioCommands = (mml: string) => {
-
 	const notes: [] = []
 	const noteMap: Record<string, number> = {
-		"c": 0, "d": 2, "e": 4, "f": 5, "g": 7, "a": 9, "b": 11
+		c: 0,
+		d: 2,
+		e: 4,
+		f: 5,
+		g: 7,
+		a: 9,
+		b: 11
 	}
 
 	let match
@@ -19,8 +24,11 @@ export const MMLtoAudioCommands = (mml: string) => {
 
 		let noteNum = noteMap[noteName] + (octave + 1) * 12
 
-		if (accidental === "#") noteNum++
-		else if (accidental === "b") noteNum--
+		if (accidental === "#") {
+			noteNum++
+		} else if (accidental === "b") {
+			noteNum--
+		}
 
 		const length = 4 / (1 + dot * 0.5)
 		const audioCommand = new AudioCommand()

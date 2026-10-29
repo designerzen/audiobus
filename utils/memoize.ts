@@ -17,7 +17,7 @@ export function memoize<T extends (...args: any[]) => any>(
 
 	const memoized = (...args: Parameters<T>): ReturnType<T> => {
 		const key = keyGenerator ? keyGenerator(...args) : JSON.stringify(args)
-		
+
 		if (cache.has(key)) {
 			return cache.get(key)
 		}

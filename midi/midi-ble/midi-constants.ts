@@ -1,68 +1,75 @@
-import { EVENT_NOTEOFF, EVENT_NOTEON, EVENT_CONTROLCHANGE, EVENT_PROGRAMCHANGE, EVENT_PITCHBEND } from '../../event-constants.ts'
+import {
+	EVENT_NOTEOFF,
+	EVENT_NOTEON,
+	EVENT_CONTROLCHANGE,
+	EVENT_PROGRAMCHANGE,
+	EVENT_PITCHBEND
+} from "../../event-constants.ts"
 // MIDI Status Byte Constants
 
 // Channel Voice Messages
 // <<4 for MIDI commands rahter than these nibbles
 export const MIDI_NOTE_OFF = 0x8
 export const MIDI_NOTE_ON = 0x9
-export const MIDI_POLYPHONIC_KEY_PRESSURE = 0xA
-export const MIDI_CONTROL_CHANGE = 0xB
-export const MIDI_PROGRAM_CHANGE = 0xC
-export const MIDI_CHANNEL_PRESSURE = 0xD
-export const MIDI_PITCH_BEND = 0xE
+export const MIDI_POLYPHONIC_KEY_PRESSURE = 0xa
+export const MIDI_CONTROL_CHANGE = 0xb
+export const MIDI_PROGRAM_CHANGE = 0xc
+export const MIDI_CHANNEL_PRESSURE = 0xd
+export const MIDI_PITCH_BEND = 0xe
 
 /**
  * MIDI uses channels 0-15, but users specify 1-16, so subtract 1
  * and return as a 4 bit value
- * @param channel 
+ * @param channel
  * @returns {number}
  */
-export const getMIDIChannelEncoded = (channel:number=1) => Math.max(0, channel - 1) & 0x0f
+export const getMIDIChannelEncoded = (channel: number = 1) => Math.max(0, channel - 1) & 0x0f
 
-export const getMIDIBytesFromNibble = (nibble:number) => nibble << 4
-export const getMIDIStatusBytesFromByteAndChannel = (byte:number, channel:number) => getMIDIChannelEncoded(channel) | byte
-export const getMIDIStatusBytesFromNibbleAndChannel = (nibble:number, channel:number) => getMIDIChannelEncoded(channel) | getMIDIBytesFromNibble( nibble )
+export const getMIDIBytesFromNibble = (nibble: number) => nibble << 4
+export const getMIDIStatusBytesFromByteAndChannel = (byte: number, channel: number) =>
+	getMIDIChannelEncoded(channel) | byte
+export const getMIDIStatusBytesFromNibbleAndChannel = (nibble: number, channel: number) =>
+	getMIDIChannelEncoded(channel) | getMIDIBytesFromNibble(nibble)
 
 // System Common Messages
-export const MIDI_SYSTEM_EXCLUSIVE = 0xF0   // SYSEX!
-export const MIDI_TIME_CODE_QUARTER_FRAME = 0xF1
-export const MIDI_SONG_POSITION = 0xF2
-export const MIDI_SONG_SELECT = 0xF3
-export const MIDI_TUNE_REQUEST = 0xF6
-export const MIDI_END_OF_EXCLUSIVE = 0xF7
+export const MIDI_SYSTEM_EXCLUSIVE = 0xf0 // SYSEX!
+export const MIDI_TIME_CODE_QUARTER_FRAME = 0xf1
+export const MIDI_SONG_POSITION = 0xf2
+export const MIDI_SONG_SELECT = 0xf3
+export const MIDI_TUNE_REQUEST = 0xf6
+export const MIDI_END_OF_EXCLUSIVE = 0xf7
 
 // System Real-Time Messages
-export const MIDI_TIMING_CLOCK = 0xF8
-export const MIDI_START = 0xFA
-export const MIDI_CONTINUE = 0xFB
-export const MIDI_STOP = 0xFC
+export const MIDI_TIMING_CLOCK = 0xf8
+export const MIDI_START = 0xfa
+export const MIDI_CONTINUE = 0xfb
+export const MIDI_STOP = 0xfc
 
-export const MIDI_ACTIVE_SENSING = 0xFE
-export const MIDI_RESET = 0xFF
+export const MIDI_ACTIVE_SENSING = 0xfe
+export const MIDI_RESET = 0xff
 
 // useful for debugging
 export const MIDI_TYPES: Record<number, string> = {
-    [MIDI_NOTE_OFF]: EVENT_NOTEOFF,
-    [MIDI_NOTE_ON]: EVENT_NOTEON,
-    [MIDI_POLYPHONIC_KEY_PRESSURE]: 'polyat',
-    [MIDI_CONTROL_CHANGE]: EVENT_CONTROLCHANGE,
-    [MIDI_PROGRAM_CHANGE]: EVENT_PROGRAMCHANGE,
-    [MIDI_CHANNEL_PRESSURE]: 'channelat',
-    [MIDI_PITCH_BEND]: EVENT_PITCHBEND,
-    
-    [MIDI_SYSTEM_EXCLUSIVE]: 'sysex',
-    [MIDI_TIME_CODE_QUARTER_FRAME]: 'timecode',
-    [MIDI_SONG_POSITION]: 'songposition',
-    [MIDI_SONG_SELECT]: 'songselect',
-    [MIDI_TUNE_REQUEST]: 'tunerequest',
-    [MIDI_END_OF_EXCLUSIVE]: 'eox',
+	[MIDI_NOTE_OFF]: EVENT_NOTEOFF,
+	[MIDI_NOTE_ON]: EVENT_NOTEON,
+	[MIDI_POLYPHONIC_KEY_PRESSURE]: "polyat",
+	[MIDI_CONTROL_CHANGE]: EVENT_CONTROLCHANGE,
+	[MIDI_PROGRAM_CHANGE]: EVENT_PROGRAMCHANGE,
+	[MIDI_CHANNEL_PRESSURE]: "channelat",
+	[MIDI_PITCH_BEND]: EVENT_PITCHBEND,
 
-    [MIDI_TIMING_CLOCK]: 'timingclock',
-    [MIDI_START]: 'start',
-    [MIDI_CONTINUE]: 'continue',
-    [MIDI_STOP]: 'stop',
+	[MIDI_SYSTEM_EXCLUSIVE]: "sysex",
+	[MIDI_TIME_CODE_QUARTER_FRAME]: "timecode",
+	[MIDI_SONG_POSITION]: "songposition",
+	[MIDI_SONG_SELECT]: "songselect",
+	[MIDI_TUNE_REQUEST]: "tunerequest",
+	[MIDI_END_OF_EXCLUSIVE]: "eox",
 
-    [MIDI_ACTIVE_SENSING]: 'activesensing',
-    [MIDI_RESET]: 'reset'
+	[MIDI_TIMING_CLOCK]: "timingclock",
+	[MIDI_START]: "start",
+	[MIDI_CONTINUE]: "continue",
+	[MIDI_STOP]: "stop",
+
+	[MIDI_ACTIVE_SENSING]: "activesensing",
+	[MIDI_RESET]: "reset"
 }
-

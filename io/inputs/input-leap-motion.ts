@@ -1,10 +1,10 @@
-import { EVENT_FRAME, EVENT_CONNECT, EVENT_DISCONNECT } from '../../event-constants.ts'
+import { EVENT_FRAME, EVENT_CONNECT, EVENT_DISCONNECT } from "../../event-constants.ts"
 /**
  * Leap Motion hand tracking input
  * Maps hand positions to MIDI notes and velocities
  */
 
-import { NOTE_OFF, NOTE_ON } from '../../commands'
+import { NOTE_OFF, NOTE_ON } from "../../commands"
 import AudioCommand from "../../audio-command.ts"
 import AbstractInput from "./abstract-input.ts"
 import type { IAudioInput } from "./input-interface.ts"
@@ -12,7 +12,6 @@ import type { IAudioInput } from "./input-interface.ts"
 export const LEAP_MOTION_INPUT_ID = "LeapMotion"
 
 export default class InputLeapMotion extends AbstractInput implements IAudioInput {
-
 	#controller: any = null
 	#handsTracked: Map<number, number> = new Map()
 
@@ -79,8 +78,8 @@ export default class InputLeapMotion extends AbstractInput implements IAudioInpu
 
 		frame.hands.forEach((hand: any) => {
 			trackedIds.add(hand.id)
-			const [x, y, z] = hand.palmPosition
-			
+			const [x, y] = hand.palmPosition
+
 			const noteNumber = this.mapPositionToNote(x)
 			const velocity = this.mapHeightToVelocity(y)
 
@@ -130,13 +129,13 @@ export default class InputLeapMotion extends AbstractInput implements IAudioInpu
 	private mapPositionToNote(x: number): number {
 		const normalized = (x - this.#minX) / (this.#maxX - this.#minX)
 		const clamped = Math.max(0, Math.min(1, normalized))
-		return Math.round(this.#minNote + (clamped * (this.#maxNote - this.#minNote)))
+		return Math.round(this.#minNote + clamped * (this.#maxNote - this.#minNote))
 	}
 
 	private mapHeightToVelocity(y: number): number {
 		const normalized = (y - this.#minY) / (this.#maxY - this.#minY)
 		const clamped = Math.max(0, Math.min(1, normalized))
-		return 40 + (clamped * (127 - 40))
+		return 40 + clamped * (127 - 40)
 	}
 
 	setPositionBounds(minX: number, maxX: number, minY: number, maxY: number): void {
@@ -166,7 +165,3 @@ export default class InputLeapMotion extends AbstractInput implements IAudioInpu
 		this.setAsDisconnected()
 	}
 }
-
-
-
-

@@ -4,34 +4,19 @@
  */
 
 // MIDI constants
-export * from './midi-constants.js'
+export * from "./midi-constants.js"
 
 // MIDI commands
-export {
-  MIDICommand,
-  parseMIDICommand,
-  createMIDICommand,
-} from './midi-command.ts'
+export { MIDICommand, parseMIDICommand, createMIDICommand } from "./midi-command.ts"
 
 // MIDI channels
-export {
-  MIDIChannels,
-  getMIDIChannelName,
-  parseMIDIChannel,
-} from './midi-channels.ts'
+export { MIDIChannels, getMIDIChannelName, parseMIDIChannel } from "./midi-channels.ts"
 
 // MIDI requested commands
-export {
-  MIDIRequestedCommand,
-} from './midi-requested-command.ts'
+export { MIDIRequestedCommand } from "./midi-requested-command.ts"
 
 // MIDI 2.0 utilities
-export {
-  MIDI2Utils,
-  convertMIDI1toMIDI2,
-  convertMIDI2toMIDI1,
-} from './midi2-utils.ts'
+export { MIDI2Utils, convertMIDI1toMIDI2, convertMIDI2toMIDI1 } from "./midi2-utils.ts"
 
 // Bluetooth MIDI
-export * from './midi-ble/index.ts'
-
+export * from "./midi-ble/index.ts"

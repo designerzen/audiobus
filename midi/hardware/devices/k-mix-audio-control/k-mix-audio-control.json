@@ -1,552 +1,544 @@
 {
-  "$schema": "../profile.schema.json",
-  "schemaVersion": 1,
-  "id": "k-mix-audio-control",
-  "name": "K-Mix Audio Control",
-  "manufacturer": "Keith McMillen Instruments",
-  "ids": [
-    "k-mix-audio-control"
-  ],
-  "portNames": [
-    "2- Audio Control",
-    "K-Mix Audio Control"
-  ],
-  "description": "Hardware MIDI input for the K-Mix Audio Control port, restored from the original AudioBus adapter.",
-  "icon": "icon.svg",
-  "documentation": [
-    {
-      "title": "K-Mix user manual: MIDI channels and parameters",
-      "url": "https://files.keithmcmillen.com/products/k-mix/documentation/kmix-manual.pdf"
-    },
-    {
-      "title": "Original AudioBus K-Mix port adapter",
-      "url": "https://github.com/designerzen/audiobus/blob/ts2wp2es6pug/source/code/typescript/audiobus/io/devices/KMix.ts"
-    }
-  ],
-  "abilities": [
-    "MIDI message forwarding",
-    "Independent Audio Control port selection"
-  ],
-  "hardwareControls": [
-    "Eight input faders",
-    "Main fader",
-    "Channel mute buttons",
-    "Four rotary touch controls",
-    "Three MIDI banks"
-  ],
-  "notice": "Select the matching hardware port. The original Windows port name is 2- Audio Control. MIDI is forwarded into this chain; use a MIDI device output to send commands back to the hardware. Custom MIDI assignments depend on the K-Mix configuration. Audio Control uses documented CC1 faders and CC2 mutes on channels 1-9.",
-  "controls": [
-    {
-      "id": "fader-1",
-      "label": "Channel 1 fader",
-      "message": {
-        "type": "cc",
-        "number": 1,
-        "channel": 1
-      },
-      "widget": "slider"
-    },
-    {
-      "id": "mute-1",
-      "label": "Channel 1 mute",
-      "message": {
-        "type": "cc",
-        "number": 2,
-        "channel": 1
-      },
-      "widget": "toggle"
-    },
-    {
-      "id": "fader-2",
-      "label": "Channel 2 fader",
-      "message": {
-        "type": "cc",
-        "number": 1,
-        "channel": 2
-      },
-      "widget": "slider"
-    },
-    {
-      "id": "mute-2",
-      "label": "Channel 2 mute",
-      "message": {
-        "type": "cc",
-        "number": 2,
-        "channel": 2
-      },
-      "widget": "toggle"
-    },
-    {
-      "id": "fader-3",
-      "label": "Channel 3 fader",
-      "message": {
-        "type": "cc",
-        "number": 1,
-        "channel": 3
-      },
-      "widget": "slider"
-    },
-    {
-      "id": "mute-3",
-      "label": "Channel 3 mute",
-      "message": {
-        "type": "cc",
-        "number": 2,
-        "channel": 3
-      },
-      "widget": "toggle"
-    },
-    {
-      "id": "fader-4",
-      "label": "Channel 4 fader",
-      "message": {
-        "type": "cc",
-        "number": 1,
-        "channel": 4
-      },
-      "widget": "slider"
-    },
-    {
-      "id": "mute-4",
-      "label": "Channel 4 mute",
-      "message": {
-        "type": "cc",
-        "number": 2,
-        "channel": 4
-      },
-      "widget": "toggle"
-    },
-    {
-      "id": "fader-5",
-      "label": "Channel 5 fader",
-      "message": {
-        "type": "cc",
-        "number": 1,
-        "channel": 5
-      },
-      "widget": "slider"
-    },
-    {
-      "id": "mute-5",
-      "label": "Channel 5 mute",
-      "message": {
-        "type": "cc",
-        "number": 2,
-        "channel": 5
-      },
-      "widget": "toggle"
-    },
-    {
-      "id": "fader-6",
-      "label": "Channel 6 fader",
-      "message": {
-        "type": "cc",
-        "number": 1,
-        "channel": 6
-      },
-      "widget": "slider"
-    },
-    {
-      "id": "mute-6",
-      "label": "Channel 6 mute",
-      "message": {
-        "type": "cc",
-        "number": 2,
-        "channel": 6
-      },
-      "widget": "toggle"
-    },
-    {
-      "id": "fader-7",
-      "label": "Channel 7 fader",
-      "message": {
-        "type": "cc",
-        "number": 1,
-        "channel": 7
-      },
-      "widget": "slider"
-    },
-    {
-      "id": "mute-7",
-      "label": "Channel 7 mute",
-      "message": {
-        "type": "cc",
-        "number": 2,
-        "channel": 7
-      },
-      "widget": "toggle"
-    },
-    {
-      "id": "fader-8",
-      "label": "Channel 8 fader",
-      "message": {
-        "type": "cc",
-        "number": 1,
-        "channel": 8
-      },
-      "widget": "slider"
-    },
-    {
-      "id": "mute-8",
-      "label": "Channel 8 mute",
-      "message": {
-        "type": "cc",
-        "number": 2,
-        "channel": 8
-      },
-      "widget": "toggle"
-    },
-    {
-      "id": "fader-9",
-      "label": "Main fader",
-      "message": {
-        "type": "cc",
-        "number": 1,
-        "channel": 9
-      },
-      "widget": "slider"
-    },
-    {
-      "id": "mute-9",
-      "label": "Main mute",
-      "message": {
-        "type": "cc",
-        "number": 2,
-        "channel": 9
-      },
-      "widget": "toggle"
-    }
-  ],
-  "modes": [],
-  "gui": {
-    "type": "column",
-    "gap": "0.65rem",
-    "children": [
-      {
-        "type": "status"
-      },
-      {
-        "type": "image",
-        "src": "panel.svg",
-        "alt": "K-Mix Audio Control MIDI port illustration"
-      },
-      {
-        "type": "notes"
-      },
-      {
-        "type": "channel"
-      },
-      {
-        "type": "guide",
-        "label": "Original hardware adapter"
-      }
-    ]
-  },
-  "manufacturerUrl": "https://www.keithmcmillen.com/",
-  "productUrl": "https://www.keithmcmillen.com/products/k-mix/",
-  "surface": {
-    "src": "panel.svg",
-    "width": 600,
-    "height": 300,
-    "elements": [
-      {
-        "id": "fader-1",
-        "label": "Channel 1 fader",
-        "kind": "fader",
-        "position": {
-          "x": 4.1667,
-          "y": 31.6667,
-          "width": 6.0,
-          "height": 50.0
-        },
-        "control": "fader-1",
-        "learnable": false
-      },
-      {
-        "id": "mute-1",
-        "label": "Channel 1 mute",
-        "kind": "button",
-        "position": {
-          "x": 4.1667,
-          "y": 85.0,
-          "width": 6.0,
-          "height": 8.0
-        },
-        "control": "mute-1",
-        "learnable": false
-      },
-      {
-        "id": "fader-2",
-        "label": "Channel 2 fader",
-        "kind": "fader",
-        "position": {
-          "x": 14.5,
-          "y": 31.6667,
-          "width": 6.0,
-          "height": 50.0
-        },
-        "control": "fader-2",
-        "learnable": false
-      },
-      {
-        "id": "mute-2",
-        "label": "Channel 2 mute",
-        "kind": "button",
-        "position": {
-          "x": 14.5,
-          "y": 85.0,
-          "width": 6.0,
-          "height": 8.0
-        },
-        "control": "mute-2",
-        "learnable": false
-      },
-      {
-        "id": "fader-3",
-        "label": "Channel 3 fader",
-        "kind": "fader",
-        "position": {
-          "x": 24.8333,
-          "y": 31.6667,
-          "width": 6.0,
-          "height": 50.0
-        },
-        "control": "fader-3",
-        "learnable": false
-      },
-      {
-        "id": "mute-3",
-        "label": "Channel 3 mute",
-        "kind": "button",
-        "position": {
-          "x": 24.8333,
-          "y": 85.0,
-          "width": 6.0,
-          "height": 8.0
-        },
-        "control": "mute-3",
-        "learnable": false
-      },
-      {
-        "id": "fader-4",
-        "label": "Channel 4 fader",
-        "kind": "fader",
-        "position": {
-          "x": 35.1667,
-          "y": 31.6667,
-          "width": 6.0,
-          "height": 50.0
-        },
-        "control": "fader-4",
-        "learnable": false
-      },
-      {
-        "id": "mute-4",
-        "label": "Channel 4 mute",
-        "kind": "button",
-        "position": {
-          "x": 35.1667,
-          "y": 85.0,
-          "width": 6.0,
-          "height": 8.0
-        },
-        "control": "mute-4",
-        "learnable": false
-      },
-      {
-        "id": "fader-5",
-        "label": "Channel 5 fader",
-        "kind": "fader",
-        "position": {
-          "x": 45.5,
-          "y": 31.6667,
-          "width": 6.0,
-          "height": 50.0
-        },
-        "control": "fader-5",
-        "learnable": false
-      },
-      {
-        "id": "mute-5",
-        "label": "Channel 5 mute",
-        "kind": "button",
-        "position": {
-          "x": 45.5,
-          "y": 85.0,
-          "width": 6.0,
-          "height": 8.0
-        },
-        "control": "mute-5",
-        "learnable": false
-      },
-      {
-        "id": "fader-6",
-        "label": "Channel 6 fader",
-        "kind": "fader",
-        "position": {
-          "x": 55.8333,
-          "y": 31.6667,
-          "width": 6.0,
-          "height": 50.0
-        },
-        "control": "fader-6",
-        "learnable": false
-      },
-      {
-        "id": "mute-6",
-        "label": "Channel 6 mute",
-        "kind": "button",
-        "position": {
-          "x": 55.8333,
-          "y": 85.0,
-          "width": 6.0,
-          "height": 8.0
-        },
-        "control": "mute-6",
-        "learnable": false
-      },
-      {
-        "id": "fader-7",
-        "label": "Channel 7 fader",
-        "kind": "fader",
-        "position": {
-          "x": 66.1667,
-          "y": 31.6667,
-          "width": 6.0,
-          "height": 50.0
-        },
-        "control": "fader-7",
-        "learnable": false
-      },
-      {
-        "id": "mute-7",
-        "label": "Channel 7 mute",
-        "kind": "button",
-        "position": {
-          "x": 66.1667,
-          "y": 85.0,
-          "width": 6.0,
-          "height": 8.0
-        },
-        "control": "mute-7",
-        "learnable": false
-      },
-      {
-        "id": "fader-8",
-        "label": "Channel 8 fader",
-        "kind": "fader",
-        "position": {
-          "x": 76.5,
-          "y": 31.6667,
-          "width": 6.0,
-          "height": 50.0
-        },
-        "control": "fader-8",
-        "learnable": false
-      },
-      {
-        "id": "mute-8",
-        "label": "Channel 8 mute",
-        "kind": "button",
-        "position": {
-          "x": 76.5,
-          "y": 85.0,
-          "width": 6.0,
-          "height": 8.0
-        },
-        "control": "mute-8",
-        "learnable": false
-      },
-      {
-        "id": "fader-9",
-        "label": "Main fader",
-        "kind": "fader",
-        "position": {
-          "x": 86.8333,
-          "y": 31.6667,
-          "width": 6.0,
-          "height": 50.0
-        },
-        "control": "fader-9",
-        "learnable": false
-      },
-      {
-        "id": "mute-9",
-        "label": "Main mute",
-        "kind": "button",
-        "position": {
-          "x": 86.8333,
-          "y": 85.0,
-          "width": 6.0,
-          "height": 8.0
-        },
-        "control": "mute-9",
-        "learnable": false
-      },
-      {
-        "id": "rotary-1",
-        "label": "Assignable rotary 1",
-        "kind": "knob",
-        "position": {
-          "x": 25,
-          "y": 13,
-          "width": 6,
-          "height": 12
-        },
-        "message": {
-          "type": "cc",
-          "number": 50
-        },
-        "learnable": true
-      },
-      {
-        "id": "rotary-2",
-        "label": "Assignable rotary 2",
-        "kind": "knob",
-        "position": {
-          "x": 37,
-          "y": 13,
-          "width": 6,
-          "height": 12
-        },
-        "message": {
-          "type": "cc",
-          "number": 51
-        },
-        "learnable": true
-      },
-      {
-        "id": "rotary-3",
-        "label": "Assignable rotary 3",
-        "kind": "knob",
-        "position": {
-          "x": 49,
-          "y": 13,
-          "width": 6,
-          "height": 12
-        },
-        "message": {
-          "type": "cc",
-          "number": 52
-        },
-        "learnable": true
-      },
-      {
-        "id": "rotary-4",
-        "label": "Assignable rotary 4",
-        "kind": "knob",
-        "position": {
-          "x": 61,
-          "y": 13,
-          "width": 6,
-          "height": 12
-        },
-        "message": {
-          "type": "cc",
-          "number": 53
-        },
-        "learnable": true
-      }
-    ]
-  }
+	"$schema": "../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "k-mix-audio-control",
+	"name": "K-Mix Audio Control",
+	"manufacturer": "Keith McMillen Instruments",
+	"ids": ["k-mix-audio-control"],
+	"portNames": ["2- Audio Control", "K-Mix Audio Control"],
+	"description": "Hardware MIDI input for the K-Mix Audio Control port, restored from the original AudioBus adapter.",
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "K-Mix user manual: MIDI channels and parameters",
+			"url": "https://files.keithmcmillen.com/products/k-mix/documentation/kmix-manual.pdf"
+		},
+		{
+			"title": "Original AudioBus K-Mix port adapter",
+			"url": "https://github.com/designerzen/audiobus/blob/ts2wp2es6pug/source/code/typescript/audiobus/io/devices/KMix.ts"
+		}
+	],
+	"abilities": ["MIDI message forwarding", "Independent Audio Control port selection"],
+	"hardwareControls": [
+		"Eight input faders",
+		"Main fader",
+		"Channel mute buttons",
+		"Four rotary touch controls",
+		"Three MIDI banks"
+	],
+	"notice": "Select the matching hardware port. The original Windows port name is 2- Audio Control. MIDI is forwarded into this chain; use a MIDI device output to send commands back to the hardware. Custom MIDI assignments depend on the K-Mix configuration. Audio Control uses documented CC1 faders and CC2 mutes on channels 1-9.",
+	"controls": [
+		{
+			"id": "fader-1",
+			"label": "Channel 1 fader",
+			"message": {
+				"type": "cc",
+				"number": 1,
+				"channel": 1
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "mute-1",
+			"label": "Channel 1 mute",
+			"message": {
+				"type": "cc",
+				"number": 2,
+				"channel": 1
+			},
+			"widget": "toggle"
+		},
+		{
+			"id": "fader-2",
+			"label": "Channel 2 fader",
+			"message": {
+				"type": "cc",
+				"number": 1,
+				"channel": 2
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "mute-2",
+			"label": "Channel 2 mute",
+			"message": {
+				"type": "cc",
+				"number": 2,
+				"channel": 2
+			},
+			"widget": "toggle"
+		},
+		{
+			"id": "fader-3",
+			"label": "Channel 3 fader",
+			"message": {
+				"type": "cc",
+				"number": 1,
+				"channel": 3
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "mute-3",
+			"label": "Channel 3 mute",
+			"message": {
+				"type": "cc",
+				"number": 2,
+				"channel": 3
+			},
+			"widget": "toggle"
+		},
+		{
+			"id": "fader-4",
+			"label": "Channel 4 fader",
+			"message": {
+				"type": "cc",
+				"number": 1,
+				"channel": 4
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "mute-4",
+			"label": "Channel 4 mute",
+			"message": {
+				"type": "cc",
+				"number": 2,
+				"channel": 4
+			},
+			"widget": "toggle"
+		},
+		{
+			"id": "fader-5",
+			"label": "Channel 5 fader",
+			"message": {
+				"type": "cc",
+				"number": 1,
+				"channel": 5
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "mute-5",
+			"label": "Channel 5 mute",
+			"message": {
+				"type": "cc",
+				"number": 2,
+				"channel": 5
+			},
+			"widget": "toggle"
+		},
+		{
+			"id": "fader-6",
+			"label": "Channel 6 fader",
+			"message": {
+				"type": "cc",
+				"number": 1,
+				"channel": 6
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "mute-6",
+			"label": "Channel 6 mute",
+			"message": {
+				"type": "cc",
+				"number": 2,
+				"channel": 6
+			},
+			"widget": "toggle"
+		},
+		{
+			"id": "fader-7",
+			"label": "Channel 7 fader",
+			"message": {
+				"type": "cc",
+				"number": 1,
+				"channel": 7
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "mute-7",
+			"label": "Channel 7 mute",
+			"message": {
+				"type": "cc",
+				"number": 2,
+				"channel": 7
+			},
+			"widget": "toggle"
+		},
+		{
+			"id": "fader-8",
+			"label": "Channel 8 fader",
+			"message": {
+				"type": "cc",
+				"number": 1,
+				"channel": 8
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "mute-8",
+			"label": "Channel 8 mute",
+			"message": {
+				"type": "cc",
+				"number": 2,
+				"channel": 8
+			},
+			"widget": "toggle"
+		},
+		{
+			"id": "fader-9",
+			"label": "Main fader",
+			"message": {
+				"type": "cc",
+				"number": 1,
+				"channel": 9
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "mute-9",
+			"label": "Main mute",
+			"message": {
+				"type": "cc",
+				"number": 2,
+				"channel": 9
+			},
+			"widget": "toggle"
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "K-Mix Audio Control MIDI port illustration"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "guide",
+				"label": "Original hardware adapter"
+			}
+		]
+	},
+	"manufacturerUrl": "https://www.keithmcmillen.com/",
+	"productUrl": "https://www.keithmcmillen.com/products/k-mix/",
+	"surface": {
+		"src": "panel.svg",
+		"width": 600,
+		"height": 300,
+		"elements": [
+			{
+				"id": "fader-1",
+				"label": "Channel 1 fader",
+				"kind": "fader",
+				"position": {
+					"x": 4.1667,
+					"y": 31.6667,
+					"width": 6.0,
+					"height": 50.0
+				},
+				"control": "fader-1",
+				"learnable": false
+			},
+			{
+				"id": "mute-1",
+				"label": "Channel 1 mute",
+				"kind": "button",
+				"position": {
+					"x": 4.1667,
+					"y": 85.0,
+					"width": 6.0,
+					"height": 8.0
+				},
+				"control": "mute-1",
+				"learnable": false
+			},
+			{
+				"id": "fader-2",
+				"label": "Channel 2 fader",
+				"kind": "fader",
+				"position": {
+					"x": 14.5,
+					"y": 31.6667,
+					"width": 6.0,
+					"height": 50.0
+				},
+				"control": "fader-2",
+				"learnable": false
+			},
+			{
+				"id": "mute-2",
+				"label": "Channel 2 mute",
+				"kind": "button",
+				"position": {
+					"x": 14.5,
+					"y": 85.0,
+					"width": 6.0,
+					"height": 8.0
+				},
+				"control": "mute-2",
+				"learnable": false
+			},
+			{
+				"id": "fader-3",
+				"label": "Channel 3 fader",
+				"kind": "fader",
+				"position": {
+					"x": 24.8333,
+					"y": 31.6667,
+					"width": 6.0,
+					"height": 50.0
+				},
+				"control": "fader-3",
+				"learnable": false
+			},
+			{
+				"id": "mute-3",
+				"label": "Channel 3 mute",
+				"kind": "button",
+				"position": {
+					"x": 24.8333,
+					"y": 85.0,
+					"width": 6.0,
+					"height": 8.0
+				},
+				"control": "mute-3",
+				"learnable": false
+			},
+			{
+				"id": "fader-4",
+				"label": "Channel 4 fader",
+				"kind": "fader",
+				"position": {
+					"x": 35.1667,
+					"y": 31.6667,
+					"width": 6.0,
+					"height": 50.0
+				},
+				"control": "fader-4",
+				"learnable": false
+			},
+			{
+				"id": "mute-4",
+				"label": "Channel 4 mute",
+				"kind": "button",
+				"position": {
+					"x": 35.1667,
+					"y": 85.0,
+					"width": 6.0,
+					"height": 8.0
+				},
+				"control": "mute-4",
+				"learnable": false
+			},
+			{
+				"id": "fader-5",
+				"label": "Channel 5 fader",
+				"kind": "fader",
+				"position": {
+					"x": 45.5,
+					"y": 31.6667,
+					"width": 6.0,
+					"height": 50.0
+				},
+				"control": "fader-5",
+				"learnable": false
+			},
+			{
+				"id": "mute-5",
+				"label": "Channel 5 mute",
+				"kind": "button",
+				"position": {
+					"x": 45.5,
+					"y": 85.0,
+					"width": 6.0,
+					"height": 8.0
+				},
+				"control": "mute-5",
+				"learnable": false
+			},
+			{
+				"id": "fader-6",
+				"label": "Channel 6 fader",
+				"kind": "fader",
+				"position": {
+					"x": 55.8333,
+					"y": 31.6667,
+					"width": 6.0,
+					"height": 50.0
+				},
+				"control": "fader-6",
+				"learnable": false
+			},
+			{
+				"id": "mute-6",
+				"label": "Channel 6 mute",
+				"kind": "button",
+				"position": {
+					"x": 55.8333,
+					"y": 85.0,
+					"width": 6.0,
+					"height": 8.0
+				},
+				"control": "mute-6",
+				"learnable": false
+			},
+			{
+				"id": "fader-7",
+				"label": "Channel 7 fader",
+				"kind": "fader",
+				"position": {
+					"x": 66.1667,
+					"y": 31.6667,
+					"width": 6.0,
+					"height": 50.0
+				},
+				"control": "fader-7",
+				"learnable": false
+			},
+			{
+				"id": "mute-7",
+				"label": "Channel 7 mute",
+				"kind": "button",
+				"position": {
+					"x": 66.1667,
+					"y": 85.0,
+					"width": 6.0,
+					"height": 8.0
+				},
+				"control": "mute-7",
+				"learnable": false
+			},
+			{
+				"id": "fader-8",
+				"label": "Channel 8 fader",
+				"kind": "fader",
+				"position": {
+					"x": 76.5,
+					"y": 31.6667,
+					"width": 6.0,
+					"height": 50.0
+				},
+				"control": "fader-8",
+				"learnable": false
+			},
+			{
+				"id": "mute-8",
+				"label": "Channel 8 mute",
+				"kind": "button",
+				"position": {
+					"x": 76.5,
+					"y": 85.0,
+					"width": 6.0,
+					"height": 8.0
+				},
+				"control": "mute-8",
+				"learnable": false
+			},
+			{
+				"id": "fader-9",
+				"label": "Main fader",
+				"kind": "fader",
+				"position": {
+					"x": 86.8333,
+					"y": 31.6667,
+					"width": 6.0,
+					"height": 50.0
+				},
+				"control": "fader-9",
+				"learnable": false
+			},
+			{
+				"id": "mute-9",
+				"label": "Main mute",
+				"kind": "button",
+				"position": {
+					"x": 86.8333,
+					"y": 85.0,
+					"width": 6.0,
+					"height": 8.0
+				},
+				"control": "mute-9",
+				"learnable": false
+			},
+			{
+				"id": "rotary-1",
+				"label": "Assignable rotary 1",
+				"kind": "knob",
+				"position": {
+					"x": 25,
+					"y": 13,
+					"width": 6,
+					"height": 12
+				},
+				"message": {
+					"type": "cc",
+					"number": 50
+				},
+				"learnable": true
+			},
+			{
+				"id": "rotary-2",
+				"label": "Assignable rotary 2",
+				"kind": "knob",
+				"position": {
+					"x": 37,
+					"y": 13,
+					"width": 6,
+					"height": 12
+				},
+				"message": {
+					"type": "cc",
+					"number": 51
+				},
+				"learnable": true
+			},
+			{
+				"id": "rotary-3",
+				"label": "Assignable rotary 3",
+				"kind": "knob",
+				"position": {
+					"x": 49,
+					"y": 13,
+					"width": 6,
+					"height": 12
+				},
+				"message": {
+					"type": "cc",
+					"number": 52
+				},
+				"learnable": true
+			},
+			{
+				"id": "rotary-4",
+				"label": "Assignable rotary 4",
+				"kind": "knob",
+				"position": {
+					"x": 61,
+					"y": 13,
+					"width": 6,
+					"height": 12
+				},
+				"message": {
+					"type": "cc",
+					"number": 53
+				},
+				"learnable": true
+			}
+		]
+	}
 }

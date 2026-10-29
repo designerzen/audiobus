@@ -1,6 +1,6 @@
-export const WAM_ARCHIVE_CACHE = 'harmoneasy-wam-archives-v1'
-export const WAM_ARCHIVE_DIRECTORY = 'wam-archives/'
-export const EVENT_ARCHIVE_FETCH = 'fetch'
+export const WAM_ARCHIVE_CACHE = "harmoneasy-wam-archives-v1"
+export const WAM_ARCHIVE_DIRECTORY = "wam-archives/"
+export const EVENT_ARCHIVE_FETCH = "fetch"
 
 // Prepended to the existing isolation worker, so archive imports retain COOP/COEP.
 export const wamArchiveWorkerSource = `

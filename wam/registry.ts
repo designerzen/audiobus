@@ -1,14 +1,14 @@
 /**
  * WAM2 Registry Manager
- * 
+ *
  * Manages fetching and caching the WAM2 community plugin registry
  * Provides discovery, filtering, and metadata for available WAM2 plugins
- * 
+ *
  * Registry source: https://www.webaudiomodules.com/community/plugins.json
  */
 
-import communityPlugins from './community-plugins.json'
-import additionalPlugins from './additional-plugins.json'
+import communityPlugins from "./community-plugins.json"
+import additionalPlugins from "./additional-plugins.json"
 
 export interface WAM2PluginDescriptor {
 	identifier: string
@@ -28,7 +28,9 @@ export interface WAM2PluginDescriptor {
 
 // Expose every published instrument directly in the output picker, even offline.
 const bundledPlugins: WAM2PluginDescriptor[] = [...communityPlugins, ...additionalPlugins]
-export const WAM2_INSTRUMENTS = bundledPlugins.filter(plugin => plugin.category?.includes('Instrument'))
+export const WAM2_INSTRUMENTS = bundledPlugins.filter((plugin) =>
+	plugin.category?.includes("Instrument")
+)
 export const wam2OutputId = (plugin: WAM2PluginDescriptor) => `wam2:${plugin.identifier}`
 
 export class WAM2Registry {
@@ -52,31 +54,62 @@ export class WAM2Registry {
 	 * Initialize the registry by fetching plugins from the online registry
 	 */
 	async initialize(): Promise<void> {
-		if (this.initialized) return
-		if (this.initPromise) return this.initPromise
+		if (this.initialized) {
+			return
+		}
+		if (this.initPromise) {
+			return this.initPromise
+		}
 
 		this.initPromise = this.fetchRegistry()
-			.then(() => { this.initialized = true })
-			.catch(() => { /* Bundled entries remain available; retry discovery next time. */ })
-			.finally(() => { this.initPromise = null })
+			.then(() => {
+				this.initialized = true
+			})
+			.catch(() => {
+				/* Bundled entries remain available; retry discovery next time. */
+			})
+			.finally(() => {
+				this.initPromise = null
+			})
 		return this.initPromise
 	}
 
 	private async fetchRegistry(): Promise<void> {
 		try {
-			const response = await fetch(WAM2Registry.REGISTRY_URL, { signal: AbortSignal.timeout(10000) })
+			const response = await fetch(WAM2Registry.REGISTRY_URL, {
+				signal: AbortSignal.timeout(10000)
+			})
 			if (!response.ok) {
 				throw new Error(`Failed to fetch WAM2 registry: ${response.statusText}`)
 			}
 
 			const data = await response.json()
 			const plugins = Array.isArray(data) ? data : data.plugins
-			if (!Array.isArray(plugins) || !plugins.length) throw new Error('Empty WAM2 registry')
-			this.plugins = [...new Map([...bundledPlugins, ...plugins].filter(p =>
-				typeof p.identifier === 'string' && typeof p.path === 'string' && typeof p.name === 'string'
-			).map(p => [p.identifier, { ...p, vendor: p.vendor ?? '', description: p.description ?? '',
-				category: Array.isArray(p.category) ? p.category : [], keywords: Array.isArray(p.keywords) ? p.keywords : [] }])).values()]
-			
+			if (!Array.isArray(plugins) || !plugins.length) {
+				throw new Error("Empty WAM2 registry")
+			}
+			this.plugins = [
+				...new Map(
+					[...bundledPlugins, ...plugins]
+						.filter(
+							(p) =>
+								typeof p.identifier === "string" &&
+								typeof p.path === "string" &&
+								typeof p.name === "string"
+						)
+						.map((p) => [
+							p.identifier,
+							{
+								...p,
+								vendor: p.vendor ?? "",
+								description: p.description ?? "",
+								category: Array.isArray(p.category) ? p.category : [],
+								keywords: Array.isArray(p.keywords) ? p.keywords : []
+							}
+						])
+				).values()
+			]
+
 			console.info(`Loaded ${this.plugins.length} WAM2 plugins from registry`)
 		} catch (error) {
 			console.error("Failed to fetch WAM2 registry:", error)
@@ -97,15 +130,15 @@ export class WAM2Registry {
 	 * Get a plugin by identifier
 	 */
 	getById(identifier: string): WAM2PluginDescriptor | undefined {
-		return this.plugins.find(p => p.identifier === identifier)
+		return this.plugins.find((p) => p.identifier === identifier)
 	}
 
 	/**
 	 * Filter plugins by category
 	 */
 	getByCategory(category: string): WAM2PluginDescriptor[] {
-		return this.plugins.filter(p => 
-			p.category.some(c => c.toLowerCase() === category.toLowerCase())
+		return this.plugins.filter((p) =>
+			p.category.some((c) => c.toLowerCase() === category.toLowerCase())
 		)
 	}
 
@@ -135,11 +168,12 @@ export class WAM2Registry {
 	 */
 	search(query: string): WAM2PluginDescriptor[] {
 		const term = query.toLowerCase()
-		return this.plugins.filter(p =>
-			p.name.toLowerCase().includes(term) ||
-			p.vendor.toLowerCase().includes(term) ||
-			p.description.toLowerCase().includes(term) ||
-			p.keywords.some(k => k.toLowerCase().includes(term))
+		return this.plugins.filter(
+			(p) =>
+				p.name.toLowerCase().includes(term) ||
+				p.vendor.toLowerCase().includes(term) ||
+				p.description.toLowerCase().includes(term) ||
+				p.keywords.some((k) => k.toLowerCase().includes(term))
 		)
 	}
 
@@ -154,7 +188,9 @@ export class WAM2Registry {
 	 * Get the full URL for a plugin's thumbnail
 	 */
 	getThumbnailUrl(plugin: WAM2PluginDescriptor): string | null {
-		if (!plugin.thumbnail) return null
+		if (!plugin.thumbnail) {
+			return null
+		}
 		return new URL(plugin.thumbnail, WAM2Registry.BASE_URL).href
 	}
 
@@ -163,9 +199,9 @@ export class WAM2Registry {
 	 */
 	getGroupedByCategory(): Map<string, WAM2PluginDescriptor[]> {
 		const grouped = new Map<string, WAM2PluginDescriptor[]>()
-		
-		this.plugins.forEach(plugin => {
-			plugin.category.forEach(cat => {
+
+		this.plugins.forEach((plugin) => {
+			plugin.category.forEach((cat) => {
 				if (!grouped.has(cat)) {
 					grouped.set(cat, [])
 				}
@@ -174,7 +210,7 @@ export class WAM2Registry {
 		})
 
 		// Sort each group by name
-		grouped.forEach(plugins => {
+		grouped.forEach((plugins) => {
 			plugins.sort((a, b) => a.name.localeCompare(b.name))
 		})
 

@@ -1,30 +1,27 @@
-const now = () => performance.now ?? Date.now() * 1000
-export const getGamePads = () => navigator.getGamepads() || navigator.webkitGetGamepads() 
+const now = () => performance.now()
+export const getGamePads = () =>
+	typeof navigator?.getGamepads === "function" ? navigator.getGamepads() : []
 
 export const fetchGamePads = () => {
-
 	const gamepads = getGamePads()
-	for (let i = 0; i < gamepads.length; i++) 
-	{
+	for (let i = 0; i < gamepads.length; i++) {
 		console.log("Gamepad " + i + ":")
 
-		if (gamepads[i] === null) 
-		{
+		if (!gamepads[i]) {
 			console.log("[null]")
 			continue
 		}
 
-		if (!gamepads[i].connected) 
-		{
+		if (!gamepads[i]!.connected) {
 			console.log("[disconnected]")
 			continue
 		}
 
-		console.log("    Index: " + gamepads[i].index)
-		console.log("    ID: " + gamepads[i].id)
-		console.log("    Axes: " + gamepads[i].axes.length)
-		console.log("    Buttons: " + gamepads[i].buttons.length)
-		console.log("    Mapping: " + gamepads[i].mapping)
+		console.log("    Index: " + gamepads[i]!.index)
+		console.log("    ID: " + gamepads[i]!.id)
+		console.log("    Axes: " + gamepads[i]!.axes.length)
+		console.log("    Buttons: " + gamepads[i]!.buttons.length)
+		console.log("    Mapping: " + gamepads[i]!.mapping)
 	}
 	return gamepads
 }
@@ -53,7 +50,7 @@ export const BUTTON_RIGHT_SHOULDER = "rs"
 
 export const DIRECTION_UP = "dup"
 export const DIRECTION_DOWN = "ddown"
-export const DIRECTION_LEFT = "dleft"		
+export const DIRECTION_LEFT = "dleft"
 export const DIRECTION_RIGHT = "dright"
 
 export const DIRECTION_LEFT_STICK_Y = "leftstickY"
@@ -82,7 +79,7 @@ export const COMMANDS = {
 	RIGHT: DIRECTION_RIGHT,
 	LEFT_STICK_Y: DIRECTION_LEFT_STICK_Y,
 	LEFT_STICK_X: DIRECTION_LEFT_STICK_X,
-	RIGHT_STICK_Y: DIRECTION_RIGHT_STICK_Y,	
+	RIGHT_STICK_Y: DIRECTION_RIGHT_STICK_Y,
 	RIGHT_STICK_X: DIRECTION_RIGHT_STICK_X
 }
 
@@ -97,16 +94,16 @@ const BUTTON_NAMES = [
 	BUTTON_LT,
 	BUTTON_RT,
 	BUTTON_SELECT,
-	BUTTON_START, 
-	BUTTON_LEFT_SHOULDER, 
-	BUTTON_RIGHT_SHOULDER, 
-	DIRECTION_UP, 
-	DIRECTION_DOWN, 
-	DIRECTION_LEFT,	
+	BUTTON_START,
+	BUTTON_LEFT_SHOULDER,
+	BUTTON_RIGHT_SHOULDER,
+	DIRECTION_UP,
+	DIRECTION_DOWN,
+	DIRECTION_LEFT,
 	DIRECTION_RIGHT,
 	BUTTON_P1,
-	BUTTON_P2,
-]
+	BUTTON_P2
+] as const
 
 // Gamepad reference IDs
 // const BUTTON_NAMES = [
@@ -119,23 +116,22 @@ const BUTTON_NAMES = [
 // 	"lt",
 // 	"rt",
 // 	"select",
-// 	"start", 
-// 	"ls", 
-// 	"rs", 
-// 	"dup", 
-// 	"ddown", 
-// 	"dleft", 
+// 	"start",
+// 	"ls",
+// 	"rs",
+// 	"dup",
+// 	"ddown",
+// 	"dleft",
 // 	"dright"
 // ]
 
 const BUTTON_QUANTITY = BUTTON_NAMES.length
 
 export default class GamePad {
-
 	index = -1
 	connectionIndex = -1
 	gamePadIndex = -1
-	gamepad = null	// just a cache of the last state
+	gamepad: Gamepad | null = null // just a cache of the last state
 	available = false
 	connected = false
 
@@ -170,36 +166,40 @@ export default class GamePad {
 
 	standardMapping = false
 
-	watcher = null
+	watcher: ((button: string, value: string | number | boolean, heldFor: number) => void) | null =
+		null
 
-	pressedAt = new Map()
+	pressedAt = new Map<string, number>()
 
-    constructor( gamePadId=0, connectionIndex=-1 ) {
+	constructor(gamePadId = 0, connectionIndex = -1) {
 		this.connected = false
 		this.gamePadIndex = gamePadId
-		this.connectionIndex = connectionIndex	
-    }
+		this.connectionIndex = connectionIndex
+	}
 
 	// getButton(name){
 	// 	return this.buttonLibrary.get(name)
 	// }
-	
-	on( callback ) {
+
+	on(callback: GamePad["watcher"]) {
 		this.watcher = callback
 	}
 
-	dispatch( key:string, value:string ){
-		this.watcher && this.watcher(key, value)
+	dispatch(key: string, value: string | number | boolean, heldFor = -1) {
+		if (this.watcher) {
+			this.watcher(key, value, heldFor)
+		}
 	}
-	
+
 	/**
 	 * Connect to this gamepad
-	 * @param {Event} event 
+	 * @param {Event} event
 	 */
-    connect(event) {
-		const gamepad = event.originalEvent ? event.originalEvent.gamepad : event.gamepad
-		
+	connect(event: GamepadEvent) {
+		const gamepad = event.gamepad
+
 		this.connected = true
+		this.available = true
 		this.gamepad = gamepad
 		this.index = gamepad.index
 
@@ -208,49 +208,56 @@ export default class GamePad {
 		// BUTTON_NAMES.forEach( (button,index) => {
 		// 	this.buttonLibrary.set( button, this.buttons[index] )
 		// })
-	
+
 		// this.update()
-		this.dispatch(GAME_PAD_AVAILBLE, this.toString() )
-    }
-    
+		this.dispatch(GAME_PAD_AVAILBLE, this.toString())
+	}
+
 	/**
 	 * Disconnect from this gamepad
-	 * @param {Event} event 
+	 * @param {Event} event
 	 */
-    disconnect(event) {
+	disconnect() {
 		// const gamepad = event.originalEvent ? event.originalEvent.gamepad : event.gamepad
 		this.connected = false
 		this.available = false
 		this.gamepad = null
-		this.dispatch( GAME_PAD_UNPLUGGED, this.toString() )
-    }
+		this.dispatch(GAME_PAD_UNPLUGGED, this.toString())
+	}
 
 	/**
 	 * Make the gamepad vibrate!
-	 * 
-	 * @param {Number} value 
-	 * @param {Number} duration 
-	 * @param {Number} hapticIndex 
+	 *
+	 * @param {Number} value
+	 * @param {Number} duration
+	 * @param {Number} hapticIndex
 	 */
-	vibrate(value=1, duration=200, hapticIndex=0 ){
-		if (this.gamepad)
-		{
-			this.gamepad.hapticActuators[hapticIndex].pulse(value, duration)
+	vibrate(value = 1, duration = 200, hapticIndex = 0) {
+		if (this.gamepad) {
+			const pad = this.gamepad as Gamepad & {
+				hapticActuators?: { pulse(value: number, duration: number): Promise<boolean> }[]
+			}
+			void pad.hapticActuators?.[hapticIndex]?.pulse(value, duration)
 		}
 	}
 
 	/**
-	 * 
-	 * @param {String} type 
-	 * @param {Number} startDelay 
-	 * @param {Number} duration 
-	 * @param {Number} weakMagnitude 
-	 * @param {Number} strongMagnitude 
+	 *
+	 * @param {String} type
+	 * @param {Number} startDelay
+	 * @param {Number} duration
+	 * @param {Number} weakMagnitude
+	 * @param {Number} strongMagnitude
 	 */
-	playEffect(type="dual-rumble", startDelay=0, duration=1000, weakMagnitude=1.0, strongMagnitude=1.0 ){
-		if (this.gamepad)
-		{
-			this.gamepad.vibrationActuator.playEffect(type, {
+	playEffect(
+		type: GamepadHapticEffectType = "dual-rumble",
+		startDelay = 0,
+		duration = 1000,
+		weakMagnitude = 1.0,
+		strongMagnitude = 1.0
+	) {
+		if (this.gamepad) {
+			this.gamepad.vibrationActuator?.playEffect(type, {
 				startDelay,
 				duration,
 				weakMagnitude,
@@ -261,33 +268,28 @@ export default class GamePad {
 
 	/**
 	 * Check if changed and send out event if so
-	 * 
-	 * @param {Class} gamepad 
-	 * @param {} button 
-	 * @param {Number} buttonIndex 
+	 *
+	 * @param {Class} gamepad
+	 * @param {} button
+	 * @param {Number} buttonIndex
 	 */
-	setBoolean( newValue, button, dispatchEvent=true ){
-	 
-		const oldValue = this[button] 
+	setBoolean(newValue: boolean, button: (typeof BUTTON_NAMES)[number], dispatchEvent = true) {
+		const oldValue = this[button]
 		let elapsed = -1
-		
-		if (oldValue === false && newValue === true)
-		{
+
+		if (oldValue === false && newValue === true) {
 			// ON
-			this.pressedAt.set( button, now() )
-		}else if (oldValue === true && newValue === false)
-		{
+			this.pressedAt.set(button, now())
+		} else if (oldValue === true && newValue === false) {
 			// OFF
-			elapsed = now() - this.pressedAt.get( button )
-			this.pressedAt.delete( button )
+			elapsed = now() - (this.pressedAt.get(button) ?? now())
+			this.pressedAt.delete(button)
 		}
 
 		// TOGGLE
-		if (oldValue !== newValue)
-		{
+		if (oldValue !== newValue) {
 			this[button] = newValue
-			if (dispatchEvent)
-			{
+			if (dispatchEvent) {
 				this.dispatch(button, newValue, elapsed)
 			}
 
@@ -298,19 +300,19 @@ export default class GamePad {
 	}
 
 	/**
-	 * 
-	 * @param {String} key 
-	 * @param {String|Number} value 
+	 *
+	 * @param {String} key
+	 * @param {String|Number} value
 	 */
-	setStickPosition(key, value){
-		if (!this.available)
-		{	
+	setStickPosition(
+		key: "leftstickX" | "leftstickY" | "rightstickX" | "rightstickY",
+		value: number
+	) {
+		if (!this.available) {
 			// dont't dispatch if first grep
 			this[key] = value
 			this.available = true
-			
 		} else if (this[key] !== value) {
-
 			this[key] = value
 			this.dispatch(key, value)
 		}
@@ -319,8 +321,10 @@ export default class GamePad {
 	/**
 	 * Set all joystick positions
 	 */
-	setAllStickPositions(){
-
+	setAllStickPositions() {
+		if (!this.gamepad) {
+			return
+		}
 		this.setStickPosition("leftstickX", this.gamepad.axes[0])
 		this.setStickPosition("leftstickY", this.gamepad.axes[1])
 		this.setStickPosition("rightstickX", this.gamepad.axes[2])
@@ -331,34 +335,35 @@ export default class GamePad {
 		// this.rightstickX = this.gamepad.axes[2]
 		// this.rightstickY = this.gamepad.axes[3]
 	}
-    
+
 	/**
 	 * Update the gamepad state
 	 */
-    update() {
-		
+	update() {
 		// NB. *always* fetch the pads to get their latest state
 		const gamepads = getGamePads()
-		
-    	if (this.available && this.connected) 
-		{
-			// console.log( "Updating gamepad data",this.gamepad, this)
-			this.setAllStickPositions()
-		
-			const gamepad = gamepads[this.index]
 
-			for (let i = 0; i < BUTTON_QUANTITY; ++i) 
-			{
-				
+		if (this.available && this.connected) {
+			// console.log( "Updating gamepad data",this.gamepad, this)
+
+			const gamepad = gamepads[this.index]
+			if (!gamepad) {
+				this.disconnect()
+				return
+			}
+			this.gamepad = gamepad
+			this.setAllStickPositions()
+
+			for (let i = 0; i < BUTTON_QUANTITY; ++i) {
 				// const gamepadButton = this.gamepad.buttons[i]
 				const gamepadButton = gamepad.buttons[i]
-				const newValue = gamepadButton.pressed
+				const newValue = gamepadButton?.pressed ?? false
 
 				// if (newValue){
 				// 	console.error("gamepadButton",  this.gamepad.buttons[i].pressed,  getGamePads()[this.index].buttons[i].pressed, this.index )
 				// 	// console.info("gamepadButton", gamepadButton, this.gamepad, navigator.getGamepads()[this.buttonIndex] )
-				// } 
-				this.setBoolean( newValue, BUTTON_NAMES[i] )
+				// }
+				this.setBoolean(newValue, BUTTON_NAMES[i])
 			}
 
 			//BUTTON_NAMES.forEach( (button, i) => this.setBoolean( this.gamepad, button, i) )
@@ -395,22 +400,24 @@ export default class GamePad {
 			// this.ddown = !!gamepad.buttons[13].value
 			// this.dleft = !!gamepad.buttons[14].value
 			// this.dright = !!gamepad.buttons[15].value
-
-		}else{
+		} else {
 			//console.log(this.available, "failing to update gamepad data", this.gamepad)
 		}
 
 		// kill any references remaining...
 		// this.gamepad = null
-    }
-
-	toStringState(){
-		return BUTTON_NAMES.map( button => this[button] ).join(" / ")
-	
 	}
 
-	toString(){
-		return `Gamepad #${this.index} : ${this.gamePadId} -> ${this.toStringState()}`
+	get id(): string {
+		return this.gamepad?.id ?? String(this.gamePadIndex)
+	}
+
+	toStringState() {
+		return BUTTON_NAMES.map((button) => this[button]).join(" / ")
+	}
+
+	toString() {
+		return `Gamepad #${this.index} : ${this.gamePadIndex} -> ${this.toStringState()}`
 	}
 }
 
@@ -421,145 +428,97 @@ export const GAME_PAD_DISCONNECTED = "game-pad-disconnected"
  * Manager for the above class
  */
 export class GamePadManager {
-	
-	controllers = new Map()
-	callbacks = new Set()
-	held = new Map()
-
-    /**
-     * 
-     */
-	get isAnyButtonHeld(){
+	controllers = new Map<number, GamePad>()
+	callbacks = new Set<(key: string, value: number, gamePad: GamePad, heldFor: number) => void>()
+	held = new Map<string, number>()
+	private abortController = new AbortController()
+	private animationFrame = -1
+	get isAnyButtonHeld() {
 		return this.held.size > 0
 	}
-
-    /**
-     * 
-     */
-	get heldButtons(){
+	get heldButtons() {
 		return this.held
 	}
-
 	constructor() {
-
-		// fetch any previously registered game pads
-		let pads = fetchGamePads()
-		let quantity = 0
-		let intervalID = -1
-		const eventLoop = () => {
-
-			// console.info("checking buttons for pads", quantity)
-			this.controllers.forEach( gamePad => gamePad.update() )
-			if (quantity > 0 )
-			{
-				//console.info("Gamepads", { pads }, this )
-				cancelAnimationFrame(intervalID)
-				intervalID = requestAnimationFrame( eventLoop )
-			}else{
-				console.warn("Gamepads loop exit", { pads }, this )
+		window.addEventListener("gamepadconnected", (event) => this.connectPad(event.gamepad), {
+			signal: this.abortController.signal
+		})
+		window.addEventListener(
+			"gamepaddisconnected",
+			(event) => {
+				const pad = this.controllers.get(event.gamepad.index)
+				if (!pad) {
+					return
+				}
+				pad.disconnect()
+				this.controllers.delete(event.gamepad.index)
+				this.held.clear()
+				this.dispatchEvent(GAME_PAD_DISCONNECTED, 0, pad)
+			},
+			{ signal: this.abortController.signal }
+		)
+		for (const pad of getGamePads()) {
+			if (pad?.connected) {
+				this.connectPad(pad)
 			}
 		}
-
-		//pads.forEach( pad => pad && this.controllers.set(pad.index, new GamePad(pad.index)) )
-		console.info("Existing Gamepads", { pads }, this )
-
-		window.addEventListener("gamepadconnected", e => {
-
-			const event = e.originalEvent ? e.originalEvent.gamepad : e.gamepad
-			const gamePad = new GamePad(e.index, quantity++)
-			gamePad.connect(e)
-			gamePad.on( (buttonName, value, heldFor ) => {
-					
-				switch(buttonName)
-				{
-					// ignore caching these
-					case GAME_PAD_CONNECTED:
-					case GAME_PAD_DISCONNECTED:
-					case COMMANDS.LEFT_STICK_Y: 
-					case COMMANDS.LEFT_STICK_X: 
-					case COMMANDS.RIGHT_STICK_Y: j
-					case COMMANDS.RIGHT_STICK_X:
-					// case COMMANDS.UP: 
-					// case COMMANDS.DOWN: 
-					// case COMMANDS.LEFT: 
-					// case COMMANDS.RIGHT: 
-						break
-				
-					default: 
-						if (value)
-						{
-							this.held.set(buttonName, value)
-						}else{
-							this.held.delete(buttonName)
-						}
+	}
+	private connectPad(device: Gamepad) {
+		if (this.controllers.has(device.index)) {
+			return
+		}
+		const pad = new GamePad(device.index, this.controllers.size)
+		pad.connect({ gamepad: device } as GamepadEvent)
+		pad.on((button, value, heldFor) => {
+			const numericValue = Number(value)
+			if (!Number.isFinite(numericValue)) {
+				return
+			}
+			if (!button.includes("stick")) {
+				if (numericValue) {
+					this.held.set(button, numericValue)
+				} else {
+					this.held.delete(button)
 				}
-				console.info("gamepad message", buttonName, value )
-				this.dispatchEvent( buttonName, value, gamePad, heldFor )
-			})
-						
-			pads = fetchGamePads()
-			this.controllers.set( event.index, gamePad )
-			
-			console.info(
-				"Gamepad connected at index %d: %s. %d buttons, %d axes.",
-				event.index,
-				event.id,
-				event.buttons.length,
-				event.axes.length,
-				{gamePad, e, event},
-				this.controllers,
-				pads
-			)
-			this.dispatchEvent( GAME_PAD_CONNECTED, gamePad )
-			// start loop if not started already
-			eventLoop()
+			}
+			this.dispatchEvent(button, numericValue, pad, heldFor)
 		})
-
-		window.addEventListener("gamepaddisconnected", e =>{
-			let gamePad = this.controllers.get(e.gamepad.connectionIndex)
-			gamePad.disconnect()
-			this.controllers.delete(e.gamepad.connectionIndex)
-			gamePad = null
-			quantity--
-			this.dispatchEvent( GAME_PAD_DISCONNECTED, gamePad )
-			console.info("Gamepad disconnected", {gamePad, e}, this.controllers )
-	 	} )
-
-		// start jloop for an existing pre-connected gamepads
-		eventLoop()
-	}
-
-    /**
-     * Test if button is actively held down
-     * @param buttonName 
-     * @returns 
-     */
-	isHeld( buttonName:string ):boolean{
-		return this.held.has(buttonName)
-	}
-
-	/**
-	 * 
-	 * @param {String} key 
-	 * @param {Boolean|String|Object} value 
-	 */
-	dispatchEvent( key:string, value, gamePad:GamePad ){
-		if (this.callbacks.size)
-		{
-			this.callbacks.forEach( (callback:Function) => callback(key,value, gamePad) )
+		this.controllers.set(device.index, pad)
+		this.dispatchEvent(GAME_PAD_CONNECTED, 1, pad)
+		if (this.animationFrame < 0) {
+			this.update()
 		}
 	}
-
-	addEventListener( callback:Function ){
+	private update = () => {
+		for (const pad of this.controllers.values()) {
+			pad.update()
+		}
+		this.animationFrame = this.controllers.size ? requestAnimationFrame(this.update) : -1
+	}
+	isHeld(buttonName: string): boolean {
+		return this.held.has(buttonName)
+	}
+	dispatchEvent(key: string, value: number, gamePad: GamePad, heldFor = -1) {
+		for (const callback of this.callbacks) {
+			callback(key, value, gamePad, heldFor)
+		}
+	}
+	addEventListener(
+		callback: (key: string, value: number, gamePad: GamePad, heldFor: number) => void
+	) {
 		this.callbacks.add(callback)
 	}
-
-	removeEventListener( callback:Function ){
+	removeEventListener(
+		callback: (key: string, value: number, gamePad: GamePad, heldFor: number) => void
+	) {
 		this.callbacks.delete(callback)
 	}
-
-	destroy(){
-
+	destroy() {
+		this.abortController.abort()
+		cancelAnimationFrame(this.animationFrame)
+		this.animationFrame = -1
+		this.callbacks.clear()
+		this.controllers.clear()
+		this.held.clear()
 	}
 }
-

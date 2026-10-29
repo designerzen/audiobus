@@ -58,16 +58,16 @@ export interface IPercussionQuantiser {
 	getTriggerAt(input: { inputAudioTime?: number; now: number }): number | null
 }
 
-export type DrumCoreLane = 'kick' | 'snare' | 'hat' | 'clap'
-export type DrumSubdivisionStyle = 'auto' | 'triplet' | 'sextuplet' | 'rapid'
+export type DrumCoreLane = "kick" | "snare" | "hat" | "clap"
+export type DrumSubdivisionStyle = "auto" | "triplet" | "sextuplet" | "rapid"
 export type DrumPerformancePreset =
-	| 'auto'
-	| 'steady'
-	| 'crescendo'
-	| 'bridge'
-	| 'snare-roll'
-	| 'breakdown'
-	| 'drop'
+	| "auto"
+	| "steady"
+	| "crescendo"
+	| "bridge"
+	| "snare-roll"
+	| "breakdown"
+	| "drop"
 
 export interface DrumIntent {
 	energy: number

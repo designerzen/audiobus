@@ -1,6 +1,6 @@
-import type { IAudioCommand } from '../audio-command-interface'
-import * as Commands from '../commands'
-import { unzipSync } from 'fflate'
+import type { IAudioCommand } from "../audio-command-interface"
+import * as Commands from "../commands"
+import { unzipSync } from "fflate"
 
 /**
  * Import .dawProject file and convert to audio commands
@@ -8,17 +8,19 @@ import { unzipSync } from 'fflate'
  * @param file The .dawProject file to import
  * @returns Commands array and note count
  */
-export const importDawProjectFile = async (file: File): Promise<{ commands: IAudioCommand[], noteCount: number }> => {
+export const importDawProjectFile = async (
+	file: File
+): Promise<{ commands: IAudioCommand[]; noteCount: number }> => {
 	try {
 		// .dawProject files are ZIP archives
 		const arrayBuffer = await file.arrayBuffer()
 		const uint8Array = new Uint8Array(arrayBuffer)
 
 		// Check if it's a valid ZIP file (starts with PK)
-		const isZip = uint8Array[0] === 0x50 && uint8Array[1] === 0x4B // 'PK'
+		const isZip = uint8Array[0] === 0x50 && uint8Array[1] === 0x4b // 'PK'
 
 		if (!isZip) {
-			throw new Error('.dawProject file must be a valid ZIP archive')
+			throw new Error(".dawProject file must be a valid ZIP archive")
 		}
 
 		let projectData: any = null
@@ -28,28 +30,29 @@ export const importDawProjectFile = async (file: File): Promise<{ commands: IAud
 			const unzipped = unzipSync(uint8Array)
 
 			// Look for project.json or similar
-			let projectFile = unzipped['project.json'] || unzipped['project.xml']
-			
+			let projectFile: Uint8Array | undefined =
+				unzipped["project.json"] || unzipped["project.xml"]
+
 			// If no standard names found, get the first file
 			if (!projectFile) {
 				const firstKey = Object.keys(unzipped)[0]
-				projectFile = firstKey ? unzipped[firstKey] : null
+				projectFile = firstKey ? unzipped[firstKey] : undefined
 			}
 
 			if (!projectFile) {
-				throw new Error('No project data found in .dawProject file')
+				throw new Error("No project data found in .dawProject file")
 			}
 
 			const text = new TextDecoder().decode(projectFile)
 			projectData = JSON.parse(text)
 		} catch (zipError) {
-			console.warn('Could not parse as ZIP with fflate:', zipError)
+			console.warn("Could not parse as ZIP with fflate:", zipError)
 			// Try treating as JSON directly (some tools export raw JSON)
 			try {
 				const text = new TextDecoder().decode(uint8Array)
 				projectData = JSON.parse(text)
 			} catch (jsonError) {
-				throw new Error('Invalid .dawProject format: ' + (jsonError as Error).message)
+				throw new Error("Invalid .dawProject format: " + (jsonError as Error).message)
 			}
 		}
 
@@ -59,19 +62,31 @@ export const importDawProjectFile = async (file: File): Promise<{ commands: IAud
 		// Parse project data structure
 		// The structure varies by DAW, so we look for common patterns
 		const getTracks = () => {
-			if (projectData.tracks) return projectData.tracks
-			if (projectData.song?.tracks) return projectData.song.tracks
-			if (projectData.arrangement?.tracks) return projectData.arrangement.tracks
+			if (projectData.tracks) {
+				return projectData.tracks
+			}
+			if (projectData.song?.tracks) {
+				return projectData.song.tracks
+			}
+			if (projectData.arrangement?.tracks) {
+				return projectData.arrangement.tracks
+			}
 			return []
 		}
 
 		const getNotes = (track: any) => {
-			if (track.notes) return track.notes
-			if (track.events) return track.events.filter((e: any) => e.type === 'note')
+			if (track.notes) {
+				return track.notes
+			}
+			if (track.events) {
+				return track.events.filter((e: any) => e.type === "note")
+			}
 			if (track.clips) {
 				const allNotes: any[] = []
 				track.clips.forEach((clip: any) => {
-					if (clip.notes) allNotes.push(...clip.notes)
+					if (clip.notes) {
+						allNotes.push(...clip.notes)
+					}
 				})
 				return allNotes
 			}
@@ -79,7 +94,7 @@ export const importDawProjectFile = async (file: File): Promise<{ commands: IAud
 		}
 
 		const tracks = getTracks()
-		let bpm = projectData.bpm || projectData.tempo || 120
+		const bpm = projectData.bpm || projectData.tempo || 120
 
 		tracks.forEach((track: any, trackIndex: number) => {
 			const notes = getNotes(track)
@@ -121,7 +136,7 @@ export const importDawProjectFile = async (file: File): Promise<{ commands: IAud
 		// Sort by start time
 		commands.sort((a, b) => (a.startAt || 0) - (b.startAt || 0))
 
-		console.info('.dawProject file loaded successfully', {
+		console.info(".dawProject file loaded successfully", {
 			fileName: file.name,
 			noteCount,
 			tracks: tracks.length,
@@ -130,9 +145,7 @@ export const importDawProjectFile = async (file: File): Promise<{ commands: IAud
 
 		return { commands, noteCount }
 	} catch (error) {
-		console.error('Error importing .dawProject file:', error)
+		console.error("Error importing .dawProject file:", error)
 		throw error
 	}
 }
-
-

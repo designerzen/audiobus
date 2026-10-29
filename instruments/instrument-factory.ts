@@ -11,7 +11,6 @@ import {
 	INSTRUMENT_TYPE_OPENDAW_VAPORISATEUR,
 	INSTRUMENT_CATEGORY_WAM2,
 	EXTERNAL_DATA_KEY_SCSYNTH,
-	EXTERNAL_DATA_KEY_SAMPLE_URLS,
 	INSTRUMENTS,
 	type InstrumentMetadata
 } from "./instrument-types.ts"
@@ -91,13 +90,9 @@ export class InstrumentFactory {
 
 		// Check for required external data
 		if (metadata.requiresExternalData) {
-			const missing = metadata.requiresExternalData.filter(
-				(key) => !(key in externalData)
-			)
+			const missing = metadata.requiresExternalData.filter((key) => !(key in externalData))
 			if (missing.length > 0) {
-				throw new Error(
-					`Missing required data for ${instrumentId}: ${missing.join(", ")}`
-				)
+				throw new Error(`Missing required data for ${instrumentId}: ${missing.join(", ")}`)
 			}
 		}
 
@@ -173,7 +168,7 @@ export class InstrumentFactory {
 			options?: Record<string, any>
 		}>,
 		audioContext: BaseAudioContext | AudioContext
-	): Promise<Array<{ id: string; instance: IAudioOutput; error?: Error }>> {
+	): Promise<Array<{ id: string; instance?: IAudioOutput; error?: Error }>> {
 		const results = await Promise.all(
 			definitions.map(async (def) => {
 				try {
@@ -202,17 +197,14 @@ export class InstrumentFactory {
 	 * Check if an instrument requires external data
 	 */
 	static requiresExternalData(instrumentId: string): string[] {
-		const metadata = this.INSTRUMENTS.get(instrumentId)
+		const metadata = this.INSTRUMENTS_REGISTRY.get(instrumentId)
 		return metadata?.requiresExternalData ?? []
 	}
 
 	/**
 	 * Register a custom instrument
 	 */
-	static registerCustomInstrument(
-		id: string,
-		metadata: Omit<InstrumentMetadata, "id">
-	): void {
+	static registerCustomInstrument(id: string, metadata: Omit<InstrumentMetadata, "id">): void {
 		this.INSTRUMENTS_REGISTRY.set(id, { id, ...metadata })
 	}
 

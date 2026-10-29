@@ -1,5 +1,5 @@
-import { EVENT_LOAD, EVENT_CONNECTED } from '../../event-constants.ts'
-import { getAudioDestination } from '../../audio-destination'
+import { EVENT_LOAD, EVENT_CONNECTED } from "../../event-constants.ts"
+import { getAudioDestination } from "../../audio-destination"
 import { midiNoteToFrequency } from "../../conversion/note-to-frequency.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 
@@ -28,10 +28,9 @@ const DEFAULT_OPTIONS: Config = {
  * Maps MIDI notes to vocal tract frequencies and controls synthesis parameters.
  */
 export default class OutputPinkTrombone extends EventTarget implements IAudioOutput {
-
 	static ID: number = 0
 
-	#uuid: string = "Output-Pink-Trombone-" + (OutputPinkTrombone.ID++)
+	#uuid: string = "Output-Pink-Trombone-" + OutputPinkTrombone.ID++
 	#config: Config
 	#pinkTromboneElement: HTMLElement | null = null
 	#audioContext: AudioContext | null = null
@@ -43,11 +42,11 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 	}
 
 	get name(): string {
-		return 'Pink Trombone'
+		return "Pink Trombone"
 	}
 
 	get description(): string {
-		return 'Vocal synthesis using Pink Trombone'
+		return "Vocal synthesis using Pink Trombone"
 	}
 
 	get isConnected(): boolean {
@@ -69,24 +68,24 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 	 * AudioContext must be provided via config.audioContext
 	 */
 	private initialise(): void {
-		if (typeof window === 'undefined') {
+		if (typeof window === "undefined") {
 			return
 		}
 
 		try {
 			// AudioContext must be provided from app
 			if (!this.#config.audioContext) {
-				console.error('[PINK-TROMBONE] AudioContext must be passed via config.audioContext')
+				console.error("[PINK-TROMBONE] AudioContext must be passed via config.audioContext")
 				return
 			}
 
 			this.#audioContext = this.#config.audioContext
 
 			// Create or find Pink Trombone element
-			let element = document.querySelector('pink-trombone')
+			let element = document.querySelector("pink-trombone")
 
 			if (!element) {
-				element = document.createElement('pink-trombone')
+				element = document.createElement("pink-trombone")
 				document.body.appendChild(element)
 			}
 
@@ -102,7 +101,7 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 				this.onPinkTromboneLoaded()
 			}
 		} catch (error) {
-			console.debug('[PINK-TROMBONE] Initialization failed:', error)
+			console.debug("[PINK-TROMBONE] Initialization failed:", error)
 		}
 	}
 
@@ -129,7 +128,7 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 				element.frequency.value = this.#config.frequency
 			}
 		} catch (error) {
-			console.debug('[PINK-TROMBONE] Failed to update parameters:', error)
+			console.debug("[PINK-TROMBONE] Failed to update parameters:", error)
 		}
 	}
 
@@ -143,11 +142,11 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 
 		try {
 			const element = this.#pinkTromboneElement as any
-			if (element.start && typeof element.start === 'function') {
+			if (element.start && typeof element.start === "function") {
 				element.start()
 			}
 		} catch (error) {
-			console.debug('[PINK-TROMBONE] Failed to start synthesis:', error)
+			console.debug("[PINK-TROMBONE] Failed to start synthesis:", error)
 		}
 	}
 
@@ -161,11 +160,11 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 
 		try {
 			const element = this.#pinkTromboneElement as any
-			if (element.stop && typeof element.stop === 'function') {
+			if (element.stop && typeof element.stop === "function") {
 				element.stop()
 			}
 		} catch (error) {
-			console.debug('[PINK-TROMBONE] Failed to stop synthesis:', error)
+			console.debug("[PINK-TROMBONE] Failed to stop synthesis:", error)
 		}
 	}
 
@@ -185,18 +184,18 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 			// Creates variation in the vocal tract shape
 			const normalizedNote = noteNumber % 12 // Get pitch class (0-11)
 			const index = 20 + (normalizedNote / 12) * 20 // Range: 20-40
-			const diameter = 1 + Math.sin(normalizedNote / 12 * Math.PI) * 2 // Vary diameter 0.3-3
+			const diameter = 1 + Math.sin((normalizedNote / 12) * Math.PI) * 2 // Vary diameter 0.3-3
 
 			// Use the tongue constriction API from Pink Trombone
 			// Add a new constriction or set existing one
-			if (element.addConstriction && typeof element.addConstriction === 'function') {
+			if (element.addConstriction && typeof element.addConstriction === "function") {
 				const constriction = element.addConstriction(index, diameter)
 				if (!this.#activeNotes.has(noteNumber)) {
 					this.#activeNotes.set(noteNumber, constriction)
 				}
 			}
 		} catch (error) {
-			console.debug('[PINK-TROMBONE] Failed to set vocal constriction:', error)
+			console.debug("[PINK-TROMBONE] Failed to set vocal constriction:", error)
 		}
 	}
 
@@ -234,9 +233,9 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 			// Update vocal tract for this note
 			this.setVocalConstriction(noteNumber)
 
-			console.debug('[PINK-TROMBONE] Note on:', { noteNumber, frequency, velocity })
+			console.debug("[PINK-TROMBONE] Note on:", { noteNumber, frequency, velocity })
 		} catch (error) {
-			console.debug('[PINK-TROMBONE] Note on failed:', error)
+			console.debug("[PINK-TROMBONE] Note on failed:", error)
 		}
 	}
 
@@ -251,7 +250,10 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 			// Remove constriction if it exists
 			if (constriction && this.#pinkTromboneElement) {
 				const element = this.#pinkTromboneElement as any
-				if (element.removeConstriction && typeof element.removeConstriction === 'function') {
+				if (
+					element.removeConstriction &&
+					typeof element.removeConstriction === "function"
+				) {
 					element.removeConstriction(constriction)
 				}
 			}
@@ -263,7 +265,7 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 				// If there are still active notes, use the highest frequency
 				let highestFrequency = 0
 				for (const freq of this.#activeNotes.values()) {
-					if (typeof freq === 'number' && freq > highestFrequency) {
+					if (typeof freq === "number" && freq > highestFrequency) {
 						highestFrequency = freq
 					}
 				}
@@ -274,9 +276,9 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 				}
 			}
 
-			console.debug('[PINK-TROMBONE] Note off:', { noteNumber })
+			console.debug("[PINK-TROMBONE] Note off:", { noteNumber })
 		} catch (error) {
-			console.debug('[PINK-TROMBONE] Note off failed:', error)
+			console.debug("[PINK-TROMBONE] Note off failed:", error)
 		}
 	}
 
@@ -288,7 +290,7 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 			this.#activeNotes.clear()
 			this.stopSynthesis()
 		} catch (error) {
-			console.debug('[PINK-TROMBONE] All notes off failed:', error)
+			console.debug("[PINK-TROMBONE] All notes off failed:", error)
 		}
 	}
 
@@ -317,27 +319,27 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 	 * Create GUI controls for Pink Trombone parameters
 	 */
 	async createGui(): Promise<HTMLElement> {
-		const container = document.createElement('div')
-		container.classList.add('pink-trombone-gui')
+		const container = document.createElement("div")
+		container.classList.add("pink-trombone-gui")
 
 		// Title
-		const title = document.createElement('h3')
-		title.innerText = 'Pink Trombone'
+		const title = document.createElement("h3")
+		title.innerText = "Pink Trombone"
 		container.appendChild(title)
 
 		// Loudness control
-		const loudnessLabel = document.createElement('label')
-		loudnessLabel.innerText = 'Loudness:'
+		const loudnessLabel = document.createElement("label")
+		loudnessLabel.innerText = "Loudness:"
 		container.appendChild(loudnessLabel)
 
-		const loudnessSlider = document.createElement('input')
-		loudnessSlider.type = 'range'
-		loudnessSlider.id = 'pink-trombone-loudness'
-		loudnessSlider.min = '0'
-		loudnessSlider.max = '1'
-		loudnessSlider.step = '0.01'
+		const loudnessSlider = document.createElement("input")
+		loudnessSlider.type = "range"
+		loudnessSlider.id = "pink-trombone-loudness"
+		loudnessSlider.min = "0"
+		loudnessSlider.max = "1"
+		loudnessSlider.step = "0.01"
 		loudnessSlider.value = this.#config.loudness.toString()
-		loudnessSlider.addEventListener('input', (e) => {
+		loudnessSlider.addEventListener("input", (e) => {
 			const target = e.target as HTMLInputElement
 			this.#config.loudness = parseFloat(target.value)
 			this.updateSynthesisParameters()
@@ -345,18 +347,18 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 		container.appendChild(loudnessSlider)
 
 		// Tenseness control
-		const tensenessLabel = document.createElement('label')
-		tensenessLabel.innerText = 'Tenseness:'
+		const tensenessLabel = document.createElement("label")
+		tensenessLabel.innerText = "Tenseness:"
 		container.appendChild(tensenessLabel)
 
-		const tensenessSlider = document.createElement('input')
-		tensenessSlider.type = 'range'
-		tensenessSlider.id = 'pink-trombone-tenseness'
-		tensenessSlider.min = '0'
-		tensenessSlider.max = '1'
-		tensenessSlider.step = '0.01'
+		const tensenessSlider = document.createElement("input")
+		tensenessSlider.type = "range"
+		tensenessSlider.id = "pink-trombone-tenseness"
+		tensenessSlider.min = "0"
+		tensenessSlider.max = "1"
+		tensenessSlider.step = "0.01"
 		tensenessSlider.value = this.#config.tenseness.toString()
-		tensenessSlider.addEventListener('input', (e) => {
+		tensenessSlider.addEventListener("input", (e) => {
 			const target = e.target as HTMLInputElement
 			this.#config.tenseness = parseFloat(target.value)
 			this.updateSynthesisParameters()
@@ -364,18 +366,18 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 		container.appendChild(tensenessSlider)
 
 		// Frequency control
-		const frequencyLabel = document.createElement('label')
-		frequencyLabel.innerText = 'Frequency:'
+		const frequencyLabel = document.createElement("label")
+		frequencyLabel.innerText = "Frequency:"
 		container.appendChild(frequencyLabel)
 
-		const frequencySlider = document.createElement('input')
-		frequencySlider.type = 'range'
-		frequencySlider.id = 'pink-trombone-frequency'
-		frequencySlider.min = '50'
-		frequencySlider.max = '400'
-		frequencySlider.step = '1'
+		const frequencySlider = document.createElement("input")
+		frequencySlider.type = "range"
+		frequencySlider.id = "pink-trombone-frequency"
+		frequencySlider.min = "50"
+		frequencySlider.max = "400"
+		frequencySlider.step = "1"
 		frequencySlider.value = this.#config.frequency.toString()
-		frequencySlider.addEventListener('input', (e) => {
+		frequencySlider.addEventListener("input", (e) => {
 			const target = e.target as HTMLInputElement
 			this.#config.frequency = parseFloat(target.value)
 			this.updateSynthesisParameters()
@@ -383,12 +385,12 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 		container.appendChild(frequencySlider)
 
 		// Pink Trombone element visualization
-		const pinkTromboneContainer = document.createElement('div')
-		pinkTromboneContainer.id = 'pink-trombone-element-container'
+		const pinkTromboneContainer = document.createElement("div")
+		pinkTromboneContainer.id = "pink-trombone-element-container"
 		if (this.#pinkTromboneElement) {
 			// Show UI if available
 			const element = this.#pinkTromboneElement as any
-			if (element.startUI && typeof element.startUI === 'function') {
+			if (element.startUI && typeof element.startUI === "function") {
 				element.startUI()
 			}
 		}
@@ -404,29 +406,33 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 		// Store event handler references for removal
 		const handlers = new Map<string, EventListener>()
 
-		const loudnessSlider = document.getElementById('pink-trombone-loudness') as HTMLInputElement
-		const tensenessSlider = document.getElementById('pink-trombone-tenseness') as HTMLInputElement
-		const frequencySlider = document.getElementById('pink-trombone-frequency') as HTMLInputElement
+		const loudnessSlider = document.getElementById("pink-trombone-loudness") as HTMLInputElement
+		const tensenessSlider = document.getElementById(
+			"pink-trombone-tenseness"
+		) as HTMLInputElement
+		const frequencySlider = document.getElementById(
+			"pink-trombone-frequency"
+		) as HTMLInputElement
 
 		if (loudnessSlider) {
-			loudnessSlider.removeEventListener('input', handlers.get('loudness') || (() => {}))
+			loudnessSlider.removeEventListener("input", handlers.get("loudness") || (() => {}))
 		}
 		if (tensenessSlider) {
-			tensenessSlider.removeEventListener('input', handlers.get('tenseness') || (() => {}))
+			tensenessSlider.removeEventListener("input", handlers.get("tenseness") || (() => {}))
 		}
 		if (frequencySlider) {
-			frequencySlider.removeEventListener('input', handlers.get('frequency') || (() => {}))
+			frequencySlider.removeEventListener("input", handlers.get("frequency") || (() => {}))
 		}
 
 		// Stop UI visualization
 		if (this.#pinkTromboneElement) {
 			const element = this.#pinkTromboneElement as any
-			if (element.stopUI && typeof element.stopUI === 'function') {
+			if (element.stopUI && typeof element.stopUI === "function") {
 				element.stopUI()
 			}
 		}
 	}
-	
+
 	/**
 	 * Handle Pink Trombone loaded event
 	 */
@@ -439,32 +445,33 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 			const element = this.#pinkTromboneElement as any
 
 			// Set the audio context
-			Promise.resolve(element.setAudioContext(this.#audioContext)).then(() => {
-				// Connect to audio destination
-				element.connect(getAudioDestination(this.#audioContext!))
+			Promise.resolve(element.setAudioContext(this.#audioContext))
+				.then(() => {
+					// Connect to audio destination
+					element.connect(getAudioDestination(this.#audioContext!))
 
-				// Set initial parameters
-				this.updateSynthesisParameters()
+					// Set initial parameters
+					this.updateSynthesisParameters()
 
-				this.#isInitialized = true
-				this.dispatchEvent(new CustomEvent(EVENT_CONNECTED))
+					this.#isInitialized = true
+					this.dispatchEvent(new CustomEvent(EVENT_CONNECTED))
 
-				console.debug('[PINK-TROMBONE] Initialized successfully')
-			}).catch((error: Error) => {
-				console.debug('[PINK-TROMBONE] Failed to setup audio:', error)
-			})
+					console.debug("[PINK-TROMBONE] Initialized successfully")
+				})
+				.catch((error: Error) => {
+					console.debug("[PINK-TROMBONE] Failed to setup audio:", error)
+				})
 		} catch (error) {
-			console.debug('[PINK-TROMBONE] Error in onPinkTromboneLoaded:', error)
+			console.debug("[PINK-TROMBONE] Error in onPinkTromboneLoaded:", error)
 		}
 	}
-
 }
 
 // Add type declaration for pink-trombone element
 declare global {
 	namespace JSX {
 		interface IntrinsicElements {
-			'pink-trombone': any
+			"pink-trombone": any
 		}
 	}
 }

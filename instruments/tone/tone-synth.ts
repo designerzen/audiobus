@@ -3,8 +3,6 @@ import { velocityToGain } from "../../conversion/velocity-to-gain.ts"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
 
-const SILENCE = 0.00000000009
-
 /**
  * Tone.js Synth Instrument
  * Polyphonic synthesizer with ADSR envelope
@@ -14,7 +12,7 @@ export default class ToneSynth implements IAudioOutput {
 	static ID: number = 0
 
 	options = {
-		title:"Tone.js Synth Instrument",
+		title: "Tone.js Synth Instrument",
 		// Default amplitude
 		gain: 0.3, // match the built-in oscillator's default level
 		attack: 0.4, // in s
@@ -42,7 +40,7 @@ export default class ToneSynth implements IAudioOutput {
 		// Tone.js Synth specific
 		polyphony: 32,
 		oscillator: {
-			type: "triangle"
+			type: "triangle" as const
 		},
 		envelope: {
 			attack: 0.4,
@@ -142,25 +140,26 @@ export default class ToneSynth implements IAudioOutput {
 	}
 
 	private async ensureInitialized() {
-		if (this.#initialized) return
-		
+		if (this.#initialized) {
+			return
+		}
+
 		const Tone = await import("tone")
 		const { Synth } = Tone
-		
+
 		// Tell Tone.js to use the shared AudioContext
 		Tone.setContext(this.#audioContext as any)
-		
-		
+
 		// Initialize Tone.js Synth and connect to our gain node
 		this.#synth = new Synth({
 			oscillator: this.options.oscillator,
 			envelope: this.options.envelope,
 			volume: 0 // Tone volume is 0, use our gainNode instead
 		})
-		
+
 		// Connect the synth's output to our gain node for routing through the app's audio graph
 		this.#synth.connect(this.#gainNode)
-		
+
 		this.#initialized = true
 	}
 
@@ -168,7 +167,9 @@ export default class ToneSynth implements IAudioOutput {
 	 * Convert linear (0-1) to dB
 	 */
 	private linearToDb(value: number): number {
-		if (value <= 0) return -Infinity
+		if (value <= 0) {
+			return -Infinity
+		}
 		return 20 * Math.log10(value)
 	}
 
@@ -200,12 +201,12 @@ export default class ToneSynth implements IAudioOutput {
 	 * Note ON
 	 * @param {Number} noteNumber - MIDI note number
 	 * @param {Number} velocity - strength of the note (0-127)
-	 * @param {Array<Number>} arp - intervals (currently unused)
+	 * @param {Array<Number>} _arp - intervals (currently unused)
 	 * @param {Number} delay - number to pause before playing
 	 */
-	async noteOn(noteNumber: number, velocity: number = 127, arp = null, delay: number = 0) {
+	async noteOn(noteNumber: number, velocity: number = 127, _arp = null, delay: number = 0) {
 		await this.ensureInitialized()
-		
+
 		const frequency = noteNumberToFrequency(noteNumber)
 		const startTime = this.now + delay
 		const amplitude = velocityToGain(velocity)

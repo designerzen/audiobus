@@ -7,7 +7,6 @@
  * then piped into the TransformManager for example
  */
 
-
 import AudioCommand from "../../audio-command.ts"
 import { NOTE_ON } from "../../commands"
 import AbstractInput from "./abstract-input.ts"
@@ -17,30 +16,29 @@ import type { IAudioInput } from "./input-interface.ts"
 
 export const KEYBOARD_INPUT_ID = "Keyboard"
 
-export default class InputKeyboard extends AbstractInput implements IAudioInput{
+export default class InputKeyboard extends AbstractInput implements IAudioInput {
+	#destroyKeyboardListener: Function
+	#keyboardDisplayManager: KeyboardDisplayManager | null = null
 
-	#destroyKeyboardListener:Function
-	#keyboardDisplayManager:KeyboardDisplayManager | null = null
-	
-	get name():string {
+	get name(): string {
 		return KEYBOARD_INPUT_ID
 	}
 
-	get description():string {
+	get description(): string {
 		return "QWERTY Keyboard"
 	}
 
-	constructor(options:Record<string, any> ={}) { 
+	constructor(options: Record<string, any> = {}) {
 		super(options)
 		this.onKeyEvent = this.onKeyEvent.bind(this)
-		this.#destroyKeyboardListener = addKeyboardDownEvents( this.onKeyEvent )
+		this.#destroyKeyboardListener = addKeyboardDownEvents(this.onKeyEvent)
 		this.setAsConnected()
 	}
 
 	async createGui(): Promise<HTMLElement> {
 		this.#keyboardDisplayManager = new KeyboardDisplayManager()
-		const container = document.createElement('div')
-		container.className = 'keyboard-input-gui'
+		const container = document.createElement("div")
+		container.className = "keyboard-input-gui"
 		container.appendChild(this.#keyboardDisplayManager.getElement())
 		return container
 	}
@@ -60,12 +58,12 @@ export default class InputKeyboard extends AbstractInput implements IAudioInput{
 
 	/**
 	 * Keyboard key has been pressed
-	 * @param commandType 
-	 * @param key 
-	 * @param value 
-	 * @param event 
+	 * @param commandType
+	 * @param key
+	 * @param value
+	 * @param _event
 	 */
-	protected onKeyEvent( commandType:string, key:string, value:number, event:KeyboardEvent ) {
+	protected onKeyEvent(commandType: string, key: string, value: number, _event: KeyboardEvent) {
 		const command = new AudioCommand()
 		command.type = commandType
 		command.velocity = commandType === NOTE_ON ? 127 : 0
@@ -75,7 +73,7 @@ export default class InputKeyboard extends AbstractInput implements IAudioInput{
 		command.text = key
 		command.startAt = this.now
 		command.time = this.now
-		this.dispatch( command )
+		this.dispatch(command)
 		// console.error(key, {commandType, event, value})
 	}
 }

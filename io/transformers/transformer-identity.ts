@@ -1,19 +1,17 @@
-import type AudioCommand from "../../audio-command.ts"
-import type { ITimerControl as Timer } from "netronome"
+import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { Timer } from "netronome"
 import type { ITransformer } from "./interface-transformer.ts"
 import { Transformer } from "./abstract-transformer.ts"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
 
-export const ID_IDENTITY = 'identity'
+export const ID_IDENTITY = "identity"
 
-export class IdentityTransformer extends Transformer<{}> implements ITransformer{
-    
-	protected type = ID_IDENTITY
+export class IdentityTransformer extends Transformer<{}> implements ITransformer {
+	type = ID_IDENTITY
 
 	get name(): string {
-        return 'Identity'
-    }
-    transform(command:IAudioCommandudioCommand[], timer:Timer): AudioCommand[] {
-        return command
-    }
+		return "Identity"
+	}
+	transform(command: IAudioCommand[], _timer: Timer): IAudioCommand[] {
+		return command
+	}
 }

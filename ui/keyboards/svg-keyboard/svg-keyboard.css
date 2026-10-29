@@ -1,144 +1,144 @@
 :host {
-    display: block;
-    min-width: 0;
-    color: var(--color, #f7f5ef);
-    background: var(--background-color, var(--background, #202334));
-    border-radius: var(--border-radius, 1rem);
-    font: var(
-        --font,
-        var(--font-size, 1rem)/var(--line-height, 1.5) var(--font-family, system-ui, sans-serif)
-    );
+	display: block;
+	min-width: 0;
+	color: var(--color, #f7f5ef);
+	background: var(--background-color, var(--background, #202334));
+	border-radius: var(--border-radius, 1rem);
+	font: var(
+		--font,
+		var(--font-size, 1rem)/var(--line-height, 1.5) var(--font-family, system-ui, sans-serif)
+	);
 }
 * {
-    box-sizing: border-box;
+	box-sizing: border-box;
 }
 .heading,
 p {
-    padding: var(--padding, 0.75rem);
-    margin: var(--margin, 0);
-    overflow-wrap: anywhere;
+	padding: var(--padding, 0.75rem);
+	margin: var(--margin, 0);
+	overflow-wrap: anywhere;
 }
 .viewport {
-    width: 100%;
-    overflow-x: auto;
-    padding: 4px;
-    pointer-events: auto;
+	width: 100%;
+	overflow-x: auto;
+	padding: 4px;
+	pointer-events: auto;
 }
 svg {
-    display: block;
-    width: 100%;
-    min-width: max(var(--min-width, 0px), var(--keyboard-width, 40rem));
-    height: var(--height, 14rem);
-    overflow: visible;
-    touch-action: none;
-    user-select: none;
+	display: block;
+	width: 100%;
+	min-width: max(var(--min-width, 0px), var(--keyboard-width, 40rem));
+	height: var(--height, 14rem);
+	overflow: visible;
+	touch-action: none;
+	user-select: none;
 }
 .piano-key {
-    stroke: var(--stroke, #141421);
-    stroke-width: var(--stroke-width, 1px);
-    vector-effect: non-scaling-stroke;
-    cursor: var(--cursor, pointer);
+	stroke: var(--stroke, #141421);
+	stroke-width: var(--stroke-width, 1px);
+	vector-effect: non-scaling-stroke;
+	cursor: var(--cursor, pointer);
 }
 .piano-key-white {
-    fill: var(--fill, var(--key-white-fill, #fff));
-    color: var(--key-white-color, #141421);
+	fill: var(--fill, var(--key-white-fill, #fff));
+	color: var(--key-white-color, #141421);
 }
 .piano-key-black {
-    fill: var(--fill, var(--key-black-fill, #141421));
-    color: var(--key-black-color, #fff);
+	fill: var(--fill, var(--key-black-fill, #141421));
+	color: var(--key-black-color, #fff);
 }
 .piano-key.active {
-    fill: var(--active-fill, var(--accent-color, #e4b4ff));
+	fill: var(--active-fill, var(--accent-color, #e4b4ff));
 }
 .piano-key:focus-visible {
-    outline: none;
-    stroke: var(--outline-color, currentColor);
-    stroke-width: var(--outline-width, 3px);
+	outline: none;
+	stroke: var(--outline-color, currentColor);
+	stroke-width: var(--outline-width, 3px);
 }
 .piano-key.active:focus-visible {
-    stroke: var(--active-stroke, #141421);
+	stroke: var(--active-stroke, #141421);
 }
 .piano-key[aria-disabled="true"] {
-    cursor: default;
-    opacity: var(--opacity, 0.55);
+	cursor: default;
+	opacity: var(--opacity, 0.55);
 }
 .piano-key-indicators {
-    pointer-events: none;
+	pointer-events: none;
 }
 .piano-note-indicator {
-    opacity: 0;
-    fill: var(--accent-color, #e4b4ff);
+	opacity: 0;
+	fill: var(--accent-color, #e4b4ff);
 }
 .piano-note-indicator.active {
-    opacity: 1;
+	opacity: 1;
 }
 p {
-    font-size: var(--font-size, 0.9rem);
+	font-size: var(--font-size, 0.9rem);
 }
 :host([docked]) .heading,
 :host([docked]) p {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip-path: inset(50%);
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip-path: inset(50%);
 }
 :host([docked]) .viewport {
-    padding: 0;
-    transform: translateY(calc(100% - var(--footer-height, 60px)));
+	padding: 0;
+	transform: translateY(calc(100% - var(--footer-height, 60px)));
 }
 :host([docked]) {
-    background: transparent;
-    border-radius: 0;
+	background: transparent;
+	border-radius: 0;
 }
 :host([docked]) svg {
-    /* Keep the legacy compact overview; standalone keyboards retain larger targets. */
-    min-width: max(100%, 1408px);
-    height: var(--height, min(148px, 33vh));
+	/* Keep the legacy compact overview; standalone keyboards retain larger targets. */
+	min-width: max(100%, 1408px);
+	height: var(--height, min(148px, 33vh));
 }
 .viewport[data-orientation="vertical"] {
-    max-height: var(--viewport-height, 32rem);
-    overflow: auto;
+	max-height: var(--viewport-height, 32rem);
+	overflow: auto;
 }
 svg[data-orientation="vertical"],
 :host([docked]) svg[data-orientation="vertical"] {
-    width: var(--height, 14rem);
-    max-width: 100%;
-    min-width: 0;
-    height: max(var(--min-height, 0px), var(--keyboard-width, 40rem));
+	width: var(--height, 14rem);
+	max-width: 100%;
+	min-width: 0;
+	height: max(var(--min-height, 0px), var(--keyboard-width, 40rem));
 }
 :host([docked].show-full-keyboard) .viewport,
 :host([docked]:hover) .viewport,
 :host([docked]:focus-within) .viewport {
-    transform: none;
+	transform: none;
 }
 @media (forced-colors: active) {
-    :host {
-        background: Canvas;
-        color: CanvasText;
-    }
-    .piano-key-white {
-        fill: Canvas;
-        color: CanvasText;
-        stroke: CanvasText;
-    }
-    .piano-key-black {
-        fill: CanvasText;
-        color: Canvas;
-        stroke: Canvas;
-    }
-    .piano-key.active {
-        fill: Highlight;
-    }
-    .piano-note-indicator {
-        fill: CanvasText;
-    }
-    .piano-key:focus-visible {
-        stroke: Highlight;
-    }
-    .piano-key.active:focus-visible {
-        stroke: HighlightText;
-    }
+	:host {
+		background: Canvas;
+		color: CanvasText;
+	}
+	.piano-key-white {
+		fill: Canvas;
+		color: CanvasText;
+		stroke: CanvasText;
+	}
+	.piano-key-black {
+		fill: CanvasText;
+		color: Canvas;
+		stroke: Canvas;
+	}
+	.piano-key.active {
+		fill: Highlight;
+	}
+	.piano-note-indicator {
+		fill: CanvasText;
+	}
+	.piano-key:focus-visible {
+		stroke: Highlight;
+	}
+	.piano-key.active:focus-visible {
+		stroke: HighlightText;
+	}
 }

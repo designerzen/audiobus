@@ -1,84 +1,84 @@
 :host {
-    display: grid;
-    grid-template-rows: minmax(0, 1fr) auto;
-    min-width: 0;
-    height: var(--height, 16rem);
-    color: var(--color, #f7f5ef);
-    border-radius: var(--border-radius, 1rem);
-    font: var(
-        --font,
-        var(--font-size, 1rem)/var(--line-height, 1.5) var(--font-family, system-ui, sans-serif)
-    );
+	display: grid;
+	grid-template-rows: minmax(0, 1fr) auto;
+	min-width: 0;
+	height: var(--height, 16rem);
+	color: var(--color, #f7f5ef);
+	border-radius: var(--border-radius, 1rem);
+	font: var(
+		--font,
+		var(--font-size, 1rem)/var(--line-height, 1.5) var(--font-family, system-ui, sans-serif)
+	);
 }
 :host([hidden]) {
-    display: none !important;
+	display: none !important;
 }
 * {
-    box-sizing: border-box;
+	box-sizing: border-box;
 }
 canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-    background: var(--background-color, var(--background, #202334));
-    border-radius: var(--border-radius, 1rem);
-    pointer-events: none;
+	display: block;
+	width: 100%;
+	height: 100%;
+	min-height: 0;
+	background: var(--background-color, var(--background, #202334));
+	border-radius: var(--border-radius, 1rem);
+	pointer-events: none;
 }
 .controls {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--gap, 0.75rem);
-    padding: var(--padding, 0.5rem);
-    background: var(--background-color, var(--background, #202334));
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--gap, 0.75rem);
+	padding: var(--padding, 0.5rem);
+	background: var(--background-color, var(--background, #202334));
 }
 button {
-    min-width: 44px;
-    min-height: max(44px, var(--min-height, 44px));
-    padding: var(--padding, 0.5rem);
-    color: var(--color, #f7f5ef);
-    background: var(--background-color, var(--background, #202334));
-    border: var(
-        --border,
-        var(--border-width, 2px) var(--border-style, solid) var(--border-color, currentColor)
-    );
-    border-radius: var(--border-radius, 0.5rem);
-    font: var(--font, inherit);
-    cursor: pointer;
+	min-width: 44px;
+	min-height: max(44px, var(--min-height, 44px));
+	padding: var(--padding, 0.5rem);
+	color: var(--color, #f7f5ef);
+	background: var(--background-color, var(--background, #202334));
+	border: var(
+		--border,
+		var(--border-width, 2px) var(--border-style, solid) var(--border-color, currentColor)
+	);
+	border-radius: var(--border-radius, 0.5rem);
+	font: var(--font, inherit);
+	cursor: pointer;
 }
 button:focus-visible {
-    outline: var(
-        --outline,
-        var(--outline-width, 3px) var(--outline-style, solid) var(--outline-color, currentColor)
-    );
-    outline-offset: var(--outline-offset, 4px);
+	outline: var(
+		--outline,
+		var(--outline-width, 3px) var(--outline-style, solid) var(--outline-color, currentColor)
+	);
+	outline-offset: var(--outline-offset, 4px);
 }
 .summary {
-    flex: 1 1 10rem;
-    min-width: 0;
-    overflow-wrap: anywhere;
-    font-size: var(--font-size, 0.9rem);
+	flex: 1 1 10rem;
+	min-width: 0;
+	overflow-wrap: anywhere;
+	font-size: var(--font-size, 0.9rem);
 }
 :host([decorative]),
 :host([overlay]) {
-    grid-template-rows: minmax(0, 1fr);
+	grid-template-rows: minmax(0, 1fr);
 }
 :host([decorative]) .controls,
 :host([overlay]) .controls {
-    display: none;
+	display: none;
 }
 :host([overlay]) canvas {
-    background: transparent;
+	background: transparent;
 }
 @media (forced-colors: active) {
-    canvas,
-    .controls,
-    button {
-        background: Canvas;
-        color: CanvasText;
-    }
-    :host([overlay]) canvas {
-        background: transparent;
-    }
+	canvas,
+	.controls,
+	button {
+		background: Canvas;
+		color: CanvasText;
+	}
+	:host([overlay]) canvas {
+		background: transparent;
+	}
 }

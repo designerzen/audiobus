@@ -1,4 +1,4 @@
-import { NOTE_ON, NOTE_OFF } from '../commands.ts'
+import { NOTE_ON, NOTE_OFF } from "../commands.ts"
 /**
  * Scrolling note on / off visualisation
  */
@@ -7,53 +7,51 @@ import NOTE_VISUALISER_CANVAS_WORKER from "./note-visualiser-worker.js?worker"
 import { AbstractResizeable } from "./abstract-resizeable-canvas.ts"
 import type { IAudioOutput } from "../io/outputs/output-interface.ts"
 import type NoteModel from "../note-model.ts"
-import { convertNoteNumberToColour } from '../conversion/note-to-colour'
+import { convertNoteNumberToColour } from "../conversion/note-to-colour"
 
 export default class NoteVisualiser extends AbstractResizeable implements IAudioOutput {
+	static ID: number = 0
 
-	static ID:number = 0
+	notes: NoteModel[]
+	canvas: HTMLCanvasElement
+	context: CanvasRenderingContext2D | null = null
 
-    notes:NoteModel[]
-    canvas:HTMLCanvasElement
-    context:CanvasRenderingContext2D | null = null
+	counter: number = 0
+	notesOn: number = 0
 
-    counter:number = 0
-    notesOn:number = 0
+	started: boolean = false
+	mouseDown: boolean = false
+	wave: boolean = false
+	vertical: boolean = false
 
-    started:boolean = false
-    mouseDown:boolean = false
-    wave:boolean = false
-    vertical:boolean = false
+	mouseX: number = 0
+	mouseY: number = 0
+	private observer: ResizeObserver
 
-    mouseX:number = 0
-    mouseY:number = 0
-    private observer: ResizeObserver
+	#uuid: string = "Output-Note-Visualiser-" + NoteVisualiser.ID++
+	#blendMode: number = 23
 
-	#uuid:string = "Output-Note-Visualiser-"+(NoteVisualiser.ID++)
-    #blendMode:number = 23
+	set blendMode(value: number) {
+		this.#blendMode = value
+		// console.error("Blendmode requested", value)
+	}
 
-    set blendMode(value:number){
-        this.#blendMode = value
-        // console.error("Blendmode requested", value)
-    }
+	get blendMode(): number {
+		return this.#blendMode
+	}
 
-    get blendMode():number{
-        return this.#blendMode
-    }
-
-    get backgroundColour(){
-        return getComputedStyle(this.canvas).getPropertyValue("background-color")
-        return this.canvas.style.backgroundColor
-    }
+	get backgroundColour() {
+		return getComputedStyle(this.canvas).getPropertyValue("background-color")
+	}
 
 	get uuid(): string {
 		return this.#uuid
 	}
-	
+
 	get name(): string {
 		return "Note Visualiser"
 	}
-	
+
 	get description(): string {
 		return "Visualises note data as bars on a timeline"
 	}
@@ -66,52 +64,74 @@ export default class NoteVisualiser extends AbstractResizeable implements IAudio
 		return false
 	}
 
-    constructor( notes:NoteModel[], canvas:HTMLCanvasElement, vertical:boolean=false, wave:number=0 ){
-        super(canvas, NOTE_VISUALISER_CANVAS_WORKER, {vertical, notes})
+	constructor(
+		notes: NoteModel[],
+		canvas: HTMLCanvasElement,
+		vertical: boolean = false,
+		wave: number = 0
+	) {
+		super(canvas, NOTE_VISUALISER_CANVAS_WORKER, { vertical, notes })
 		this.notes = notes
-        this.canvas = canvas
-        this.wave = wave > 0 ? true : false
-        this.vertical = vertical
-        canvas.setAttribute('aria-hidden', 'true')
-        this.observer = new ResizeObserver(entries => {
-            const { width, height } = entries[0].contentRect
-            if (width && height) this.resizeCanvasToDisplaySize(width, height, 1)
-        })
-        this.observer.observe(canvas)
-    }
-
-    /**
-     * Note On
-     * @param {Number} noteNumber 
-     * @param {number} velocity 
-     */
-    noteOn( noteNumber:number, velocity=1, colour=convertNoteNumberToColour(noteNumber) ){
-        const payload = { type:NOTE_ON, note:noteNumber,colour, velocity, time: performance.timeOrigin + performance.now() }
-        // console.info("NOTEVIZ noteOn", {note, velocity, payload} )
-        this.notesOn++
-        this.worker.postMessage(payload)
-    }
-
-    /**
-     * Note Off
-     * @param {Number} note 
-     * @param {Number} velocity 
-     */
-    noteOff( noteNumber:number, velocity=1, colour='#fff' ){
-        this.notesOn--
-        this.worker.postMessage({ type:NOTE_OFF,  note:noteNumber, colour, velocity, time: performance.timeOrigin + performance.now() })
-    }
+		this.canvas = canvas
+		this.wave = wave > 0 ? true : false
+		this.vertical = vertical
+		canvas.setAttribute("aria-hidden", "true")
+		this.observer = new ResizeObserver((entries) => {
+			const { width, height } = entries[0].contentRect
+			if (width && height) {
+				this.resizeCanvasToDisplaySize(width, height, 1)
+			}
+		})
+		this.observer.observe(canvas)
+	}
 
 	/**
-	 * 
+	 * Note On
+	 * @param {Number} noteNumber
+	 * @param {number} velocity
+	 */
+	noteOn(noteNumber: number, velocity = 1, colour = convertNoteNumberToColour(noteNumber)) {
+		const payload = {
+			type: NOTE_ON,
+			note: noteNumber,
+			colour,
+			velocity,
+			time: performance.timeOrigin + performance.now()
+		}
+		// console.info("NOTEVIZ noteOn", {note, velocity, payload} )
+		this.notesOn++
+		this.worker.postMessage(payload)
+	}
+
+	/**
+	 * Note Off
+	 * @param {Number} note
+	 * @param {Number} velocity
+	 */
+	noteOff(noteNumber: number, velocity = 1, colour = "#fff") {
+		this.notesOn--
+		this.worker.postMessage({
+			type: NOTE_OFF,
+			note: noteNumber,
+			colour,
+			velocity,
+			time: performance.timeOrigin + performance.now()
+		})
+	}
+
+	/**
+	 *
 	 */
 	allNotesOff(): void {
 		this.notesOn = 0
-		this.worker.postMessage({ type:"allNotesOff", time: performance.timeOrigin + performance.now() })
+		this.worker.postMessage({
+			type: "allNotesOff",
+			time: performance.timeOrigin + performance.now()
+		})
 	}
 
-    destroy() {
-        this.observer.disconnect()
-        this.worker.terminate()
-    }
+	destroy() {
+		this.observer.disconnect()
+		this.worker.terminate()
+	}
 }

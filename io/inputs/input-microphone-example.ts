@@ -1,8 +1,8 @@
-import { NOTE_ON, NOTE_OFF, PITCH_BEND } from '../../commands.ts'
-import { INPUT_EVENT } from '../../event-constants.ts'
+import { NOTE_ON, NOTE_OFF, PITCH_BEND } from "../../commands.ts"
+import { INPUT_EVENT } from "../../event-constants.ts"
 /**
  * Example: Integrating Microphone Input into HarmonEasy
- * 
+ *
  * This file demonstrates how to use InputMicrophoneFormant
  * in your application
  */
@@ -17,7 +17,7 @@ import type { IAudioCommand } from "../../audio-command-interface.ts"
 export async function setupBasicMicrophoneInput(inputManager: InputManager) {
 	const micInput = new InputMicrophoneFormant()
 	inputManager.add(micInput)
-	
+
 	try {
 		await micInput.connect()
 		console.log("Microphone input ready")
@@ -33,16 +33,16 @@ export async function setupBasicMicrophoneInput(inputManager: InputManager) {
 export async function setupVocalInput(inputManager: InputManager) {
 	const vocalInput = new InputMicrophoneFormant({
 		smoothing: 0.85,
-		minFrequency: 80,        // Low soprano
-		maxFrequency: 1000,      // High soprano/tenor
+		minFrequency: 80, // Low soprano
+		maxFrequency: 1000, // High soprano/tenor
 		confidenceThreshold: 0.85,
-		analyzeInterval: 40,     // Slightly faster for vocal responsiveness
-		fftSize: 4096            // Better frequency resolution
+		analyzeInterval: 40, // Slightly faster for vocal responsiveness
+		fftSize: 4096 // Better frequency resolution
 	})
-	
+
 	inputManager.add(vocalInput)
 	await vocalInput.connect()
-	
+
 	return vocalInput
 }
 
@@ -53,16 +53,16 @@ export async function setupVocalInput(inputManager: InputManager) {
 export async function setupInstrumentInput(inputManager: InputManager) {
 	const instrumentInput = new InputMicrophoneFormant({
 		smoothing: 0.8,
-		minFrequency: 60,        // Low notes
-		maxFrequency: 2000,      // Extended range
+		minFrequency: 60, // Low notes
+		maxFrequency: 2000, // Extended range
 		confidenceThreshold: 0.8,
-		analyzeInterval: 50,     // Standard interval
+		analyzeInterval: 50, // Standard interval
 		fftSize: 4096
 	})
-	
+
 	inputManager.add(instrumentInput)
 	await vocalInput.connect()
-	
+
 	return instrumentInput
 }
 
@@ -76,13 +76,13 @@ export async function setupLowLatencyInput(inputManager: InputManager) {
 		minFrequency: 100,
 		maxFrequency: 1200,
 		confidenceThreshold: 0.75,
-		analyzeInterval: 30,     // More frequent checks
-		fftSize: 2048            // Smaller window = lower latency
+		analyzeInterval: 30, // More frequent checks
+		fftSize: 2048 // Smaller window = lower latency
 	})
-	
+
 	inputManager.add(lowLatencyInput)
 	await lowLatencyInput.connect()
-	
+
 	return lowLatencyInput
 }
 
@@ -94,15 +94,15 @@ export async function setupHighAccuracyInput(inputManager: InputManager) {
 	const accurateInput = new InputMicrophoneFormant({
 		smoothing: 0.9,
 		minFrequency: 50,
-		maxFrequency: 3000,      // Extended range
+		maxFrequency: 3000, // Extended range
 		confidenceThreshold: 0.92,
-		analyzeInterval: 100,    // Slower but more stable
-		fftSize: 8192            // Better frequency resolution
+		analyzeInterval: 100, // Slower but more stable
+		fftSize: 8192 // Better frequency resolution
 	})
-	
+
 	inputManager.add(accurateInput)
 	await accurateInput.connect()
-	
+
 	return accurateInput
 }
 
@@ -112,18 +112,18 @@ export async function setupHighAccuracyInput(inputManager: InputManager) {
 export function monitorMicrophoneEvents(inputManager: InputManager) {
 	inputManager.addEventListener(INPUT_EVENT, (event: any) => {
 		const command: IAudioCommand = event.command
-		
+
 		switch (command.subtype) {
 			case NOTE_ON:
 				console.log(`🎵 Note On: #${command.noteNumber} Velocity: ${command.velocity}`)
 				// Update UI, trigger synth, etc.
 				break
-				
+
 			case NOTE_OFF:
 				console.log(`🔇 Note Off: #${command.noteNumber}`)
 				// Stop synth, update UI, etc.
 				break
-				
+
 			case PITCH_BEND:
 				const cents = ((command.value - 8192) / 8192) * 100
 				console.log(`🎚️  Pitch Bend: ${cents.toFixed(1)} cents`)
@@ -145,7 +145,7 @@ export function createMicrophoneController(micInput: InputMicrophoneFormant) {
 		background: rgba(0, 136, 255, 0.1);
 		font-family: monospace;
 	`
-	
+
 	// Status indicator
 	const statusDiv = document.createElement("div")
 	statusDiv.innerHTML = `
@@ -157,11 +157,11 @@ export function createMicrophoneController(micInput: InputMicrophoneFormant) {
 		<p>Confidence: <span id="confidence">-</span></p>
 	`
 	container.appendChild(statusDiv)
-	
+
 	// Event listeners
 	const toggleBtn = container.querySelector("#mic-toggle") as HTMLButtonElement
 	let isListening = micInput.isListening
-	
+
 	toggleBtn.onclick = async () => {
 		if (isListening) {
 			await micInput.disconnect()
@@ -172,19 +172,19 @@ export function createMicrophoneController(micInput: InputMicrophoneFormant) {
 		}
 		toggleBtn.textContent = isListening ? "Stop Listening" : "Start Listening"
 	}
-	
+
 	// Update on note events
 	micInput.addEventListener(INPUT_EVENT, (event: any) => {
 		const cmd = event.command
 		const noteDiv = container.querySelector("#last-note") as HTMLElement
 		const confDiv = container.querySelector("#confidence") as HTMLElement
-		
+
 		if (cmd.subtype === NOTE_ON) {
 			noteDiv.textContent = `${cmd.noteNumber}`
 			confDiv.textContent = `${((cmd.velocity / 127) * 100).toFixed(1)}%`
 		}
 	})
-	
+
 	return container
 }
 
@@ -194,7 +194,7 @@ export function createMicrophoneController(micInput: InputMicrophoneFormant) {
 export async function setupCompleteExample() {
 	// Create input manager
 	const inputManager = new InputManager()
-	
+
 	// Setup microphone input with vocal settings
 	const micInput = new InputMicrophoneFormant({
 		smoothing: 0.85,
@@ -204,13 +204,13 @@ export async function setupCompleteExample() {
 		analyzeInterval: 40,
 		fftSize: 4096
 	})
-	
+
 	inputManager.add(micInput)
-	
+
 	try {
 		// Request microphone access and start listening
 		await micInput.connect()
-		
+
 		// Monitor events
 		inputManager.addEventListener(INPUT_EVENT, (event: any) => {
 			const cmd = event.command
@@ -220,14 +220,13 @@ export async function setupCompleteExample() {
 				time: cmd.time
 			})
 		})
-		
+
 		// Create UI controller
 		const controller = createMicrophoneController(micInput)
 		document.body.appendChild(controller)
-		
+
 		console.log("✅ Microphone input setup complete")
 		return { inputManager, micInput }
-		
 	} catch (error) {
 		console.error("❌ Setup failed:", error)
 		throw error

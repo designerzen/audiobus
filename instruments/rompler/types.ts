@@ -96,10 +96,7 @@ export interface SoundFontInstrumentOptions extends SampleInstrumentOptions {
 /**
  * Progress callback for instrument loading
  */
-export type ProgressCallback = (progress: {
-	progress: number
-	instrumentName: string
-}) => void
+export type ProgressCallback = (progress: { progress: number; instrumentName: string }) => void
 
 /**
  * Worker message for audio fetching

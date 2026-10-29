@@ -1,17 +1,17 @@
 /**
  * Microphone Input with ML-based Polyphonic Pitch Detection
- * 
+ *
  * Uses Spotify's Basic Pitch neural network to detect
  * polyphonic notes from microphone audio in near-real-time.
  * Audio is captured in chunks, resampled to 22050Hz, and fed through
  * the model which outputs note events with pitch bend data.
- * 
+ *
  * https://github.com/spotify/basic-pitch-ts/tree/main
  */
 import AbstractInput from "./abstract-input.ts"
-import { loadCaptureWorklet } from './load-capture-worklet.ts'
+import { loadCaptureWorklet } from "./load-capture-worklet.ts"
 import { createAudioCommand } from "../../audio-command-factory.ts"
-import { NOTE_ON, NOTE_OFF, PITCH_BEND } from '../../commands.ts'
+import { NOTE_ON, NOTE_OFF, PITCH_BEND } from "../../commands.ts"
 
 import type { IAudioInput } from "./input-interface.ts"
 import type { IAudioCommand } from "../../audio-command-interface.ts"
@@ -22,12 +22,12 @@ export const MICROPHONE_PITCH_INPUT_ID = "MicrophonePitch"
 const BASIC_PITCH_SAMPLE_RATE = 22050
 
 const DEFAULT_OPTIONS = {
-	modelUrl: '/models/basic-pitch/model.json',
+	modelUrl: "/models/basic-pitch/model.json",
 	bufferDurationSeconds: 2,
 	onsetThreshold: 0.5,
 	frameThreshold: 0.3,
 	minNoteLength: 5,
-	audioContext: undefined as AudioContext | undefined,
+	audioContext: undefined as AudioContext | undefined
 }
 
 const WORKLET_PROCESSOR_CODE = `
@@ -56,7 +56,6 @@ registerProcessor('pitch-capture-processor', PitchCaptureProcessor)
 `
 
 export default class InputMicrophonePitch extends AbstractInput implements IAudioInput {
-
 	#audioContext: AudioContext | null = null
 	#mediaStream: MediaStream | null = null
 	#sourceNode: MediaStreamAudioSourceNode | null = null
@@ -92,14 +91,16 @@ export default class InputMicrophonePitch extends AbstractInput implements IAudi
 	}
 
 	async connect(): Promise<Function> {
-		if (this.#isListening) return () => this.disconnect()
+		if (this.#isListening) {
+			return () => this.disconnect()
+		}
 		if (!this.options.audioContext) {
-			throw new Error('InputMicrophonePitch requires audioContext to be passed via options')
+			throw new Error("InputMicrophonePitch requires audioContext to be passed via options")
 		}
 
 		const audioContext: AudioContext = this.options.audioContext
 		this.#audioContext = audioContext
-		await loadCaptureWorklet(audioContext, 'pitch-capture-processor', WORKLET_PROCESSOR_CODE)
+		await loadCaptureWorklet(audioContext, "pitch-capture-processor", WORKLET_PROCESSOR_CODE)
 
 		const { BasicPitch } = await import("@spotify/basic-pitch")
 		this.#basicPitch = new BasicPitch(this.options.modelUrl || DEFAULT_OPTIONS.modelUrl)
@@ -108,13 +109,13 @@ export default class InputMicrophonePitch extends AbstractInput implements IAudi
 			audio: {
 				echoCancellation: false,
 				noiseSuppression: false,
-				autoGainControl: false,
+				autoGainControl: false
 			}
 		})
 
 		this.#sourceNode = audioContext.createMediaStreamSource(this.#mediaStream)
 
-		this.#workletNode = new AudioWorkletNode(audioContext, 'pitch-capture-processor', {
+		this.#workletNode = new AudioWorkletNode(audioContext, "pitch-capture-processor", {
 			processorOptions: { bufferSize: 4096 }
 		})
 		this.#workletNode.port.onmessage = (event) => this.#onAudioData(event.data.audioData)
@@ -153,7 +154,7 @@ export default class InputMicrophonePitch extends AbstractInput implements IAudi
 		}
 
 		if (this.#mediaStream) {
-			this.#mediaStream.getTracks().forEach(track => track.stop())
+			this.#mediaStream.getTracks().forEach((track) => track.stop())
 			this.#mediaStream = null
 		}
 
@@ -165,7 +166,9 @@ export default class InputMicrophonePitch extends AbstractInput implements IAudi
 	}
 
 	#onAudioData(audioData: Float32Array): void {
-		if (!this.#isListening) return
+		if (!this.#isListening) {
+			return
+		}
 
 		this.#audioBuffer.push(audioData)
 		this.#samplesCollected += audioData.length
@@ -176,7 +179,9 @@ export default class InputMicrophonePitch extends AbstractInput implements IAudi
 	}
 
 	async #processBuffer(): Promise<void> {
-		if (this.#processing || !this.#basicPitch || !this.#audioContext) return
+		if (this.#processing || !this.#basicPitch || !this.#audioContext) {
+			return
+		}
 		this.#processing = true
 
 		try {
@@ -217,7 +222,8 @@ export default class InputMicrophonePitch extends AbstractInput implements IAudi
 			}
 
 			// Convert model output to note events
-			const { outputToNotesPoly, addPitchBendsToNoteEvents, noteFramesToTime } = await import("@spotify/basic-pitch")
+			const { outputToNotesPoly, addPitchBendsToNoteEvents, noteFramesToTime } =
+				await import("@spotify/basic-pitch")
 
 			const noteEvents = noteFramesToTime(
 				addPitchBendsToNoteEvents(
@@ -246,7 +252,11 @@ export default class InputMicrophonePitch extends AbstractInput implements IAudi
 		}
 
 		const duration = audioData.length / sourceSampleRate
-		const offlineCtx = new OfflineAudioContext(1, Math.ceil(duration * BASIC_PITCH_SAMPLE_RATE), BASIC_PITCH_SAMPLE_RATE)
+		const offlineCtx = new OfflineAudioContext(
+			1,
+			Math.ceil(duration * BASIC_PITCH_SAMPLE_RATE),
+			BASIC_PITCH_SAMPLE_RATE
+		)
 		const buffer = offlineCtx.createBuffer(1, audioData.length, sourceSampleRate)
 		buffer.getChannelData(0).set(audioData)
 
@@ -260,7 +270,9 @@ export default class InputMicrophonePitch extends AbstractInput implements IAudi
 	}
 
 	#handleNoteEvents(notes: NoteEventTime[]): void {
-		if (!this.#isListening) return
+		if (!this.#isListening) {
+			return
+		}
 
 		const newActiveNotes = new Set<number>()
 
@@ -292,23 +304,13 @@ export default class InputMicrophonePitch extends AbstractInput implements IAudi
 	}
 
 	#dispatchNoteOn(noteNumber: number, amplitude: number): void {
-		const command: IAudioCommand = createAudioCommand(
-			NOTE_ON,
-			noteNumber,
-			this.now,
-			this.name
-		)
+		const command: IAudioCommand = createAudioCommand(NOTE_ON, noteNumber, this.now, this.name)
 		command.velocity = Math.round(Math.min(1, amplitude) * 127)
 		this.dispatch(command)
 	}
 
 	#dispatchNoteOff(noteNumber: number): void {
-		const command: IAudioCommand = createAudioCommand(
-			NOTE_OFF,
-			noteNumber,
-			this.now,
-			this.name
-		)
+		const command: IAudioCommand = createAudioCommand(NOTE_OFF, noteNumber, this.now, this.name)
 		this.dispatch(command)
 	}
 

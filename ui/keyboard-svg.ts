@@ -1,6 +1,6 @@
-import AbstractInteractive from './abstract-interactive.ts'
+import AbstractInteractive from "./abstract-interactive.ts"
 
-const DEFAULT_TITLE = 'Piano Keyboard with 12 keys'
+const DEFAULT_TITLE = "Piano Keyboard with 12 keys"
 
 interface KeyInfo {
 	noteNumber: number
@@ -76,58 +76,71 @@ export default class SVGKeyboard extends AbstractInteractive {
 		const { svg } = this.createKeyboard(notes)
 
 		this.htmlElement = document.createDocumentFragment()
-		const pianoElement = this.htmlElement.appendChild(document.createElement('div'))
+		const pianoElement = this.htmlElement.appendChild(document.createElement("div"))
 		this.asElement = pianoElement
-		pianoElement.className = 'piano'
-		pianoElement.setAttribute('data-piano', 'true')
-		const viewport = pianoElement.appendChild(document.createElement('div'))
-		viewport.className = 'piano-viewport'
+		pianoElement.className = "piano"
+		pianoElement.setAttribute("data-piano", "true")
+		const viewport = pianoElement.appendChild(document.createElement("div"))
+		viewport.className = "piano-viewport"
 		viewport.innerHTML = svg
-		pianoElement.style.setProperty('--piano-white-keys', String(notes.filter(note => !note.accidental).length))
-		const range = pianoElement.appendChild(document.createElement('input'))
-		range.type = 'range'
-		range.className = 'piano-range'
-		range.min = '0'
-		range.max = '100'
-		range.step = 'any'
-		range.value = '50'
-		range.setAttribute('aria-label', 'Keyboard range, low to high notes')
+		pianoElement.style.setProperty(
+			"--piano-white-keys",
+			String(notes.filter((note) => !note.accidental).length)
+		)
+		const range = pianoElement.appendChild(document.createElement("input"))
+		range.type = "range"
+		range.className = "piano-range"
+		range.min = "0"
+		range.max = "100"
+		range.step = "any"
+		range.value = "50"
+		range.setAttribute("aria-label", "Keyboard range, low to high notes")
 		const positionKeyboard = () => {
 			const overflow = Math.max(0, viewport.scrollWidth - viewport.clientWidth)
 			range.disabled = overflow === 0
-			viewport.scrollLeft = overflow * Number(range.value) / 100
+			viewport.scrollLeft = (overflow * Number(range.value)) / 100
 		}
-		range.addEventListener('input', () => {
-			this.allNotesOff()
-			positionKeyboard()
-		}, { signal: this.rangeController.signal })
+		range.addEventListener(
+			"input",
+			() => {
+				this.allNotesOff()
+				positionKeyboard()
+			},
+			{ signal: this.rangeController.signal }
+		)
 		this.resizeObserver = new ResizeObserver(() => {
 			cancelAnimationFrame(this.layoutFrame)
 			this.layoutFrame = requestAnimationFrame(positionKeyboard)
 		})
 		this.resizeObserver.observe(viewport)
 		this.layoutFrame = requestAnimationFrame(positionKeyboard)
-		this.titleElement = pianoElement.querySelector('title')
-		this.keyElements = Array.from(pianoElement.querySelectorAll('.piano-key'))
+		this.titleElement = pianoElement.querySelector("title")
+		this.keyElements = Array.from(pianoElement.querySelectorAll(".piano-key"))
 
 		this.keyMap = new Map()
 		this.keyElements.forEach((value) => {
-			const noteNum = parseInt(value.getAttribute('data-number') ?? '0')
+			const noteNum = parseInt(value.getAttribute("data-number") ?? "0")
 			this.keyMap.set(noteNum, value)
 		})
 
 		this.firstNoteNumber = notes[0]?.noteNumber ?? 0
-		this.noteMap = new Map(notes.map(note => [note.noteNumber, note]))
+		this.noteMap = new Map(notes.map((note) => [note.noteNumber, note]))
 		this.svgString = svg
 		this.addInteractivity(this.keyElements, noteOn, noteOff)
 	}
 
 	getNoteFromKey(button: Element): KeyInfo {
-		const noteNumber = parseInt(button.getAttribute('data-number') ?? '0')
+		const noteNumber = parseInt(button.getAttribute("data-number") ?? "0")
 		return this.noteMap.get(noteNumber)!
 	}
 
-	private createKeyName(key: KeyInfo, x: number, y: number, _width: number = 23, height: number = 120): string {
+	private createKeyName(
+		key: KeyInfo,
+		x: number,
+		y: number,
+		_width: number = 23,
+		height: number = 120
+	): string {
 		const textYPosition = y + height
 		return `<text x="${x}" y="${textYPosition}" class="piano-key-name">${key.noteName}</text>`
 	}
@@ -263,10 +276,10 @@ export default class SVGKeyboard extends AbstractInteractive {
 			return indicator
 		})
 
-		const keyboard = `<g class="piano-key-notes piano-keys-white">${whiteKeyElements.join('')}</g>
-						<g class="piano-key-notes piano-keys-black">${blackKeyElements.join('')}</g>`
+		const keyboard = `<g class="piano-key-notes piano-keys-white">${whiteKeyElements.join("")}</g>
+						<g class="piano-key-notes piano-keys-black">${blackKeyElements.join("")}</g>`
 
-		const indicators = `<g class="piano-key-indicators">${indicatorElements.join('')}</g>`
+		const indicators = `<g class="piano-key-indicators">${indicatorElements.join("")}</g>`
 
 		const svg = `<svg 
 					xmlns="http://www.w3.org/2000/svg" 
@@ -293,9 +306,9 @@ export default class SVGKeyboard extends AbstractInteractive {
 		const key = this.keyMap.get(noteNumber)
 
 		if (key && key instanceof Element) {
-			key.classList.toggle('active', true)
+			key.classList.toggle("active", true)
 			if (colour) {
-				key.setAttribute('style', `--col-accent: ${colour};`)
+				key.setAttribute("style", `--col-accent: ${colour};`)
 			}
 		}
 	}
@@ -308,7 +321,7 @@ export default class SVGKeyboard extends AbstractInteractive {
 		const key = this.keyMap.get(noteNumber)
 
 		if (key && key instanceof Element) {
-			key.classList.toggle('active', false)
+			key.classList.toggle("active", false)
 		}
 	}
 

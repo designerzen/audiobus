@@ -1,7 +1,7 @@
-import { loadYoshimi, yoshimiAsset } from '../../wam/yoshimi-assets'
-import { commandToMidi } from '../../midi/midi-command-conversion'
-import type { IAudioCommand } from '../../audio-command-interface'
-import { EVENT_PRESET_CHANGED } from '../../event-constants.ts'
+import { loadYoshimi, yoshimiAsset } from "../../wam/yoshimi-assets"
+import { commandToMidi } from "../../midi/midi-command-conversion"
+import type { IAudioCommand } from "../../audio-command-interface"
+import { EVENT_PRESET_CHANGED } from "../../event-constants.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 
 export interface YoshimiBank {
@@ -17,20 +17,20 @@ export interface YoshimiPreset {
 
 /**
  * Yoshimi Web Audio Module (WAM) Output
- * 
+ *
  * Integrates Yoshimi - a free and open source high quality software synthesizer
  * into the Harmoneasy audio engine. Yoshimi features:
  * - Polyphonic synthesis with 16 parts
  * - Rich library of presets organized by banks
  * - Real-time synthesis engine
- * 
+ *
  * Features:
  * - Load and switch between 700+ presets
  * - Organize presets by instrument banks
  * - Real-time MIDI note control
  * - Audio output to Web Audio API
  * - GUI for preset selection and browsing
- * 
+ *
  * @example
  * const yoshimi = new OutputYoshimi(audioContext)
  * await yoshimi.connect()
@@ -39,10 +39,9 @@ export interface YoshimiPreset {
  * yoshimi.noteOff(60)
  */
 export default class OutputYoshimi extends EventTarget implements IAudioOutput {
-
 	static ID: number = 0
 
-	#uuid: string = "Output-Yoshimi-" + (OutputYoshimi.ID++)
+	#uuid: string = "Output-Yoshimi-" + OutputYoshimi.ID++
 	#name: string = "Yoshimi"
 	#audioContext: AudioContext
 	#output: GainNode
@@ -56,7 +55,6 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 	#banks: YoshimiBank[] = []
 	#guiContainer: HTMLElement | null = null
 	#presetsLoaded: boolean = false
-
 
 	get uuid(): string {
 		return this.#uuid
@@ -78,7 +76,9 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		return false
 	}
 
-	get output(): AudioNode { return this.#output }
+	get output(): AudioNode {
+		return this.#output
+	}
 
 	get currentBank(): string {
 		return this.#currentBank
@@ -96,7 +96,9 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		super()
 		this.#audioContext = audioContext
 		this.#output = audioContext.createGain()
-		if (destination !== null) this.#output.connect(destination ?? audioContext.destination)
+		if (destination !== null) {
+			this.#output.connect(destination ?? audioContext.destination)
+		}
 
 		if (name) {
 			this.#name = name
@@ -132,31 +134,47 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 	 * Loads the WAM scripts and creates the synthesizer instance
 	 */
 	async connect(): Promise<void> {
-        if (this.#isConnected) return
-        if (this.#connecting) return this.#connecting
-        this.#connecting = (async () => {
-            const processorOptions = await loadYoshimi(this.#audioContext)
-            const node = new AudioWorkletNode(this.#audioContext, 'YOSHIMI', {
-                numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2], processorOptions,
-            })
-            this.#yoshimiInstance = node
-            this.#yoshimiInstance.onMidi = (data: number[]) => node.port.postMessage({ type: 'midi', data })
-            this.#yoshimiInstance.sendMessage = (verb: string, prop: string, data: string) => node.port.postMessage({ type: 'msg', verb, prop, data })
-            node.connect(this.#output)
-            this.#isConnected = true
-            if (!this.#presetsLoaded) {
-                await this.loadBanksList()
-                this.#presetsLoaded = true
-            }
-            const bank = this.#banks.find(bank => bank.name === this.#currentBank) ?? this.#banks[0]
-            if (bank) {
-                this.#currentBank = bank.name
-                if (!bank.instruments.includes(this.#currentPreset)) this.#currentPreset = bank.instruments[0]
-                await this.loadPreset(this.#currentBank, this.#currentPreset)
-            }
-        })()
-        try { await this.#connecting } finally { this.#connecting = null }
-    }
+		if (this.#isConnected) {
+			return
+		}
+		if (this.#connecting) {
+			return this.#connecting
+		}
+		this.#connecting = (async () => {
+			const processorOptions = await loadYoshimi(this.#audioContext)
+			const node = new AudioWorkletNode(this.#audioContext, "YOSHIMI", {
+				numberOfInputs: 0,
+				numberOfOutputs: 1,
+				outputChannelCount: [2],
+				processorOptions
+			})
+			this.#yoshimiInstance = node
+			this.#yoshimiInstance.onMidi = (data: number[]) =>
+				node.port.postMessage({ type: "midi", data })
+			this.#yoshimiInstance.sendMessage = (verb: string, prop: string, data: string) =>
+				node.port.postMessage({ type: "msg", verb, prop, data })
+			node.connect(this.#output)
+			this.#isConnected = true
+			if (!this.#presetsLoaded) {
+				await this.loadBanksList()
+				this.#presetsLoaded = true
+			}
+			const bank =
+				this.#banks.find((bank) => bank.name === this.#currentBank) ?? this.#banks[0]
+			if (bank) {
+				this.#currentBank = bank.name
+				if (!bank.instruments.includes(this.#currentPreset)) {
+					this.#currentPreset = bank.instruments[0]
+				}
+				await this.loadPreset(this.#currentBank, this.#currentPreset)
+			}
+		})()
+		try {
+			await this.#connecting
+		} finally {
+			this.#connecting = null
+		}
+	}
 
 	/**
 	 * Play a note on the Yoshimi synthesizer
@@ -174,7 +192,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 
 		try {
 			// Send MIDI note on (0x90 = Note On)
-			if (typeof this.#yoshimiInstance.onMidi === 'function') {
+			if (typeof this.#yoshimiInstance.onMidi === "function") {
 				this.#yoshimiInstance.onMidi([0x90, midiNote, midiVelocity])
 			}
 
@@ -198,7 +216,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 
 		try {
 			// Send MIDI note off (0x80 = Note Off)
-			if (typeof this.#yoshimiInstance.onMidi === 'function') {
+			if (typeof this.#yoshimiInstance.onMidi === "function") {
 				this.#yoshimiInstance.onMidi([0x80, midiNote, 0])
 			}
 
@@ -218,7 +236,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 
 		try {
 			// Send all notes off (CC 123)
-			if (typeof this.#yoshimiInstance.onMidi === 'function') {
+			if (typeof this.#yoshimiInstance.onMidi === "function") {
 				for (let channel = 0; channel < 16; channel++) {
 					this.#yoshimiInstance.onMidi([0xb0 | channel, 64, 0])
 					this.#yoshimiInstance.onMidi([0xb0 | channel, 123, 0])
@@ -242,7 +260,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		}
 
 		try {
-			if (typeof this.#yoshimiInstance.onMidi === 'function') {
+			if (typeof this.#yoshimiInstance.onMidi === "function") {
 				this.#yoshimiInstance.onMidi(midiMessage)
 			}
 		} catch (error) {
@@ -251,9 +269,13 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 	}
 	sendCommand(command: IAudioCommand): void {
 		const bytes = commandToMidi(command)
-		if (bytes) this.processMidi(bytes)
+		if (bytes) {
+			this.processMidi(bytes)
+		}
 	}
-	getNoteKey(command: IAudioCommand): string { return `${command.channel || 1}:${command.number}` }
+	getNoteKey(command: IAudioCommand): string {
+		return `${command.channel || 1}:${command.number}`
+	}
 
 	/**
 	 * Load a preset (instrument) from a bank
@@ -261,9 +283,13 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 	 * @param instrumentFilename - Filename of the instrument (e.g., "0040-Master Synth Low.xiz")
 	 * @param part - Zero-based part/MIDI channel (0-15); the preset browser controls part 0
 	 */
-	async loadPreset(bankName: string, instrumentFilename: string, part: number = 0): Promise<void> {
+	async loadPreset(
+		bankName: string,
+		instrumentFilename: string,
+		part: number = 0
+	): Promise<void> {
 		if (!Number.isInteger(part) || part < 0 || part > 15) {
-			throw new RangeError('Yoshimi part must be an integer from 0 to 15')
+			throw new RangeError("Yoshimi part must be an integer from 0 to 15")
 		}
 		if (!this.#isConnected || !this.#yoshimiInstance) {
 			console.warn("Yoshimi not connected")
@@ -275,13 +301,18 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 			const url = yoshimiAsset(filename)
 
 			const resp = await fetch(url)
-            if (!resp.ok) throw new Error(`Unable to load preset: ${resp.status}`)
-            const bytes = new Uint8Array(await resp.arrayBuffer())
-            const data = bytes[0] === 0x1f && bytes[1] === 0x8b
-                ? await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text()
-                : new TextDecoder().decode(bytes)
+			if (!resp.ok) {
+				throw new Error(`Unable to load preset: ${resp.status}`)
+			}
+			const bytes = new Uint8Array(await resp.arrayBuffer())
+			const data =
+				bytes[0] === 0x1f && bytes[1] === 0x8b
+					? await new Response(
+							new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))
+						).text()
+					: new TextDecoder().decode(bytes)
 			// Send preset data to Yoshimi
-			if (typeof this.#yoshimiInstance.sendMessage === 'function') {
+			if (typeof this.#yoshimiInstance.sendMessage === "function") {
 				this.#yoshimiInstance.sendMessage("set", `patch${part}`, data)
 			}
 
@@ -294,11 +325,12 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 
 			// Dispatch event for UI updates
 			if (part === 0) {
-				this.dispatchEvent(new CustomEvent(EVENT_PRESET_CHANGED, {
-					detail: { bank: bankName, preset: instrumentFilename }
-				}))
+				this.dispatchEvent(
+					new CustomEvent(EVENT_PRESET_CHANGED, {
+						detail: { bank: bankName, preset: instrumentFilename }
+					})
+				)
 			}
-
 		} catch (error) {
 			console.error("Failed to load Yoshimi preset:", error)
 		}
@@ -319,16 +351,17 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		}
 	}
 
-
 	/**
 	 * Disconnect and cleanup Yoshimi
 	 */
 	async disconnect(): Promise<void> {
-		if (this.#connecting) await this.#connecting.catch(() => {})
+		if (this.#connecting) {
+			await this.#connecting.catch(() => {})
+		}
 		try {
 			this.allNotesOff()
 
-			if (this.#yoshimiInstance && typeof this.#yoshimiInstance.disconnect === 'function') {
+			if (this.#yoshimiInstance && typeof this.#yoshimiInstance.disconnect === "function") {
 				await this.#yoshimiInstance.disconnect()
 				this.#yoshimiInstance.port.close()
 			}
@@ -345,7 +378,9 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 	 * Create GUI for preset selection and browsing
 	 */
 	async createGui(): Promise<HTMLElement> {
-		if (this.#guiContainer) return this.#guiContainer
+		if (this.#guiContainer) {
+			return this.#guiContainer
+		}
 		await this.connect()
 		this.#guiEvents = new AbortController()
 		this.#guiContainer = document.createElement("div")
@@ -405,7 +440,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		bankSelect.style.fontSize = "12px"
 		bankSelect.style.cursor = "pointer"
 
-		this.#banks.forEach(bank => {
+		this.#banks.forEach((bank) => {
 			const option = document.createElement("option")
 			option.value = bank.name
 			option.textContent = bank.name
@@ -442,9 +477,9 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		presetSelect.style.overflowY = "auto"
 
 		// Populate presets for initial bank
-		const currentBank = this.#banks.find(b => b.name === this.#currentBank)
+		const currentBank = this.#banks.find((b) => b.name === this.#currentBank)
 		if (currentBank) {
-			currentBank.instruments.forEach(instrument => {
+			currentBank.instruments.forEach((instrument) => {
 				const option = document.createElement("option")
 				option.value = instrument
 				option.textContent = instrument
@@ -459,14 +494,14 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		this.#guiContainer.appendChild(presetContainer)
 
 		// Event listeners for bank/preset changes
-		bankSelect.addEventListener('change', async () => {
+		bankSelect.addEventListener("change", async () => {
 			const newBank = bankSelect.value
 
 			// Update preset options
 			presetSelect.innerHTML = ""
-			const bank = this.#banks.find(b => b.name === newBank)
+			const bank = this.#banks.find((b) => b.name === newBank)
 			if (bank) {
-				bank.instruments.forEach(instrument => {
+				bank.instruments.forEach((instrument) => {
 					const option = document.createElement("option")
 					option.value = instrument
 					option.textContent = instrument
@@ -481,7 +516,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 			}
 		})
 
-		presetSelect.addEventListener('change', async () => {
+		presetSelect.addEventListener("change", async () => {
 			const newPreset = presetSelect.value
 			await this.loadPreset(bankSelect.value, newPreset)
 
@@ -493,26 +528,30 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		})
 
 		// Listen for preset changes from other sources
-		this.addEventListener(EVENT_PRESET_CHANGED, (event: any) => {
-			bankSelect.value = event.detail.bank
-			presetSelect.innerHTML = ""
-			const bank = this.#banks.find(b => b.name === event.detail.bank)
-			if (bank) {
-				bank.instruments.forEach((instrument: string) => {
-					const option = document.createElement("option")
-					option.value = instrument
-					option.textContent = instrument
-					if (instrument === event.detail.preset) {
-						option.selected = true
-					}
-					presetSelect.appendChild(option)
-				})
-			}
-			currentDisplay.innerHTML = `
+		this.addEventListener(
+			EVENT_PRESET_CHANGED,
+			(event: any) => {
+				bankSelect.value = event.detail.bank
+				presetSelect.innerHTML = ""
+				const bank = this.#banks.find((b) => b.name === event.detail.bank)
+				if (bank) {
+					bank.instruments.forEach((instrument: string) => {
+						const option = document.createElement("option")
+						option.value = instrument
+						option.textContent = instrument
+						if (instrument === event.detail.preset) {
+							option.selected = true
+						}
+						presetSelect.appendChild(option)
+					})
+				}
+				currentDisplay.innerHTML = `
 				<div style="font-weight: 600; color: #4fc3f7;">${event.detail.bank}</div>
 				<div style="color: #999; margin-top: 4px;">${event.detail.preset}</div>
 			`
-		}, { signal: this.#guiEvents.signal })
+			},
+			{ signal: this.#guiEvents.signal }
+		)
 
 		return this.#guiContainer
 	}

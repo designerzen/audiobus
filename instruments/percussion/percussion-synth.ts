@@ -1,10 +1,10 @@
-import { GENERAL_MIDI_PERCUSSION_NOTES } from '../../timing/percussion-note-map.ts'
-import type { IPercussionOutput, PercussionHit } from '../../timing/percussion-types.ts'
-import { noteNumberToFrequency } from '../../conversion/note-to-frequency.ts'
+import { GENERAL_MIDI_PERCUSSION_NOTES } from "../../timing/percussion-note-map.ts"
+import type { IPercussionOutput, PercussionHit } from "../../timing/percussion-types.ts"
+import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
 import {
 	DEFAULT_DRUM_COMPRESSOR_SETTINGS,
-	type DrumCompressorSettings,
-} from '../../effects/drum-compressor.ts'
+	type DrumCompressorSettings
+} from "../../effects/drum-compressor.ts"
 
 interface PercussionVoice {
 	source: AudioScheduledSourceNode
@@ -27,7 +27,7 @@ export class PercussionSynth implements IPercussionOutput {
 
 	constructor(
 		private readonly context: AudioContext,
-		destination: AudioNode = context.destination,
+		destination: AudioNode = context.destination
 	) {
 		this.output = context.createGain()
 		this.output.gain.value = 0.55
@@ -48,7 +48,9 @@ export class PercussionSynth implements IPercussionOutput {
 		this.setCompressor(DEFAULT_DRUM_COMPRESSOR_SETTINGS)
 		this.noise = context.createBuffer(1, context.sampleRate, context.sampleRate)
 		const data = this.noise.getChannelData(0)
-		for (let index = 0; index < data.length; index++) data[index] = Math.random() * 2 - 1
+		for (let index = 0; index < data.length; index++) {
+			data[index] = Math.random() * 2 - 1
+		}
 	}
 
 	setVolume(volume: number): void {
@@ -62,27 +64,32 @@ export class PercussionSynth implements IPercussionOutput {
 			[this.compressor.ratio, settings.compressorRatio],
 			[this.compressor.knee, settings.compressorKnee],
 			[this.compressor.attack, settings.compressorAttack],
-			[this.compressor.release, settings.compressorRelease],
-		] as const)
+			[this.compressor.release, settings.compressorRelease]
+		] as const) {
 			parameter.setTargetAtTime(value, now, 0.01)
+		}
 		this.makeup.gain.setTargetAtTime(10 ** (settings.compressorMakeupGain / 20), now, 0.01)
 		this.dry.gain.setTargetAtTime(settings.compressorEnabled ? 0 : 1, now, 0.01)
 		this.wet.gain.setTargetAtTime(settings.compressorEnabled ? 1 : 0, now, 0.01)
 	}
 
 	trigger(hit: Readonly<PercussionHit>): void {
-		if (!Number.isFinite(hit.velocity) || hit.velocity <= 0) return
-		const part = hit.part === 'hat' ? (hit.open ? 'hatOpen' : 'hatClosed') : hit.part
+		if (!Number.isFinite(hit.velocity) || hit.velocity <= 0) {
+			return
+		}
+		const part = hit.part === "hat" ? (hit.open ? "hatOpen" : "hatClosed") : hit.part
 		const note = GENERAL_MIDI_PERCUSSION_NOTES[part]
-		if (note === undefined) return
+		if (note === undefined) {
+			return
+		}
 		const at = Math.max(this.context.currentTime, hit.triggerAt)
 		const velocity = Math.min(1, hit.velocity)
 		const scale = hit.lengthScale ?? 1
 		const pitchScale =
 			hit.tuningNote === undefined ? 1 : noteNumberToFrequency(hit.tuningNote) / 42
-		if (part === 'hatClosed' || part === 'hatPedal') {
+		if (part === "hatClosed" || part === "hatPedal") {
 			for (const voice of this.voices) {
-				if (voice.part === 'hatOpen' && voice.startAt <= at && voice.stopAt > at) {
+				if (voice.part === "hatOpen" && voice.startAt <= at && voice.stopAt > at) {
 					voice.source.stop(at)
 					voice.stopAt = at
 				}
@@ -96,7 +103,7 @@ export class PercussionSynth implements IPercussionOutput {
 				145 * pitchScale,
 				42 * pitchScale,
 				0.32 * scale,
-				'sine',
+				"sine"
 			)
 		} else if (note === 38 || note === 40 || note === 39) {
 			this.noiseHit(
@@ -105,10 +112,10 @@ export class PercussionSynth implements IPercussionOutput {
 				velocity * 0.45,
 				note === 39 ? 0.12 : 0.18,
 				1600,
-				'highpass',
-				scale,
+				"highpass",
+				scale
 			)
-			if (note !== 39)
+			if (note !== 39) {
 				this.tone(
 					part,
 					at,
@@ -116,26 +123,41 @@ export class PercussionSynth implements IPercussionOutput {
 					190 * pitchScale,
 					115 * pitchScale,
 					0.09 * scale,
-					'triangle',
+					"triangle"
 				)
+			}
 		} else if ([42, 44, 46].includes(note)) {
 			// AudioBus TR808Hat: six metallic square waves through band/high-pass filters.
-			this.metalHit(part, at, velocity * 0.12, [2, 3, 4.16, 5.43, 6.79, 8.21].map(ratio => 40 * ratio * pitchScale),
-				(part === 'hatOpen' ? 0.24 : 0.045) * scale, 10000, 7000)
+			this.metalHit(
+				part,
+				at,
+				velocity * 0.12,
+				[2, 3, 4.16, 5.43, 6.79, 8.21].map((ratio) => 40 * ratio * pitchScale),
+				(part === "hatOpen" ? 0.24 : 0.045) * scale,
+				10000,
+				7000
+			)
 		} else if (note === 56) {
 			// AudioBus TR808Cowbell: the original 800/540 Hz oscillator pair.
-			this.metalHit(part, at, velocity * 0.2, [800 * pitchScale, 540 * pitchScale], 0.4 * scale, 1000)
+			this.metalHit(
+				part,
+				at,
+				velocity * 0.2,
+				[800 * pitchScale, 540 * pitchScale],
+				0.4 * scale,
+				1000
+			)
 		} else if ([49, 51, 52, 53, 55, 57, 59, 69, 70, 54, 82, 83].includes(note)) {
 			const duration =
-				part === 'hatOpen' ? 0.24 : part.startsWith('hat') ? 0.045 : note >= 69 ? 0.08 : 0.5
+				part === "hatOpen" ? 0.24 : part.startsWith("hat") ? 0.045 : note >= 69 ? 0.08 : 0.5
 			this.noiseHit(
 				part,
 				at,
 				velocity * 0.3,
 				duration,
 				note >= 69 ? 3500 : 6500,
-				'highpass',
-				scale,
+				"highpass",
+				scale
 			)
 		} else {
 			const frequency = 80 * 2 ** ((note - 41) / 16) * pitchScale
@@ -146,26 +168,33 @@ export class PercussionSynth implements IPercussionOutput {
 				frequency * 1.5,
 				frequency,
 				0.16 * scale,
-				note >= 56 ? 'square' : 'sine',
+				note >= 56 ? "square" : "sine"
 			)
 		}
 	}
 
-	private metalHit(part: string, at: number, velocity: number, frequencies: number[], duration: number,
-		bandpassHz: number, highpassHz?: number): void {
+	private metalHit(
+		part: string,
+		at: number,
+		velocity: number,
+		frequencies: number[],
+		duration: number,
+		bandpassHz: number,
+		highpassHz?: number
+	): void {
 		// Each oscillator owns its filter/envelope path, so voices remain independently disposable.
 		for (const frequency of frequencies) {
 			const source = this.context.createOscillator()
-			source.type = 'square'
+			source.type = "square"
 			source.frequency.setValueAtTime(frequency, at)
 			const bandpass = this.context.createBiquadFilter()
-			bandpass.type = 'bandpass'
+			bandpass.type = "bandpass"
 			bandpass.frequency.value = Math.min(bandpassHz, this.context.sampleRate * 0.45)
 			source.connect(bandpass)
 			const nodes: AudioNode[] = [bandpass]
 			if (highpassHz !== undefined) {
 				const highpass = this.context.createBiquadFilter()
-				highpass.type = 'highpass'
+				highpass.type = "highpass"
 				highpass.frequency.value = Math.min(highpassHz, this.context.sampleRate * 0.45)
 				bandpass.connect(highpass)
 				nodes.push(highpass)
@@ -181,7 +210,7 @@ export class PercussionSynth implements IPercussionOutput {
 		from: number,
 		to: number,
 		duration: number,
-		type: OscillatorType,
+		type: OscillatorType
 	): void {
 		const source = this.context.createOscillator()
 		source.type = type
@@ -197,7 +226,7 @@ export class PercussionSynth implements IPercussionOutput {
 		duration: number,
 		frequency: number,
 		type: BiquadFilterType,
-		scale: number,
+		scale: number
 	): void {
 		const source = this.context.createBufferSource()
 		source.buffer = this.noise
@@ -214,7 +243,7 @@ export class PercussionSynth implements IPercussionOutput {
 		part: string,
 		at: number,
 		velocity: number,
-		length: number,
+		length: number
 	): void {
 		const duration = Math.max(0.015, length)
 		const envelope = this.context.createGain()
@@ -228,13 +257,15 @@ export class PercussionSynth implements IPercussionOutput {
 			nodes: [...nodes, envelope],
 			part,
 			startAt: at,
-			stopAt: at + duration + 0.01,
+			stopAt: at + duration + 0.01
 		}
 		this.voices.add(voice)
 		source.onended = () => {
 			this.voices.delete(voice)
 			source.disconnect()
-			for (const node of voice.nodes) node.disconnect()
+			for (const node of voice.nodes) {
+				node.disconnect()
+			}
 		}
 		source.start(at)
 		source.stop(at + duration + 0.01)
@@ -244,7 +275,9 @@ export class PercussionSynth implements IPercussionOutput {
 		for (const voice of this.voices) {
 			voice.source.stop()
 			voice.source.disconnect()
-			for (const node of voice.nodes) node.disconnect()
+			for (const node of voice.nodes) {
+				node.disconnect()
+			}
 		}
 		this.voices.clear()
 	}

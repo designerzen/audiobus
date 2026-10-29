@@ -1,6 +1,6 @@
 import type { DeviceClassification } from "../io/device-classification.ts"
-import { defineDevice } from '../io/device-definition'
-import { OUTPUT_PREVIEWS } from '../io/output-previews'
+import { defineDevice } from "../io/device-definition"
+import { OUTPUT_PREVIEWS } from "../io/output-previews"
 /**
  * Factory interface for creating instrument UI factories
  * Bridges InstrumentFactory with the UI layer
@@ -15,14 +15,17 @@ import {
 	EXTERNAL_DATA_KEY_SAMPLE_URLS
 } from "./instrument-factory.ts"
 
-export interface InstrumentUIFactory extends DeviceClassification<'engine'> {
+export interface InstrumentUIFactory extends DeviceClassification<"engine"> {
 	id: string
 	name: string
 	description: string
 	category: string
 	preview?: string
 	isAvailable: () => boolean
-	create: (audioContext: BaseAudioContext | AudioContext, options?: Record<string, any>) => IAudioOutput | Promise<IAudioOutput>
+	create: (
+		audioContext: BaseAudioContext | AudioContext,
+		options?: Record<string, any>
+	) => IAudioOutput | Promise<IAudioOutput>
 }
 
 /**
@@ -49,8 +52,13 @@ const createInstrument = async (
 		// but options can include sample URLs
 	}
 
-	const instrument = await InstrumentFactory.createInstrument(instrumentId, audioContext, externalData, options)
-	if (instrument.output && options?.mixer) {
+	const instrument = await InstrumentFactory.createInstrument(
+		instrumentId,
+		audioContext,
+		externalData,
+		options
+	)
+	if (instrument.output && "connect" in instrument.output && options?.mixer) {
 		instrument.output.connect(options.mixer)
 	}
 	return instrument
@@ -66,27 +74,39 @@ const metadataToUIFactory = (metadata: InstrumentMetadata): InstrumentUIFactory 
 	name: metadata.name,
 	description: metadata.description,
 	category: metadata.category,
-	preview: OUTPUT_PREVIEWS[`instrument:${metadata.id}`]
-		?? (metadata.category === INSTRUMENT_CATEGORY_WAM2 ? OUTPUT_PREVIEWS[`output:${metadata.id}`] : undefined),
+	preview:
+		OUTPUT_PREVIEWS[`instrument:${metadata.id}`] ??
+		(metadata.category === INSTRUMENT_CATEGORY_WAM2
+			? OUTPUT_PREVIEWS[`output:${metadata.id}`]
+			: undefined),
 	isAvailable: () => {
-		if (metadata.category === INSTRUMENT_CATEGORY_WAM2 && typeof AudioWorkletNode === 'undefined') return false
+		if (
+			metadata.category === INSTRUMENT_CATEGORY_WAM2 &&
+			typeof AudioWorkletNode === "undefined"
+		) {
+			return false
+		}
 		// Check if required external data is available
 		const requiredData = metadata.requiresExternalData ?? []
-		
+
 		for (const key of requiredData) {
 			switch (key) {
 				case EXTERNAL_DATA_KEY_SCSYNTH:
-					if (!(window as any).scsynth) return false
+					if (!(window as any).scsynth) {
+						return false
+					}
 					break
 				case EXTERNAL_DATA_KEY_SAMPLE_URLS:
 					// Sampler always available, sample URLs can be provided later
 					break
 			}
 		}
-		
+
 		// Check for Web Audio API
-		return typeof (window as any).AudioContext !== "undefined" || 
-		       typeof (window as any).webkitAudioContext !== "undefined"
+		return (
+			typeof (window as any).AudioContext !== "undefined" ||
+			typeof (window as any).webkitAudioContext !== "undefined"
+		)
 	},
 	create: (audioContext, options) => createInstrument(audioContext, metadata.id, options)
 })
@@ -96,9 +116,7 @@ const metadataToUIFactory = (metadata: InstrumentMetadata): InstrumentUIFactory 
  */
 export function getAvailableInstrumentFactories(): InstrumentUIFactory[] {
 	const allInstruments = InstrumentFactory.getAvailableInstruments()
-	return allInstruments
-		.map(metadataToUIFactory)
-		.filter((factory) => factory.isAvailable())
+	return allInstruments.map(metadataToUIFactory).filter((factory) => factory.isAvailable())
 }
 
 /**
@@ -127,7 +145,11 @@ export async function createInstrumentById(
 		throw new Error(`Instrument not available: ${metadata.name}`)
 	}
 
-	return defineDevice(await factory.create(audioContext, options), { factory: 'instrument', type: id, options })
+	return defineDevice(await factory.create(audioContext, options), {
+		factory: "instrument",
+		type: id,
+		options
+	})
 }
 
 /**

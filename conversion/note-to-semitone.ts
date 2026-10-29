@@ -9,6 +9,6 @@ const SEMITONE_NOTE_MAP: Record<string, number> = {
 	B: 11
 }
 
-export const convertNoteLetterToSemitone = (noteLetter:string) => {
+export const convertNoteLetterToSemitone = (noteLetter: string) => {
 	return SEMITONE_NOTE_MAP[noteLetter]
 }

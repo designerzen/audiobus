@@ -3,28 +3,30 @@
  * Supports MOD, XM, IT, S3M and other tracker formats via FlodJS
  */
 
-import type { IAudioCommand } from '../audio-command-interface.ts'
-import AudioCommand from '../audio-command.ts'
+import type { IAudioCommand } from "../audio-command-interface.ts"
+import AudioCommand from "../audio-command.ts"
 
 /**
  * Import a tracker file (MOD, XM, IT, S3M, etc.) and extract audio commands
  * @param file - The tracker file to import
  * @returns Array of IAudioCommand and the note count
  */
-export async function importTrackerFile(file: File): Promise<{ commands: IAudioCommand[], noteCount: number }> {
+export async function importTrackerFile(
+	file: File
+): Promise<{ commands: IAudioCommand[]; noteCount: number }> {
 	try {
 		const arrayBuffer = await file.arrayBuffer()
-		
+
 		// Try to parse the tracker file
 		const trackerData = parseTrackerFile(arrayBuffer)
-		
+
 		if (!trackerData) {
 			throw new Error(`Unable to parse tracker file: ${file.name}`)
 		}
 
 		// Convert tracker data to audio commands
 		const commands = convertTrackerDataToCommands(trackerData)
-		
+
 		console.info(`Imported tracker file: ${file.name}`, {
 			title: trackerData.title,
 			format: trackerData.format,
@@ -39,7 +41,9 @@ export async function importTrackerFile(file: File): Promise<{ commands: IAudioC
 			noteCount: commands.length
 		}
 	} catch (error) {
-		throw new Error(`Failed to import tracker file: ${error instanceof Error ? error.message : String(error)}`)
+		throw new Error(
+			`Failed to import tracker file: ${error instanceof Error ? error.message : String(error)}`
+		)
 	}
 }
 
@@ -88,7 +92,7 @@ function parseTrackerFile(arrayBuffer: ArrayBuffer): TrackerData | null {
 	// Check for MOD format (ProTracker, etc)
 	if (arrayBuffer.byteLength >= 1084) {
 		const signature = readString(uint8Array, 1080, 4)
-		if (signature === 'M.K.' || signature === 'M!K!' || signature === 'FLT4') {
+		if (signature === "M.K." || signature === "M!K!" || signature === "FLT4") {
 			return parseModFile(uint8Array)
 		}
 	}
@@ -96,7 +100,7 @@ function parseTrackerFile(arrayBuffer: ArrayBuffer): TrackerData | null {
 	// Check for XM format (FastTracker 2)
 	if (arrayBuffer.byteLength >= 76) {
 		const xmId = readString(uint8Array, 0, 4)
-		if (xmId === 'Extended Module: ') {
+		if (xmId === "Extended Module: ") {
 			return parseXmFile(uint8Array)
 		}
 	}
@@ -104,7 +108,7 @@ function parseTrackerFile(arrayBuffer: ArrayBuffer): TrackerData | null {
 	// Check for IT format (Impulse Tracker)
 	if (arrayBuffer.byteLength >= 4) {
 		const itId = readString(uint8Array, 0, 4)
-		if (itId === 'IMPM') {
+		if (itId === "IMPM") {
 			return parseItFile(uint8Array)
 		}
 	}
@@ -112,7 +116,7 @@ function parseTrackerFile(arrayBuffer: ArrayBuffer): TrackerData | null {
 	// Check for S3M format (ScreamTracker 3)
 	if (arrayBuffer.byteLength >= 48) {
 		const s3mId = readString(uint8Array, 44, 4)
-		if (s3mId === 'SCRM') {
+		if (s3mId === "SCRM") {
 			return parseS3mFile(uint8Array)
 		}
 	}
@@ -138,8 +142,8 @@ function parseModFile(data: Uint8Array): TrackerData {
 
 	// Default values for MOD
 	const trackerData: TrackerData = {
-		title: title || 'Unnamed MOD',
-		format: 'MOD',
+		title: title || "Unnamed MOD",
+		format: "MOD",
 		tempo: 125,
 		bpm: 125,
 		channels,
@@ -155,15 +159,15 @@ function parseModFile(data: Uint8Array): TrackerData {
 function parseXmFile(data: Uint8Array): TrackerData {
 	// XM header info
 	const title = readString(data, 17, 20).trim()
-	
-	let offset = 60 // Header size
+
+	let _offset = 60 // Header size
 	const headerLength = readUint32LE(data, 4)
-	offset += headerLength
+	_offset += headerLength
 
 	// Default values
 	const trackerData: TrackerData = {
-		title: title || 'Unnamed XM',
-		format: 'XM',
+		title: title || "Unnamed XM",
+		format: "XM",
 		tempo: 125,
 		bpm: 125,
 		channels: 32 // XM can have up to 32 channels
@@ -183,8 +187,8 @@ function parseItFile(data: Uint8Array): TrackerData {
 	const channels = Math.min(readUint16LE(data, 32), 64)
 
 	const trackerData: TrackerData = {
-		title: title || 'Unnamed IT',
-		format: 'IT',
+		title: title || "Unnamed IT",
+		format: "IT",
 		tempo,
 		bpm,
 		channels
@@ -202,8 +206,8 @@ function parseS3mFile(data: Uint8Array): TrackerData {
 	const channels = Math.min(readUint16LE(data, 48), 32)
 
 	const trackerData: TrackerData = {
-		title: title || 'Unnamed S3M',
-		format: 'S3M',
+		title: title || "Unnamed S3M",
+		format: "S3M",
 		tempo: 125,
 		bpm: 125,
 		channels
@@ -218,9 +222,9 @@ function parseS3mFile(data: Uint8Array): TrackerData {
 function extractModPatterns(data: Uint8Array, songLength: number): TrackerPattern[] {
 	const patterns: TrackerPattern[] = []
 	const patternTable = data.slice(952, 1080) // Pattern sequence table
-	
+
 	// Calculate where pattern data starts (after headers)
-	let patternOffset = 1084
+	const patternOffset = 1084
 	const maxPatterns = 128
 	const notesPerRow = 4 // MOD has 4 channels
 	const rowsPerPattern = 64
@@ -235,22 +239,26 @@ function extractModPatterns(data: Uint8Array, songLength: number): TrackerPatter
 	}
 
 	// Parse patterns (simplified - just extract note info)
-	patternNumbers.forEach(patternNum => {
+	patternNumbers.forEach((patternNum) => {
 		const notes: TrackerNote[] = []
-		
+
 		// MOD pattern structure: 4 bytes per note (channel)
 		// Byte 0-1: Note and sample
 		// Byte 2-3: Effect and effect param
 		for (let row = 0; row < rowsPerPattern; row++) {
 			for (let channel = 0; channel < notesPerRow; channel++) {
-				const offset = patternOffset + (patternNum * rowsPerPattern * notesPerRow * 4) + (row * notesPerRow * 4) + (channel * 4)
-				
+				const offset =
+					patternOffset +
+					patternNum * rowsPerPattern * notesPerRow * 4 +
+					row * notesPerRow * 4 +
+					channel * 4
+
 				if (offset + 4 <= data.length) {
 					const byte0 = data[offset]
 					const byte1 = data[offset + 1]
-					const noteNum = ((byte0 & 0x0F) << 4) | ((byte1 >> 4) & 0x0F)
-					const sample = (((byte0 & 0xF0) >> 4) | (byte1 & 0x0F)) << 4
-					
+					const noteNum = ((byte0 & 0x0f) << 4) | ((byte1 >> 4) & 0x0f)
+					const sample = (((byte0 & 0xf0) >> 4) | (byte1 & 0x0f)) << 4
+
 					// Valid note range in MOD (note 0 = C-0)
 					if (noteNum > 0 && noteNum <= 96) {
 						notes.push({
@@ -270,10 +278,12 @@ function extractModPatterns(data: Uint8Array, songLength: number): TrackerPatter
 		if (notes.length > 0) {
 			patterns.push({
 				index: patternNum,
-				rows: [{
-					noteData: notes,
-					effects: []
-				}]
+				rows: [
+					{
+						noteData: notes,
+						effects: []
+					}
+				]
 			})
 		}
 	})
@@ -291,13 +301,13 @@ function convertTrackerDataToCommands(trackerData: TrackerData): IAudioCommand[]
 
 	// Process patterns
 	if (trackerData.patterns) {
-		trackerData.patterns.forEach(pattern => {
-			pattern.rows.forEach(row => {
-				row.noteData.forEach(note => {
+		trackerData.patterns.forEach((pattern) => {
+			pattern.rows.forEach((row) => {
+				row.noteData.forEach((note) => {
 					if (note.note !== null) {
 						// Create note on command
 						const noteCommand = new AudioCommand()
-						noteCommand.number = note.note + (note.octave * 12)
+						noteCommand.number = note.note + note.octave * 12
 						noteCommand.velocity = note.volume / 64 // Normalize to 0-1
 						noteCommand.startAt = currentTick
 						noteCommand.patch = note.instrument
@@ -306,7 +316,7 @@ function convertTrackerDataToCommands(trackerData: TrackerData): IAudioCommand[]
 
 						// Create note off command (assume quarter note)
 						const noteOffCommand = new AudioCommand()
-						noteOffCommand.number = note.note + (note.octave * 12)
+						noteOffCommand.number = note.note + note.octave * 12
 						noteOffCommand.velocity = 0
 						noteOffCommand.startAt = currentTick + ticksPerRow * 4
 						noteOffCommand.patch = note.instrument
@@ -329,10 +339,12 @@ function convertTrackerDataToCommands(trackerData: TrackerData): IAudioCommand[]
  * Helper: Read string from data
  */
 function readString(data: Uint8Array, offset: number, length: number): string {
-	let result = ''
+	let result = ""
 	for (let i = 0; i < length && offset + i < data.length; i++) {
 		const char = data[offset + i]
-		if (char === 0) break
+		if (char === 0) {
+			break
+		}
 		result += String.fromCharCode(char)
 	}
 	return result
@@ -349,6 +361,7 @@ function readUint16LE(data: Uint8Array, offset: number): number {
  * Helper: Read 32-bit unsigned integer (little-endian)
  */
 function readUint32LE(data: Uint8Array, offset: number): number {
-	return data[offset] | (data[offset + 1] << 8) | (data[offset + 2] << 16) | (data[offset + 3] << 24)
+	return (
+		data[offset] | (data[offset + 1] << 8) | (data[offset + 2] << 16) | (data[offset + 3] << 24)
+	)
 }
-

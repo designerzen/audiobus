@@ -1,28 +1,27 @@
-
-export interface IAudioInput{
+export interface IAudioInput extends EventTarget {
 	get uuid(): string
-	get name():string
-	get description():string
-	get isConnected():boolean
-	get isHidden():boolean
-	
+	get name(): string
+	get description(): string
+	get isConnected(): boolean
+	get isHidden(): boolean
+
 	// optional
 	readonly requiresConnectionControl?: boolean
 	updateTime?(now: number): void
 	startClock?(): void
 	stopClock?(): void
-	connect?():Promise<void | Function>|Function
-	disconnect?():Promise<void>|Function
-	createGui?():Promise<HTMLElement>
-	destroyGui?():Promise<void>
+	connect?(): Promise<void | Function> | Function
+	disconnect?(): Promise<void> | Function
+	createGui?(): Promise<HTMLElement>
+	destroyGui?(): Promise<void>
 
 	// From the WAM spec
-	hasAudioInput?():boolean
-	hasMidiInput?():boolean
-	hasAutomationInput?():boolean
-	hasMpeInput?():boolean
-	hasOscInput?():boolean
-	hasSysexInput?():boolean
+	hasAudioInput?(): boolean
+	hasMidiInput?(): boolean
+	hasAutomationInput?(): boolean
+	hasMpeInput?(): boolean
+	hasOscInput?(): boolean
+	hasSysexInput?(): boolean
 }
 /**
  * 

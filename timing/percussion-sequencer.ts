@@ -1,5 +1,5 @@
-import { PercussionHoldRepeater } from './percussion-hold-repeater.ts'
-import { PercussionQuantiser, getPercussionTriggerTime } from './percussion-quantise.ts'
+import { PercussionHoldRepeater } from "./percussion-hold-repeater.ts"
+import { PercussionQuantiser, getPercussionTriggerTime } from "./percussion-quantise.ts"
 import type {
 	IDrumArranger,
 	IPercussionClock,
@@ -8,8 +8,8 @@ import type {
 	IPercussionQuantiser,
 	PercussionHit,
 	PercussionPress,
-	PercussionTiming,
-} from './percussion-types.ts'
+	PercussionTiming
+} from "./percussion-types.ts"
 
 /** Orchestrates interchangeable inputs and outputs without owning the master clock. */
 export class PercussionSequencer {
@@ -27,7 +27,7 @@ export class PercussionSequencer {
 			quantiser?: IPercussionQuantiser
 			quantise?: boolean
 			holdThresholdTicks?: number
-		} = {},
+		} = {}
 	) {
 		this.quantiser = options.quantiser ?? new PercussionQuantiser()
 		this.quantise = options.quantise ?? false
@@ -37,8 +37,8 @@ export class PercussionSequencer {
 				this.trigger({
 					...repeat.options,
 					triggerAt: undefined,
-					inputAudioTime: this.clock.currentTime,
-				}),
+					inputAudioTime: this.clock.currentTime
+				})
 		})
 	}
 
@@ -66,14 +66,18 @@ export class PercussionSequencer {
 			release: (inputId) => {
 				held.delete(prefix + inputId)
 				this.holds.release(prefix + inputId)
-			},
+			}
 		})
 		let attached = true
 		const detach = () => {
-			if (!attached) return
+			if (!attached) {
+				return
+			}
 			attached = false
 			unsubscribe()
-			for (const inputId of held) this.holds.release(inputId)
+			for (const inputId of held) {
+				this.holds.release(inputId)
+			}
 			this.inputs.delete(input)
 		}
 		this.inputs.set(input, detach)
@@ -86,13 +90,13 @@ export class PercussionSequencer {
 			...press,
 			now,
 			quantise: this.quantise,
-			quantiser: this.quantiser,
+			quantiser: this.quantiser
 		})
 		this.output.trigger({
 			part: press.part,
 			velocity: this.velocity(press.velocity ?? 1),
 			triggerAt,
-			open: press.open,
+			open: press.open
 		})
 	}
 
@@ -106,18 +110,22 @@ export class PercussionSequencer {
 	next(
 		triggerAt = this.clock.currentTime,
 		bpm?: number,
-		stepDuration?: number,
+		stepDuration?: number
 	): readonly PercussionHit[] {
 		const parts = this.options.arranger?.next({ triggerAt, bpm, stepDuration })
-		if (!parts) return []
+		if (!parts) {
+			return []
+		}
 		const hits: PercussionHit[] = []
 		for (const [part, velocity] of Object.entries(parts)) {
-			if (typeof velocity !== 'number' || velocity <= 0) continue
+			if (typeof velocity !== "number" || velocity <= 0) {
+				continue
+			}
 			hits.push({
 				part,
 				velocity: this.velocity(velocity / 255),
 				triggerAt,
-				open: part === 'hat' && parts.hatOpen,
+				open: part === "hat" && parts.hatOpen
 			})
 		}
 		for (const event of parts.events) {
@@ -125,10 +133,12 @@ export class PercussionSequencer {
 				part: event.lane,
 				velocity: this.velocity(event.velocity / 255),
 				triggerAt: triggerAt + event.offset,
-				lengthScale: event.lengthScale,
+				lengthScale: event.lengthScale
 			})
 		}
-		for (const hit of hits) this.output.trigger(hit)
+		for (const hit of hits) {
+			this.output.trigger(hit)
+		}
 		return hits
 	}
 
@@ -138,7 +148,9 @@ export class PercussionSequencer {
 	}
 
 	destroy(): void {
-		for (const detach of this.inputs.values()) detach()
+		for (const detach of this.inputs.values()) {
+			detach()
+		}
 		this.stop()
 	}
 

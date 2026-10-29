@@ -1,20 +1,19 @@
 /**
  * Take note Ons and detune the note to match the specified
  * microtonal scale using the pitfalls library.
- * 
+ *
  * This transformer applies microtonal tuning by calculating detune values
  * in cents for each note based on the EDO (Equal Division of the Octave)
  * scale definition, compatible with MIDI 1.0 pitch bend control.
  */
-import type AudioCommand from "../../audio-command.ts"
-import type { ITimerControl as Timer } from "netronome"
+import type { Timer } from "netronome"
 
 import type { ITransformer } from "./interface-transformer.ts"
 import { Transformer } from "./abstract-transformer.ts"
 import { parseEdoScaleMicroTuningOctave } from "../../../pitfalls/ts/index.ts"
 import { TRANSFORMER_CATEGORY_TUNING } from "./transformer-categories.ts"
 import type { IAudioCommand } from "../../audio-command-interface.ts"
-import * as Commands from '../../commands'
+import * as Commands from "../../commands"
 import type Pitches from "../../../pitfalls/ts/pitches.ts"
 
 export const ID_MICROTONALITY = "Micro-Tonality"
@@ -41,19 +40,18 @@ const DEFAULT_OPTIONS: Config = {
 
 /**
  * Microtonality Transformer
- * 
+ *
  * Applies microtonal detuning to NOTE_ON commands using EDO scales.
  * The detune value is stored as cents offset, compatible with MIDI 1.0.
  */
 export class TransformerMicroTonality extends Transformer<Config> implements ITransformer {
-
-	protected type = ID_MICROTONALITY
+	type = ID_MICROTONALITY
 	category = TRANSFORMER_CATEGORY_TUNING
 
 	private microtones: Pitches | null = null
 
 	get name(): string {
-		return 'Microtonality'
+		return "Microtonality"
 	}
 
 	get description(): string {
@@ -63,91 +61,91 @@ export class TransformerMicroTonality extends Transformer<Config> implements ITr
 	get fields() {
 		return [
 			{
-				name: 'enabled',
-				type: 'select',
+				name: "enabled",
+				type: "select",
 				enabled: true,
 				values: [
-					{ name: 'On', value: 1 },
-					{ name: 'Off', value: 0 }
+					{ name: "On", value: 1 },
+					{ name: "Off", value: 0 }
 				],
 				default: DEFAULT_OPTIONS.enabled
 			},
 			{
-				name: 'baseNoteMidi',
-				type: 'number',
+				name: "baseNoteMidi",
+				type: "number",
 				enabled: true,
 				min: 0,
 				max: 127,
 				default: DEFAULT_OPTIONS.baseNoteMidi
 			},
 			{
-				name: 'rootOctave',
-				type: 'select',
+				name: "rootOctave",
+				type: "select",
 				enabled: true,
 				values: [
-					{ name: '0', value: 0 },
-					{ name: '1', value: 1 },
-					{ name: '2', value: 2 },
-					{ name: '3', value: 3 },
-					{ name: '4', value: 4 },
-					{ name: '5', value: 5 },
-					{ name: '6', value: 6 },
-					{ name: '7', value: 7 },
-					{ name: '8', value: 8 },
-					{ name: '9', value: 9 },
-					{ name: '10', value: 10 }
+					{ name: "0", value: 0 },
+					{ name: "1", value: 1 },
+					{ name: "2", value: 2 },
+					{ name: "3", value: 3 },
+					{ name: "4", value: 4 },
+					{ name: "5", value: 5 },
+					{ name: "6", value: 6 },
+					{ name: "7", value: 7 },
+					{ name: "8", value: 8 },
+					{ name: "9", value: 9 },
+					{ name: "10", value: 10 }
 				],
 				default: DEFAULT_OPTIONS.rootOctave
 			},
 			{
-				name: 'sequence',
-				type: 'text',
+				name: "sequence",
+				type: "text",
 				enabled: true,
 				default: DEFAULT_OPTIONS.sequence
 			},
 			{
-				name: 'large',
-				type: 'select',
+				name: "large",
+				type: "select",
 				enabled: true,
 				values: [
-					{ name: '1', value: 1 },
-					{ name: '2', value: 2 },
-					{ name: '3', value: 3 },
-					{ name: '4', value: 4 },
-					{ name: '5', value: 5 },
-					{ name: '6', value: 6 },
-					{ name: '7', value: 7 },
-					{ name: '8', value: 8 },
-					{ name: '9', value: 9 },
-					{ name: '10', value: 10 },
-					{ name: '11', value: 11 },
-					{ name: '12', value: 12 }
+					{ name: "1", value: 1 },
+					{ name: "2", value: 2 },
+					{ name: "3", value: 3 },
+					{ name: "4", value: 4 },
+					{ name: "5", value: 5 },
+					{ name: "6", value: 6 },
+					{ name: "7", value: 7 },
+					{ name: "8", value: 8 },
+					{ name: "9", value: 9 },
+					{ name: "10", value: 10 },
+					{ name: "11", value: 11 },
+					{ name: "12", value: 12 }
 				],
 				default: DEFAULT_OPTIONS.large
 			},
 			{
-				name: 'small',
-				type: 'select',
+				name: "small",
+				type: "select",
 				enabled: true,
 				values: [
-					{ name: '1', value: 1 },
-					{ name: '2', value: 2 },
-					{ name: '3', value: 3 },
-					{ name: '4', value: 4 },
-					{ name: '5', value: 5 },
-					{ name: '6', value: 6 },
-					{ name: '7', value: 7 },
-					{ name: '8', value: 8 },
-					{ name: '9', value: 9 },
-					{ name: '10', value: 10 },
-					{ name: '11', value: 11 },
-					{ name: '12', value: 12 }
+					{ name: "1", value: 1 },
+					{ name: "2", value: 2 },
+					{ name: "3", value: 3 },
+					{ name: "4", value: 4 },
+					{ name: "5", value: 5 },
+					{ name: "6", value: 6 },
+					{ name: "7", value: 7 },
+					{ name: "8", value: 8 },
+					{ name: "9", value: 9 },
+					{ name: "10", value: 10 },
+					{ name: "11", value: 11 },
+					{ name: "12", value: 12 }
 				],
 				default: DEFAULT_OPTIONS.small
 			},
 			{
-				name: 'rootFrequency',
-				type: 'number',
+				name: "rootFrequency",
+				type: "number",
 				enabled: true,
 				min: 20,
 				max: 20000,
@@ -175,7 +173,7 @@ export class TransformerMicroTonality extends Transformer<Config> implements ITr
 				this.config.rootFrequency
 			)
 		} catch (error) {
-			console.error('[MICROTONALITY] Failed to initialize microtones:', error)
+			console.error("[MICROTONALITY] Failed to initialize microtones:", error)
 			this.microtones = null
 		}
 	}
@@ -197,7 +195,7 @@ export class TransformerMicroTonality extends Transformer<Config> implements ITr
 				return centsOffset - 50
 			}
 		} catch (error) {
-			console.debug('[MICROTONALITY] Error getting detune for note', midiNote, error)
+			console.debug("[MICROTONALITY] Error getting detune for note", midiNote, error)
 		}
 
 		return 0
@@ -206,8 +204,7 @@ export class TransformerMicroTonality extends Transformer<Config> implements ITr
 	/**
 	 * Transform audio commands by applying microtonal detuning to NOTE_ON commands
 	 */
-	transform(commands: IAudioCommand[], timer: Timer): IAudioCommand[] {
-
+	transform(commands: IAudioCommand[], _timer: Timer): IAudioCommand[] {
 		if (!this.config.enabled || !this.microtones || commands.length === 0) {
 			return commands
 		}
@@ -240,7 +237,11 @@ export class TransformerMicroTonality extends Transformer<Config> implements ITr
 
 		// Reinitialize microtones when any configuration changes
 		// that affects the scale calculation
-		if (['baseNoteMidi', 'rootOctave', 'sequence', 'large', 'small', 'rootFrequency'].includes(key)) {
+		if (
+			["baseNoteMidi", "rootOctave", "sequence", "large", "small", "rootFrequency"].includes(
+				key
+			)
+		) {
 			this.initializeMicrotones()
 		}
 	}
@@ -255,7 +256,3 @@ export class TransformerMicroTonality extends Transformer<Config> implements ITr
 		}
 	}
 }
-
-
-
-

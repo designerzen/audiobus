@@ -1,158 +1,158 @@
 :host {
-    display: block;
-    color: var(--color, #f7f5ef);
-    font: var(
-        --font,
-        var(--font-size, 1rem)/var(--line-height, 1.5) var(--font-family, system-ui, sans-serif)
-    );
+	display: block;
+	color: var(--color, #f7f5ef);
+	font: var(
+		--font,
+		var(--font-size, 1rem)/var(--line-height, 1.5) var(--font-family, system-ui, sans-serif)
+	);
 }
 section {
-    background: var(--background-color, var(--background, #202334));
-    border: var(--border, 1px solid var(--border-color, currentColor));
-    border-radius: var(--border-radius, 1rem);
-    padding: var(--padding, 1rem);
+	background: var(--background-color, var(--background, #202334));
+	border: var(--border, 1px solid var(--border-color, currentColor));
+	border-radius: var(--border-radius, 1rem);
+	padding: var(--padding, 1rem);
 }
 h2 {
-    margin: var(--margin, 0 0 0.5rem);
-    font-size: var(--font-size, 1.5rem);
+	margin: var(--margin, 0 0 0.5rem);
+	font-size: var(--font-size, 1.5rem);
 }
 p {
-    max-width: 65ch;
+	max-width: 65ch;
 }
 .controls {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--gap, 0.75rem);
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--gap, 0.75rem);
 }
 label {
-    display: flex;
-    align-items: center;
-    gap: var(--gap, 0.5rem);
+	display: flex;
+	align-items: center;
+	gap: var(--gap, 0.5rem);
 }
 button,
 input {
-    box-sizing: border-box;
-    min-height: 44px;
-    color: inherit;
-    background: var(--background-color, var(--background, #202334));
-    border: var(--border, 2px solid var(--border-color, currentColor));
-    border-radius: var(--border-radius, 0.5rem);
-    padding: var(--padding, 0.5rem 0.75rem);
-    font: inherit;
+	box-sizing: border-box;
+	min-height: 44px;
+	color: inherit;
+	background: var(--background-color, var(--background, #202334));
+	border: var(--border, 2px solid var(--border-color, currentColor));
+	border-radius: var(--border-radius, 0.5rem);
+	padding: var(--padding, 0.5rem 0.75rem);
+	font: inherit;
 }
 button {
-    cursor: pointer;
+	cursor: pointer;
 }
 input {
-    width: 5rem;
+	width: 5rem;
 }
 button:disabled,
 input:disabled {
-    opacity: var(--opacity, 0.55);
-    cursor: default;
+	opacity: var(--opacity, 0.55);
+	cursor: default;
 }
 button:focus-visible,
 input:focus-visible {
-    outline: var(--outline, 3px solid var(--outline-color, #ffd700));
-    outline-offset: var(--outline-offset, 3px);
+	outline: var(--outline, 3px solid var(--outline-color, #ffd700));
+	outline-offset: var(--outline-offset, 3px);
 }
 .wheel {
-    position: relative;
-    width: 100%;
-    max-width: var(--max-width, 36rem);
-    margin: var(--margin, 1rem auto);
+	position: relative;
+	width: 100%;
+	max-width: var(--max-width, 36rem);
+	margin: var(--margin, 1rem auto);
 }
 .wheel::before {
-    content: "";
-    position: absolute;
-    inset: 9.6153846%;
-    border-radius: 50%;
-    background:
-        radial-gradient(closest-side, #fff, transparent),
-        conic-gradient(from 270deg, red, yellow, lime, cyan, blue, magenta, red);
-    pointer-events: none;
+	content: "";
+	position: absolute;
+	inset: 9.6153846%;
+	border-radius: 50%;
+	background:
+		radial-gradient(closest-side, #fff, transparent),
+		conic-gradient(from 270deg, red, yellow, lime, cyan, blue, magenta, red);
+	pointer-events: none;
 }
 svg {
-    position: relative;
-    display: block;
-    width: 100%;
-    height: auto;
-    overflow: visible;
-    touch-action: none;
-    user-select: none;
+	position: relative;
+	display: block;
+	width: 100%;
+	height: auto;
+	overflow: visible;
+	touch-action: none;
+	user-select: none;
 }
 .edge {
-    fill: none;
-    stroke: var(--stroke, currentColor);
-    stroke-width: var(--stroke-width, 2px);
-    pointer-events: none;
+	fill: none;
+	stroke: var(--stroke, currentColor);
+	stroke-width: var(--stroke-width, 2px);
+	pointer-events: none;
 }
 [data-node],
 [data-rotate] {
-    cursor: grab;
+	cursor: grab;
 }
 [data-node] circle {
-    stroke: var(--stroke, #161923);
-    stroke-width: var(--stroke-width, 3px);
+	stroke: var(--stroke, #161923);
+	stroke-width: var(--stroke-width, 3px);
 }
 [data-node] text {
-    fill: #fff;
-    stroke: #000;
-    stroke-width: 4px;
-    paint-order: stroke;
-    font-size: 14px;
-    font-weight: bold;
+	fill: #fff;
+	stroke: #000;
+	stroke-width: 4px;
+	paint-order: stroke;
+	font-size: 14px;
+	font-weight: bold;
 }
 text {
-    text-anchor: middle;
-    dominant-baseline: central;
-    pointer-events: none;
+	text-anchor: middle;
+	dominant-baseline: central;
+	pointer-events: none;
 }
 [data-rotate] path {
-    fill: var(--fill, var(--key-black-background, #30384c));
-    stroke: var(--stroke, currentColor);
-    stroke-width: var(--stroke-width, 2px);
+	fill: var(--fill, var(--key-black-background, #30384c));
+	stroke: var(--stroke, currentColor);
+	stroke-width: var(--stroke-width, 2px);
 }
 [data-rotate] text {
-    fill: var(--key-black-color, #fff);
-    font-size: 28px;
+	fill: var(--key-black-color, #fff);
+	font-size: 28px;
 }
 [data-node]:focus,
 [data-rotate]:focus {
-    outline: none;
+	outline: none;
 }
 [data-node]:focus-visible circle,
 [data-rotate]:focus-visible path {
-    stroke: var(--outline-color, #ffd700);
-    stroke-width: var(--outline-width, 6px);
+	stroke: var(--outline-color, #ffd700);
+	stroke-width: var(--outline-width, 6px);
 }
 [data-active] circle {
-    stroke: var(--controller-active, var(--accent-color, #ffd700));
-    stroke-dasharray: 4 3;
+	stroke: var(--controller-active, var(--accent-color, #ffd700));
+	stroke-dasharray: 4 3;
 }
 output {
-    display: block;
-    min-height: 1.5em;
+	display: block;
+	min-height: 1.5em;
 }
 @media (forced-colors: active) {
-    .wheel::before {
-        opacity: 0.25;
-        forced-color-adjust: none;
-    }
-    [data-node] circle,
-    [data-rotate] path {
-        fill: Canvas;
-        stroke: CanvasText;
-    }
-    [data-node] text,
-    [data-rotate] text {
-        fill: CanvasText;
-        stroke: none;
-    }
-    [data-node]:focus-visible circle,
-    [data-rotate]:focus-visible path,
-    [data-active] circle {
-        stroke: Highlight;
-    }
+	.wheel::before {
+		opacity: 0.25;
+		forced-color-adjust: none;
+	}
+	[data-node] circle,
+	[data-rotate] path {
+		fill: Canvas;
+		stroke: CanvasText;
+	}
+	[data-node] text,
+	[data-rotate] text {
+		fill: CanvasText;
+		stroke: none;
+	}
+	[data-node]:focus-visible circle,
+	[data-rotate]:focus-visible path,
+	[data-active] circle {
+		stroke: Highlight;
+	}
 }

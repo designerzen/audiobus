@@ -1,5 +1,8 @@
-import { INSTRUMENT_CLASSIFICATION, type DeviceClassification } from "../io/device-classification.ts"
-import wam2Registry, { WAM2_INSTRUMENTS, wam2OutputId } from '../wam/registry'
+import {
+	INSTRUMENT_CLASSIFICATION,
+	type DeviceClassification
+} from "../io/device-classification.ts"
+import wam2Registry, { WAM2_INSTRUMENTS, wam2OutputId } from "../wam/registry"
 /**
  * Instrument Type Constants
  */
@@ -36,11 +39,19 @@ export const EXTERNAL_DATA_KEY_SAMPLE_URLS = "sampleUrls"
 /**
  * Instrument metadata for lazy loading
  */
-export interface InstrumentMetadata extends DeviceClassification<'engine'> {
+export interface InstrumentMetadata extends DeviceClassification<"engine"> {
 	id: string
 	name: string
 	description: string
-	category: "oscillator" | "synthesis" | "sampling" | "physical" | "fm" | "supercollider" | "faust" | "wam2"
+	category:
+		| "oscillator"
+		| "synthesis"
+		| "sampling"
+		| "physical"
+		| "fm"
+		| "supercollider"
+		| "faust"
+		| "wam2"
 	loader: () => Promise<any>
 	defaultOptions?: Record<string, any>
 	requiresExternalData?: string[] // e.g., ["scsynth", "sampleUrls"]
@@ -167,10 +178,11 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 INSTRUMENTS.set(INSTRUMENT_TYPE_WAM2, {
 	id: INSTRUMENT_TYPE_WAM2,
 	...INSTRUMENT_CLASSIFICATION,
-	name: 'WAM2 Instrument',
-	description: 'Play Web Audio Module instruments with a searchable catalogue or a hosted plugin URL',
+	name: "WAM2 Instrument",
+	description:
+		"Play Web Audio Module instruments with a searchable catalogue or a hosted plugin URL",
 	category: INSTRUMENT_CATEGORY_WAM2,
-	loader: () => import('./wam/wam-instrument'),
+	loader: () => import("./wam/wam-instrument")
 })
 
 for (const plugin of WAM2_INSTRUMENTS) {
@@ -182,6 +194,6 @@ for (const plugin of WAM2_INSTRUMENTS) {
 		description: `${plugin.description} — ${plugin.vendor}`,
 		category: INSTRUMENT_CATEGORY_WAM2,
 		defaultOptions: { pluginUrl: wam2Registry.getPluginUrl(plugin), name: plugin.name },
-		loader: () => import('./wam/wam-instrument'),
+		loader: () => import("./wam/wam-instrument")
 	})
 }

@@ -2,11 +2,10 @@ import type { IAudioOutput } from "./output-interface.ts"
 import { noteNumberToName } from "../../conversion/note-to-name.ts"
 import { convertNoteNumberToColour } from "../../conversion/note-to-colour.ts"
 
-export default class OutputConsole extends EventTarget implements IAudioOutput{
+export default class OutputConsole extends EventTarget implements IAudioOutput {
+	static ID: number = 0
 
-	static ID:number = 0
-
-	#uuid:string = "Output-Console-"+(OutputConsole.ID++)
+	#uuid: string = "Output-Console-" + OutputConsole.ID++
 	#activeNotes: Map<number, number> = new Map() // noteNumber -> velocity
 	#container: HTMLElement | null = null
 
@@ -14,11 +13,11 @@ export default class OutputConsole extends EventTarget implements IAudioOutput{
 		return this.#uuid
 	}
 
-	get name():string {
+	get name(): string {
 		return "Console"
 	}
 
-	get description():string {
+	get description(): string {
 		return "Outputs notes to the console and displays active notes"
 	}
 
@@ -89,7 +88,9 @@ export default class OutputConsole extends EventTarget implements IAudioOutput{
 	 * Render active notes in the container
 	 */
 	#render(): void {
-		if (!this.#container) return
+		if (!this.#container) {
+			return
+		}
 
 		this.#container.innerHTML = ""
 
@@ -102,8 +103,9 @@ export default class OutputConsole extends EventTarget implements IAudioOutput{
 		this.#container.style.color = "#333"
 
 		// Sort notes by note number and display them
-		const sortedNotes = Array.from(this.#activeNotes.entries())
-			.sort(([noteA], [noteB]) => noteA - noteB)
+		const sortedNotes = Array.from(this.#activeNotes.entries()).sort(
+			([noteA], [noteB]) => noteA - noteB
+		)
 
 		sortedNotes.forEach(([noteNumber, velocity]) => {
 			const noteName = noteNumberToName(noteNumber)
@@ -123,7 +125,7 @@ export default class OutputConsole extends EventTarget implements IAudioOutput{
 		})
 	}
 
-	noteOn(noteNumber:number, velocity: number): void {
+	noteOn(noteNumber: number, velocity: number): void {
 		const normalizedVelocity = velocity > 1 ? velocity / 127 : velocity
 		this.#activeNotes.set(noteNumber, normalizedVelocity)
 		console.info(this.uuid, "Note ON: " + noteNumber + " velocity: " + velocity)

@@ -1,8 +1,7 @@
 import type { IAudioOutput } from "./output-interface.ts"
-import { getAudioDestination } from '../../audio-destination'
+import { getAudioDestination } from "../../audio-destination"
 
 export default class OutputMetronome extends EventTarget implements IAudioOutput {
-
 	static ID: number = 0
 
 	#uuid: string = "Output-Metronome-" + OutputMetronome.ID++
@@ -40,17 +39,19 @@ export default class OutputMetronome extends EventTarget implements IAudioOutput
 		return false
 	}
 
-	constructor( audioContext:AudioContext ) {
+	constructor(audioContext: AudioContext) {
 		super()
 		if (!audioContext) {
-			throw new Error('OutputMetronome requires audioContext to be passed in constructor')
+			throw new Error("OutputMetronome requires audioContext to be passed in constructor")
 		}
 		this.#audioContext = audioContext
 		this.createGainNode()
 	}
 
 	createGainNode(): void {
-		if (!this.#audioContext) return
+		if (!this.#audioContext) {
+			return
+		}
 		this.#gainNode = this.#audioContext.createGain()
 		this.#gainNode.connect(getAudioDestination(this.#audioContext))
 		this.#gainNode.gain.value = 0.3
@@ -109,7 +110,9 @@ export default class OutputMetronome extends EventTarget implements IAudioOutput
 	 * Play a click sound
 	 */
 	#playClick(contextTime?: number): void {
-		if (!this.#audioContext || !this.#gainNode) return
+		if (!this.#audioContext || !this.#gainNode) {
+			return
+		}
 
 		try {
 			// Accent the first beat of each measure.
@@ -118,7 +121,10 @@ export default class OutputMetronome extends EventTarget implements IAudioOutput
 			const displayColor = isDownbeat ? this.#accentColor : this.#normalColor
 
 			// Create and play oscillator
-			const now = Math.max(this.#audioContext.currentTime, contextTime ?? this.#audioContext.currentTime)
+			const now = Math.max(
+				this.#audioContext.currentTime,
+				contextTime ?? this.#audioContext.currentTime
+			)
 			const oscillator = this.#audioContext.createOscillator()
 			const envelopeGain = this.#audioContext.createGain()
 
@@ -256,7 +262,9 @@ export default class OutputMetronome extends EventTarget implements IAudioOutput
 	}
 
 	#updateBeatDisplay(beatNumber: number, color: string): void {
-		if (!this.#beatDisplay) return
+		if (!this.#beatDisplay) {
+			return
+		}
 
 		const beatPosition = beatNumber % this.#beatsPerMeasure
 		const isDownbeat = beatPosition === 0

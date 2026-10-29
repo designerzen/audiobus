@@ -1,5 +1,5 @@
 import type { IAudioOutput } from "./output-interface.ts"
-import { getAudioDestination } from '../../audio-destination'
+import { getAudioDestination } from "../../audio-destination"
 
 export interface AudioAsset {
 	id: string
@@ -8,7 +8,6 @@ export interface AudioAsset {
 }
 
 export default class OutputAudioClick extends EventTarget implements IAudioOutput {
-
 	static ID: number = 0
 
 	#uuid: string = "Output-AudioClick-" + OutputAudioClick.ID++
@@ -45,7 +44,7 @@ export default class OutputAudioClick extends EventTarget implements IAudioOutpu
 	constructor(audioContext: AudioContext) {
 		super()
 		if (!audioContext) {
-			throw new Error('OutputAudioClick requires audioContext to be passed in constructor')
+			throw new Error("OutputAudioClick requires audioContext to be passed in constructor")
 		}
 		this.#audioContext = audioContext
 		this.#loadAudioManifest()
@@ -80,7 +79,7 @@ export default class OutputAudioClick extends EventTarget implements IAudioOutpu
 	 */
 	async #loadAudioManifest(): Promise<void> {
 		try {
-			const response = await fetch('/audio/audio-manifest.json')
+			const response = await fetch("/audio/audio-manifest.json")
 			const manifest = await response.json()
 			this.#audioAssets = manifest.assets || []
 
@@ -99,13 +98,19 @@ export default class OutputAudioClick extends EventTarget implements IAudioOutpu
 	 * Load and decode an audio asset
 	 */
 	async #loadAudioAsset(assetId: string): Promise<void> {
-		if (!this.#audioContext) return
+		if (!this.#audioContext) {
+			return
+		}
 
 		// Already loaded
-		if (this.#audioBuffers.has(assetId)) return
+		if (this.#audioBuffers.has(assetId)) {
+			return
+		}
 
-		const asset = this.#audioAssets.find(a => a.id === assetId)
-		if (!asset) return
+		const asset = this.#audioAssets.find((a) => a.id === assetId)
+		if (!asset) {
+			return
+		}
 
 		try {
 			const response = await fetch(`/audio/${asset.path}`)
@@ -125,7 +130,7 @@ export default class OutputAudioClick extends EventTarget implements IAudioOutpu
 	 */
 	noteOn(_noteNumber?: number, _velocity?: number): void {
 		// Increment beat counter for every MIDI clock
-		const isBarTrigger = (this.#beatCounter % (this.#beatsPerMeasure * 24)) === 0
+		const isBarTrigger = this.#beatCounter % (this.#beatsPerMeasure * 24) === 0
 
 		if (isBarTrigger) {
 			this.#playClick()
@@ -147,10 +152,14 @@ export default class OutputAudioClick extends EventTarget implements IAudioOutpu
 	 * Play the selected audio click
 	 */
 	#playClick(): void {
-		if (!this.#audioContext || !this.#selectedAssetId) return
+		if (!this.#audioContext || !this.#selectedAssetId) {
+			return
+		}
 
 		const audioBuffer = this.#audioBuffers.get(this.#selectedAssetId)
-		if (!audioBuffer) return
+		if (!audioBuffer) {
+			return
+		}
 
 		try {
 			const source = this.#audioContext.createBufferSource()
@@ -172,8 +181,10 @@ export default class OutputAudioClick extends EventTarget implements IAudioOutpu
 	 * Change the selected audio asset
 	 */
 	async selectAsset(assetId: string): Promise<void> {
-		const asset = this.#audioAssets.find(a => a.id === assetId)
-		if (!asset) return
+		const asset = this.#audioAssets.find((a) => a.id === assetId)
+		if (!asset) {
+			return
+		}
 
 		this.#selectedAssetId = assetId
 		await this.#loadAudioAsset(assetId)
@@ -247,7 +258,7 @@ export default class OutputAudioClick extends EventTarget implements IAudioOutpu
 
 		// Wait for assets to load
 		if (this.#audioAssets.length === 0) {
-			await new Promise(resolve => setTimeout(resolve, 100))
+			await new Promise((resolve) => setTimeout(resolve, 100))
 		}
 
 		this.#audioAssets.forEach((asset) => {

@@ -1,4 +1,4 @@
-import { NOTE_ON, NOTE_OFF } from '../../commands.ts'
+import { NOTE_ON, NOTE_OFF } from "../../commands.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 import { convertNoteNumberToColour } from "../../conversion/note-to-colour.ts"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
@@ -32,11 +32,10 @@ export default class OutputSpectrumAnalyser extends EventTarget implements IAudi
 	get isConnected(): boolean {
 		return this.#analyser !== null
 	}
-	
+
 	get isHidden(): boolean {
 		return false
 	}
-
 
 	constructor(audioNodeToAnalyse: GainNode, audioContext?: AudioContext) {
 		super()
@@ -45,26 +44,27 @@ export default class OutputSpectrumAnalyser extends EventTarget implements IAudi
 			context = (audioNodeToAnalyse as any).context
 		}
 		if (!context) {
-			throw new Error('OutputSpectrumAnalyser requires AudioContext - pass it explicitly or ensure mixerNode.context exists')
+			throw new Error(
+				"OutputSpectrumAnalyser requires AudioContext - pass it explicitly or ensure mixerNode.context exists"
+			)
 		}
-		
+
 		// Create analyser node
 		this.#analyser = context.createAnalyser()
 		this.#analyser.fftSize = this.#fftSize
-		
+
 		// Connect mixer to analyser
 		audioNodeToAnalyse.connect(this.#analyser)
-		
+
 		// Create data buffer
 		const bufferLength = this.#analyser.frequencyBinCount
 		this.#dataArray = new Uint8Array(bufferLength)
-		
+
 		// Create GUI and start visualization
 		this.createGui()
 		this.#startVisualization()
 	}
 
-	
 	hasMidiOutput(): boolean {
 		return false
 	}
@@ -84,7 +84,6 @@ export default class OutputSpectrumAnalyser extends EventTarget implements IAudi
 		return false
 	}
 
-
 	async createGui(): Promise<HTMLCanvasElement> {
 		// Clear existing canvas
 		if (this.#canvas) {
@@ -100,7 +99,7 @@ export default class OutputSpectrumAnalyser extends EventTarget implements IAudi
 
 		// Transfer control to OffscreenCanvas immediately (must be before initializing worker)
 		this.#offscreenCanvas = this.#canvas.transferControlToOffscreen()
-		
+
 		// Initialize worker with the OffscreenCanvas
 		this.#initializeWorker()
 
@@ -115,10 +114,10 @@ export default class OutputSpectrumAnalyser extends EventTarget implements IAudi
 		this.#offscreenCanvas = null
 	}
 
-
-
 	#startVisualization(): void {
-		if (this.#isRunning) return
+		if (this.#isRunning) {
+			return
+		}
 		this.#isRunning = true
 		this.#animate()
 	}
@@ -126,7 +125,9 @@ export default class OutputSpectrumAnalyser extends EventTarget implements IAudi
 	#animate = (): void => {
 		this.#animationFrameId = requestAnimationFrame(this.#animate)
 
-		if (!this.#analyser || !this.#worker || !this.#canvas) return
+		if (!this.#analyser || !this.#worker || !this.#canvas) {
+			return
+		}
 
 		// Get waveform data (time-domain)
 		// @ts-ignore - Web Audio API type issue
@@ -135,16 +136,18 @@ export default class OutputSpectrumAnalyser extends EventTarget implements IAudi
 		// Send waveform data to worker
 		const dataCopy = Array.from(this.#dataArray)
 		this.#worker.postMessage({
-			type: 'render',
+			type: "render",
 			waveformData: new Uint8Array(dataCopy),
 			width: this.#canvas.width,
 			height: this.#canvas.height,
-			now: Date.now(),
+			now: Date.now()
 		})
 	}
 
 	#initializeWorker(): void {
-		if (!this.#offscreenCanvas) return
+		if (!this.#offscreenCanvas) {
+			return
+		}
 
 		const workerCode = `
 			let canvas;
@@ -241,26 +244,26 @@ export default class OutputSpectrumAnalyser extends EventTarget implements IAudi
 					ctx.globalAlpha = 1;
 				}
 			}
-		`;
+		`
 
-		const blob = new Blob([workerCode], { type: 'application/javascript' })
+		const blob = new Blob([workerCode], { type: "application/javascript" })
 		const workerUrl = URL.createObjectURL(blob)
 		this.#worker = new Worker(workerUrl)
 
 		// Send OffscreenCanvas to worker
 		this.#worker.postMessage(
 			{
-				type: 'init',
-				offscreenCanvas: this.#offscreenCanvas,
+				type: "init",
+				offscreenCanvas: this.#offscreenCanvas
 			},
 			[this.#offscreenCanvas as any]
 		)
 	}
 
-
-
 	#stopVisualization(): void {
-		if (!this.#isRunning) return
+		if (!this.#isRunning) {
+			return
+		}
 		this.#isRunning = false
 		if (this.#animationFrameId !== null) {
 			cancelAnimationFrame(this.#animationFrameId)
@@ -281,7 +284,9 @@ export default class OutputSpectrumAnalyser extends EventTarget implements IAudi
 	}
 
 	noteOn(note: number, velocity: number): void {
-		if (!this.#worker) return
+		if (!this.#worker) {
+			return
+		}
 
 		const frequency = noteNumberToFrequency(note)
 		const color = convertNoteNumberToColour(note, 12, velocity)
@@ -292,24 +297,28 @@ export default class OutputSpectrumAnalyser extends EventTarget implements IAudi
 			velocity,
 			frequency,
 			color,
-			now: Date.now(),
+			now: Date.now()
 		})
 	}
 
 	noteOff(note: number): void {
-		if (!this.#worker) return
+		if (!this.#worker) {
+			return
+		}
 
 		this.#worker.postMessage({
 			type: NOTE_OFF,
-			note,
+			note
 		})
 	}
 
 	allNotesOff(): void {
-		if (!this.#worker) return
+		if (!this.#worker) {
+			return
+		}
 
 		this.#worker.postMessage({
-			type: 'allNotesOff',
+			type: "allNotesOff"
 		})
 	}
 }

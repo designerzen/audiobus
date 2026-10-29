@@ -41,7 +41,7 @@ export class NotationStaff {
 			staffLineCount: config.staffLineCount ?? 5,
 			lineSpacing: config.lineSpacing ?? 12,
 			noteRadius: config.noteRadius ?? 6,
-			staffPadding: config.staffPadding ?? 40,
+			staffPadding: config.staffPadding ?? 40
 		}
 
 		// Create canvas
@@ -70,7 +70,7 @@ export class NotationStaff {
 	noteOn(noteNumber: number, velocity: number = 127): void {
 		this.activeNotes.set(noteNumber, {
 			noteNumber,
-			velocity: Math.max(0, Math.min(127, velocity)),
+			velocity: Math.max(0, Math.min(127, velocity))
 		})
 		this.render()
 	}
@@ -117,9 +117,17 @@ export class NotationStaff {
 	 * Draw the musical staff lines and ledger lines
 	 */
 	private drawStaff(): void {
-		const { width, height, staffLineCount, lineSpacing, staffPadding, lineColor, ledgerLineColor } = this.config
+		const {
+			width,
+			height,
+			staffLineCount,
+			lineSpacing,
+			staffPadding,
+			lineColor,
+			ledgerLineColor
+		} = this.config
 
-		const topMargin = height / 2 - (staffLineCount - 1) * lineSpacing / 2
+		const topMargin = height / 2 - ((staffLineCount - 1) * lineSpacing) / 2
 		const bottomLine = topMargin + (staffLineCount - 1) * lineSpacing
 		const topLine = topMargin
 
@@ -181,7 +189,7 @@ export class NotationStaff {
 	private drawNotes(): void {
 		const { height, staffLineCount, lineSpacing } = this.config
 
-		const topMargin = height / 2 - (staffLineCount - 1) * lineSpacing / 2
+		const topMargin = height / 2 - ((staffLineCount - 1) * lineSpacing) / 2
 
 		// Group notes by Y position to handle simultaneous notes
 		const notesByY: Map<number, StaffNote[]> = new Map()

@@ -1,126 +1,126 @@
 :host {
-    display: block;
-    color: var(--color, #f7f5ef);
-    font: var(
-        --font,
-        var(--font-size, 1rem)/var(--line-height, 1.5) var(--font-family, system-ui, sans-serif)
-    );
+	display: block;
+	color: var(--color, #f7f5ef);
+	font: var(
+		--font,
+		var(--font-size, 1rem)/var(--line-height, 1.5) var(--font-family, system-ui, sans-serif)
+	);
 }
 section {
-    padding: var(--padding, 1rem);
-    background: var(--background-color, var(--background, #191d2a));
-    border: var(--border, 1px solid var(--border-color, currentColor));
-    border-radius: var(--border-radius, 12px);
+	padding: var(--padding, 1rem);
+	background: var(--background-color, var(--background, #191d2a));
+	border: var(--border, 1px solid var(--border-color, currentColor));
+	border-radius: var(--border-radius, 12px);
 }
 h2 {
-    margin: var(--margin, 0 0 1rem);
-    font-size: var(--font-size, 1.25rem);
+	margin: var(--margin, 0 0 1rem);
+	font-size: var(--font-size, 1.25rem);
 }
 .controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--gap, 1rem);
-    align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--gap, 1rem);
+	align-items: center;
 }
 label {
-    display: flex;
-    align-items: center;
-    gap: var(--gap, 0.5rem);
+	display: flex;
+	align-items: center;
+	gap: var(--gap, 0.5rem);
 }
 input {
-    box-sizing: border-box;
-    min-height: 44px;
-    width: 5rem;
-    color: inherit;
-    background: var(--background, #191d2a);
-    border: 1px solid currentColor;
-    border-radius: var(--border-radius, 6px);
-    font: inherit;
-    padding: 0.4rem;
+	box-sizing: border-box;
+	min-height: 44px;
+	width: 5rem;
+	color: inherit;
+	background: var(--background, #191d2a);
+	border: 1px solid currentColor;
+	border-radius: var(--border-radius, 6px);
+	font: inherit;
+	padding: 0.4rem;
 }
 input[type="checkbox"] {
-    width: 24px;
-    accent-color: var(--accent-color, #ffd700);
+	width: 24px;
+	accent-color: var(--accent-color, #ffd700);
 }
 p {
-    font-size: var(--font-size, 0.9rem);
+	font-size: var(--font-size, 0.9rem);
 }
 svg {
-    display: block;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 10 / 3;
-    min-height: 264px;
-    overflow: visible;
-    touch-action: none;
-    user-select: none;
+	display: block;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 10 / 3;
+	min-height: 264px;
+	overflow: visible;
+	touch-action: none;
+	user-select: none;
 }
 rect {
-    fill: var(--key-colour, var(--key-black-background, #30384c));
-    stroke: var(--stroke, #8d96ab);
-    stroke-width: var(--stroke-width, 1px);
+	fill: var(--key-colour, var(--key-black-background, #30384c));
+	stroke: var(--stroke, #8d96ab);
+	stroke-width: var(--stroke-width, 1px);
 }
 text {
-    fill: var(--key-black-color, #f7f5ef);
-    text-anchor: middle;
-    dominant-baseline: middle;
-    pointer-events: none;
+	fill: var(--key-black-color, #f7f5ef);
+	text-anchor: middle;
+	dominant-baseline: middle;
+	pointer-events: none;
 }
 .bend-zone {
-    stroke: var(--stroke, #8d96ab);
-    stroke-dasharray: 4 5;
-    fill: none;
-    pointer-events: none;
+	stroke: var(--stroke, #8d96ab);
+	stroke-dasharray: 4 5;
+	fill: none;
+	pointer-events: none;
 }
 [data-pad] {
-    cursor: pointer;
+	cursor: pointer;
 }
 [data-pad]:focus {
-    outline: none;
+	outline: none;
 }
 [data-pad]:focus-visible rect {
-    stroke: var(--outline-color, #ffd700);
-    stroke-width: var(--outline-width, 5px);
+	stroke: var(--outline-color, #ffd700);
+	stroke-width: var(--outline-width, 5px);
 }
 [data-active] rect {
-    fill: var(--controller-active, var(--key-active-background, #66550d));
-    stroke: var(--accent-color, #ffd700);
+	fill: var(--controller-active, var(--key-active-background, #66550d));
+	stroke: var(--accent-color, #ffd700);
 }
 [data-active] text {
-    fill: var(--key-active-color, #f7f5ef);
+	fill: var(--key-active-color, #f7f5ef);
 }
 :host([inverted]) svg {
-    min-height: 528px;
+	min-height: 528px;
 }
 [aria-disabled="true"] {
-    cursor: default;
-    opacity: var(--opacity, 0.55);
+	cursor: default;
+	opacity: var(--opacity, 0.55);
 }
 output {
-    display: block;
-    min-height: 1.5em;
-    margin-top: 0.75rem;
+	display: block;
+	min-height: 1.5em;
+	margin-top: 0.75rem;
 }
 @media (max-width: 600px) {
-    svg {
-        min-height: 264px;
-    }
+	svg {
+		min-height: 264px;
+	}
 }
 @media (forced-colors: active) {
-    rect {
-        fill: Canvas;
-        stroke: CanvasText;
-    }
-    text {
-        fill: CanvasText;
-    }
-    [data-active] rect {
-        fill: Highlight;
-    }
-    [data-active] text {
-        fill: HighlightText;
-    }
-    [data-pad]:focus-visible rect {
-        stroke: Highlight;
-    }
+	rect {
+		fill: Canvas;
+		stroke: CanvasText;
+	}
+	text {
+		fill: CanvasText;
+	}
+	[data-active] rect {
+		fill: Highlight;
+	}
+	[data-active] text {
+		fill: HighlightText;
+	}
+	[data-pad]:focus-visible rect {
+		stroke: Highlight;
+	}
 }

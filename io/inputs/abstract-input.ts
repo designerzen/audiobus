@@ -1,17 +1,16 @@
-import { EVENT_CONNECTION_CHANGED } from '../../event-constants.ts'
+import { EVENT_CONNECTION_CHANGED } from "../../event-constants.ts"
 /**
- * 
+ *
  */
 import InputAudioEvent from "../events/input-audio-event.ts"
 import type { IAudioInput } from "./input-interface.ts"
 import type { IAudioCommand } from "../../audio-command-interface.ts"
 
-const DEFAULT_OPTIONS:Record<string, any> = {
+const DEFAULT_OPTIONS: Record<string, any> = {
 	now: () => performance.now()
 }
 
-export default abstract class AbstractInput extends EventTarget implements IAudioInput{
-	
+export default abstract class AbstractInput extends EventTarget implements IAudioInput {
 	/**
 	 * @property {Function} parameterDescriptors Get the custom parameters of the processor.
 	 *
@@ -22,48 +21,48 @@ export default abstract class AbstractInput extends EventTarget implements IAudi
 	}
 	*/
 
-    static ID:number = 0
+	static ID: number = 0
 
-    static getUniqueID( name: string ) {
-		return `input-${name}-${ String(AbstractInput.ID++) }`
-    }
+	static getUniqueID(name: string) {
+		return `input-${name}-${String(AbstractInput.ID++)}`
+	}
 
-    #uuid: string
-	#options:Record<string, any>
-	#connected:boolean = false
+	#uuid: string
+	#options: Record<string, any>
+	#connected: boolean = false
 
-	get uuid():string{
+	get uuid(): string {
 		return this.#uuid
 	}
 
-	get name():string {
+	get name(): string {
 		return "InputDevice"
 	}
 
-	get description():string {
+	get description(): string {
 		return "Abstract input device"
 	}
 
-	get options():Record<string, any> {
+	get options(): Record<string, any> {
 		return this.#options
 	}
 
-	get isConnected():boolean {
+	get isConnected(): boolean {
 		return this.#connected
 	}
 
-	get isHidden():boolean {
+	get isHidden(): boolean {
 		return false
 	}
 
-	get now():number {
+	get now(): number {
 		return this.#options?.now() ?? performance.now
 	}
 
-	constructor(options:Record<string, any> = DEFAULT_OPTIONS) {
+	constructor(options: Record<string, any> = DEFAULT_OPTIONS) {
 		super()
-		this.#options = {...DEFAULT_OPTIONS, ...options}
-        this.#uuid = AbstractInput.getUniqueID(this.name)
+		this.#options = { ...DEFAULT_OPTIONS, ...options }
+		this.#uuid = AbstractInput.getUniqueID(this.name)
 	}
 
 	// createGui?(): Promise<HTMLElement> {
@@ -75,7 +74,7 @@ export default abstract class AbstractInput extends EventTarget implements IAudi
 
 	/**
 	 * Overwrite these as applicable
-	 * @returns 
+	 * @returns
 	 */
 	hasAudioInput(): boolean {
 		return false
@@ -96,24 +95,28 @@ export default abstract class AbstractInput extends EventTarget implements IAudi
 		return false
 	}
 
-	setAsConnected():void{
-		if (this.#connected) return
+	setAsConnected(): void {
+		if (this.#connected) {
+			return
+		}
 		this.#connected = true
 		this.dispatchEvent(new Event(EVENT_CONNECTION_CHANGED))
 	}
-	
-	setAsDisconnected():void{
-		if (!this.#connected) return
+
+	setAsDisconnected(): void {
+		if (!this.#connected) {
+			return
+		}
 		this.#connected = false
 		this.dispatchEvent(new Event(EVENT_CONNECTION_CHANGED))
 	}
 
-	dispatch(command:IAudioCommand, origin: object = {}):void {
-		const event:InputAudioEvent = new InputAudioEvent( command, origin )
-		this.dispatchEvent( event )
+	dispatch(command: IAudioCommand, origin: object = {}): void {
+		const event: InputAudioEvent = new InputAudioEvent(command, origin)
+		this.dispatchEvent(event)
 	}
 
-	destroy():void{
+	destroy(): void {
 		throw new Error("AbstractInput::destroy() must be implemented in subclasses.")
 	}
 }

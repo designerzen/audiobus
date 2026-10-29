@@ -1,4 +1,4 @@
-import { QUARTER } from './constants'
+import { QUARTER } from "./constants"
 
 /**
  * Convert seconds to pulses at a given BPM
@@ -6,4 +6,5 @@ import { QUARTER } from './constants'
  * @param bpm Beats per minute
  * @returns Number of pulses (PPQN units)
  */
-export const secondsToPulses = (seconds: number, bpm: number): number => seconds * bpm / 60 * QUARTER
+export const secondsToPulses = (seconds: number, bpm: number): number =>
+	((seconds * bpm) / 60) * QUARTER

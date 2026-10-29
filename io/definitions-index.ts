@@ -5,8 +5,8 @@
  * Provides unified access to metadata for inputs, outputs, and transformers
  */
 
-import type { DeviceClassification } from './device-classification.ts'
-export * from './device-classification.ts'
+import type { DeviceClassification } from "./device-classification.ts"
+export * from "./device-classification.ts"
 
 // Input definitions
 export {
@@ -14,7 +14,7 @@ export {
 	getInputDefinition,
 	getInputIcon,
 	getInputsByCategory,
-	type InputDefinition,
+	type InputDefinition
 } from "./input-definitions.ts"
 
 // Output definitions
@@ -23,7 +23,7 @@ export {
 	getOutputDefinition,
 	getOutputIcon,
 	getOutputsByCategory,
-	type OutputDefinition,
+	type OutputDefinition
 } from "./output-definitions.ts"
 
 // Transformer definitions
@@ -32,7 +32,7 @@ export {
 	getTransformerDefinition,
 	getTransformerIcon,
 	getTransformersByCategory,
-	type TransformerDefinition,
+	type TransformerDefinition
 } from "./transformer-definitions.ts"
 
 /**
@@ -75,9 +75,7 @@ export async function getAllDeviceDefinitions(): Promise<DeviceDefinition[]> {
 /**
  * Get all devices grouped by category
  */
-export async function getAllDevicesByCategory(): Promise<
-	Record<string, DeviceDefinition[]>
-> {
+export async function getAllDevicesByCategory(): Promise<Record<string, DeviceDefinition[]>> {
 	const grouped: Record<string, DeviceDefinition[]> = {}
 	const devices = await getAllDeviceDefinitions()
 

@@ -7,7 +7,7 @@
  * CLAP Patch Configuration
  * Represents a CLAP plugin patch with its metadata
  */
-import type { DeviceClassification, DeviceAttribution } from '../../io/device-classification'
+import type { DeviceClassification, DeviceAttribution } from "../../io/device-classification"
 
 export interface CLAPPatch {
 	id: string
@@ -20,7 +20,7 @@ export interface CLAPPatch {
 	factory?: string // Factory ID within the plugin
 	features?: string[]
 	title?: string
-	type?: DeviceClassification['type']
-	subtype?: DeviceClassification['subtype']
+	type?: DeviceClassification["type"]
+	subtype?: DeviceClassification["subtype"]
 	attribution?: DeviceAttribution
 }

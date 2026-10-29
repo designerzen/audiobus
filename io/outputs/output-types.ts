@@ -4,13 +4,13 @@
  */
 
 export const CONSOLE = "console" as const
-export const NOTE_MONITOR = 'note-monitor' as const
+export const NOTE_MONITOR = "note-monitor" as const
 export const SION = "sion" as const
-export const SAMPLE_PLAYER = 'sample-player' as const
-export const EVENT_RECORDER = 'event-recorder' as const
-export const OSC = 'osc' as const
-export const PERFORMANCE = 'performance' as const
-export const RECORDER = 'recorder' as const
+export const SAMPLE_PLAYER = "sample-player" as const
+export const EVENT_RECORDER = "event-recorder" as const
+export const OSC = "osc" as const
+export const PERFORMANCE = "performance" as const
+export const RECORDER = "recorder" as const
 export const DESCRIBE = "describe" as const
 export const PINK_TROMBONE = "pink-trombone" as const
 export const NOTATION = "notation" as const
@@ -19,8 +19,8 @@ export const SPEECH_SYNTHESIS = "speech-synthesis" as const
 export const VIBRATOR = "vibrator" as const
 export const WAM2 = "wam2" as const
 export const MOOG = "moog" as const
-export const TB303 = 'tb303' as const
-export const SYNTH_303 = '303' as const
+export const TB303 = "tb303" as const
+export const SYNTH_303 = "303" as const
 export const WAM = "wam" as const
 export const YOSHIMI = "yoshimi" as const
 export const WEBMIDI = "webmidi" as const
@@ -31,20 +31,21 @@ export const MIDI2_NATIVE = "midi2-native" as const
 export const SUPERSONIC = "supersonic" as const
 export const METRONOME = "metronome" as const
 export const AUDIO_CLICK = "audio-click" as const
-export const DRUM_ACCOMPANIMENT = 'drum-accompaniment' as const
-export const DRUM_KIT = 'drum-kit' as const
+export const DRUM_ACCOMPANIMENT = "drum-accompaniment" as const
+export const DRUM_KIT = "drum-kit" as const
 export const BUTTERCHURN = "butterchurn" as const
-export const WEBCLAP_PREFIX = 'webclap:' as const
-export const webclapOutputId = (pluginId: string): `webclap:${string}` => `${WEBCLAP_PREFIX}${pluginId}`
+export const WEBCLAP_PREFIX = "webclap:" as const
+export const webclapOutputId = (pluginId: string): `webclap:${string}` =>
+	`${WEBCLAP_PREFIX}${pluginId}`
 
 export type OutputId =
-    | typeof SION
-    | typeof NOTE_MONITOR
-    | typeof SAMPLE_PLAYER
-    | typeof EVENT_RECORDER
-    | typeof OSC
-    | typeof PERFORMANCE
-    | typeof RECORDER
+	| typeof SION
+	| typeof NOTE_MONITOR
+	| typeof SAMPLE_PLAYER
+	| typeof EVENT_RECORDER
+	| typeof OSC
+	| typeof PERFORMANCE
+	| typeof RECORDER
 	| `webclap:${string}`
 	| typeof CONSOLE
 	| typeof DESCRIBE

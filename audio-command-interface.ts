@@ -1,39 +1,39 @@
 export interface IAudioCommand {
-    
-    // Handy places to store information about this command
-	id:number
-	
-    type:string
+	// Handy places to store information about this command
+	id: string | number
+	previous?: IAudioCommand
+	next?: IAudioCommand
+
+	type: string
 	bpm?: number
-	subtype:string
-    number:number
+	subtype: string
+	number: number
 
-    channel:number
+	channel: number
 
-    // Recording provenance when the same input feeds multiple chains.
-    chainId?: string
-    chainName?: string
+	// Recording provenance when the same input feeds multiple chains.
+	chainId?: string
+	chainName?: string
 
-    // velocity / amplitude value
-    velocity:number
-    startAt:number
-    endAt:number
+	// velocity / amplitude value
+	velocity: number
+	startAt: number
+	endAt: number
 
 	// pitch value from MIDI is 0 -> 16383
-	value:number
-	pitchBend:number
+	value: number
+	pitchBend: number
 
-	time:number
-    timeCode:number
+	time: number
+	timeCode: number
 
-	text:string
-
+	text: string
 
 	// UNOFFICAl: Uint8Array
-	raw:Uint8Array
-    // Preserve native UMP precision alongside the MIDI 1-compatible command fields.
-    ump?: number[]
-    umpOriginal?: { type: string; number: number; velocity: number; value: number }
+	raw: Uint8Array
+	// Preserve native UMP precision alongside the MIDI 1-compatible command fields.
+	ump?: number[]
+	umpOriginal?: { type: string; number: number; velocity: number; value: number }
 	// UNOFFICIAL: From Device (uuid)
-	from:string
+	from: string
 }

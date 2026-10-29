@@ -1,17 +1,17 @@
 /**
  * DVS Control Vinyl Input - Serato v2
- * 
+ *
  * Captures line-in audio from a Serato v2 control vinyl/CD signal,
  * estimates relative speed from the pilot tone in an AudioWorklet, and
  * dispatches CLOCK signal AudioCommands for synchronization.
- * 
+ *
  * This pilot-tone tracker generates relative clock ticks. It does not
  * decode absolute timecode position or determine rotation direction.
  */
 import AbstractInput from "./abstract-input.ts"
-import { loadCaptureWorklet } from './load-capture-worklet.ts'
+import { loadCaptureWorklet } from "./load-capture-worklet.ts"
 import { createAudioCommand } from "../../audio-command-factory.ts"
-import { DVS_CLOCK, MIDI_CLOCK } from '../../commands.ts'
+import { DVS_CLOCK, MIDI_CLOCK } from "../../commands.ts"
 
 import type { IAudioInput } from "./input-interface.ts"
 import type { IAudioCommand } from "../../audio-command-interface.ts"
@@ -40,7 +40,7 @@ const DEFAULT_OPTIONS = {
 	referenceRPM: REFERENCE_RPM,
 	minSignalThreshold: MIN_SIGNAL_THRESHOLD,
 	speedSmoothing: SPEED_SMOOTHING,
-	useMidiClock: false,
+	useMidiClock: false
 }
 
 const WORKLET_PROCESSOR_CODE = `
@@ -224,7 +224,7 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 		speed: 0,
 		direction: 0,
 		tickCount: 0,
-		bpm: 0,
+		bpm: 0
 	}
 
 	get name(): string {
@@ -245,13 +245,17 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 
 	constructor(options: Record<string, any> = DEFAULT_OPTIONS) {
 		super({ ...DEFAULT_OPTIONS, ...options })
-		for (const name of ['ticksPerRevolution', 'referenceRPM', 'minSignalThreshold']) {
+		for (const name of ["ticksPerRevolution", "referenceRPM", "minSignalThreshold"]) {
 			if (!Number.isFinite(this.options[name]) || this.options[name] <= 0) {
 				throw new RangeError(`${name} must be positive and finite`)
 			}
 		}
-		if (!Number.isFinite(this.options.speedSmoothing) || this.options.speedSmoothing < 0 || this.options.speedSmoothing >= 1) {
-			throw new RangeError('speedSmoothing must be between 0 (inclusive) and 1 (exclusive)')
+		if (
+			!Number.isFinite(this.options.speedSmoothing) ||
+			this.options.speedSmoothing < 0 ||
+			this.options.speedSmoothing >= 1
+		) {
+			throw new RangeError("speedSmoothing must be between 0 (inclusive) and 1 (exclusive)")
 		}
 	}
 
@@ -260,18 +264,20 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 	}
 
 	async connect(): Promise<Function> {
-		if (this.#isListening) return () => this.disconnect()
+		if (this.#isListening) {
+			return () => this.disconnect()
+		}
 		if (!this.options.audioContext) {
-			throw new Error('InputDvsControlVinyl requires audioContext to be passed via options')
+			throw new Error("InputDvsControlVinyl requires audioContext to be passed via options")
 		}
 
 		const audioContext: AudioContext = this.options.audioContext
-		await loadCaptureWorklet(audioContext, 'dvs-decoder-processor', WORKLET_PROCESSOR_CODE)
+		await loadCaptureWorklet(audioContext, "dvs-decoder-processor", WORKLET_PROCESSOR_CODE)
 
 		const audioConstraints: MediaTrackConstraints = {
 			echoCancellation: false,
 			noiseSuppression: false,
-			autoGainControl: false,
+			autoGainControl: false
 		}
 
 		if (this.options.deviceId) {
@@ -286,13 +292,13 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 
 		this.#sourceNode = audioContext.createMediaStreamSource(this.#mediaStream)
 
-		this.#workletNode = new AudioWorkletNode(audioContext, 'dvs-decoder-processor', {
+		this.#workletNode = new AudioWorkletNode(audioContext, "dvs-decoder-processor", {
 			processorOptions: {
 				pilotFrequency: PILOT_FREQUENCY,
 				threshold: this.options.minSignalThreshold,
 				ticksPerRevolution: this.options.ticksPerRevolution,
 				referenceRPM: this.options.referenceRPM,
-				speedSmoothing: this.options.speedSmoothing,
+				speedSmoothing: this.options.speedSmoothing
 			}
 		})
 
@@ -305,7 +311,7 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 
 		console.info("[DVS Control Vinyl] Connected and listening", {
 			sampleRate: audioContext.sampleRate,
-			deviceId: this.options.deviceId || 'default',
+			deviceId: this.options.deviceId || "default"
 		})
 
 		return () => this.disconnect()
@@ -326,23 +332,32 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 		}
 
 		if (this.#mediaStream) {
-			this.#mediaStream.getTracks().forEach(track => track.stop())
+			this.#mediaStream.getTracks().forEach((track) => track.stop())
 			this.#mediaStream = null
 		}
 
 		this.#tickTimes = []
 		this.#tickCount = 0
-		this.#stats = { signalLevel: 0, hasSignal: false, speed: 0, direction: 0, tickCount: 0, bpm: 0 }
+		this.#stats = {
+			signalLevel: 0,
+			hasSignal: false,
+			speed: 0,
+			direction: 0,
+			tickCount: 0,
+			bpm: 0
+		}
 		this.setAsDisconnected()
 		console.info("[DVS Control Vinyl] Disconnected")
 	}
 
 	#onWorkletMessage(data: any): void {
-		if (!this.#isListening) return
+		if (!this.#isListening) {
+			return
+		}
 
-		if (data.type === 'tick') {
+		if (data.type === "tick") {
 			this.#handleTick(data)
-		} else if (data.type === 'status') {
+		} else if (data.type === "status") {
 			this.#stats.signalLevel = data.signalLevel
 			this.#stats.hasSignal = data.hasSignal
 			this.#stats.speed = data.speed
@@ -374,7 +389,7 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 			const timeSpan = this.#tickTimes[this.#tickTimes.length - 1] - this.#tickTimes[0]
 			const tickCount = this.#tickTimes.length - 1
 			if (timeSpan > 0) {
-				this.#stats.bpm = 60 * tickCount / (timeSpan * 24)
+				this.#stats.bpm = (60 * tickCount) / (timeSpan * 24)
 			}
 		}
 
@@ -390,7 +405,7 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 		command.value = speed * 1000
 		command.bpm = this.#stats.bpm
 		command.velocity = Math.abs(direction) * 127
-		command.text = 'direction unknown'
+		command.text = "direction unknown"
 		this.dispatch(command)
 	}
 
