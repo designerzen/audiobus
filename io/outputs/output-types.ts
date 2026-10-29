@@ -20,7 +20,7 @@ export const VIBRATOR = "vibrator" as const
 export const WAM2 = "wam2" as const
 export const MOOG = "moog" as const
 export const TB303 = 'tb303' as const
-export const AUDIOBUS_303 = 'audiobus-303' as const
+export const SYNTH_303 = '303' as const
 export const WAM = "wam" as const
 export const YOSHIMI = "yoshimi" as const
 export const WEBMIDI = "webmidi" as const
@@ -56,7 +56,7 @@ export type OutputId =
 	| typeof WAM2
 	| typeof MOOG
 	| typeof TB303
-	| typeof AUDIOBUS_303
+	| typeof SYNTH_303
 	| typeof WAM
 	| typeof YOSHIMI
 	| typeof WEBMIDI

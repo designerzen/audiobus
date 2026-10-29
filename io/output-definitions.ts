@@ -27,8 +27,8 @@ export interface OutputDefinition extends DeviceClassification {
 }
 
 export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
-    [OUTPUT_TYPES.AUDIOBUS_303]: {
-        id: OUTPUT_TYPES.AUDIOBUS_303, name: 'AudioBus 303',
+    [OUTPUT_TYPES.SYNTH_303]: {
+        id: OUTPUT_TYPES.SYNTH_303, name: '303',
         description: 'Original AudioBus wavetable bass synthesis with slide, accent, foldback distortion and delay',
         type: 'engine', subtype: 'instrument', category: 'Synthesis', icon: '/icons/output-tb303.svg',
         attribution: { author: 'Emil Loer; AudioBus port by designerzen',
