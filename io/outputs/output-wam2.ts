@@ -24,13 +24,13 @@ export default class OutputWAM2 extends EventTarget implements IAudioOutput {
     #silentInput: GainNode | null = null
     #activeNotes = new Set<string>()
 
-    constructor(context: AudioContext, pluginUrl = '', name = 'WAM2', destination?: AudioNode) {
+    constructor(context: AudioContext, pluginUrl = '', name = 'WAM2', destination?: AudioNode | null) {
         super()
         this.context = context
         this.#url = pluginUrl
         this.#name = name
         this.#output = context.createGain()
-        this.#output.connect(destination ?? context.destination)
+        if (destination !== null) this.#output.connect(destination ?? context.destination)
     }
     get name() { return this.#name }
     get description() { return `${this.label} instrument output` }

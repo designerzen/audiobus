@@ -978,6 +978,222 @@
           "summary": "Arpeggiator — plays chord tones down at 1/4 spacing, synced to tempo."
         }
       ]
+    },
+    {
+      "id": "gentle-strummed-chords",
+      "name": "Gentle Strummed Chords",
+      "category": "Chords & accompaniment",
+      "description": "Turn one-finger chords into soft alternating strokes.",
+      "useCase": "Play single notes to sketch a strummed accompaniment.",
+      "steps": [
+        {
+          "type": "Chordifier",
+          "config": {
+            "root": 3,
+            "mode": "ionian",
+            "simultaneous": 3
+          },
+          "summary": "Build diatonic triads."
+        },
+        {
+          "type": "Velocity-Shaper",
+          "config": {
+            "curve": 0.75,
+            "minimum": 35,
+            "maximum": 95
+          },
+          "summary": "Keep dynamics gentle."
+        },
+        {
+          "type": "Strummer",
+          "config": {
+            "direction": "alternate",
+            "spread": 80,
+            "collect": 25
+          },
+          "summary": "Alternate up and down strokes."
+        }
+      ]
+    },
+    {
+      "id": "smooth-chord-voices",
+      "name": "Smooth Chord Voices",
+      "category": "Chords & accompaniment",
+      "description": "Keep chord changes in a comfortable register with less voice movement.",
+      "useCase": "Play chords or single-note chord roots.",
+      "steps": [
+        {
+          "type": "Chordifier",
+          "config": {
+            "root": 3,
+            "mode": "ionian",
+            "simultaneous": 3
+          },
+          "summary": "Generate chords in C major."
+        },
+        {
+          "type": "Voice-Leader",
+          "config": {
+            "lower": 48,
+            "upper": 84,
+            "collect": 30
+          },
+          "summary": "Choose nearby chord voicings."
+        }
+      ]
+    },
+    {
+      "id": "held-euclidean-pulses",
+      "name": "Held Euclidean Pulses",
+      "category": "Rhythm & repeats",
+      "description": "Latch a chord and turn it into a rotating five-in-sixteen pulse.",
+      "useCase": "Play a chord, release the keys and use Latch Enabled to stop.",
+      "steps": [
+        {
+          "type": "Latch",
+          "config": {
+            "mode": "replace"
+          },
+          "summary": "Hold the last chord."
+        },
+        {
+          "type": "Euclidean-Gate",
+          "config": {
+            "steps": 16,
+            "pulses": 5,
+            "rotation": 0,
+            "rate": 0.25,
+            "gate": 50
+          },
+          "summary": "Five pulses over sixteen steps."
+        }
+      ]
+    },
+    {
+      "id": "sparse-drum-variation",
+      "name": "Sparse Drum Variation",
+      "category": "Rhythm & repeats",
+      "description": "Thin a drum pattern with repeatable chance and varied dynamics.",
+      "useCase": "Feed a busy drum pattern into this chain.",
+      "steps": [
+        {
+          "type": "Probability-Gate",
+          "config": {
+            "chance": 70,
+            "seed": 7
+          },
+          "summary": "Keep about 70% of incoming hits."
+        },
+        {
+          "type": "Velocity-Shaper",
+          "config": {
+            "minimum": 45,
+            "maximum": 115,
+            "variation": 10
+          },
+          "summary": "Vary the strength of surviving hits."
+        }
+      ]
+    },
+    {
+      "id": "breathing-mod-wheel",
+      "name": "Breathing Mod Wheel",
+      "category": "Register & layering",
+      "description": "Send a smooth four-beat modulation cycle while notes are held.",
+      "useCase": "Use an instrument that responds to MIDI CC 1.",
+      "steps": [
+        {
+          "type": "CC-Animator",
+          "config": {
+            "controller": 1,
+            "waveform": "sine",
+            "beats": 4,
+            "maximum": 90
+          },
+          "summary": "Animate the modulation wheel."
+        }
+      ]
+    },
+    {
+      "id": "mod-wheel-to-expression",
+      "name": "Mod Wheel to Expression",
+      "category": "Register & layering",
+      "description": "Map the modulation wheel to a useful expression range.",
+      "useCase": "Control MIDI CC 11 with a hardware modulation wheel.",
+      "steps": [
+        {
+          "type": "CC-Mapper",
+          "config": {
+            "input": 1,
+            "output": 11,
+            "minimum": 35,
+            "maximum": 127
+          },
+          "summary": "Map CC 1 to CC 11."
+        }
+      ]
+    },
+    {
+      "id": "connected-ornaments",
+      "name": "Connected Ornaments",
+      "category": "Arpeggios & movement",
+      "description": "Join a melody smoothly and add light upper-note mordents.",
+      "useCase": "Play a monophonic line; the final note ends after four beats.",
+      "steps": [
+        {
+          "type": "Legato",
+          "config": {
+            "overlap": 20,
+            "hold": 4
+          },
+          "summary": "Join successive notes."
+        },
+        {
+          "type": "Ornamenter",
+          "config": {
+            "style": "mordent",
+            "chance": 50,
+            "interval": 2
+          },
+          "summary": "Decorate selected notes."
+        }
+      ]
+    },
+    {
+      "id": "rotating-phrase",
+      "name": "Rotating Phrase",
+      "category": "Arpeggios & movement",
+      "description": "Capture four beats and replay the rhythm with rotated pitches.",
+      "useCase": "Play a short phrase, then listen; playing again records a fresh phrase.",
+      "steps": [
+        {
+          "type": "Phrase-Recombiner",
+          "config": {
+            "beats": 4,
+            "operation": "rotate",
+            "dimension": "pitch",
+            "rotation": 1
+          },
+          "summary": "Rotate the captured pitches by one note."
+        }
+      ]
+    },
+    {
+      "id": "drum-map-octave",
+      "name": "Drum Map: Octave Layer",
+      "category": "Register & layering",
+      "description": "Map selected drum notes and layer the snare an octave above.",
+      "useCase": "Try a drum controller or edit the map for your instrument.",
+      "steps": [
+        {
+          "type": "Note-Mapper",
+          "config": {
+            "mapping": "36:36; 38:38+50; 42:42",
+            "unmatched": "pass"
+          },
+          "summary": "Layer snare note 38 with note 50."
+        }
+      ]
     }
   ],
   "setups": []

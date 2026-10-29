@@ -27,6 +27,22 @@ export interface OutputDefinition extends DeviceClassification {
 }
 
 export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
+    [OUTPUT_TYPES.NOTE_MONITOR]: {
+        id: OUTPUT_TYPES.NOTE_MONITOR, name: 'Piano Roll / Note Monitor', description: 'View transformed pitches, channels, velocities and note durations',
+        type: 'visual', subtype: 'visualiser', category: 'Visual', icon: '/icons/device-piano.svg',
+    },
+    [OUTPUT_TYPES.SAMPLE_PLAYER]: {
+        id: OUTPUT_TYPES.SAMPLE_PLAYER, name: 'Sample Player', description: 'Load your own audio sample and play it across the keyboard; samples persist with the workspace',
+        type: 'engine', subtype: 'instrument', category: 'Audio', icon: '/icons/output-recorder.svg',
+    },
+    [OUTPUT_TYPES.EVENT_RECORDER]: {
+        id: OUTPUT_TYPES.EVENT_RECORDER, name: 'Event Recorder / Looper', description: 'Record this chain’s musical commands and download a replayable event loop',
+        type: 'midi', subtype: 'device', category: 'Recording', icon: '/icons/output-recorder.svg',
+    },
+    [OUTPUT_TYPES.OSC]: {
+        id: OUTPUT_TYPES.OSC, name: 'OSC Bridge', description: 'Send notes and controllers to a binary OSC WebSocket bridge',
+        type: 'midi', subtype: 'device', category: 'Network', icon: '/icons/output-webmidi.svg',
+    },
     [OUTPUT_TYPES.PERFORMANCE]: {
         id: OUTPUT_TYPES.PERFORMANCE, type: 'visual', subtype: 'visualiser', name: 'Performance',
         description: 'Monitor IOChain event load, processing delays, FPS, main-thread pressure and Netronome timing with lag markers.',

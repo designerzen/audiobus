@@ -9,6 +9,7 @@ import {
 	INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT,
 	INSTRUMENT_TYPE_CLAP,
 	INSTRUMENT_TYPE_OPENDAW_VAPORISATEUR,
+	INSTRUMENT_CATEGORY_WAM2,
 	EXTERNAL_DATA_KEY_SCSYNTH,
 	EXTERNAL_DATA_KEY_SAMPLE_URLS,
 	INSTRUMENTS,
@@ -26,6 +27,8 @@ export {
 	INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT,
 	INSTRUMENT_TYPE_CLAP,
 	INSTRUMENT_TYPE_OPENDAW_VAPORISATEUR,
+	INSTRUMENT_TYPE_WAM2,
+	INSTRUMENT_CATEGORY_WAM2,
 	INSTRUMENT_CATEGORY_OSCILLATOR,
 	INSTRUMENT_CATEGORY_SYNTHESIS,
 	INSTRUMENT_CATEGORY_FM,
@@ -101,6 +104,18 @@ export class InstrumentFactory {
 		// Lazy load the module
 		const module = await metadata.loader()
 		const InstrumentClass = module.default
+		options = { ...metadata.defaultOptions, ...options }
+
+		if (metadata.category === INSTRUMENT_CATEGORY_WAM2) {
+			const instrument = new InstrumentClass(audioContext, options)
+			try {
+				await instrument.connect()
+				return instrument
+			} catch (error) {
+				await instrument.destroy()
+				throw error
+			}
+		}
 
 		// Instantiate based on instrument type
 		let instance: IAudioOutput

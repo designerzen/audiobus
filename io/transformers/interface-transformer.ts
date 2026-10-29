@@ -8,6 +8,8 @@ export interface ITransformer {
     description:string
 	
     transform(commands: IAudioCommand[], timer:Timer ): IAudioCommand[]
+    tick?(now: number, timer: Timer): IAudioCommand[]
+    readonly handlesMidiControls?: boolean
     reset():void
     destroy():void
 	exportConfig():string

@@ -284,6 +284,7 @@ export default class IOChain extends EventTarget {
      */
     clearNoteCommands(): void {
         this.#generation++
+        this.#transformerManager.reset()
         this.#audioCommandQueue = this.#audioCommandQueue.filter(cmd =>
             cmd.type !== NOTE_ON && cmd.type !== NOTE_OFF
         )
@@ -332,7 +333,7 @@ export default class IOChain extends EventTarget {
         // update remaining queue
         this.#audioCommandQueue = remainingCommands
 
-        return activeCommands
+        return activeCommands.sort((a, b) => a.startAt - b.startAt)
     }
 
     /**
@@ -344,6 +345,7 @@ export default class IOChain extends EventTarget {
      */
     updateTimeForCommandQueue(now: number, divisionsElapsed: number, options: {}): IAudioCommand[] {
         if (!this.isActive) return []
+        if (this.#enabled) this.addCommands(this.#transformerManager.advanceTime(now, this.timer))
         let activeCommands: IAudioCommand[]
 
         // Always process the queue, with or without quantisation
@@ -720,7 +722,10 @@ export default class IOChain extends EventTarget {
         // Channel controllers and system messages must not be interpreted as notes
         // by pitch transformers, quantised, or swallowed by transport handling.
         const midiControl = (audioCommand.raw?.length || audioCommand.ump?.length) && audioCommand.type !== NOTE_ON && audioCommand.type !== NOTE_OFF
-        if (midiControl) void this.triggerAudioCommandsOnDevice([audioCommand])
+        if (midiControl) {
+            const commands = this.#enabled ? this.#transformerManager.transformMidiControls([audioCommand], this.timer) : [audioCommand]
+            void this.triggerAudioCommandsOnDevice(commands)
+        }
         const origin = inputEvent.origin ?? inputEvent
         let handled = handledTransport.get(this.timer)
         if (!handled) handledTransport.set(this.timer, handled = new WeakSet())
@@ -801,6 +806,7 @@ export default class IOChain extends EventTarget {
      */
     onTransformersChanged(transformerEvent: CustomEvent): void {
         transformerEvent.preventDefault()
+        this.clearNoteCommands()
         this.dispatchEvent(new CustomEvent(transformerEvent.type, { detail: transformerEvent.detail }))
     }
 

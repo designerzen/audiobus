@@ -18,9 +18,33 @@ import { ID_FILTER, TransformerFilter } from "./transformers/transformer-filter.
 import { ID_EMOJI, TransformerEmoji } from "./transformers/transformer-emoji.ts"
 import { ID_MIDI_FILE_PLAYER, TransformerMIDIFilePlayer } from "./transformers/transformer-midi-file-player.ts"
 import { ID_MAGENTA, TransformerMagenta } from "./transformers/transformer-magenta.ts"
+import { ID_VELOCITY_SHAPER, TransformerVelocityShaper } from './transformers/transformer-velocity-shaper.ts'
+import { ID_STRUMMER, TransformerStrummer } from './transformers/transformer-strummer.ts'
+import { ID_PROBABILITY_GATE, TransformerProbabilityGate } from './transformers/transformer-probability-gate.ts'
+import { ID_NOTE_MAPPER, TransformerNoteMapper } from './transformers/transformer-note-mapper.ts'
+import { ID_LATCH, TransformerLatch } from './transformers/transformer-latch.ts'
+import { ID_EUCLIDEAN_GATE, TransformerEuclideanGate } from './transformers/transformer-euclidean-gate.ts'
+import { ID_VOICE_LEADER, TransformerVoiceLeader } from './transformers/transformer-voice-leader.ts'
+import { ID_CC_ANIMATOR, TransformerCCAnimator } from './transformers/transformer-cc-animator.ts'
+import { ID_ORNAMENTER, TransformerOrnamenter } from './transformers/transformer-ornamenter.ts'
+import { ID_PHRASE_RECOMBINER, TransformerPhraseRecombiner } from './transformers/transformer-phrase-recombiner.ts'
+import { ID_LEGATO, TransformerLegato } from './transformers/transformer-legato.ts'
+import { ID_CC_MAPPER, TransformerCCMapper } from './transformers/transformer-cc-mapper.ts'
 
 export const tranformerFactory = (type: string, config: any={} ) => {
     switch (type) {
+        case ID_VELOCITY_SHAPER: return new TransformerVelocityShaper(config)
+        case ID_STRUMMER: return new TransformerStrummer(config)
+        case ID_PROBABILITY_GATE: return new TransformerProbabilityGate(config)
+        case ID_NOTE_MAPPER: return new TransformerNoteMapper(config)
+        case ID_LATCH: return new TransformerLatch(config)
+        case ID_EUCLIDEAN_GATE: return new TransformerEuclideanGate(config)
+        case ID_VOICE_LEADER: return new TransformerVoiceLeader(config)
+        case ID_CC_ANIMATOR: return new TransformerCCAnimator(config)
+        case ID_ORNAMENTER: return new TransformerOrnamenter(config)
+        case ID_PHRASE_RECOMBINER: return new TransformerPhraseRecombiner(config)
+        case ID_LEGATO: return new TransformerLegato(config)
+        case ID_CC_MAPPER: return new TransformerCCMapper(config)
         case ID_MAGENTA: return new TransformerMagenta(config)
         case ID_ARPEGGIATOR: return new TransformerArpeggiator(config)
     case ID_CHANNELER: return new TransformerChanneler(config)
@@ -45,6 +69,18 @@ export const tranformerFactory = (type: string, config: any={} ) => {
 }
 
 export const TRANSFORMER_TYPE = {
+    ID_VELOCITY_SHAPER,
+    ID_STRUMMER,
+    ID_PROBABILITY_GATE,
+    ID_NOTE_MAPPER,
+    ID_LATCH,
+    ID_EUCLIDEAN_GATE,
+    ID_VOICE_LEADER,
+    ID_CC_ANIMATOR,
+    ID_ORNAMENTER,
+    ID_PHRASE_RECOMBINER,
+    ID_LEGATO,
+    ID_CC_MAPPER,
     ID_MAGENTA,
     ID_ARPEGGIATOR,
     ID_CHANNELER,

@@ -22,10 +22,11 @@ export async function restoreDevice(saved: SavedDevice, options: {
     audioContext?: AudioContext
     outputMixer: GainNode
     now: () => number
+    getBpm?: () => number
     externalDevices?: Record<string, object>
 }, devices: Map<string, any>): Promise<any> {
     const { definition, id } = saved
-    const creationOptions = { ...definition.options, audioContext: options.audioContext, mixer: options.outputMixer, now: options.now }
+    const creationOptions = { ...definition.options, audioContext: options.audioContext, mixer: options.outputMixer, now: options.now, getBpm: options.getBpm }
     let device: any
     switch (definition.factory) {
         case 'input':

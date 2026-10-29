@@ -1,3 +1,4 @@
+import { UI_INPUT_COMPONENTS } from "../ui/input-components.ts"
 import { INPUT_DEFINITIONS } from "./input-definitions.ts"
 import type { DeviceClassification } from "./device-classification.ts"
 import { defineDevice } from './device-definition'
@@ -18,9 +19,16 @@ export interface InputFactory extends DeviceClassification {
 }
 
 const loadSupportingLibrary = async (type: string) => {
+    if (Object.hasOwn(UI_INPUT_COMPONENTS, type)) return await import("./inputs/input-web-component.ts")
     if (Object.hasOwn(MIDI_DEVICE_PROFILES, type)) return await import('./inputs/input-profiled-midi-device')
 	// Create and return instance based on type
 	switch (type) {
+        case INPUT_TYPES.STEP_SEQUENCER: return await import('./inputs/input-step-sequencer')
+        case INPUT_TYPES.PADS: return await import('./inputs/input-pads')
+        case INPUT_TYPES.MICROPHONE_TRIGGER: return await import('./inputs/input-microphone-trigger')
+        case INPUT_TYPES.CAMERA_GESTURES: return await import('./inputs/input-camera-gestures')
+        case INPUT_TYPES.EVENT_LOOP: return await import('./inputs/input-event-loop')
+        case INPUT_TYPES.OSC: return await import('./inputs/input-osc')
 		case INPUT_TYPES.MIDI_FILE:
 			return await import('./inputs/input-midi-file')
 		case INPUT_TYPES.KEYBOARD:
@@ -90,6 +98,7 @@ const loadSupportingLibraries = async (type: string): Promise<any> => {
 const createInput = async (type: string, options={} ): Promise<IAudioInput> => {
 	const Class = await loadSupportingLibraries(type)
 	return new Class(Object.hasOwn(MIDI_DEVICE_PROFILES, type) ? { ...options, profileId: type }
+        : Object.hasOwn(UI_INPUT_COMPONENTS, type) ? { ...options, component: type }
         : type === INPUT_TYPES.WEBMIDI ? { autoConnect: true, ...options } : options)
 }
 
@@ -100,6 +109,21 @@ const createInput = async (type: string, options={} ): Promise<IAudioInput> => {
  * then uses the loaded imports in future requests
  */
 export const INPUT_FACTORIES: InputFactory[] = [
+    ...[INPUT_TYPES.STEP_SEQUENCER, INPUT_TYPES.PADS, INPUT_TYPES.EVENT_LOOP].map(id => ({
+        ...INPUT_DEFINITIONS[id], isAvailable: () => true, create: (options?: Record<string, any>) => createInput(id, options),
+    })),
+    { ...INPUT_DEFINITIONS[INPUT_TYPES.MICROPHONE_TRIGGER],
+        isAvailable: () => typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia && typeof AudioContext !== 'undefined',
+        create: options => createInput(INPUT_TYPES.MICROPHONE_TRIGGER, options) },
+    { ...INPUT_DEFINITIONS[INPUT_TYPES.CAMERA_GESTURES],
+        isAvailable: () => typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia && typeof Worker !== 'undefined' && typeof createImageBitmap === 'function' && typeof OffscreenCanvas !== 'undefined',
+        create: options => createInput(INPUT_TYPES.CAMERA_GESTURES, options) },
+    { ...INPUT_DEFINITIONS[INPUT_TYPES.OSC], isAvailable: () => typeof WebSocket !== 'undefined', create: options => createInput(INPUT_TYPES.OSC, options) },
+    ...Object.keys(UI_INPUT_COMPONENTS).map((id): InputFactory => ({
+        ...INPUT_DEFINITIONS[id],
+        isAvailable: () => typeof document !== "undefined" && typeof customElements !== "undefined",
+        create: options => createInput(id, options),
+    })),
     {
         ...INPUT_DEFINITIONS[INPUT_TYPES.MIDI_FILE],
         isAvailable: () => true,

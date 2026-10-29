@@ -21,6 +21,54 @@ export interface TransformerDefinition extends DeviceClassification<'transformer
 }
 
 export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
+    [TRANSFORMER_TYPE.ID_VELOCITY_SHAPER]: {
+        id: TRANSFORMER_TYPE.ID_VELOCITY_SHAPER, name: 'Velocity Shaper', description: 'Shape dynamics with velocity curves, limits, fixed levels and variation.',
+        icon: '/icons/transformer-velocity-shaper.svg', category: 'Variation', type: 'transformer', subtype: 'variation',
+    },
+    [TRANSFORMER_TYPE.ID_STRUMMER]: {
+        id: TRANSFORMER_TYPE.ID_STRUMMER, name: 'Strummer', description: 'Spread live chords into upstrokes, downstrokes or alternating strokes.',
+        icon: '/icons/transformer-strummer.svg', category: 'Timing', type: 'transformer', subtype: 'timing',
+    },
+    [TRANSFORMER_TYPE.ID_PROBABILITY_GATE]: {
+        id: TRANSFORMER_TYPE.ID_PROBABILITY_GATE, name: 'Probability Gate', description: 'Thin selected notes with seeded probability and safe note releases.',
+        icon: '/icons/transformer-probability-gate.svg', category: 'Variation', type: 'transformer', subtype: 'variation',
+    },
+    [TRANSFORMER_TYPE.ID_NOTE_MAPPER]: {
+        id: TRANSFORMER_TYPE.ID_NOTE_MAPPER, name: 'Note Mapper', description: 'Remap drum notes, layer pitches or turn keys into controller messages.',
+        icon: '/icons/transformer-note-mapper.svg', category: 'Routing', type: 'transformer', subtype: 'routing',
+    },
+    [TRANSFORMER_TYPE.ID_LATCH]: {
+        id: TRANSFORMER_TYPE.ID_LATCH, name: 'Latch / Hold', description: 'Sustain chords after key release, replacing or toggling held notes.',
+        icon: '/icons/transformer-latch.svg', category: 'Duration', type: 'transformer', subtype: 'duration',
+    },
+    [TRANSFORMER_TYPE.ID_EUCLIDEAN_GATE]: {
+        id: TRANSFORMER_TYPE.ID_EUCLIDEAN_GATE, name: 'Euclidean Gate', description: 'Pulse held notes with evenly spaced rhythms, rotation and accents.',
+        icon: '/icons/transformer-euclidean-gate.svg', category: 'Pattern', type: 'transformer', subtype: 'pattern',
+    },
+    [TRANSFORMER_TYPE.ID_VOICE_LEADER]: {
+        id: TRANSFORMER_TYPE.ID_VOICE_LEADER, name: 'Voice Leader', description: 'Choose chord octave placements that minimise movement between voices.',
+        icon: '/icons/transformer-voice-leader.svg', category: 'Harmony', type: 'transformer', subtype: 'harmony',
+    },
+    [TRANSFORMER_TYPE.ID_CC_ANIMATOR]: {
+        id: TRANSFORMER_TYPE.ID_CC_ANIMATOR, name: 'CC Animator', description: 'Animate a MIDI controller with tempo-synced waveforms while notes are held.',
+        icon: '/icons/transformer-cc-animator.svg', category: 'Modulation', type: 'transformer', subtype: 'modulation',
+    },
+    [TRANSFORMER_TYPE.ID_ORNAMENTER]: {
+        id: TRANSFORMER_TYPE.ID_ORNAMENTER, name: 'Ornamenter', description: 'Decorate live notes with grace notes, flams, mordents and trills.',
+        icon: '/icons/transformer-ornamenter.svg', category: 'Pattern', type: 'transformer', subtype: 'pattern',
+    },
+    [TRANSFORMER_TYPE.ID_PHRASE_RECOMBINER]: {
+        id: TRANSFORMER_TYPE.ID_PHRASE_RECOMBINER, name: 'Phrase Recombiner', description: 'Capture a phrase, then rotate, mirror or shuffle its note properties.',
+        icon: '/icons/transformer-phrase-recombiner.svg', category: 'Variation', type: 'transformer', subtype: 'variation',
+    },
+    [TRANSFORMER_TYPE.ID_LEGATO]: {
+        id: TRANSFORMER_TYPE.ID_LEGATO, name: 'Legato', description: 'Connect a melody until the next note, with adjustable overlap and maximum hold.',
+        icon: '/icons/transformer-legato.svg', category: 'Duration', type: 'transformer', subtype: 'duration',
+    },
+    [TRANSFORMER_TYPE.ID_CC_MAPPER]: {
+        id: TRANSFORMER_TYPE.ID_CC_MAPPER, name: 'CC Mapper', description: 'Reassign, scale, invert, duplicate or filter MIDI controller messages.',
+        icon: '/icons/transformer-cc-mapper.svg', category: 'Routing', type: 'transformer', subtype: 'routing',
+    },
     identity: {
         id: 'identity', name: 'Identity', description: 'Passes notes through unchanged',
         icon: '/icons/transformer-default.svg', category: 'Routing', type: "transformer", subtype: "routing",

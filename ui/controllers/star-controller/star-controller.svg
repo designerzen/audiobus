@@ -1,0 +1,105 @@
+<svg class="emotion-star" viewBox="0 0 320 330"  version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;" aria-labelledby="plutchik-wheel-title">
+    <defs>
+        <style>
+            .path-default { fill-rule: nonzero; stroke-width: 1px; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; }
+            .path-thin { fill-rule: nonzero; stroke-width: 1px; stroke-linecap: butt; stroke-miterlimit: 2; }
+            .apprehension { fill: rgb(173,216,230); stroke: rgb(135,206,235); }
+            .terror-secondary { fill: rgb(208,228,234); stroke: rgb(135,206,235); }
+            .fear { fill: rgb(65,105,225); stroke: rgb(30,64,175); }
+            .sadness { fill: rgb(0,0,139); stroke: rgb(30,64,175); }
+            .annoyance { fill: rgb(255,221,226); stroke: rgb(221,160,221); }
+            .annoyance-alt { fill: rgb(255,182,193); stroke: rgb(255,105,180); }
+            .anger { fill: rgb(255,68,68); stroke: rgb(204,0,0); }
+            .rage { fill: rgb(139,0,0); stroke: rgb(92,0,0); }
+            .serenity { fill: rgb(255,250,205); stroke: rgb(255,230,128); }
+            .joy { fill: rgb(255,215,0); stroke: rgb(255,165,0); }
+            .ecstasy-secondary { fill: rgb(249,249,249); stroke: rgb(255,230,128); }
+            .ecstasy { fill: rgb(255,165,0); stroke: rgb(255,99,71); }
+            .interest { fill: rgb(255,218,185); stroke: rgb(255,179,71); }
+            .anticipation { fill: rgb(255,140,0); stroke: rgb(255,99,71); }
+            .vigilance { fill: rgb(255,99,71); stroke: rgb(220,20,60); }
+            .vigilance-secondary { fill: rgb(243,235,228); stroke: rgb(255,179,71); }
+            .admiration { fill: rgb(60,179,113); stroke: rgb(34,139,34); }
+            .acceptance { fill: rgb(184,230,184); stroke: rgb(144,238,144); }
+            .trust { fill: rgb(34,139,34); stroke: rgb(58,166,85); }
+            .admiration-secondary { fill: rgb(218,240,218); stroke: rgb(172,232,172); }
+            .distraction { fill: rgb(175,238,238); stroke: rgb(0,206,209); }
+            .amazement-secondary { fill: rgb(223,252,252); stroke: rgb(0,206,209); }
+            .surprise { fill: rgb(0,206,209); stroke: rgb(8,145,178); }
+            .amazement { fill: rgb(0,128,128); stroke: rgb(0,102,102); }
+            .grief-secondary { fill: rgb(234,233,234); stroke: rgb(221,160,221); }
+            .pensiveness { fill: rgb(230,199,230); stroke: rgb(221,160,221); }
+            .sadness-alt { fill: rgb(147,112,219); stroke: rgb(124,58,237); }
+            .grief { fill: rgb(75,0,130); stroke: rgb(44,0,80); }
+            .loathing-secondary { fill: rgb(235,228,215); stroke: rgb(212,196,168); }
+            .boredom { fill: rgb(212,196,168); stroke: rgb(184,149,106); }
+            .disgust { fill: rgb(139,115,85); stroke: rgb(101,67,33); }
+            .loathing { fill: rgb(101,67,33); stroke: rgb(61,40,23); }
+        </style>
+    </defs>
+
+    <title id="plutchik-wheel-title">Plutchik's Wheel of Emotions</title>
+   
+    <g data-emotion="circles" inert="">
+        <circle stroke-dasharray="0 0.05 0" cx="158.94" cy="174.312" r="2.114" transform="matrix(36.5361,0,0,36.5361,-5648.25,-6194.61)" style="fill:none;stroke:rgb(114,129,134);stroke-width:0.03px;"></circle>
+        <circle stroke-dasharray="0 0.05 0" cx="158.94" cy="174.312" r="2.114" transform="matrix(48.3863,0,0,48.3863,-7532,-8260)" style="fill:none;stroke:rgb(179,198,205);stroke-width:0.02px;"></circle>
+    </g>
+   
+    <g data-emotion="terror" transform="matrix(1,0,0,1,30,30)">
+        <path role="button" tabindex="0"  aria-label="apprehension" data-emotion="apprehension" class="path-default apprehension" d="M147.57,69.66C145.968,60.413 143.555,51.324 140.36,42.5C132.659,41.615 124.881,41.615 117.18,42.5C113.945,51.309 111.499,60.388 109.87,69.63C122.243,66.505 135.202,66.516 147.57,69.66Z" transform="matrix(6.12323e-17,1,-1,6.12323e-17,272.983,15.42)"></path>
+        <path role="button" tabindex="0"  aria-label="terror" class="path-thin terror-secondary" d="M230.51,155.76C239.58,152.546 248.415,148.703 256.95,144.26C248.428,139.784 239.603,135.912 230.54,132.67C231.4,140.343 231.39,148.089 230.51,155.76"></path>
+        <path role="button" tabindex="0"  aria-label="fear" data-emotion="fear" class="path-default fear" d="M110.04,99.14L110.04,99.23C115.658,96.895 121.667,95.639 127.75,95.53L129.55,95.53C135.633,95.669 141.636,96.944 147.25,99.29L147.25,99.21C149.48,90.04 149.17,79.78 147.53,69.67C135.165,66.512 122.206,66.488 109.83,69.6C108.19,79.7 107.85,89.96 110.04,99.14Z" transform="matrix(6.12323e-17,1,-1,6.12323e-17,273.16,15.4702)"></path>
+        <path role="button" tabindex="0"  aria-label="terror" data-emotion="terror" class="path-default sadness" d="M173.86,125.7L128.86,144.27L173.8,162.94C178.773,151.034 178.794,137.622 173.86,125.7Z"></path>
+    </g>
+   
+    <g data-emotion="rage" transform="matrix(1,0,0,1,30,30)">
+        <path role="button" tabindex="0"  aria-label="annoyance" data-emotion="annoyance" class="path-thin annoyance" d="M27.09,132.71C17.977,135.948 9.102,139.821 0.53,144.3C9.097,148.791 17.973,152.668 27.09,155.9C26.205,148.195 26.205,140.415 27.09,132.71"></path>
+        <path role="button" tabindex="0"  aria-label="annoyance" data-emotion="annoyance" class="path-default annoyance-alt" d="M147.57,69.66C145.968,60.413 143.555,51.324 140.36,42.5C132.659,41.615 124.881,41.615 117.18,42.5C113.945,51.309 111.499,60.388 109.87,69.63C122.243,66.505 135.202,66.516 147.57,69.66Z" transform="matrix(-6.12323e-17,1,1,6.12323e-17,-15.4852,15.63)"></path>
+        <path role="button" tabindex="0"  aria-label="anger" data-emotion="anger" class="path-default anger" d="M110.04,99.14L110.04,99.23C115.658,96.895 121.667,95.639 127.75,95.53L129.55,95.53C135.633,95.669 141.636,96.944 147.25,99.29L147.25,99.21C149.48,90.04 149.17,79.78 147.53,69.67C135.165,66.512 122.206,66.488 109.83,69.6C108.19,79.7 107.85,89.96 110.04,99.14Z" transform="matrix(-5.78055e-17,1,1.01543,6.56042e-17,-16.8474,15.596)"></path>
+        <path role="button" tabindex="0"  aria-label="rage" data-emotion="rage" class="path-default rage" d="M83.92,162.74L128.92,144.17L83.99,125.5C79.017,137.405 78.992,150.816 83.92,162.74Z"></path>
+    </g>
+   
+    <g data-emotion="ecstasy" transform="matrix(1,0,0,1,30,30)">
+        <path role="button" tabindex="0"  aria-label="serenity" data-emotion="serenity" class="path-default serenity" d="M147.57,69.66C145.968,60.413 143.555,51.324 140.36,42.5C132.659,41.615 124.881,41.615 117.18,42.5C113.945,51.309 111.499,60.388 109.87,69.63C122.243,66.505 135.202,66.516 147.57,69.66Z"></path>
+        <path role="button" tabindex="0"  aria-label="joy" data-emotion="joy" class="path-default joy" d="M110.04,99.14L110.04,99.23C115.658,96.895 121.667,95.639 127.75,95.53L129.55,95.53C135.633,95.669 141.636,96.944 147.25,99.29L147.25,99.21C149.48,90.04 149.17,79.78 147.53,69.67C135.165,66.512 122.206,66.488 109.83,69.6C108.19,79.7 107.85,89.96 110.04,99.14Z" transform="matrix(1,0,0,1.01543,0,-1.56613)"></path>
+        <path role="button" tabindex="0"  aria-label="ecstasy" data-emotion="ecstasy" class="path-thin ecstasy-secondary" d="M140.36,42.5C137.134,33.38 133.271,24.498 128.8,15.92C124.299,24.481 120.409,33.35 117.16,42.46C124.869,41.587 132.654,41.6 140.36,42.5"></path>
+        <path role="button" tabindex="0"  aria-label="ecstasy" data-emotion="ecstasy" class="path-default ecstasy" d="M110.41,99.24L128.94,144.24L147.65,99.32C135.745,94.348 122.336,94.32 110.41,99.24Z"></path>
+    </g>
+   
+    <g data-emotion="vigilance" transform="matrix(1,0,0,1,30,30)">
+        <path role="button" tabindex="0"  aria-label="interest" data-emotion="interest" class="path-default interest" d="M89.31,78.14C81.621,72.766 73.473,68.082 64.96,64.14C58.927,68.927 53.455,74.382 48.65,80.4C52.591,88.91 57.276,97.055 62.65,104.74C69.189,93.797 78.352,84.654 89.31,78.14Z"></path>
+        <path role="button" tabindex="0"  aria-label="anticipation" data-emotion="anticipation" class="path-default anticipation" d="M83.8,125.59L83.8,125.66C86.15,120.014 89.543,114.86 93.8,110.47C94.01,110.25 94.21,110.03 94.42,109.82L95.07,109.2C99.459,104.983 104.602,101.628 110.23,99.31L110.16,99.31C105.22,91.14 97.68,84.14 89.31,78.14C78.367,84.659 69.218,93.802 62.69,104.74C68.68,113.14 75.73,120.65 83.8,125.59Z"></path>
+        <path role="button" tabindex="0"  aria-label="vigilance" data-emotion="vigilance" class="path-default vigilance" d="M110.3,99.29L128.86,144.29L83.94,125.62C88.863,113.685 98.359,104.2 110.3,99.29Z"></path>
+        <path role="button" tabindex="0"  aria-label="vigilance" data-emotion="vigilance" class="path-thin vigilance-secondary" d="M64.96,64.07C56.27,59.941 47.301,56.426 38.12,53.55C40.998,62.735 44.517,71.707 48.65,80.4C53.451,74.357 58.923,68.879 64.96,64.07"></path>
+    </g>
+   
+    <g data-emotion="admiration" transform="matrix(1,0,0,1,30,30)">
+        <path role="button" tabindex="0"  aria-label="admiration" data-emotion="admiration" class="path-default admiration" d="M173.8,125.66L128.8,144.2L147.51,99.28C159.43,104.222 168.899,113.723 173.8,125.66Z"></path>
+        <path role="button" tabindex="0"  aria-label="acceptance" data-emotion="acceptance" class="path-default acceptance" d="M195.07,104.78C200.477,97.092 205.186,88.936 209.14,80.41C204.332,74.36 198.85,68.878 192.8,64.07C184.293,68.01 176.151,72.695 168.47,78.07C179.42,84.622 188.564,93.803 195.07,104.78Z"></path>
+        <path role="button" tabindex="0"  aria-label="trust" data-emotion="trust" class="path-default trust" d="M147.64,99.25L147.59,99.25C148.52,99.64 149.44,100.07 150.35,100.52C154.927,102.746 159.128,105.675 162.8,109.2L163.44,109.82L164.07,110.47C168.276,114.857 171.624,119.992 173.94,125.61L173.94,125.56L174,125.56C182.05,120.62 189.08,113.11 195,104.78C188.515,93.842 179.411,84.686 168.51,78.14C160.14,84.14 152.59,91.14 147.64,99.25Z"></path>
+        <path role="button" tabindex="0"  aria-label="admiration" data-emotion="admiration" class="path-thin admiration-secondary" d="M209.14,80.41C213.275,71.714 216.793,62.739 219.67,53.55C210.478,56.424 201.5,59.94 192.8,64.07C198.85,68.878 204.332,74.36 209.14,80.41"></path>
+    </g>
+   
+    <g data-emotion="amazement" transform="matrix(1,0,0,1,30,30)">
+        <path role="button" tabindex="0"  aria-label="distraction" data-emotion="distraction" class="path-default distraction" d="M168.084,210.17C175.764,215.585 183.825,220.427 192.34,224.4C198.399,219.619 203.895,214.164 208.72,208.14C204.781,199.626 200.156,191.376 194.78,183.688C188.214,194.604 179.054,203.695 168.084,210.17Z"></path>
+        <path role="button" tabindex="0"  aria-label="amazement" data-emotion="amazement" class="path-thin amazement-secondary" d="M192.34,224.4C201.03,228.553 210.003,232.088 219.19,234.98C216.329,225.801 212.83,216.832 208.72,208.14C203.895,214.164 198.399,219.619 192.34,224.4"></path>
+        <path role="button" tabindex="0"  aria-label="surprise" data-emotion="surprise" class="path-default surprise" d="M173.61,162.87L173.61,162.82C173.21,163.76 172.78,164.68 172.33,165.59C170.105,170.12 167.194,174.279 163.7,177.92C163.49,178.13 163.29,178.35 163.07,178.56L162.43,179.18C158.034,183.379 152.893,186.72 147.27,189.03L147.32,189.03L147.32,189.09C152.24,197.15 159.74,204.19 168.06,210.17C179.031,203.692 188.216,194.579 194.78,183.66C188.74,175.39 181.7,167.83 173.61,162.87Z"></path>
+        <path role="button" tabindex="0"  aria-label="amazement" data-emotion="amazement" class="path-default amazement" d="M147.49,189.14L128.92,144.14L173.85,162.82C168.916,174.746 159.423,184.224 147.49,189.14Z"></path>
+    </g>
+   
+    <g data-emotion="grief" transform="matrix(1,0,0,1,30,30)">
+        <path role="button" tabindex="0"  aria-label="grief" data-emotion="grief" class="path-thin grief-secondary" d="M116.8,245.95C120.01,255.029 123.857,263.871 128.31,272.41C132.784,263.896 136.654,255.077 139.89,246.02C132.216,246.871 124.469,246.847 116.8,245.95" transform="matrix(1,0,0,1,0.174446,0)"></path>
+        <path role="button" tabindex="0"  aria-label="pensiveness" data-emotion="pensiveness" class="path-default pensiveness" d="M147.57,69.66C145.968,60.413 143.555,51.324 140.36,42.5C132.659,41.615 124.881,41.615 117.18,42.5C113.945,51.309 111.499,60.388 109.87,69.63C122.243,66.505 135.202,66.516 147.57,69.66Z" transform="matrix(1,0,0,-1,-0.200554,288.42)"></path>
+        <path role="button" tabindex="0"  aria-label="sadness" data-emotion="sadness" class="path-default sadness-alt" d="M147.11,189.19L147.11,189.14C146.17,189.53 145.22,189.87 144.26,190.19C139.485,191.823 134.486,192.707 129.44,192.81L127.64,192.81C121.56,192.672 115.56,191.397 109.95,189.05L109.95,189.2C107.73,198.38 108.05,208.66 109.71,218.77C122.052,221.947 134.993,221.999 147.36,218.92C148.96,208.75 149.32,198.42 147.11,189.19Z" transform="matrix(1,0,0,1,0,0.12745)"></path>
+        <path role="button" tabindex="0"  aria-label="grief" data-emotion="grief" class="path-default grief" d="M147.38,189.21L128.85,144.21L110.14,189.14C122.045,194.113 135.456,194.138 147.38,189.21Z"></path>
+    </g>
+   
+    <g data-emotion="loathing" transform="matrix(1,0,0,1,30,30)">
+        <path role="button" tabindex="0"  aria-label="loathing" data-emotion="loathing" class="path-thin loathing-secondary" d="M48.7,208.14C44.543,216.88 41.008,225.903 38.12,235.14C47.359,232.252 56.381,228.713 65.12,224.55C59.038,219.725 53.529,214.219 48.7,208.14"></path>
+        <path role="button" tabindex="0"  aria-label="boredom" data-emotion="boredom" class="path-default boredom" d="M62.8,183.77C57.389,191.46 52.67,199.616 48.7,208.14C53.524,214.211 59.026,219.71 65.1,224.53C73.609,220.571 81.751,215.866 89.43,210.47C78.473,203.922 69.319,194.744 62.8,183.77Z"></path>
+        <path role="button" tabindex="0"  aria-label="disgust" data-emotion="disgust" class="path-default disgust" d="M110.16,189.38L110.23,189.38C104.606,187.053 99.465,183.699 95.07,179.49L94.43,178.87L93.8,178.14C89.59,173.747 86.239,168.605 83.92,162.98L83.92,163.05C75.92,167.97 68.85,175.46 62.92,183.78C69.453,194.743 78.617,203.907 89.58,210.44C97.8,204.46 105.24,197.43 110.16,189.38Z"></path>
+        <path role="button" tabindex="0"  aria-label="loathing" data-emotion="loathing" class="path-default loathing" d="M83.94,162.79L128.94,144.25L110.23,189.14C98.317,184.203 88.85,174.714 83.94,162.79Z"></path>
+    </g>
+   
+    <circle cx="158.94" cy="174.312" r="2.114" style="fill:white;stroke:black;stroke-width:1px;"></circle>
+</svg>

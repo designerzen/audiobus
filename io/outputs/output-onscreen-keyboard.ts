@@ -11,6 +11,7 @@ export default class OutputOnScreenKeyboard implements IAudioOutput{
 	
 	#uuid:string = "Output-Onscreen-Keyboard-"+(OutputOnScreenKeyboard.ID++)
 	#keyboard:SVGKeyboard
+	#held = new Map<number, number>()
 
 	get uuid(): string {
 		return this.#uuid
@@ -42,12 +43,20 @@ export default class OutputOnScreenKeyboard implements IAudioOutput{
 	}
 	
 	noteOn(noteNumber: number, _velocity?: number): void {
+		if (_velocity === 0) { this.noteOff(noteNumber); return }
+		this.#held.set(noteNumber, (this.#held.get(noteNumber) ?? 0) + 1)
 		this.#keyboard.setKeyAsActive(noteNumber)
 	}
 	noteOff(noteNumber: number): void {
+		const count = this.#held.get(noteNumber) ?? 0
+		if (count === 0) return
+		if (count > 1) { this.#held.set(noteNumber, count - 1); return }
+		this.#held.delete(noteNumber)
 		this.#keyboard.setKeyAsInactive(noteNumber)
 	}
 	allNotesOff(): void {
-		// Clear all active keys
+		for (const note of this.#held.keys()) this.#keyboard.setKeyAsInactive(note)
+		this.#held.clear()
 	}
+	destroy(): void { this.allNotesOff() }
 }

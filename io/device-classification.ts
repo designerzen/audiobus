@@ -1,8 +1,8 @@
 export const DEVICE_SUBTYPES = {
-    controller: ['keyboard', 'gamepad', 'gesture', 'pointer'],
+    controller: ['keyboard', 'gamepad', 'gesture', 'pointer', 'pads'],
     midi: ['device'],
-    audio: ['pitch', 'formant', 'speech', 'metronome', 'effect', 'modulation', 'dynamics', 'equalizer', 'delay', 'reverb', 'distortion', 'utility'],
-    generator: ['ai'],
+    audio: ['pitch', 'formant', 'trigger', 'speech', 'metronome', 'effect', 'modulation', 'dynamics', 'equalizer', 'delay', 'reverb', 'distortion', 'utility'],
+    generator: ['ai', 'sequencer'],
     sync: ['clock', 'vinyl'],
     visual: ['visualiser', 'notation', 'description'],
     engine: ['instrument'],

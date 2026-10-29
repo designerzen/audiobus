@@ -10,6 +10,7 @@ import {
 	InstrumentFactory,
 	type InstrumentMetadata,
 	INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT,
+	INSTRUMENT_CATEGORY_WAM2,
 	EXTERNAL_DATA_KEY_SCSYNTH,
 	EXTERNAL_DATA_KEY_SAMPLE_URLS
 } from "./instrument-factory.ts"
@@ -65,8 +66,10 @@ const metadataToUIFactory = (metadata: InstrumentMetadata): InstrumentUIFactory 
 	name: metadata.name,
 	description: metadata.description,
 	category: metadata.category,
-	preview: OUTPUT_PREVIEWS[`instrument:${metadata.id}`],
+	preview: OUTPUT_PREVIEWS[`instrument:${metadata.id}`]
+		?? (metadata.category === INSTRUMENT_CATEGORY_WAM2 ? OUTPUT_PREVIEWS[`output:${metadata.id}`] : undefined),
 	isAvailable: () => {
+		if (metadata.category === INSTRUMENT_CATEGORY_WAM2 && typeof AudioWorkletNode === 'undefined') return false
 		// Check if required external data is available
 		const requiredData = metadata.requiresExternalData ?? []
 		

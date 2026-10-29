@@ -10,6 +10,7 @@ import type { DeviceClassification } from "./device-classification.ts"
  * This provides a single source of truth for input UI presentation
  */
 
+import { UI_INPUT_COMPONENTS } from "../ui/input-components.ts"
 import * as INPUT_TYPES from "./inputs/input-types.ts"
 import { MIDI_DEVICE_PROFILES, onMidiDeviceProfilesChanged } from '../midi/hardware/device-profiles'
 
@@ -22,6 +23,34 @@ export interface InputDefinition extends DeviceClassification {
 }
 
 export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
+    [INPUT_TYPES.STEP_SEQUENCER]: {
+        id: INPUT_TYPES.STEP_SEQUENCER, name: 'Step Sequencer', description: 'Edit a repeating sixteen-step melody or drum pattern on the shared transport',
+        type: 'generator', subtype: 'sequencer', category: 'Sequencing', icon: '/icons/preset-melodic-sequencer.svg',
+    },
+    [INPUT_TYPES.PADS]: {
+        id: INPUT_TYPES.PADS, name: 'Chord / Drum Pads', description: 'Eight accessible touch and keyboard pads for chords or drums',
+        type: 'controller', subtype: 'pads', category: 'UI', icon: '/icons/device-drums.svg',
+    },
+    [INPUT_TYPES.MICROPHONE_TRIGGER]: {
+        id: INPUT_TYPES.MICROPHONE_TRIGGER, name: 'Microphone Triggers', description: 'Turn claps and taps into notes using an adjustable amplitude threshold',
+        type: 'audio', subtype: 'trigger', category: 'Audio', icon: '/icons/device-microphone.svg',
+    },
+    [INPUT_TYPES.CAMERA_GESTURES]: {
+        id: INPUT_TYPES.CAMERA_GESTURES, name: 'Camera Gestures', description: 'Pinch to play and move your hand to select pitch; requires camera permission and model download',
+        type: 'controller', subtype: 'gesture', category: 'Gesture', icon: '/icons/input-leap-motion.svg',
+    },
+    [INPUT_TYPES.EVENT_LOOP]: {
+        id: INPUT_TYPES.EVENT_LOOP, name: 'Event Loop', description: 'Load a captured event loop and replay its notes and controllers through this chain',
+        type: 'generator', subtype: 'sequencer', category: 'Sequencing', icon: '/icons/transformer-midi-file-player.svg',
+    },
+    [INPUT_TYPES.OSC]: {
+        id: INPUT_TYPES.OSC, name: 'OSC Bridge', description: 'Receive notes and controllers from a binary OSC WebSocket bridge',
+        type: 'midi', subtype: 'device', category: 'Network', icon: '/icons/input-webmidi.svg',
+    },
+    ...Object.fromEntries(Object.entries(UI_INPUT_COMPONENTS).map(([id, component]) => [id, {
+        id, name: component.name, description: component.description, type: "controller",
+        subtype: component.subtype, category: "UI", icon: "/icons/input-onscreen-keyboard.svg",
+    }])),
     [INPUT_TYPES.MIDI_FILE]: {
         id: INPUT_TYPES.MIDI_FILE, name: 'MIDI File', description: 'Drop a MIDI file to load a tune for transport playback',
         type: 'midi', subtype: 'device', category: 'MIDI', icon: '/icons/transformer-midi-file-player.svg',

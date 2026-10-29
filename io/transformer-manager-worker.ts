@@ -9,6 +9,7 @@ import { Transformer } from "./transformers/abstract-transformer.ts"
 import { TransformerHarmoniser } from "./transformers/transformer-harmoniser.ts"
 import { ID_QUANTISE, TransformerQuantise } from "./transformers/transformer-quantise.ts"
 import { tranformerFactory } from './transformer-factory'
+import { applyTransformer, advanceTransformers, transformMidiControls } from './transformer-pipeline.ts'
 
 import type { ITimerControl as Timer } from "netronome"
 import type { FieldConfig, ITransformer } from "./transformers/interface-transformer.ts"
@@ -164,7 +165,7 @@ export default class TransformerManagerWorker extends EventTarget implements ITr
      */
     async transform(commands: IAudioCommand[], timer: Timer): Promise<IAudioCommand[]> {
         try {
-            return this.#transformers.reduce((value, transformer) => transformer.transform(value, timer), commands)
+            return this.#transformers.reduce((value, transformer) => applyTransformer(transformer, value, timer), commands)
         } catch (error) {
             console.error('Transform error:', error)
             return commands
@@ -178,7 +179,15 @@ export default class TransformerManagerWorker extends EventTarget implements ITr
      * Reset the state of all Transformers
      */
     reset(): void {
-        this.#transformers.forEach(t => t.reset())
+        this.#transformers.forEach(t => t.reset?.())
+    }
+
+    advanceTime(now: number, timer: Timer): IAudioCommand[] {
+        return advanceTransformers(this.#transformers, now, timer)
+    }
+
+    transformMidiControls(commands: IAudioCommand[], timer: Timer): IAudioCommand[] {
+        return transformMidiControls(this.#transformers, commands, timer)
     }
 
     exportConfig(): string {

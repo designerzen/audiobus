@@ -9,6 +9,7 @@ import { compress, decompress } from 'lz-string'
 import { Transformer } from "./transformers/abstract-transformer.ts"
 import { TransformerHarmoniser } from "./transformers/transformer-harmoniser.ts"
 import { ID_QUANTISE, TransformerQuantise } from "./transformers/transformer-quantise.ts"
+import { applyTransformer, advanceTransformers, transformMidiControls } from './transformer-pipeline.ts'
 
 import type { ITimerControl as Timer } from "netronome"
 import type { FieldConfig, ITransformer } from "./transformers/interface-transformer.ts"
@@ -184,7 +185,15 @@ export default class TransformerManager extends EventTarget implements ITransfor
      * @returns Promise<IAudioCommand[]>
      */
     transform(commands: IAudioCommand[], timer:Timer ): Promise<IAudioCommand[]> {
-        return Promise.resolve(this.#transformers.reduce((v, t) => t.transform(v, timer), commands))
+        return Promise.resolve(this.#transformers.reduce((v, t) => applyTransformer(t, v, timer), commands))
+    }
+
+    advanceTime(now: number, timer: Timer): IAudioCommand[] {
+        return advanceTransformers(this.#transformers, now, timer)
+    }
+
+    transformMidiControls(commands: IAudioCommand[], timer: Timer): IAudioCommand[] {
+        return transformMidiControls(this.#transformers, commands, timer)
     }
 
     /**
@@ -192,7 +201,7 @@ export default class TransformerManager extends EventTarget implements ITransfor
      * Reset the state of all Transformers
      */
     reset():void{
-       this.#transformers.forEach(t => t.reset())
+       this.#transformers.forEach(t => t.reset?.())
     }
 
 	exportConfig(): string {

@@ -29,6 +29,10 @@ export interface OutputFactory extends DeviceClassification {
 const loadSupportingLibrary = async (type: string) => {
 	// Create and return instance based on type
 	switch (type) {
+        case OUTPUT_TYPES.NOTE_MONITOR: return await import('./outputs/output-note-monitor')
+        case OUTPUT_TYPES.SAMPLE_PLAYER: return await import('./outputs/output-sample-player')
+        case OUTPUT_TYPES.EVENT_RECORDER: return await import('./outputs/output-event-recorder')
+        case OUTPUT_TYPES.OSC: return await import('./outputs/output-osc')
         case OUTPUT_TYPES.PERFORMANCE:
             return await import('./outputs/output-performance.ts')
         case OUTPUT_TYPES.RECORDER:
@@ -164,6 +168,11 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
  * Uses lazy loading for better performance
  */
 export const OUTPUT_FACTORIES: OutputFactory[] = [
+    ...[OUTPUT_TYPES.NOTE_MONITOR, OUTPUT_TYPES.EVENT_RECORDER].map(id => ({
+        ...OUTPUT_DEFINITIONS[id], isAvailable: () => true, create: (options?: Record<string, any>) => createOutput(id, options),
+    })),
+    { ...OUTPUT_DEFINITIONS[OUTPUT_TYPES.SAMPLE_PLAYER], isAvailable: () => typeof AudioContext !== 'undefined', create: options => createOutput(OUTPUT_TYPES.SAMPLE_PLAYER, options) },
+    { ...OUTPUT_DEFINITIONS[OUTPUT_TYPES.OSC], isAvailable: () => typeof WebSocket !== 'undefined', create: options => createOutput(OUTPUT_TYPES.OSC, options) },
     {
         ...OUTPUT_DEFINITIONS[OUTPUT_TYPES.PERFORMANCE],
         isAvailable: () => typeof requestAnimationFrame === 'function',

@@ -110,7 +110,7 @@ export class IOChainManager extends EventTarget {
 
     get entries(): Array<[string, IOChain]> { return [...this.#chains.entries()] }
     get devices() { return [...this.#devices].map(([id, value]) => ({ id, ...value })) }
-    get deviceOptions() { return { now: () => (this.#options.timer as Timer & { now: number }).now, audioContext: this.audioContext, mixer: this.outputMixer } }
+    get deviceOptions() { return { now: () => (this.#options.timer as Timer & { now: number }).now, getBpm: () => this.#options.timer.BPM, audioContext: this.audioContext, mixer: this.outputMixer } }
 
     private changed = () => {
         if (this.#restoring) return
@@ -302,7 +302,7 @@ export class IOChainManager extends EventTarget {
                 // Restore dependent keyboard displays after their inputs.
                 for (const saved of [...data.devices].sort((a, b) => Number(a.definition.factory === 'keyboard-output') - Number(b.definition.factory === 'keyboard-output'))) {
                     try {
-                        devices.set(saved.id, await restoreDevice(saved, { ...this.#options, now: () => (this.#options.timer as Timer & { now: number }).now }, devices))
+                        devices.set(saved.id, await restoreDevice(saved, { ...this.#options, now: this.deviceOptions.now, getBpm: this.deviceOptions.getBpm }, devices))
                     } catch (error) {
                         const reason = `Could not restore ${saved.definition.type ?? saved.definition.factory}: ${String(error)}`
                         warnings.push(reason)

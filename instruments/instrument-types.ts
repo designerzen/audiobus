@@ -1,4 +1,5 @@
 import { INSTRUMENT_CLASSIFICATION, type DeviceClassification } from "../io/device-classification.ts"
+import wam2Registry, { WAM2_INSTRUMENTS, wam2OutputId } from '../wam/registry'
 /**
  * Instrument Type Constants
  */
@@ -12,6 +13,7 @@ export const INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT = "scsynth-instrument"
 export const INSTRUMENT_TYPE_CLAP = "clap"
 export const INSTRUMENT_TYPE_FAUST = "faust"
 export const INSTRUMENT_TYPE_OPENDAW_VAPORISATEUR = "opendaw-vaporisateur"
+export const INSTRUMENT_TYPE_WAM2 = "wam2"
 
 /**
  * Instrument Category Constants
@@ -23,6 +25,7 @@ export const INSTRUMENT_CATEGORY_PHYSICAL = "physical"
 export const INSTRUMENT_CATEGORY_SAMPLING = "sampling"
 export const INSTRUMENT_CATEGORY_SUPERCOLLIDER = "supercollider"
 export const INSTRUMENT_CATEGORY_FAUST = "faust"
+export const INSTRUMENT_CATEGORY_WAM2 = "wam2"
 
 /**
  * External Data Key Constants
@@ -37,8 +40,9 @@ export interface InstrumentMetadata extends DeviceClassification<'engine'> {
 	id: string
 	name: string
 	description: string
-	category: "oscillator" | "synthesis" | "sampling" | "physical" | "fm" | "supercollider" | "faust"
+	category: "oscillator" | "synthesis" | "sampling" | "physical" | "fm" | "supercollider" | "faust" | "wam2"
 	loader: () => Promise<any>
+	defaultOptions?: Record<string, any>
 	requiresExternalData?: string[] // e.g., ["scsynth", "sampleUrls"]
 }
 
@@ -159,3 +163,25 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 		}
 	]
 ])
+
+INSTRUMENTS.set(INSTRUMENT_TYPE_WAM2, {
+	id: INSTRUMENT_TYPE_WAM2,
+	...INSTRUMENT_CLASSIFICATION,
+	name: 'WAM2 Instrument',
+	description: 'Play Web Audio Module instruments with a searchable catalogue or a hosted plugin URL',
+	category: INSTRUMENT_CATEGORY_WAM2,
+	loader: () => import('./wam/wam-instrument'),
+})
+
+for (const plugin of WAM2_INSTRUMENTS) {
+	const id = wam2OutputId(plugin)
+	INSTRUMENTS.set(id, {
+		id,
+		...INSTRUMENT_CLASSIFICATION,
+		name: `${plugin.name} (WAM2)`,
+		description: `${plugin.description} — ${plugin.vendor}`,
+		category: INSTRUMENT_CATEGORY_WAM2,
+		defaultOptions: { pluginUrl: wam2Registry.getPluginUrl(plugin), name: plugin.name },
+		loader: () => import('./wam/wam-instrument'),
+	})
+}
