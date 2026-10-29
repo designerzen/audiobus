@@ -7,7 +7,10 @@ self.addEventListener(EVENT_MESSAGE, async (event: MessageEvent) => {
 	try {
 		if (type === "init") {
 			const files = await FilesetResolver.forVisionTasks(
-				"https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.2.0/wasm"
+				"https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.2.0/wasm",
+				// Module workers import the loader as ESM. The classic loader's factory
+				// stays module-local and causes "ModuleFactory not set" during startup.
+				true
 			)
 			detector = await HandLandmarker.createFromOptions(files, {
 				baseOptions: {
