@@ -1,3 +1,6 @@
+import register303 from "../../instruments/303/processor.js"
+import { load303Wavetable } from "../../instruments/303/wavetable"
+import { loadCaptureWorklet } from "../../io/inputs/load-capture-worklet"
 import registerTB303Processor from "./processor.js"
 import { TB303_DESCRIPTOR, TB303_ID, TB303_PARAMETERS } from "./parameters"
 import { createTB303Gui, destroyTB303Gui } from "./gui"
@@ -5,21 +8,19 @@ import { createTB303Gui, destroyTB303Gui } from "./gui"
 const modules = new WeakMap<AudioContext, Promise<void>>()
 export async function createTB303Plugin(groupId: string, context: AudioContext) {
 	const base = "https://cdn.jsdelivr.net/npm/@webaudiomodules/sdk@0.0.12/src/"
-	const [{ default: WebAudioModule }, { default: WamNode }, { default: addFunctionModule }] =
-		await Promise.all([
-			import(/* @vite-ignore */ `${base}WebAudioModule.js`),
-			import(/* @vite-ignore */ `${base}WamNode.js`),
-			import(/* @vite-ignore */ `${base}addFunctionModule.js`)
-		])
+	const [{ default: WebAudioModule }, { default: WamNode }, wavetable] = await Promise.all([
+		import(/* @vite-ignore */ `${base}WebAudioModule.js`),
+		import(/* @vite-ignore */ `${base}WamNode.js`),
+		load303Wavetable()
+	])
 	let loading = modules.get(context)
 	if (!loading) {
 		loading = (async () => {
 			await WamNode.addModules(context, TB303_ID)
-			await addFunctionModule(
-				context.audioWorklet,
-				registerTB303Processor,
+			await loadCaptureWorklet(
+				context,
 				TB303_ID,
-				TB303_PARAMETERS
+				`(${registerTB303Processor.toString()})(${JSON.stringify(TB303_ID)}, ${JSON.stringify(TB303_PARAMETERS)}, (${register303.toString()}))`
 			)
 		})()
 		modules.set(context, loading)
@@ -35,7 +36,8 @@ export async function createTB303Plugin(groupId: string, context: AudioContext) 
 			const node = new WamNode(this, {
 				numberOfInputs: 0,
 				numberOfOutputs: 1,
-				outputChannelCount: [2]
+				outputChannelCount: [2],
+				processorOptions: { wavetable }
 			})
 			try {
 				await node._initialize()

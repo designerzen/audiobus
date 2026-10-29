@@ -19,7 +19,7 @@ If not, see http://www.gnu.org/licenses/.
 
 // Port of designerzen/audiobus, branch ts2wp2es6pug, commit 5f65dc9.
 // Uses the original wavetable and DSP; runs in an AudioWorklet at the actual device rate.
-export default function registerSynth303Processor(definitions) {
+export default function registerSynth303Processor(definitions, runtime = {}) {
 	const anti_denormal = 1e-20
 	const tau = 2 * Math.PI
 	const LOG_OF_TWO = Math.log(2)
@@ -354,7 +354,7 @@ export default function registerSynth303Processor(definitions) {
 		}
 	}
 
-	class Synth303Processor extends globalThis.AudioWorkletProcessor {
+	class Synth303Processor extends (runtime.Processor ?? globalThis.AudioWorkletProcessor) {
 		static get parameterDescriptors() {
 			return Object.entries(definitions).map(([name, config]) => ({
 				name,
@@ -365,7 +365,7 @@ export default function registerSynth303Processor(definitions) {
 			}))
 		}
 		constructor(options) {
-			super()
+			super(options)
 			const table = options.processorOptions.wavetable
 			if (!(table instanceof Float32Array) || table.length !== 1048576) {
 				throw new Error("Invalid 303 wavetable")
@@ -376,14 +376,16 @@ export default function registerSynth303Processor(definitions) {
 			this.sustain = new Uint8Array(16)
 			this.active = null
 			this.disposed = false
-			this.port.onmessage = ({ data }) => {
-				if (data.type === "destroy") {
-					this.silence()
-					this.disposed = true
-				} else if (data.type === "panic") {
-					this.silence()
-				} else if (data.type === "midi") {
-					this.midi(data.bytes)
+			if (!runtime.wam) {
+				this.port.onmessage = ({ data }) => {
+					if (data.type === "destroy") {
+						this.silence()
+						this.disposed = true
+					} else if (data.type === "panic") {
+						this.silence()
+					} else if (data.type === "midi") {
+						this.midi(data.bytes)
+					}
 				}
 			}
 		}
@@ -475,7 +477,7 @@ export default function registerSynth303Processor(definitions) {
 				}
 			}
 		}
-		process(_inputs, outputs, parameters) {
+		process(_inputs, outputs, parameters, start = 0, end = outputs[0]?.[0]?.length ?? 0) {
 			if (this.disposed) {
 				return false
 			}
@@ -483,7 +485,9 @@ export default function registerSynth303Processor(definitions) {
 			if (!channels?.length) {
 				return true
 			}
-			const value = (key) => parameters[key]?.[0] ?? definitions[key].defaultValue
+			const value = (key) =>
+				parameters[key]?.[parameters[key].length === 1 ? 0 : start] ??
+				definitions[key].defaultValue
 			const engine = this.engine
 			const tuning = value("tuning")
 			if (engine.tuning !== tuning && this.active) {
@@ -524,12 +528,12 @@ export default function registerSynth303Processor(definitions) {
 				engine.delaypos = 0
 			}
 			const volume = value("volume")
-			for (let i = 0; i < channels[0].length; i++) {
+			for (let i = start; i < end; i++) {
 				const sample = engine.render() * volume
 				if (!Number.isFinite(sample)) {
 					this.silence()
 					for (const channel of channels) {
-						channel.fill(0, i)
+						channel.fill(0, i, end)
 					}
 					break
 				}
@@ -540,5 +544,8 @@ export default function registerSynth303Processor(definitions) {
 			return true
 		}
 	}
-	globalThis.registerProcessor("303", Synth303Processor)
+	if (runtime.register !== false) {
+		globalThis.registerProcessor("303", Synth303Processor)
+	}
+	return Synth303Processor
 }

@@ -77,7 +77,7 @@ export async function createTB303Gui(node: any): Promise<HTMLElement> {
 		const knob = document.createElement("div")
 		knob.className = "knob"
 		knob.setAttribute("aria-hidden", "true")
-		const logarithmic = id === "cutoff" || id === "decay"
+		const logarithmic = id === "cutoff" || id === "decay" || id === "delayTime"
 		const toPosition = (value: number) =>
 			logarithmic
 				? Math.log(value / config.minValue) / Math.log(config.maxValue / config.minValue)
@@ -165,7 +165,7 @@ export async function createTB303Gui(node: any): Promise<HTMLElement> {
 				? choices[Math.round(value)]
 				: id === "cutoff"
 					? `${Math.round(value)} Hz`
-					: id === "decay"
+					: id === "decay" || id === "delayTime"
 						? `${value.toFixed(2)} s`
 						: id === "tuning"
 							? `${Math.round(value)} ct`

@@ -5,37 +5,13 @@ import { EVENT_CONFIGURATION_CHANGED } from "../../event-constants"
 import { commandToMidi } from "../../midi/midi-command-conversion"
 import { getAudioDestination } from "../../audio-destination"
 import { loadCaptureWorklet } from "../inputs/load-capture-worklet"
-import { bounded, devicePanel, numberControl } from "../device-controls"
+import { bounded } from "../device-controls"
+import { create303Gui } from "../../instruments/303/gui"
 import { musicalCommand } from "../event-clip"
 import registerSynth303Processor from "../../instruments/303/processor.js"
 import { SYNTH_303_PARAMETERS, type Synth303Settings } from "../../instruments/303/parameters"
 
-let wavetable: Promise<Float32Array> | undefined
-function loadWavetable(): Promise<Float32Array> {
-	return (wavetable ??= fetch(new URL("../../instruments/303/wavetable.bin", import.meta.url))
-		.then(async (response) => {
-			if (!response.ok) {
-				throw new Error(`303 wavetable: HTTP ${response.status}`)
-			}
-			const bytes = await response.arrayBuffer()
-			if (bytes.byteLength !== 4194304) {
-				throw new Error("Invalid 303 wavetable size")
-			}
-			const view = new DataView(bytes)
-			const table = new Float32Array(1048576)
-			for (let i = 0; i < table.length; i++) {
-				table[i] = view.getFloat32(i * 4, true)
-				if (!Number.isFinite(table[i]) || Math.abs(table[i]) > 2) {
-					throw new Error("Invalid 303 wavetable sample")
-				}
-			}
-			return table
-		})
-		.catch((error) => {
-			wavetable = undefined
-			throw error
-		}))
-}
+import { load303Wavetable } from "../../instruments/303/wavetable"
 
 export default class Output303 extends EventTarget implements IAudioOutput {
 	readonly uuid = `Output-Synth303-${crypto.randomUUID()}`
@@ -103,7 +79,7 @@ export default class Output303 extends EventTarget implements IAudioOutput {
 		}
 		return (this.loading ??= (async () => {
 			const [table] = await Promise.all([
-				loadWavetable(),
+				load303Wavetable(),
 				loadCaptureWorklet(
 					this.context,
 					"303",
@@ -179,45 +155,9 @@ export default class Output303 extends EventTarget implements IAudioOutput {
 		if (this.gui) {
 			return this.gui
 		}
-		const panel = devicePanel()
-		panel.setAttribute("aria-label", "303 controls")
-		const info = document.createElement("p")
-		info.textContent =
-			"Original 303 by Emil Loer. Overlap notes for slide; velocity 100–127 adds accent."
-		panel.append(info)
-		const inputs = Object.entries(SYNTH_303_PARAMETERS).map(([id, config]) => {
-			const key = id as keyof Synth303Settings
-			const input = numberControl(
-				panel,
-				config.label,
-				this.settings[key],
-				config.minValue,
-				config.maxValue,
-				(value) => this.configure({ [key]: value }),
-				config.step
-			)
-			input.name = id
-			return { key, input }
-		})
 		this.guiEvents = new AbortController()
-		this.addEventListener(
-			EVENT_CONFIGURATION_CHANGED,
-			() => {
-				for (const { key, input } of inputs) {
-					input.value = String(this.settings[key])
-				}
-			},
-			{ signal: this.guiEvents.signal }
-		)
-		const source = document.createElement("a")
-		source.href =
-			"https://github.com/designerzen/audiobus/blob/ts2wp2es6pug/source/code/typescript/audiobus/instruments/TB303/TB303.ts"
-		source.textContent = "Original source · GPL-3.0-or-later"
-		source.target = "_blank"
-		source.rel = "noopener noreferrer"
-		panel.append(source)
-		this.gui = panel
-		return panel
+		this.gui = create303Gui(this, this.guiEvents.signal)
+		return this.gui
 	}
 	async destroyGui(): Promise<void> {
 		this.guiEvents?.abort()
