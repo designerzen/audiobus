@@ -1,6 +1,8 @@
 import { UI_INPUT_COMPONENTS } from "../ui/input-components.ts"
 import { INPUT_DEFINITIONS } from "./input-definitions.ts"
-import type { DeviceClassification } from "./device-classification.ts"
+import { browserAI } from './browser-ai'
+import { AI_MODELS } from './inputs/ai-model-catalogue'
+import type { DeviceClassification, DeviceAttribution } from "./device-classification.ts"
 import { defineDevice } from './device-definition'
 import { MIDI_DEVICE_PROFILES, ensureMidiDeviceProfile, onMidiDeviceProfilesChanged } from '../midi/hardware/device-profiles'
 /**
@@ -11,6 +13,7 @@ import * as INPUT_TYPES from "./inputs/input-types.ts"
 import type { IAudioInput } from "./inputs/input-interface.ts"
 
 export interface InputFactory extends DeviceClassification {
+	attribution?: DeviceAttribution
 	id: string
 	name: string
 	description: string
@@ -19,6 +22,7 @@ export interface InputFactory extends DeviceClassification {
 }
 
 const loadSupportingLibrary = async (type: string) => {
+    if (Object.hasOwn(AI_MODELS, type)) return await import('./inputs/input-ai-music')
     if (Object.hasOwn(UI_INPUT_COMPONENTS, type)) return await import("./inputs/input-web-component.ts")
     if (Object.hasOwn(MIDI_DEVICE_PROFILES, type)) return await import('./inputs/input-profiled-midi-device')
 	// Create and return instance based on type
@@ -98,6 +102,7 @@ const loadSupportingLibraries = async (type: string): Promise<any> => {
 const createInput = async (type: string, options={} ): Promise<IAudioInput> => {
 	const Class = await loadSupportingLibraries(type)
 	return new Class(Object.hasOwn(MIDI_DEVICE_PROFILES, type) ? { ...options, profileId: type }
+        : Object.hasOwn(AI_MODELS, type) ? { ...options, modelId: type }
         : Object.hasOwn(UI_INPUT_COMPONENTS, type) ? { ...options, component: type }
         : type === INPUT_TYPES.WEBMIDI ? { autoConnect: true, ...options } : options)
 }
@@ -109,6 +114,10 @@ const createInput = async (type: string, options={} ): Promise<IAudioInput> => {
  * then uses the loaded imports in future requests
  */
 export const INPUT_FACTORIES: InputFactory[] = [
+    ...Object.keys(AI_MODELS).map(id => ({
+        ...INPUT_DEFINITIONS[id], isAvailable: () => typeof Worker !== 'undefined',
+        create: (options?: Record<string, any>) => createInput(id, options),
+    })),
     ...[INPUT_TYPES.STEP_SEQUENCER, INPUT_TYPES.PADS, INPUT_TYPES.EVENT_LOOP].map(id => ({
         ...INPUT_DEFINITIONS[id], isAvailable: () => true, create: (options?: Record<string, any>) => createInput(id, options),
     })),
@@ -131,7 +140,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
     },
     ...Object.entries(MIDI_DEVICE_PROFILES).map(([id, profile]): InputFactory => ({
         id, name: profile.name, description: profile.description, type: 'midi', subtype: 'device',
-        isAvailable: () => typeof navigator !== 'undefined' && (!!(navigator as any).requestMIDIAccess || !!(globalThis as any).window?.electronAPI?.midi2),
+        isAvailable: () => typeof document !== 'undefined',
         create: options => createInput(id, options)
     })),
 	{
@@ -229,8 +238,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		type: INPUT_DEFINITIONS[INPUT_TYPES.PROMPT_AI].type,
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.PROMPT_AI].subtype,
 		name: "PromptAI Generator",
-		description: "AI-powered prompt input for generating note sequences and combinations",
-		isAvailable: () => true,
+		description: "Generate melodies, bass lines, drums and chords with built-in browser AI; no API key required",
+		isAvailable: () => !!browserAI(),
 		create: (options) => createInput(INPUT_TYPES.PROMPT_AI, options),
 	},
 	{
@@ -239,7 +248,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.PROMPT_AI_SPEECH].subtype,
 		name: "PromptAI Speech",
 		description: "AI-powered input with speech recognition for generating note sequences via voice",
-		isAvailable: () => typeof window !== "undefined" && (!!(window as any).SpeechRecognition || !!(window as any).webkitSpeechRecognition),
+		isAvailable: () => !!browserAI() && typeof window !== "undefined" && (!!(window as any).SpeechRecognition || !!(window as any).webkitSpeechRecognition),
 		create: (options) => createInput(INPUT_TYPES.PROMPT_AI_SPEECH, options),
 	},
 	{
@@ -283,7 +292,7 @@ onMidiDeviceProfilesChanged(() => {
     for (const [id, profile] of Object.entries(MIDI_DEVICE_PROFILES)) {
         if (INPUT_FACTORIES.some(factory => factory.id === id)) continue
         INPUT_FACTORIES.push({ id, name: profile.name, description: profile.description, type: 'midi', subtype: 'device',
-            isAvailable: () => typeof navigator !== 'undefined' && (!!(navigator as any).requestMIDIAccess || !!(globalThis as any).window?.electronAPI?.midi2),
+            isAvailable: () => typeof document !== 'undefined',
             create: options => createInput(id, options) })
     }
 })

@@ -118,7 +118,14 @@ export class PercussionSynth implements IPercussionOutput {
 					0.09 * scale,
 					'triangle',
 				)
-		} else if ([42, 44, 46, 49, 51, 52, 53, 55, 57, 59, 69, 70, 54, 82, 83].includes(note)) {
+		} else if ([42, 44, 46].includes(note)) {
+			// AudioBus TR808Hat: six metallic square waves through band/high-pass filters.
+			this.metalHit(part, at, velocity * 0.12, [2, 3, 4.16, 5.43, 6.79, 8.21].map(ratio => 40 * ratio * pitchScale),
+				(part === 'hatOpen' ? 0.24 : 0.045) * scale, 10000, 7000)
+		} else if (note === 56) {
+			// AudioBus TR808Cowbell: the original 800/540 Hz oscillator pair.
+			this.metalHit(part, at, velocity * 0.2, [800 * pitchScale, 540 * pitchScale], 0.4 * scale, 1000)
+		} else if ([49, 51, 52, 53, 55, 57, 59, 69, 70, 54, 82, 83].includes(note)) {
 			const duration =
 				part === 'hatOpen' ? 0.24 : part.startsWith('hat') ? 0.045 : note >= 69 ? 0.08 : 0.5
 			this.noiseHit(
@@ -141,6 +148,29 @@ export class PercussionSynth implements IPercussionOutput {
 				0.16 * scale,
 				note >= 56 ? 'square' : 'sine',
 			)
+		}
+	}
+
+	private metalHit(part: string, at: number, velocity: number, frequencies: number[], duration: number,
+		bandpassHz: number, highpassHz?: number): void {
+		// Each oscillator owns its filter/envelope path, so voices remain independently disposable.
+		for (const frequency of frequencies) {
+			const source = this.context.createOscillator()
+			source.type = 'square'
+			source.frequency.setValueAtTime(frequency, at)
+			const bandpass = this.context.createBiquadFilter()
+			bandpass.type = 'bandpass'
+			bandpass.frequency.value = Math.min(bandpassHz, this.context.sampleRate * 0.45)
+			source.connect(bandpass)
+			const nodes: AudioNode[] = [bandpass]
+			if (highpassHz !== undefined) {
+				const highpass = this.context.createBiquadFilter()
+				highpass.type = 'highpass'
+				highpass.frequency.value = Math.min(highpassHz, this.context.sampleRate * 0.45)
+				bandpass.connect(highpass)
+				nodes.push(highpass)
+			}
+			this.voice(source, nodes, part, at, velocity, duration)
 		}
 	}
 

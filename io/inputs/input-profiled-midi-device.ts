@@ -13,6 +13,7 @@ export default class InputProfiledMidiDevice extends AbstractInput {
     #gui?: ReturnType<typeof createProfiledMidiGui>
     #unclaim?: () => void
     #pending: Promise<void> = Promise.resolve()
+    #virtual = false
     get profile() {
         const profile = MIDI_DEVICE_PROFILES[this.options.profileId]
         if (!profile) throw new Error(`Unknown MIDI device profile: ${this.options.profileId}`)
@@ -47,6 +48,12 @@ export default class InputProfiledMidiDevice extends AbstractInput {
     }
     async #open(): Promise<void> {
         if (this.isConnected) return
+        if (this.options.virtualInput === true) {
+            this.#virtual = true
+            this.setAsConnected()
+            this.#gui?.setConnected(true, 'Virtual MIDI input')
+            return
+        }
         const transport: MidiProfileTransport = this.options.transport ?? 'webmidi'
         let id = this.options.deviceId as string | undefined
         let selectedDevice: string | undefined
@@ -99,6 +106,7 @@ export default class InputProfiledMidiDevice extends AbstractInput {
             try { await (adapter as any)?.destroy?.() }
             finally {
                 this.#adapter = undefined
+                this.#virtual = false
                 this.#unclaim?.(); this.#unclaim = undefined
                 this.setAsDisconnected()
                 this.#gui?.setConnected(false, this.options.deviceId ?? '')
@@ -113,12 +121,13 @@ export default class InputProfiledMidiDevice extends AbstractInput {
             const command = midiToCommand(profileMessageBytes(message, value, this.options.selectedChannel || 1), this.now, this.options.deviceId)
             if (command) { this.#gui?.receive(command); this.dispatch(command) }
         }, () => {
-            if (this.#adapter && this.#adapter.options.selectedChannel !== this.options.selectedChannel) {
+            if ((this.options.virtualInput === true) !== this.#virtual ||
+                (this.#adapter && this.#adapter.options.selectedChannel !== this.options.selectedChannel)) {
                 void this.disconnect().then(() => this.connect()).catch(error => console.warn('MIDI channel change failed', error))
             }
             this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
         })
-        this.#gui.setConnected(this.isConnected, this.options.deviceId ?? '')
+        this.#gui.setConnected(this.isConnected, this.#virtual ? 'Virtual MIDI input' : this.options.deviceId ?? '')
         return this.#gui.element
     }
     async destroyGui() { this.#gui?.destroy(); this.#gui = undefined }

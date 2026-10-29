@@ -5,8 +5,8 @@ import styles from "./sion-player.css?inline"
 import { examples } from "./sion-examples.mjs"
 import { SiONDAW } from "./sion-daw.ts"
 import { registerAudioContextOutput } from "../../interfaces/audio-context-output.ts"
-import type { SiONDriver, SiONPresetVoice } from "./engine/sion/index.js"
-import type { SiONAudioHost } from "./engine/SiONAudioHost.js"
+import type { SiONDriver, SiONPresetVoice } from "sion/sion"
+import type { SiONAudioHost } from "sion/audio-host"
 
 const notes = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B", "C"]
 const keys = [
@@ -263,7 +263,7 @@ export class SiONPlayer extends HTMLElement {
                 const libraryURL = this.getAttribute("library-url")
                 const { loadSiON } = (libraryURL ? await import(
                     /* @vite-ignore */ libraryURL
-                ) : await import("./engine/SiON.js")) as typeof import("./engine/SiON.js")
+                ) : await import("sion")) as typeof import("sion")
                 if (!this.isConnected || this.context !== context) return
                 this.output = context.createGain()
                 this.output.connect(context.destination)

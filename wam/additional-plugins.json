@@ -49,5 +49,329 @@
       "Synthesizer"
     ],
     "path": "https://mainline.i3s.unice.fr/wam2/packages/faustFlute/index.js"
+  },
+  {
+    "identifier": "dev.cmajor.examples.pro54",
+    "name": "Pro54",
+    "vendor": "Cmajor",
+    "website": "https://github.com/cmajor-lang/cmajor/tree/main/examples/patches/Pro54",
+    "description": "Prophet-5-style polyphonic synthesizer with dual oscillators, resonant filter, LFO, poly-modulation and factory presets.",
+    "keywords": [
+      "cmajor",
+      "analog",
+      "polyphonic",
+      "prophet"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/Pro54/index.js"
+  },
+  {
+    "identifier": "com.dtinth.coopiano",
+    "name": "Coopiano",
+    "vendor": "dtinth / Peter Cooper",
+    "website": "https://github.com/dtinth/coopiano-js",
+    "description": "Physically modelled piano with sustain pedal, stereo width, velocity response and room reverb. Experimental WAM2 port.",
+    "keywords": [
+      "piano",
+      "physical modelling",
+      "experimental"
+    ],
+    "category": [
+      "Instrument",
+      "Piano"
+    ],
+    "path": "https://dtinth.github.io/coopiano-js/wam/index.js"
+  },
+  {
+    "identifier": "org.grame.faustide.additivesynth",
+    "name": "Faust Additive Synth",
+    "vendor": "GRAME (faustide example)",
+    "website": "https://github.com/grame-cncm/faustide/tree/master/src/static/examples/bela",
+    "description": "Faust example (bela/AdditiveSynth.dsp), compiled via faustwasm to a WAM2 module.",
+    "keywords": [
+      "faust",
+      "faustide",
+      "bela"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/faustide/additivesynth/index.js"
+  },
+  {
+    "identifier": "org.grame.faustide.brassmidi",
+    "name": "Faust Brass",
+    "vendor": "GRAME (faustide example)",
+    "website": "https://github.com/grame-cncm/faustide/tree/master/src/static/examples/physicalModeling",
+    "description": "Simple MIDI-controllable brass instrument physical model with physical parameters.",
+    "keywords": [
+      "faust",
+      "faustide",
+      "physicalmodeling"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/faustide/brassmidi/index.js"
+  },
+  {
+    "identifier": "org.grame.faustide.clarinetmidi",
+    "name": "Faust Clarinet",
+    "vendor": "GRAME (faustide example)",
+    "website": "https://github.com/grame-cncm/faustide/tree/master/src/static/examples/physicalModeling",
+    "description": "Simple MIDI-controllable clarinet physical model with physical parameters.",
+    "keywords": [
+      "faust",
+      "faustide",
+      "physicalmodeling"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/faustide/clarinetmidi/index.js"
+  },
+  {
+    "identifier": "org.grame.faustide.djembemidi",
+    "name": "Faust Djembe",
+    "vendor": "GRAME (faustide example)",
+    "website": "https://github.com/grame-cncm/faustide/tree/master/src/static/examples/physicalModeling",
+    "description": "Simple MIDI-controllable djembe physical model.",
+    "keywords": [
+      "faust",
+      "faustide",
+      "physicalmodeling"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/faustide/djembemidi/index.js"
+  },
+  {
+    "identifier": "org.grame.faustide.dx7",
+    "name": "Faust DX7",
+    "vendor": "GRAME (faustide example)",
+    "website": "https://github.com/grame-cncm/faustide/tree/master/src/static/examples/generator",
+    "description": "Faust example (generator/dx7.dsp), compiled via faustwasm to a WAM2 module.",
+    "keywords": [
+      "faust",
+      "faustide",
+      "generator"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/faustide/dx7/index.js"
+  },
+  {
+    "identifier": "org.grame.faustide.elecguitarmidi",
+    "name": "Faust Electric Guitar",
+    "vendor": "GRAME (faustide example)",
+    "website": "https://github.com/grame-cncm/faustide/tree/master/src/static/examples/physicalModeling",
+    "description": "Simple electric guitar model without effect chain.",
+    "keywords": [
+      "faust",
+      "faustide",
+      "physicalmodeling"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/faustide/elecguitarmidi/index.js"
+  },
+  {
+    "identifier": "org.grame.faustide.fmsynth2",
+    "name": "Faust FM Synth",
+    "vendor": "GRAME (faustide example)",
+    "website": "https://github.com/grame-cncm/faustide/tree/master/src/static/examples/bela",
+    "description": "Faust example (bela/FMSynth2.dsp), compiled via faustwasm to a WAM2 module.",
+    "keywords": [
+      "faust",
+      "faustide",
+      "bela"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/faustide/fmsynth2/index.js"
+  },
+  {
+    "identifier": "org.grame.faustide.guitarmidi",
+    "name": "Faust Steel String Guitar",
+    "vendor": "GRAME (faustide example)",
+    "website": "https://github.com/grame-cncm/faustide/tree/master/src/static/examples/physicalModeling",
+    "description": "Simple acoustic guitar model with steel strings.",
+    "keywords": [
+      "faust",
+      "faustide",
+      "physicalmodeling"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/faustide/guitarmidi/index.js"
+  },
+  {
+    "identifier": "org.grame.faustide.marimbamidi",
+    "name": "Faust Marimba",
+    "vendor": "GRAME (faustide example)",
+    "website": "https://github.com/grame-cncm/faustide/tree/master/src/static/examples/physicalModeling",
+    "description": "Simple MIDI-controllable marimba physical model.",
+    "keywords": [
+      "faust",
+      "faustide",
+      "physicalmodeling"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/faustide/marimbamidi/index.js"
+  },
+  {
+    "identifier": "org.grame.faustide.modularinterpinstrmidi",
+    "name": "Faust Modular String",
+    "vendor": "GRAME (faustide example)",
+    "website": "https://github.com/grame-cncm/faustide/tree/master/src/static/examples/physicalModeling",
+    "description": "String instrument with a modular body",
+    "keywords": [
+      "faust",
+      "faustide",
+      "physicalmodeling"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/faustide/modularinterpinstrmidi/index.js"
+  },
+  {
+    "identifier": "org.grame.faustide.nylonguitarmidi",
+    "name": "Faust Nylon Guitar",
+    "vendor": "GRAME (faustide example)",
+    "website": "https://github.com/grame-cncm/faustide/tree/master/src/static/examples/physicalModeling",
+    "description": "Simple acoustic guitar model with nylon strings.",
+    "keywords": [
+      "faust",
+      "faustide",
+      "physicalmodeling"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/faustide/nylonguitarmidi/index.js"
+  },
+  {
+    "identifier": "org.grame.faustide.simpleorganmidi",
+    "name": "Faust Sine Organ",
+    "vendor": "GRAME (faustide example)",
+    "website": "https://github.com/grame-cncm/faustide/tree/master/src/static/examples/custom",
+    "description": "Minimal MIDI-controllable sine organ voice with no visible gate widget.",
+    "keywords": [
+      "faust",
+      "faustide",
+      "custom"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/faustide/simpleorganmidi/index.js"
+  },
+  {
+    "identifier": "org.grame.faustide.simplesynth",
+    "name": "Faust Simple Synth",
+    "vendor": "GRAME (faustide example)",
+    "website": "https://github.com/grame-cncm/faustide/tree/master/src/static/examples/bela",
+    "description": "Faust example (bela/simpleSynth.dsp), compiled via faustwasm to a WAM2 module.",
+    "keywords": [
+      "faust",
+      "faustide",
+      "bela"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/faustide/simplesynth/index.js"
+  },
+  {
+    "identifier": "org.grame.faustide.violinmidi",
+    "name": "Faust Violin",
+    "vendor": "GRAME (faustide example)",
+    "website": "https://github.com/grame-cncm/faustide/tree/master/src/static/examples/physicalModeling",
+    "description": "Simple MIDI-controllable violin physical model.",
+    "keywords": [
+      "faust",
+      "faustide",
+      "physicalmodeling"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/faustide/violinmidi/index.js"
+  },
+  {
+    "identifier": "org.grame.faustide.vocalbandpassmidi",
+    "name": "Faust Vocal Bandpass",
+    "vendor": "GRAME (faustide example)",
+    "website": "https://github.com/grame-cncm/faustide/tree/master/src/static/examples/physicalModeling",
+    "description": "Simple MIDI-controllable source-filter vocal synthesizer.",
+    "keywords": [
+      "faust",
+      "faustide",
+      "physicalmodeling"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/faustide/vocal-bandpass-midi/index.js"
+  },
+  {
+    "identifier": "org.grame.faustide.vocalfofmidi",
+    "name": "Faust Vocal FOF",
+    "vendor": "GRAME (faustide example)",
+    "website": "https://github.com/grame-cncm/faustide/tree/master/src/static/examples/physicalModeling",
+    "description": "MIDI-controllable FOF vocal synthesizer.",
+    "keywords": [
+      "faust",
+      "faustide",
+      "physicalmodeling"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/faustide/vocal-fof-midi/index.js"
+  },
+  {
+    "identifier": "org.grame.faustide.wavesynth",
+    "name": "Faust Wave Synth",
+    "vendor": "GRAME (faustide example)",
+    "website": "https://github.com/grame-cncm/faustide/tree/master/src/static/examples/bela",
+    "description": "Faust example (bela/WaveSynth.dsp), compiled via faustwasm to a WAM2 module.",
+    "keywords": [
+      "faust",
+      "faustide",
+      "bela"
+    ],
+    "category": [
+      "Instrument",
+      "Synthesizer"
+    ],
+    "path": "https://anouar-bm.github.io/wam-plugins/community/faustide/wavesynth/index.js"
   }
 ]

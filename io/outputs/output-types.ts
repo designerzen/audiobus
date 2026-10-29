@@ -5,6 +5,7 @@
 
 export const CONSOLE = "console" as const
 export const NOTE_MONITOR = 'note-monitor' as const
+export const SION = "sion" as const
 export const SAMPLE_PLAYER = 'sample-player' as const
 export const EVENT_RECORDER = 'event-recorder' as const
 export const OSC = 'osc' as const
@@ -19,6 +20,7 @@ export const VIBRATOR = "vibrator" as const
 export const WAM2 = "wam2" as const
 export const MOOG = "moog" as const
 export const TB303 = 'tb303' as const
+export const AUDIOBUS_303 = 'audiobus-303' as const
 export const WAM = "wam" as const
 export const YOSHIMI = "yoshimi" as const
 export const WEBMIDI = "webmidi" as const
@@ -30,11 +32,13 @@ export const SUPERSONIC = "supersonic" as const
 export const METRONOME = "metronome" as const
 export const AUDIO_CLICK = "audio-click" as const
 export const DRUM_ACCOMPANIMENT = 'drum-accompaniment' as const
+export const DRUM_KIT = 'drum-kit' as const
 export const BUTTERCHURN = "butterchurn" as const
 export const WEBCLAP_PREFIX = 'webclap:' as const
 export const webclapOutputId = (pluginId: string): `webclap:${string}` => `${WEBCLAP_PREFIX}${pluginId}`
 
 export type OutputId =
+    | typeof SION
     | typeof NOTE_MONITOR
     | typeof SAMPLE_PLAYER
     | typeof EVENT_RECORDER
@@ -52,6 +56,7 @@ export type OutputId =
 	| typeof WAM2
 	| typeof MOOG
 	| typeof TB303
+	| typeof AUDIOBUS_303
 	| typeof WAM
 	| typeof YOSHIMI
 	| typeof WEBMIDI
@@ -63,4 +68,5 @@ export type OutputId =
 	| typeof METRONOME
 	| typeof AUDIO_CLICK
 	| typeof DRUM_ACCOMPANIMENT
+	| typeof DRUM_KIT
 	| typeof BUTTERCHURN

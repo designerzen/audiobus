@@ -1,274 +1,116 @@
-import { EVENT_ERROR } from '../../event-constants.ts'
-import AbstractInput from "./abstract-input.ts"
-import AudioCommand from "../../audio-command.ts"
-import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON } from '../../commands'
-import NoteModel from "../../note-model.ts"
+import { EVENT_CHANGE, EVENT_CLICK } from '../../event-constants'
+import NoteInput from './note-input'
+import { devicePanel, numberControl, changed } from '../device-controls'
+import { MIDI_NOTES_SCHEMA, promptBrowserAI, validateMidiNotes } from '../browser-ai'
 
-import type { IAudioInput } from "./input-interface.ts"
+export const PROMPT_AI_INPUT_ID = 'PromptAI'
+const MODES = ['melody', 'bass', 'drums', 'chord']
 
-export const PROMPT_AI_INPUT_ID = "PromptAI"
+export default class InputPromptAI extends NoteInput {
+    private panel?: HTMLElement
+    private request?: AbortController
+    private playback = new Set<ReturnType<typeof setTimeout>>()
+    private disposed = false
+    get name(): string { return PROMPT_AI_INPUT_ID }
+    get description(): string { return 'Describe a melody, bass line, drum pattern or chord using built-in browser AI' }
 
-interface PromptAIOptions {
-	apiKey?: string
-	model?: string
-	temperature?: number
-	maxTokens?: number
+    constructor(options: Record<string, any> = {}) {
+        super(options)
+        this.options.prompt = String(options.prompt ?? '')
+        this.options.mode = MODES.includes(options.mode) ? options.mode : 'melody'
+        this.options.bpm = Number.isFinite(options.bpm) ? Math.max(30, Math.min(300, options.bpm)) : 120
+        this.setAsConnected()
+    }
+
+    async createGui(): Promise<HTMLElement> {
+        if (this.panel) return this.panel
+        const panel = devicePanel()
+        panel.classList.add('prompt-ai-panel')
+        const container = document.createElement('div')
+        container.className = 'prompt-ai-container'
+        const help = document.createElement('p')
+        help.textContent = 'Describe music in English. Runs on your device, without an API key. First use may download a browser model.'
+        const label = document.createElement('label')
+        label.textContent = 'Musical idea '
+        const prompt = document.createElement('textarea')
+        prompt.id = 'prompt-input'; prompt.rows = 4; prompt.value = this.options.prompt
+        prompt.placeholder = 'A gentle descending melody in D minor'
+        prompt.addEventListener(EVENT_CHANGE, () => { this.options.prompt = prompt.value; changed(this) })
+        label.append(prompt)
+        const modeLabel = document.createElement('label'), mode = document.createElement('select')
+        modeLabel.textContent = 'Generate '
+        for (const value of MODES) {
+            const option = document.createElement('option'); option.value = value; option.textContent = value
+            mode.append(option)
+        }
+        mode.value = this.options.mode
+        mode.addEventListener(EVENT_CHANGE, () => { this.options.mode = mode.value; changed(this) })
+        modeLabel.append(mode)
+        const generate = document.createElement('button'), stop = document.createElement('button')
+        generate.type = stop.type = 'button'
+        generate.id = 'generate-sequence'; generate.textContent = 'Generate and play'
+        stop.id = 'stop-generation'; stop.textContent = 'Stop'
+        generate.addEventListener(EVENT_CLICK, () => { void this.generateSequenceFromPrompt(prompt.value) })
+        stop.addEventListener(EVENT_CLICK, () => this.stopGeneration())
+        const status = document.createElement('p'), notes = document.createElement('p')
+        status.id = 'generation-status'; status.setAttribute('role', 'status'); notes.id = 'generated-notes'
+        container.append(help, label, modeLabel)
+        numberControl(container, 'Tempo (BPM)', this.options.bpm, 30, 300, value => { this.options.bpm = value; changed(this) })
+        container.append(generate, stop, status, notes); panel.append(container)
+        return this.panel = panel
+    }
+
+    async generateSequenceFromPrompt(prompt: string): Promise<void> {
+        if (this.disposed) return
+        this.stopGeneration()
+        if (!prompt.trim()) { this.updateStatus('Please describe some music.', 'error'); return }
+        this.options.prompt = prompt.slice(0, 4000); changed(this)
+        const request = this.request = new AbortController()
+        const mode = this.options.mode, bpm = this.options.bpm
+        const button = this.panel?.querySelector<HTMLButtonElement>('#generate-sequence')
+        if (button) button.disabled = true
+        try {
+            const response = await promptBrowserAI(
+                `Return only a JSON array of 1-64 integer MIDI note numbers (0-127). Create a ${mode} from the following musical description. ` +
+                (mode === 'drums' ? 'Use General MIDI percussion pitches. ' : '') +
+                'Notes play in order as eighth notes, except chord mode plays all notes together. Description: ' + this.options.prompt,
+                MIDI_NOTES_SCHEMA, request.signal, message => this.updateStatus(message))
+            if (request.signal.aborted || this.disposed) return
+            const notes = validateMidiNotes(response)
+            const display = this.panel?.querySelector('#generated-notes')
+            if (display) display.textContent = `MIDI notes: ${notes.join(', ')}`
+            const stepMs = 30000 / bpm, channel = mode === 'drums' ? 10 : 1
+            notes.forEach((note, index) => {
+                const play = () => this.pulse(note, 100, stepMs * 0.85, channel)
+                if (mode === 'chord' || index === 0) play()
+                else {
+                    const timer = setTimeout(() => { this.playback.delete(timer); play() }, index * stepMs)
+                    this.playback.add(timer)
+                }
+            })
+            this.updateStatus('Generated. Playing sequence.', 'success')
+        } catch (error) {
+            if (!request.signal.aborted) this.updateStatus(error instanceof Error ? error.message : String(error), 'error')
+        } finally {
+            if (this.request === request) { this.request = undefined; if (button) button.disabled = false }
+        }
+    }
+
+    protected updateStatus(message: string, type: 'success' | 'error' | 'info' = 'info'): void {
+        const status = this.panel?.querySelector<HTMLElement>('#generation-status')
+        if (status) { status.textContent = message; status.className = `status-message status-${type}` }
+    }
+
+    stopGeneration(): void {
+        this.request?.abort(); this.request = undefined
+        for (const timer of this.playback) clearTimeout(timer)
+        this.playback.clear(); this.allNotesOff()
+        const button = this.panel?.querySelector<HTMLButtonElement>('#generate-sequence')
+        if (button) button.disabled = false
+        this.updateStatus('Stopped')
+    }
+    stopClock(): void { this.stopGeneration() }
+    async destroyGui(): Promise<void> { this.stopGeneration(); this.panel?.remove(); this.panel = undefined }
+    async disconnect(): Promise<void> { this.stopGeneration(); await super.disconnect() }
+    override destroy(): void { this.disposed = true; void this.destroyGui(); super.destroy() }
 }
-
-const DEFAULT_OPTIONS: PromptAIOptions = {
-	model: "gpt-3.5-turbo",
-	temperature: 0.7,
-	maxTokens: 500,
-}
-
-/**
- * PromptAI Input - Generate MIDI note sequences via AI prompting
- * Allows users to describe note combinations and sequences that are generated using an LLM
- */
-export default class InputPromptAI extends AbstractInput implements IAudioInput {
-	#apiKey: string
-	#model: string
-	#temperature: number
-	#maxTokens: number
-	#promptElement: HTMLElement | null = null
-	#isGenerating: boolean = false
-
-	get name(): string {
-		return PROMPT_AI_INPUT_ID
-	}
-
-	get description(): string {
-		return "AI-powered prompt input for generating note sequences and combinations"
-	}
-
-	get isHidden(): boolean {
-		return false
-	}
-
-	constructor(options: PromptAIOptions & Record<string, any> = DEFAULT_OPTIONS) {
-		super({ ...DEFAULT_OPTIONS, ...options })
-		this.#apiKey = options.apiKey || ""
-		this.#model = options.model || DEFAULT_OPTIONS.model!
-		this.#temperature = options.temperature ?? DEFAULT_OPTIONS.temperature!
-		this.#maxTokens = options.maxTokens || DEFAULT_OPTIONS.maxTokens!
-		this.setAsConnected()
-	}
-
-	async createGui(): Promise<HTMLElement> {
-		const container = document.querySelector("main")
-
-		if (container === null) {
-			throw new Error("Could not find main container element")
-		}
-
-		const promptPanel = document.createElement("div")
-		promptPanel.className = "prompt-ai-panel"
-		promptPanel.innerHTML = `
-			<div class="prompt-ai-container">
-				<h3>PromptAI Generator</h3>
-				<textarea 
-					id="prompt-input" 
-					placeholder="Describe the notes or sequence you want (e.g., 'C major scale ascending', 'pentatonic minor pattern')"
-					rows="4"
-				></textarea>
-				<div class="prompt-controls">
-					<button id="generate-sequence" type="button">Generate Sequence</button>
-					<button id="stop-generation" type="button" disabled>Stop</button>
-				</div>
-				<div id="generation-status" class="status-message"></div>
-				<div id="generated-notes" class="generated-notes"></div>
-			</div>
-		`
-
-		this.#promptElement = container.appendChild(promptPanel)
-
-		// Setup event listeners
-		const generateBtn = this.#promptElement.querySelector("#generate-sequence") as HTMLButtonElement
-		const stopBtn = this.#promptElement.querySelector("#stop-generation") as HTMLButtonElement
-		const promptInput = this.#promptElement.querySelector("#prompt-input") as HTMLTextAreaElement
-
-		generateBtn.addEventListener('click', () => this.generateSequenceFromPrompt(promptInput.value))
-		stopBtn.addEventListener('click', () => this.stopGeneration())
-
-		return this.#promptElement
-	}
-
-	async destroyGui(): Promise<void> {
-		if (this.#promptElement !== null) {
-			this.#promptElement.remove()
-		}
-		return Promise.resolve()
-	}
-
-	private async generateSequenceFromPrompt(prompt: string): Promise<void> {
-		if (!prompt.trim()) {
-			this.updateStatus("Please enter a prompt", EVENT_ERROR)
-			return
-		}
-
-		if (!this.#apiKey) {
-			this.updateStatus("API key not configured", EVENT_ERROR)
-			return
-		}
-
-		this.#isGenerating = true
-		this.updateGenerateButtonState(true)
-
-		try {
-			const notes = await this.callAIApi(prompt)
-			await this.dispatchNoteSequence(notes)
-			this.displayGeneratedNotes(notes)
-			this.updateStatus("Sequence generated successfully", "success")
-		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : "Unknown error"
-			this.updateStatus(`Failed to generate: ${errorMessage}`, EVENT_ERROR)
-			console.error("PromptAI generation error:", error)
-		} finally {
-			this.#isGenerating = false
-			this.updateGenerateButtonState(false)
-		}
-	}
-
-	private async callAIApi(prompt: string): Promise<number[]> {
-		const systemPrompt = `You are a music generation assistant. Given a description, respond with ONLY a JSON array of MIDI note numbers (0-127) that matches the description. 
-Examples:
-- "C major scale" -> [60, 62, 64, 65, 67, 69, 71, 72]
-- "C minor chord" -> [60, 63, 67]
-- "pentatonic pattern" -> [60, 62, 64, 67, 69]
-
-Always respond with valid JSON array format. No explanations, just the array.`
-
-		const response = await fetch("https://api.openai.com/v1/chat/completions", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${this.#apiKey}`,
-			},
-			body: JSON.stringify({
-				model: this.#model,
-				messages: [
-					{
-						role: "system",
-						content: systemPrompt,
-					},
-					{
-						role: "user",
-						content: prompt,
-					},
-				],
-				temperature: this.#temperature,
-				max_tokens: this.#maxTokens,
-			}),
-		})
-
-		if (!response.ok) {
-			const errorData = await response.json()
-			throw new Error(`API Error: ${errorData.error?.message || response.statusText}`)
-		}
-
-		const data = await response.json()
-		const content = data.choices[0]?.message?.content
-
-		if (!content) {
-			throw new Error("No response from API")
-		}
-
-		// Parse JSON array from response
-		const jsonMatch = content.match(/\[\d+(?:\s*,\s*\d+)*\]/)
-		if (!jsonMatch) {
-			throw new Error("Could not parse note numbers from response")
-		}
-
-		const notes = JSON.parse(jsonMatch[0]) as number[]
-
-		// Validate note numbers
-		if (!Array.isArray(notes) || !notes.every((n) => typeof n === "number" && n >= 0 && n <= 127)) {
-			throw new Error("Invalid note numbers in response")
-		}
-
-		return notes
-	}
-
-	private async dispatchNoteSequence(notes: number[]): Promise<void> {
-		const startTime = this.now
-		const noteDuration = 500 // milliseconds
-
-		for (let i = 0; i < notes.length; i++) {
-			const noteNumber = notes[i]
-			const noteTime = startTime + i * noteDuration
-
-			// Note ON
-			const noteOnCommand = new AudioCommand()
-			noteOnCommand.type = NOTE_ON
-			noteOnCommand.velocity = 100
-			noteOnCommand.number = noteNumber
-			noteOnCommand.from = PROMPT_AI_INPUT_ID
-			noteOnCommand.startAt = noteTime
-			noteOnCommand.time = noteTime
-
-			this.dispatch(noteOnCommand)
-
-			// Note OFF after duration
-			const noteOffCommand = new AudioCommand()
-			noteOffCommand.type = NOTE_OFF
-			noteOffCommand.velocity = 0
-			noteOffCommand.number = noteNumber
-			noteOffCommand.from = PROMPT_AI_INPUT_ID
-			noteOffCommand.startAt = noteTime + noteDuration
-			noteOffCommand.time = noteTime + noteDuration
-
-			this.dispatch(noteOffCommand)
-
-			// Small delay between dispatches
-			await new Promise((resolve) => setTimeout(resolve, 10))
-		}
-	}
-
-	private displayGeneratedNotes(notes: number[]): void {
-		const notesDisplay = this.#promptElement?.querySelector("#generated-notes") as HTMLElement
-		if (!notesDisplay) return
-
-		const noteNames = notes.map((n) => new NoteModel(n).toString())
-		notesDisplay.innerHTML = `
-			<div class="notes-list">
-				<strong>Generated Notes:</strong>
-				<div class="notes-grid">${noteNames.map((name) => `<span class="note-tag">${name}</span>`).join("")}</div>
-			</div>
-		`
-	}
-
-	private updateStatus(message: string, type: "success" | "error" | "info" = "info"): void {
-		const statusEl = this.#promptElement?.querySelector("#generation-status") as HTMLElement
-		if (!statusEl) return
-
-		statusEl.textContent = message
-		statusEl.className = `status-message status-${type}`
-	}
-
-	private updateGenerateButtonState(isGenerating: boolean): void {
-		const generateBtn = this.#promptElement?.querySelector("#generate-sequence") as HTMLButtonElement
-		const stopBtn = this.#promptElement?.querySelector("#stop-generation") as HTMLButtonElement
-
-		if (generateBtn) generateBtn.disabled = isGenerating
-		if (stopBtn) stopBtn.disabled = !isGenerating
-	}
-
-	private stopGeneration(): void {
-		this.#isGenerating = false
-		this.updateGenerateButtonState(false)
-		this.updateStatus("Generation stopped", "info")
-	}
-
-	override destroy(): void {
-		this.stopGeneration()
-		this.setAsDisconnected()
-	}
-
-	hasMidiInput(): boolean {
-		return true
-	}
-}
-
-
-
-

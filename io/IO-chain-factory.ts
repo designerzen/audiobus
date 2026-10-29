@@ -239,7 +239,7 @@ export class IOChainFactory {
 						mixer: options.outputMixer,
 						audioContext: options.audioContext 
 					})
-				} else if ([OUTPUT_TYPES.PINK_TROMBONE, OUTPUT_TYPES.WAM, OUTPUT_TYPES.WAM2, OUTPUT_TYPES.MOOG, OUTPUT_TYPES.TB303, OUTPUT_TYPES.YOSHIMI, OUTPUT_TYPES.DRUM_ACCOMPANIMENT].includes(outputId as any) || outputId.startsWith('wam2:')) {
+				} else if ([OUTPUT_TYPES.PINK_TROMBONE, OUTPUT_TYPES.WAM, OUTPUT_TYPES.WAM2, OUTPUT_TYPES.MOOG, OUTPUT_TYPES.TB303, OUTPUT_TYPES.YOSHIMI, OUTPUT_TYPES.DRUM_ACCOMPANIMENT, OUTPUT_TYPES.DRUM_KIT, OUTPUT_TYPES.AUDIOBUS_303].includes(outputId as any) || outputId.startsWith('wam2:')) {
 					output = await createOutputById(outputId, { audioContext: options.audioContext, mixer: options.outputMixer })
 				} else {
 					output = await createOutputById(outputId)

@@ -1,4 +1,5 @@
-import type { DeviceClassification } from "./device-classification.ts"
+import type { DeviceClassification, DeviceAttribution } from "./device-classification.ts"
+import { AI_MODELS, type AIInputId } from './inputs/ai-model-catalogue'
 /**
  * Input Definitions
  *
@@ -15,6 +16,7 @@ import * as INPUT_TYPES from "./inputs/input-types.ts"
 import { MIDI_DEVICE_PROFILES, onMidiDeviceProfilesChanged } from '../midi/hardware/device-profiles'
 
 export interface InputDefinition extends DeviceClassification {
+	attribution?: DeviceAttribution
 	id: string
 	name: string
 	description: string
@@ -23,6 +25,10 @@ export interface InputDefinition extends DeviceClassification {
 }
 
 export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
+    ...Object.fromEntries(Object.values(AI_MODELS).map(model => [model.id, {
+        id: model.id, name: model.name, description: model.description, attribution: model.attribution,
+        type: 'generator', subtype: 'ai', category: 'AI', icon: '/icons/input-prompt-ai.svg',
+    }])) as Record<AIInputId, InputDefinition>,
     [INPUT_TYPES.STEP_SEQUENCER]: {
         id: INPUT_TYPES.STEP_SEQUENCER, name: 'Step Sequencer', description: 'Edit a repeating sixteen-step melody or drum pattern on the shared transport',
         type: 'generator', subtype: 'sequencer', category: 'Sequencing', icon: '/icons/preset-melodic-sequencer.svg',
@@ -164,7 +170,7 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		type: "generator",
 		subtype: "ai",
 		name: "PromptAI Generator",
-		description: "AI-powered prompt input for generating note sequences and combinations",
+		description: "Generate melodies, bass lines, drums and chords with built-in browser AI; no API key required",
 		icon: "/icons/input-prompt-ai.svg",
 		category: "AI",
 	},
@@ -174,8 +180,8 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		type: "generator",
 		subtype: "ai",
 		name: "PromptAI Speech",
-		description: "AI-powered input with speech recognition for generating note sequences via voice",
-		icon: "/icons/input-prompt-ai-speech.svg",
+		description: "Speak a musical idea, then generate it with built-in browser AI; speech recognition may use an online service",
+		icon: "/icons/input-prompt-ai.svg",
 		category: "AI",
 	},
 

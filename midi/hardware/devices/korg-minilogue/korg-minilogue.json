@@ -14,7 +14,7 @@
   "description": "Four-voice analog synthesizer with MIDI panel control.",
   "documentation": [
     {
-      "title": "minilogue owner’s manual: MIDI implementation chart, page 63",
+      "title": "minilogue owner\u2019s manual: MIDI implementation chart, page 63",
       "url": "https://cdn.korg.com/us/support/download/files/23be1d77cac2c42e6f6c586cf0f75ffb.pdf#page=63"
     }
   ],
@@ -31,7 +31,7 @@
     "LFO controls",
     "Assignable slider"
   ],
-  "notice": "Original minilogue only; minilogue xd uses a different implementation. Enable MIDI Tx CC on the hardware to send panel movements and MIDI Rx CC to receive them. GUI controls perform MIDI into this chain; route the chain to a MIDI output to control the synth.",
+  "notice": "Original minilogue only; minilogue xd uses a different implementation. Enable MIDI Tx CC on the hardware to send panel movements and MIDI Rx CC to receive them. GUI controls perform MIDI into this chain; route the chain to a MIDI output to control the synth. Configurable surface controls use virtual defaults; match your hardware preset with MIDI learn or edit note/CC/channel mappings. Keyboard surfaces start at MIDI note 48.",
   "controls": [
     {
       "id": "cutoff",
@@ -129,6 +129,894 @@
       {
         "type": "guide",
         "label": "Hardware and MIDI documentation"
+      }
+    ]
+  },
+  "surface": {
+    "src": "panel.svg",
+    "width": 600,
+    "height": 240,
+    "elements": [
+      {
+        "id": "key-48",
+        "label": "Key 48",
+        "kind": "key",
+        "position": {
+          "x": 4.6667,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 48
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-50",
+        "label": "Key 50",
+        "kind": "key",
+        "position": {
+          "x": 8.7883,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 50
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-52",
+        "label": "Key 52",
+        "kind": "key",
+        "position": {
+          "x": 12.9083,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 52
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-53",
+        "label": "Key 53",
+        "kind": "key",
+        "position": {
+          "x": 17.03,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 53
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-55",
+        "label": "Key 55",
+        "kind": "key",
+        "position": {
+          "x": 21.1517,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 55
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-57",
+        "label": "Key 57",
+        "kind": "key",
+        "position": {
+          "x": 25.2733,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 57
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-59",
+        "label": "Key 59",
+        "kind": "key",
+        "position": {
+          "x": 29.3933,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 59
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-60",
+        "label": "Key 60",
+        "kind": "key",
+        "position": {
+          "x": 33.515,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 60
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-62",
+        "label": "Key 62",
+        "kind": "key",
+        "position": {
+          "x": 37.6367,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 62
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-64",
+        "label": "Key 64",
+        "kind": "key",
+        "position": {
+          "x": 41.7583,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 64
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-65",
+        "label": "Key 65",
+        "kind": "key",
+        "position": {
+          "x": 45.8783,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 65
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-67",
+        "label": "Key 67",
+        "kind": "key",
+        "position": {
+          "x": 50.0,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 67
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-69",
+        "label": "Key 69",
+        "kind": "key",
+        "position": {
+          "x": 54.1217,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 69
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-71",
+        "label": "Key 71",
+        "kind": "key",
+        "position": {
+          "x": 58.2417,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 71
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-72",
+        "label": "Key 72",
+        "kind": "key",
+        "position": {
+          "x": 62.3633,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 72
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-74",
+        "label": "Key 74",
+        "kind": "key",
+        "position": {
+          "x": 66.485,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 74
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-76",
+        "label": "Key 76",
+        "kind": "key",
+        "position": {
+          "x": 70.6067,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 76
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-77",
+        "label": "Key 77",
+        "kind": "key",
+        "position": {
+          "x": 74.7267,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 77
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-79",
+        "label": "Key 79",
+        "kind": "key",
+        "position": {
+          "x": 78.8483,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 79
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-81",
+        "label": "Key 81",
+        "kind": "key",
+        "position": {
+          "x": 82.97,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 81
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-83",
+        "label": "Key 83",
+        "kind": "key",
+        "position": {
+          "x": 87.0917,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 83
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-84",
+        "label": "Key 84",
+        "kind": "key",
+        "position": {
+          "x": 91.2117,
+          "y": 51.6667,
+          "width": 3.955,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 84
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-49",
+        "label": "Key 49",
+        "kind": "key",
+        "position": {
+          "x": 7.5517,
+          "y": 51.6667,
+          "width": 2.4733,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 49
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-51",
+        "label": "Key 51",
+        "kind": "key",
+        "position": {
+          "x": 11.6733,
+          "y": 51.6667,
+          "width": 2.4733,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 51
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-54",
+        "label": "Key 54",
+        "kind": "key",
+        "position": {
+          "x": 19.915,
+          "y": 51.6667,
+          "width": 2.4733,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 54
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-56",
+        "label": "Key 56",
+        "kind": "key",
+        "position": {
+          "x": 24.0367,
+          "y": 51.6667,
+          "width": 2.4733,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 56
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-58",
+        "label": "Key 58",
+        "kind": "key",
+        "position": {
+          "x": 28.1583,
+          "y": 51.6667,
+          "width": 2.4733,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 58
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-61",
+        "label": "Key 61",
+        "kind": "key",
+        "position": {
+          "x": 36.4,
+          "y": 51.6667,
+          "width": 2.4733,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 61
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-63",
+        "label": "Key 63",
+        "kind": "key",
+        "position": {
+          "x": 40.5217,
+          "y": 51.6667,
+          "width": 2.4733,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 63
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-66",
+        "label": "Key 66",
+        "kind": "key",
+        "position": {
+          "x": 48.7633,
+          "y": 51.6667,
+          "width": 2.4733,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 66
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-68",
+        "label": "Key 68",
+        "kind": "key",
+        "position": {
+          "x": 52.885,
+          "y": 51.6667,
+          "width": 2.4733,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 68
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-70",
+        "label": "Key 70",
+        "kind": "key",
+        "position": {
+          "x": 57.0067,
+          "y": 51.6667,
+          "width": 2.4733,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 70
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-73",
+        "label": "Key 73",
+        "kind": "key",
+        "position": {
+          "x": 65.2483,
+          "y": 51.6667,
+          "width": 2.4733,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 73
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-75",
+        "label": "Key 75",
+        "kind": "key",
+        "position": {
+          "x": 69.37,
+          "y": 51.6667,
+          "width": 2.4733,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 75
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-78",
+        "label": "Key 78",
+        "kind": "key",
+        "position": {
+          "x": 77.6117,
+          "y": 51.6667,
+          "width": 2.4733,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 78
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-80",
+        "label": "Key 80",
+        "kind": "key",
+        "position": {
+          "x": 81.7333,
+          "y": 51.6667,
+          "width": 2.4733,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 80
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-82",
+        "label": "Key 82",
+        "kind": "key",
+        "position": {
+          "x": 85.855,
+          "y": 51.6667,
+          "width": 2.4733,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 82
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "knob-1",
+        "label": "Filter cutoff",
+        "kind": "knob",
+        "position": {
+          "x": 5.0,
+          "y": 17.0833,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "control": "cutoff"
+      },
+      {
+        "id": "knob-2",
+        "label": "Filter resonance",
+        "kind": "knob",
+        "position": {
+          "x": 13.0,
+          "y": 17.0833,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "control": "resonance"
+      },
+      {
+        "id": "knob-3",
+        "label": "Filter envelope amount",
+        "kind": "knob",
+        "position": {
+          "x": 21.0,
+          "y": 17.0833,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "control": "filter-eg"
+      },
+      {
+        "id": "knob-4",
+        "label": "Amp attack",
+        "kind": "knob",
+        "position": {
+          "x": 29.0,
+          "y": 17.0833,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "control": "amp-attack"
+      },
+      {
+        "id": "knob-5",
+        "label": "Amp decay",
+        "kind": "knob",
+        "position": {
+          "x": 37.0,
+          "y": 17.0833,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "control": "amp-decay"
+      },
+      {
+        "id": "knob-6",
+        "label": "Amp sustain",
+        "kind": "knob",
+        "position": {
+          "x": 45.0,
+          "y": 17.0833,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "control": "amp-sustain"
+      },
+      {
+        "id": "knob-7",
+        "label": "Amp release",
+        "kind": "knob",
+        "position": {
+          "x": 53.0,
+          "y": 17.0833,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "control": "amp-release"
+      },
+      {
+        "id": "knob-8",
+        "label": "LFO rate",
+        "kind": "knob",
+        "position": {
+          "x": 61.0,
+          "y": 17.0833,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "control": "lfo-rate"
+      },
+      {
+        "id": "knob-9",
+        "label": "LFO depth",
+        "kind": "knob",
+        "position": {
+          "x": 69.0,
+          "y": 17.0833,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "control": "lfo-depth"
+      },
+      {
+        "id": "knob-10",
+        "label": "Assignable knob 10",
+        "kind": "knob",
+        "position": {
+          "x": 5.0,
+          "y": 32.5,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "message": {
+          "type": "cc",
+          "number": 25
+        },
+        "learnable": true
+      },
+      {
+        "id": "knob-11",
+        "label": "Assignable knob 11",
+        "kind": "knob",
+        "position": {
+          "x": 13.0,
+          "y": 32.5,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "message": {
+          "type": "cc",
+          "number": 26
+        },
+        "learnable": true
+      },
+      {
+        "id": "knob-12",
+        "label": "Assignable knob 12",
+        "kind": "knob",
+        "position": {
+          "x": 21.0,
+          "y": 32.5,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "message": {
+          "type": "cc",
+          "number": 27
+        },
+        "learnable": true
+      },
+      {
+        "id": "knob-13",
+        "label": "Assignable knob 13",
+        "kind": "knob",
+        "position": {
+          "x": 29.0,
+          "y": 32.5,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "message": {
+          "type": "cc",
+          "number": 28
+        },
+        "learnable": true
+      },
+      {
+        "id": "knob-14",
+        "label": "Assignable knob 14",
+        "kind": "knob",
+        "position": {
+          "x": 37.0,
+          "y": 32.5,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "message": {
+          "type": "cc",
+          "number": 29
+        },
+        "learnable": true
+      },
+      {
+        "id": "knob-15",
+        "label": "Assignable knob 15",
+        "kind": "knob",
+        "position": {
+          "x": 45.0,
+          "y": 32.5,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "message": {
+          "type": "cc",
+          "number": 30
+        },
+        "learnable": true
+      },
+      {
+        "id": "knob-16",
+        "label": "Assignable knob 16",
+        "kind": "knob",
+        "position": {
+          "x": 53.0,
+          "y": 32.5,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "message": {
+          "type": "cc",
+          "number": 31
+        },
+        "learnable": true
+      },
+      {
+        "id": "knob-17",
+        "label": "Assignable knob 17",
+        "kind": "knob",
+        "position": {
+          "x": 61.0,
+          "y": 32.5,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "message": {
+          "type": "cc",
+          "number": 32
+        },
+        "learnable": true
+      },
+      {
+        "id": "knob-18",
+        "label": "Assignable knob 18",
+        "kind": "knob",
+        "position": {
+          "x": 69.0,
+          "y": 32.5,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "message": {
+          "type": "cc",
+          "number": 33
+        },
+        "learnable": true
       }
     ]
   }

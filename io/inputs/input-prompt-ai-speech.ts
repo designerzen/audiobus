@@ -1,21 +1,14 @@
-import { EVENT_ERROR } from '../../event-constants.ts'
-import InputPromptAI, { PROMPT_AI_INPUT_ID } from "./input-prompt-ai.ts"
+import { EVENT_ERROR, EVENT_CLICK } from '../../event-constants.ts'
+import InputPromptAI from "./input-prompt-ai.ts"
 import type { IAudioInput } from "./input-interface.ts"
 
 export const PROMPT_AI_SPEECH_INPUT_ID = "PromptAISpeech"
 
 interface PromptAISpeechOptions {
-	apiKey?: string
-	model?: string
-	temperature?: number
-	maxTokens?: number
 	language?: string
 }
 
 const DEFAULT_OPTIONS: PromptAISpeechOptions = {
-	model: "gpt-3.5-turbo",
-	temperature: 0.7,
-	maxTokens: 500,
 	language: "en-US",
 }
 
@@ -24,7 +17,7 @@ const DEFAULT_OPTIONS: PromptAISpeechOptions = {
  * Extends InputPromptAI to add Web Speech API for voice input detection
  */
 export default class InputPromptAISpeech extends InputPromptAI implements IAudioInput {
-	#recognition: (SpeechRecognition | webkitSpeechRecognition) | null = null
+	#recognition: BrowserSpeechRecognition | null = null
 	#isListening: boolean = false
 	#language: string
 	#promptElement: HTMLElement | null = null
@@ -40,7 +33,7 @@ export default class InputPromptAISpeech extends InputPromptAI implements IAudio
 	}
 
 	get description(): string {
-		return "AI-powered prompt input with speech recognition for generating note sequences via voice"
+		return "Speak a musical idea, then generate it with built-in browser AI. Speech recognition may use an online service."
 	}
 
 	private initializeSpeechRecognition(): void {
@@ -51,22 +44,23 @@ export default class InputPromptAISpeech extends InputPromptAI implements IAudio
 			return
 		}
 
-		this.#recognition = new SpeechRecognition()
-		this.#recognition.language = this.#language
-		this.#recognition.continuous = false
-		this.#recognition.interimResults = true
+		const recognition: BrowserSpeechRecognition = new SpeechRecognition()
+		this.#recognition = recognition
+		recognition.lang = this.#language
+		recognition.continuous = false
+		recognition.interimResults = true
 
-		this.#recognition.onstart = () => {
+		recognition.onstart = () => {
 			this.#isListening = true
 			this.updateListeningState(true)
 		}
 
-		this.#recognition.onend = () => {
+		recognition.onend = () => {
 			this.#isListening = false
 			this.updateListeningState(false)
 		}
 
-		this.#recognition.onresult = (event: SpeechRecognitionEvent) => {
+		recognition.onresult = (event: SpeechRecognitionEvent) => {
 			let transcript = ""
 
 			for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -83,7 +77,7 @@ export default class InputPromptAISpeech extends InputPromptAI implements IAudio
 			}
 		}
 
-		this.#recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+		recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
 			console.error("Speech recognition error:", event.error)
 			this.updateStatus(`Speech error: ${event.error}`, EVENT_ERROR)
 			this.#isListening = false
@@ -92,12 +86,16 @@ export default class InputPromptAISpeech extends InputPromptAI implements IAudio
 	}
 
 	async createGui(): Promise<HTMLElement> {
+		if (this.#promptElement) return this.#promptElement
 		// Create the parent GUI from InputPromptAI
 		this.#promptElement = await super.createGui()
 
 		// Add speech input controls
 		const container = this.#promptElement.querySelector(".prompt-ai-container")
 		if (!container) return this.#promptElement
+		const speechHelp = document.createElement('p')
+		speechHelp.textContent = 'Speak an idea, then click Generate and play. Speech recognition may use your browser’s online service.'
+		container.append(speechHelp)
 
 		// Create speech controls div
 		const speechControls = document.createElement("div")
@@ -123,11 +121,11 @@ export default class InputPromptAISpeech extends InputPromptAI implements IAudio
 		const stopBtn = this.#promptElement.querySelector("#stop-listening") as HTMLButtonElement
 
 		if (startBtn) {
-			startBtn.addEventListener('click', () => this.startListening())
+		startBtn.addEventListener(EVENT_CLICK, () => this.startListening())
 		}
 
 		if (stopBtn) {
-			stopBtn.addEventListener('click', () => this.stopListening())
+		stopBtn.addEventListener(EVENT_CLICK, () => this.stopListening())
 		}
 
 		return this.#promptElement
@@ -182,12 +180,7 @@ export default class InputPromptAISpeech extends InputPromptAI implements IAudio
 		const preview = this.#promptElement?.querySelector("#transcript-preview") as HTMLElement
 		if (!preview) return
 
-		preview.innerHTML = `
-			<div class="transcript ${isFinal ? "final" : "interim"}">
-				<strong>${isFinal ? "Recognized:" : "Interim:"}</strong>
-				<p>${transcript}</p>
-			</div>
-		`
+		preview.textContent = `${isFinal ? 'Recognized' : 'Interim'}: ${transcript}`
 	}
 
 	private populatePromptAndGenerate(transcript: string): void {
@@ -197,28 +190,40 @@ export default class InputPromptAISpeech extends InputPromptAI implements IAudio
 		// Populate the text area with the recognized speech
 		promptInput.value = transcript
 
-		// Automatically generate sequence from the speech input
-		const generateBtn = this.#promptElement?.querySelector("#generate-sequence") as HTMLButtonElement
-		if (generateBtn) {
-			// Use setTimeout to ensure the textarea is updated before triggering generation
-			setTimeout(() => {
-				generateBtn.click()
-			}, 100)
-		}
+		// Native model creation/download may require a fresh user gesture.
+		this.updateStatus('Speech captured. Click Generate and play to use browser AI. Speech recognition may use your browser’s online service.')
 	}
 
-	protected updateStatus(message: string, type: "success" | "error" | "info" = "info"): void {
-		const statusEl = this.#promptElement?.querySelector("#generation-status") as HTMLElement
-		if (!statusEl) return
-
-		statusEl.textContent = message
-		statusEl.className = `status-message status-${type}`
+	async destroyGui(): Promise<void> {
+		this.#recognition?.abort()
+		this.#isListening = false
+		this.#promptElement = null
+		await super.destroyGui()
 	}
 
 	override destroy(): void {
-		this.stopListening()
+		if (this.#recognition) {
+			this.#recognition.onresult = null
+			this.#recognition.onend = null
+			this.#recognition.onstart = null
+			this.#recognition.onerror = null
+			this.#recognition.abort()
+		}
 		super.destroy()
 	}
+}
+
+interface BrowserSpeechRecognition {
+	lang: string
+	continuous: boolean
+	interimResults: boolean
+	onstart: (() => void) | null
+	onend: (() => void) | null
+	onresult: ((event: SpeechRecognitionEvent) => void) | null
+	onerror: ((event: SpeechRecognitionErrorEvent) => void) | null
+	start(): void
+	stop(): void
+	abort(): void
 }
 
 // Type declaration for SpeechRecognitionEvent

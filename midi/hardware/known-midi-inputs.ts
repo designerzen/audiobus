@@ -18,6 +18,7 @@ export interface MidiInputDiscovery { (): Promise<void>; refresh(): Promise<void
 
 const sourceInput = (input: any) => input.midiInput ?? input
 function binding(input: any): { id: string; transport: MidiProfileTransport } | undefined {
+    if (input instanceof InputProfiledMidiDevice && input.options.virtualInput === true) return
     if (input instanceof InputProfiledMidiDevice && input.options.deviceId) return { id: input.options.deviceId, transport: input.options.transport ?? 'webmidi' }
     const source = sourceInput(input)
     if (source instanceof InputWebMIDIDevice) {

@@ -48,7 +48,7 @@ export abstract class PerformanceTransformer extends Transformer<Settings> {
     readonly handlesMidiControls = true
     private tasks: Task[] = []
     private inputs = new Map<string, Voice[]>()
-    private sounding = new Map<string, IAudioCommand>()
+    private sounding = new Map<string, IAudioCommand[]>()
     private cleanup: IAudioCommand[] = []
     protected voices = new Set<Voice>()
     protected now = 0
@@ -124,18 +124,27 @@ export abstract class PerformanceTransformer extends Transformer<Settings> {
 
     private observe(commands: IAudioCommand[]): void {
         for (const command of commands) {
-            if (isNoteOn(command)) this.sounding.set(noteKey(command), command)
-            else if (isNoteOff(command)) this.sounding.delete(noteKey(command))
+            const key = noteKey(command)
+            if (isNoteOn(command)) {
+                const notes = this.sounding.get(key) ?? []
+                notes.push(command)
+                this.sounding.set(key, notes)
+            } else if (isNoteOff(command)) {
+                const notes = this.sounding.get(key)
+                notes?.shift()
+                if (!notes?.length) this.sounding.delete(key)
+            }
         }
     }
 
     private receive(command: IAudioCommand): IAudioCommand[] {
         if (command.type === CONTROL_CHANGE && [120, 123].includes(command.number)) {
             const route = routeKey(command)
+            const controls = this.panicControls(command)
             const result = [...this.voices].filter(voice => routeKey(voice.input) === route).flatMap(voice => this.release(voice))
             this.tasks = this.tasks.filter(task => task.input || task.route !== route)
             result.push(...this.clearRoute(route))
-            return [...result, command]
+            return [...result, ...controls]
         }
         if (isNoteOff(command)) {
             const key = noteKey(command)
@@ -165,6 +174,7 @@ export abstract class PerformanceTransformer extends Transformer<Settings> {
     protected clearState(): void {}
     protected clearRoute(_route: string): IAudioCommand[] { return [] }
     protected stopControllers(): IAudioCommand[] { return [] }
+    protected panicControls(command: IAudioCommand): IAudioCommand[] { return [command] }
 
     protected schedule(at: number, run: Task['run'], voice?: Voice, route?: string): void {
         this.tasks.push({ at, run, voice, route })
@@ -190,7 +200,7 @@ export abstract class PerformanceTransformer extends Transformer<Settings> {
         })
     }
     protected releaseAll(at: number): IAudioCommand[] {
-        const result = [...this.sounding.values()].map(command => copyCommand(command, { type: NOTE_OFF, subtype: NOTE_OFF, velocity: 0, startAt: at }))
+        const result = [...this.sounding.values()].flatMap(notes => notes.map(command => copyCommand(command, { type: NOTE_OFF, subtype: NOTE_OFF, velocity: 0, startAt: at })))
         result.push(...this.stopControllers())
         for (const voice of this.voices) {
             result.push(...voice.targets.filter(command => command.type === CONTROL_CHANGE).map(command => copyCommand(command, { value: 0, startAt: at })))

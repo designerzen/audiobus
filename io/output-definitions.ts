@@ -27,6 +27,23 @@ export interface OutputDefinition extends DeviceClassification {
 }
 
 export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
+    [OUTPUT_TYPES.AUDIOBUS_303]: {
+        id: OUTPUT_TYPES.AUDIOBUS_303, name: 'AudioBus 303',
+        description: 'Original AudioBus wavetable bass synthesis with slide, accent, foldback distortion and delay',
+        type: 'engine', subtype: 'instrument', category: 'Synthesis', icon: '/icons/output-tb303.svg',
+        attribution: { author: 'Emil Loer; AudioBus port by designerzen',
+            sourceUrl: 'https://github.com/designerzen/audiobus/blob/ts2wp2es6pug/source/code/typescript/audiobus/instruments/TB303/TB303.ts',
+            license: 'GPL-3.0-or-later', licenseUrls: ['https://www.gnu.org/licenses/gpl-3.0.html'] },
+    },
+	[OUTPUT_TYPES.DRUM_KIT]: {
+		id: OUTPUT_TYPES.DRUM_KIT, name: 'Drum Kit',
+		description: 'Play synthesized drums, hi-hats, toms, cowbells and congas from MIDI notes or touch pads; no samples required',
+		type: 'engine', subtype: 'instrument', category: 'Synthesis', icon: '/icons/device-drums.svg',
+	},
+    [OUTPUT_TYPES.SION]: {
+        id: OUTPUT_TYPES.SION, name: 'SiON', description: 'Polyphonic SiON synthesizer with FM, chip and acoustic instrument presets',
+        type: 'engine', subtype: 'instrument', category: 'Synthesis', icon: '/icons/device-piano.svg',
+    },
     [OUTPUT_TYPES.NOTE_MONITOR]: {
         id: OUTPUT_TYPES.NOTE_MONITOR, name: 'Piano Roll / Note Monitor', description: 'View transformed pitches, channels, velocities and note durations',
         type: 'visual', subtype: 'visualiser', category: 'Visual', icon: '/icons/device-piano.svg',

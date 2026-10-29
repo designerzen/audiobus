@@ -1,5 +1,6 @@
 import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON, PITCH_BEND, PROGRAM_CHANGE } from '../../commands'
 import { CHANNEL_PRESSURE } from '../midi-command-conversion'
+import { createMidiDeviceSurface, validSurfaceBinding } from './midi-device-surface'
 import type { IAudioCommand } from '../../audio-command-interface'
 import { controlMessage, controlRange, type MidiDeviceProfile, type MidiGuiNode, type MidiProfileControl, type MidiProfileMessage } from './device-profile-schema'
 import { EVENT_INPUT, EVENT_CHANGE, EVENT_CLICK, EVENT_POINTER_DOWN, EVENT_POINTER_UP, EVENT_POINTER_CANCEL, EVENT_LOST_POINTER_CAPTURE, EVENT_POINTER_MOVE, EVENT_KEY_DOWN, EVENT_KEY_UP, EVENT_BLUR } from '../../event-constants'
@@ -13,6 +14,11 @@ export function createProfiledMidiGui(profile: MidiDeviceProfile, options: Recor
     const abort = new AbortController()
     const listen = (target: EventTarget, type: string, handler: (event: any) => void) => target.addEventListener(type, handler, { signal: abort.signal })
     const definitions = new Map(profile.controls.map(control => [control.id, control]))
+    const messagesForControl = (control: MidiProfileControl): MidiProfileMessage[] => {
+        const item = profile.surface?.elements.find(item => item.control === control.id)
+        const mapping = item && options.surfaceMappings?.[item.id]
+        return validSurfaceBinding(mapping) ? [mapping] : control.messages ?? [controlMessage(control)]
+    }
     const values = new Map(profile.controls.map(control => [control.id, control.default ?? controlRange(control).min]))
     const updates = new Map<string, Set<(value: number) => void>>()
     const interactive = new Set<HTMLInputElement | HTMLSelectElement | HTMLButtonElement>()
@@ -23,6 +29,7 @@ export function createProfiledMidiGui(profile: MidiDeviceProfile, options: Recor
     const activeNotes = new Map<string, number>()
     const heldNotes = new Map<string, MidiProfileMessage>()
     const releases = new Set<() => void>()
+    const surfaces: ReturnType<typeof createMidiDeviceSurface>[] = []
     const hiddenDisplays = new WeakMap<HTMLElement, string>()
     const setHidden = (node: HTMLElement, hidden: boolean) => {
         node.hidden = hidden
@@ -60,9 +67,10 @@ export function createProfiledMidiGui(profile: MidiDeviceProfile, options: Recor
         const { min, max, step } = controlRange(control)
         const next = Math.max(min, Math.min(max, min + Math.round((value - min) / step) * step))
         setValue(control, next)
-        for (const message of control.messages ?? [controlMessage(control)]) send(message, next)
+        for (const message of messagesForControl(control)) send(message, next)
     }
     const release = () => {
+        surfaces.forEach(surface => surface.release())
         releases.forEach(callback => callback())
         for (const message of heldNotes.values()) perform(message, 0)
         heldNotes.clear()
@@ -117,7 +125,7 @@ export function createProfiledMidiGui(profile: MidiDeviceProfile, options: Recor
             const press = () => {
                 if (pressed || !connected) return
                 pressed = true
-                held = (control.messages ?? [message]).map(message => ({ ...message, channel: message.channel ?? (options.selectedChannel || 1) }))
+                held = messagesForControl(control).map(message => ({ ...message, channel: message.channel ?? (options.selectedChannel || 1) }))
                 setValue(control, max)
                 held.forEach(message => send(message, max))
                 button.setAttribute('aria-pressed', 'true')
@@ -174,6 +182,10 @@ export function createProfiledMidiGui(profile: MidiDeviceProfile, options: Recor
             case 'notes': noteDisplays.push(host); renderNotes(); break
             case 'text': host.textContent = node.text ?? ''; break
             case 'image': {
+                if (profile.surface && node.src === profile.surface.src) {
+                    const surface = createMidiDeviceSurface(profile, options, send, changed)
+                    surfaces.push(surface); host.append(surface.element); break
+                }
                 const image = document.createElement('img')
                 image.src = node.src!; image.alt = node.alt ?? ''; image.style.cssText = 'display:block;width:100%;height:auto;border-radius:.6rem'
                 host.append(image); break
@@ -191,7 +203,7 @@ export function createProfiledMidiGui(profile: MidiDeviceProfile, options: Recor
             }
             case 'mode': {
                 const label = document.createElement('label'); label.textContent = node.label ?? 'Display CC mode '
-                const select = document.createElement('select'); select.dataset.midiIgnore = ''
+                const select = document.createElement('select'); select.dataset.midiIgnore = ''; select.dataset.midiControl = 'display-mode'
                 profile.modes.forEach(item => addOption(select, item.id, item.label))
                 select.value = mode?.id ?? ''
                 listen(select, EVENT_CHANGE, () => { mode = profile.modes.find(item => item.id === select.value); options.displayMode = mode?.id; refreshMode(); changed() })
@@ -283,7 +295,12 @@ export function createProfiledMidiGui(profile: MidiDeviceProfile, options: Recor
         }
         return host
     }
-    element.append(render(profile.gui))
+    const virtualLabel = document.createElement('label'), virtual = document.createElement('input')
+    virtual.type = 'checkbox'; virtual.checked = options.virtualInput === true; virtual.dataset.midiIgnore = ''
+    virtual.setAttribute('aria-label', 'Use as virtual MIDI input')
+    virtualLabel.append(virtual, ' Use as virtual MIDI input')
+    listen(virtual, EVENT_CHANGE, () => { release(); options.virtualInput = virtual.checked; changed() })
+    element.append(virtualLabel, render(profile.gui))
     refreshMode()
     return {
         element, release,
@@ -292,12 +309,14 @@ export function createProfiledMidiGui(profile: MidiDeviceProfile, options: Recor
             connected = value
             statuses.forEach(status => { status.textContent = connected ? `Connected: ${port}` : `Waiting for ${profile.name}${port ? ` (${port})` : ''}` })
             interactive.forEach(input => { input.disabled = !connected })
+            surfaces.forEach(surface => surface.setEnabled(connected))
             if (!connected) {
                 activeNotes.clear(); renderNotes()
                 profile.controls.forEach(control => setValue(control, control.default ?? controlRange(control).min))
             }
         },
         receive(command: IAudioCommand) {
+            surfaces.forEach(surface => surface.receive(command))
             if (command.channel >= 1 && command.channel <= 16 && !observedChannels.has(command.channel)) {
                 observedChannels.add(command.channel)
                 for (const select of channelSelects) for (const option of Array.from(select.options)) {
@@ -306,11 +325,12 @@ export function createProfiledMidiGui(profile: MidiDeviceProfile, options: Recor
                 }
             }
             const key = `${command.channel}:${command.number}`
-            if (command.type === NOTE_ON) activeNotes.set(key, command.number)
+            if (command.type === NOTE_ON && command.velocity > 0) activeNotes.set(key, command.number)
+            if (command.type === NOTE_ON && command.velocity === 0) activeNotes.delete(key)
             if (command.type === NOTE_OFF) activeNotes.delete(key)
             if (command.type === NOTE_ON || command.type === NOTE_OFF) renderNotes()
             for (const control of profile.controls) {
-                const message = controlMessage(control)
+                const message = messagesForControl(control)[0]
                 if (message.channel && message.channel !== command.channel) continue
                 let value: number | undefined
                 if (message.type === 'cc' && command.type === CONTROL_CHANGE && message.number === command.number) value = command.value
@@ -323,6 +343,6 @@ export function createProfiledMidiGui(profile: MidiDeviceProfile, options: Recor
                 if (value !== undefined) setValue(control, value)
             }
         },
-        destroy() { release(); abort.abort(); element.remove() }
+        destroy() { release(); surfaces.forEach(surface => surface.destroy()); abort.abort(); element.remove() }
     }
 }

@@ -12,7 +12,7 @@
   "icon": "icon.svg",
   "documentation": [
     {
-      "title": "CMPSR owner's manual, pages 5–8",
+      "title": "CMPSR owner's manual, pages 5\u20138",
       "url": "https://www.digitmusic.co.uk/wp-content/uploads/2025/07/CMPSR-Owners-Manual_V2.pdf"
     },
     {
@@ -113,14 +113,14 @@
     },
     {
       "id": "blue",
-      "label": "Blue — one CC",
+      "label": "Blue \u2014 one CC",
       "cc": [
         102
       ]
     },
     {
       "id": "red",
-      "label": "Red — eight directions",
+      "label": "Red \u2014 eight directions",
       "cc": [
         111,
         112,
@@ -134,7 +134,7 @@
     },
     {
       "id": "purple",
-      "label": "Purple — combined",
+      "label": "Purple \u2014 combined",
       "cc": [
         102,
         111,
@@ -149,7 +149,7 @@
     },
     {
       "id": "green",
-      "label": "Green — nested XY",
+      "label": "Green \u2014 nested XY",
       "cc": [
         111,
         113,
@@ -159,7 +159,7 @@
     },
     {
       "id": "yellow",
-      "label": "Yellow — CC numbers undocumented",
+      "label": "Yellow \u2014 CC numbers undocumented",
       "cc": []
     },
     {
@@ -215,5 +215,120 @@
   "$schema": "../profile.schema.json",
   "id": "digit-cmpsr",
   "manufacturerUrl": "https://www.digitmusic.co.uk/",
-  "productUrl": "https://www.digitmusic.co.uk/cmpsr/"
+  "productUrl": "https://www.digitmusic.co.uk/cmpsr/",
+  "surface": {
+    "src": "panel.svg",
+    "width": 480,
+    "height": 200,
+    "elements": [
+      {
+        "id": "expression",
+        "label": "All directions",
+        "kind": "knob",
+        "position": {
+          "x": 20.0,
+          "y": 11.0,
+          "width": 14.1667,
+          "height": 34.0
+        },
+        "control": "expression"
+      },
+      {
+        "id": "up",
+        "label": "Up",
+        "kind": "pad",
+        "position": {
+          "x": 54.1667,
+          "y": 9.0,
+          "width": 11.25,
+          "height": 16.0
+        },
+        "control": "up"
+      },
+      {
+        "id": "up-right",
+        "label": "Up-right",
+        "kind": "pad",
+        "position": {
+          "x": 70.0,
+          "y": 9.0,
+          "width": 11.25,
+          "height": 16.0
+        },
+        "control": "up-right"
+      },
+      {
+        "id": "right",
+        "label": "Right",
+        "kind": "pad",
+        "position": {
+          "x": 54.1667,
+          "y": 32.0,
+          "width": 11.25,
+          "height": 16.0
+        },
+        "control": "right"
+      },
+      {
+        "id": "down-right",
+        "label": "Down-right",
+        "kind": "pad",
+        "position": {
+          "x": 70.0,
+          "y": 32.0,
+          "width": 11.25,
+          "height": 16.0
+        },
+        "control": "down-right"
+      },
+      {
+        "id": "down",
+        "label": "Down",
+        "kind": "pad",
+        "position": {
+          "x": 54.1667,
+          "y": 55.0,
+          "width": 11.25,
+          "height": 16.0
+        },
+        "control": "down"
+      },
+      {
+        "id": "down-left",
+        "label": "Down-left",
+        "kind": "pad",
+        "position": {
+          "x": 70.0,
+          "y": 55.0,
+          "width": 11.25,
+          "height": 16.0
+        },
+        "control": "down-left"
+      },
+      {
+        "id": "left",
+        "label": "Left",
+        "kind": "pad",
+        "position": {
+          "x": 54.1667,
+          "y": 78.0,
+          "width": 11.25,
+          "height": 16.0
+        },
+        "control": "left"
+      },
+      {
+        "id": "up-left",
+        "label": "Up-left",
+        "kind": "pad",
+        "position": {
+          "x": 70.0,
+          "y": 78.0,
+          "width": 11.25,
+          "height": 16.0
+        },
+        "control": "up-left"
+      }
+    ]
+  }
 }

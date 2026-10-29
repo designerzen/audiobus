@@ -22,7 +22,8 @@
     "documentation": { "type": "array", "items": { "type": "object", "required": ["title", "url"], "properties": { "title": { "type": "string" }, "url": { "type": "string", "pattern": "^https?://" } }, "additionalProperties": false } },
     "controls": { "type": "array", "items": { "$ref": "#/$defs/control" } },
     "modes": { "type": "array", "items": { "type": "object", "required": ["id", "label", "cc"], "properties": { "id": { "type": "string" }, "label": { "type": "string" }, "cc": { "type": "array", "items": { "$ref": "#/$defs/midi7" } } }, "additionalProperties": false } },
-    "gui": { "$ref": "#/$defs/node" }
+    "gui": { "$ref": "#/$defs/node" },
+    "surface": { "$ref": "#/$defs/surface" }
   },
   "$defs": {
     "strings": { "type": "array", "items": { "type": "string", "minLength": 1 } },
@@ -90,6 +91,7 @@
         { "if": { "properties": { "type": { "const": "xy" } } }, "then": { "required": ["x", "y"] } }
       ]
     },
+    "surface": {"type": "object", "required": ["src", "width", "height", "elements"], "additionalProperties": false, "properties": {"src": {"$ref": "#/$defs/asset"}, "width": {"type": "integer", "minimum": 1, "maximum": 8192}, "height": {"type": "integer", "minimum": 1, "maximum": 8192}, "elements": {"type": "array", "items": {"type": "object", "required": ["id", "label", "kind", "position"], "additionalProperties": false, "properties": {"id": {"type": "string", "minLength": 1}, "label": {"type": "string"}, "kind": {"enum": ["key", "pad", "button", "knob", "fader"]}, "control": {"type": "string"}, "message": {"$ref": "#/$defs/message"}, "learnable": {"type": "boolean"}, "dark": {"type": "boolean"}, "position": {"type": "object", "required": ["x", "y", "width", "height"], "additionalProperties": false, "properties": {"x": {"$ref": "#/$defs/percent"}, "y": {"$ref": "#/$defs/percent"}, "width": {"$ref": "#/$defs/percent"}, "height": {"$ref": "#/$defs/percent"}}}}}}}},
     "percent": { "type": "number", "minimum": 0, "maximum": 100 }
   }
 }

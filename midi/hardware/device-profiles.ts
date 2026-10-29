@@ -62,7 +62,8 @@ export function refreshMidiDeviceProfiles(force = false): Promise<void> {
     lastRefresh = Date.now()
     pendingRefresh = (async () => {
         try {
-            const response = await fetchProfile(registryUrl(), { cache: 'no-store' })
+            let response = await fetchProfile(new URL('index.json', registryUrl()).href, { cache: 'no-store' })
+            if (!response.ok) response = await fetchProfile(registryUrl(), { cache: 'no-store' })
             if (!response.ok) return
             const ids: unknown = await response.json()
             if (Array.isArray(ids)) await Promise.all(ids.filter((id): id is string => typeof id === 'string').map(ensureMidiDeviceProfile))

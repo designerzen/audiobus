@@ -1,4 +1,4 @@
-import { cp, readdir, readFile, realpath, stat } from 'node:fs/promises'
+import { cp, readdir, readFile, realpath, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -22,6 +22,7 @@ export function createMidiDeviceStore(getRoots) {
             return [...ids].sort()
         },
         async read(relative) {
+            if (relative === 'index.json') return { type: 'application/json', bytes: Buffer.from(JSON.stringify(await this.list())) }
             const parts = relative.split('/')
             if (relative !== 'profile.schema.json' && (parts.length < 2 || !DEVICE_ID.test(parts[0]))) return null
             if (parts.some(part => !part || part === '.' || part === '..' || /[\\\0:]/.test(part))) return null
@@ -65,7 +66,10 @@ export function midiDeviceFilesPlugin() {
         configResolved(resolved) { config = resolved },
         configureServer(server) { server.middlewares.use(middleware(MIDI_DEVICE_DIRECTORY)) },
         async writeBundle() {
-            await cp(MIDI_DEVICE_DIRECTORY, path.resolve(config.root, config.build.outDir, 'midi-devices'), { recursive: true })
+            const destination = path.resolve(config.root, config.build.outDir, 'midi-devices')
+            await cp(MIDI_DEVICE_DIRECTORY, destination, { recursive: true })
+            const store = createMidiDeviceStore(() => [MIDI_DEVICE_DIRECTORY])
+            await writeFile(path.join(destination, 'index.json'), JSON.stringify(await store.list()))
         },
         configurePreviewServer(server) { server.middlewares.use(middleware(path.resolve(config.root, config.build.outDir, 'midi-devices'))) }
     }

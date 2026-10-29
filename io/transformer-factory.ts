@@ -18,6 +18,7 @@ import { ID_FILTER, TransformerFilter } from "./transformers/transformer-filter.
 import { ID_EMOJI, TransformerEmoji } from "./transformers/transformer-emoji.ts"
 import { ID_MIDI_FILE_PLAYER, TransformerMIDIFilePlayer } from "./transformers/transformer-midi-file-player.ts"
 import { ID_MAGENTA, TransformerMagenta } from "./transformers/transformer-magenta.ts"
+import { ID_BROWSER_AI, TransformerBrowserAI } from './transformers/transformer-browser-ai'
 import { ID_VELOCITY_SHAPER, TransformerVelocityShaper } from './transformers/transformer-velocity-shaper.ts'
 import { ID_STRUMMER, TransformerStrummer } from './transformers/transformer-strummer.ts'
 import { ID_PROBABILITY_GATE, TransformerProbabilityGate } from './transformers/transformer-probability-gate.ts'
@@ -30,9 +31,18 @@ import { ID_ORNAMENTER, TransformerOrnamenter } from './transformers/transformer
 import { ID_PHRASE_RECOMBINER, TransformerPhraseRecombiner } from './transformers/transformer-phrase-recombiner.ts'
 import { ID_LEGATO, TransformerLegato } from './transformers/transformer-legato.ts'
 import { ID_CC_MAPPER, TransformerCCMapper } from './transformers/transformer-cc-mapper.ts'
+import { ID_PITCH_MIRROR, TransformerPitchMirror } from './transformers/transformer-pitch-mirror.ts'
+import { ID_INTERVAL_STACK, TransformerIntervalStack } from './transformers/transformer-interval-stack.ts'
+import { ID_NOTE_BOUNCER, TransformerNoteBouncer } from './transformers/transformer-note-bouncer.ts'
+import { ID_RELEASE_TRIGGER, TransformerReleaseTrigger } from './transformers/transformer-release-trigger.ts'
+import { ID_POLYPHONY_LIMITER, TransformerPolyphonyLimiter } from './transformers/transformer-polyphony-limiter.ts'
+import { ID_NOTE_ROUTER, TransformerNoteRouter } from './transformers/transformer-note-router.ts'
+import { ID_CHANNEL_ALLOCATOR, TransformerChannelAllocator } from './transformers/transformer-channel-allocator.ts'
+import { ID_CC_STEPPER, TransformerCCStepper } from './transformers/transformer-cc-stepper.ts'
 
 export const tranformerFactory = (type: string, config: any={} ) => {
     switch (type) {
+        case ID_BROWSER_AI: return new TransformerBrowserAI(config)
         case ID_VELOCITY_SHAPER: return new TransformerVelocityShaper(config)
         case ID_STRUMMER: return new TransformerStrummer(config)
         case ID_PROBABILITY_GATE: return new TransformerProbabilityGate(config)
@@ -45,6 +55,14 @@ export const tranformerFactory = (type: string, config: any={} ) => {
         case ID_PHRASE_RECOMBINER: return new TransformerPhraseRecombiner(config)
         case ID_LEGATO: return new TransformerLegato(config)
         case ID_CC_MAPPER: return new TransformerCCMapper(config)
+        case ID_PITCH_MIRROR: return new TransformerPitchMirror(config)
+        case ID_INTERVAL_STACK: return new TransformerIntervalStack(config)
+        case ID_NOTE_BOUNCER: return new TransformerNoteBouncer(config)
+        case ID_RELEASE_TRIGGER: return new TransformerReleaseTrigger(config)
+        case ID_POLYPHONY_LIMITER: return new TransformerPolyphonyLimiter(config)
+        case ID_NOTE_ROUTER: return new TransformerNoteRouter(config)
+        case ID_CHANNEL_ALLOCATOR: return new TransformerChannelAllocator(config)
+        case ID_CC_STEPPER: return new TransformerCCStepper(config)
         case ID_MAGENTA: return new TransformerMagenta(config)
         case ID_ARPEGGIATOR: return new TransformerArpeggiator(config)
     case ID_CHANNELER: return new TransformerChanneler(config)
@@ -69,6 +87,7 @@ export const tranformerFactory = (type: string, config: any={} ) => {
 }
 
 export const TRANSFORMER_TYPE = {
+    ID_BROWSER_AI,
     ID_VELOCITY_SHAPER,
     ID_STRUMMER,
     ID_PROBABILITY_GATE,
@@ -81,6 +100,14 @@ export const TRANSFORMER_TYPE = {
     ID_PHRASE_RECOMBINER,
     ID_LEGATO,
     ID_CC_MAPPER,
+    ID_PITCH_MIRROR,
+    ID_INTERVAL_STACK,
+    ID_NOTE_BOUNCER,
+    ID_RELEASE_TRIGGER,
+    ID_POLYPHONY_LIMITER,
+    ID_NOTE_ROUTER,
+    ID_CHANNEL_ALLOCATOR,
+    ID_CC_STEPPER,
     ID_MAGENTA,
     ID_ARPEGGIATOR,
     ID_CHANNELER,

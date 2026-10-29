@@ -62,6 +62,7 @@ export * from './timing/index.ts'
 
 // Instruments and synthesis
 export * from './instruments/index.ts'
+export * from './synthesis/index.ts'
 
 // Effects and processing
 export * from './effects/index.ts'

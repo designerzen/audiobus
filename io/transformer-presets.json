@@ -1194,6 +1194,151 @@
           "summary": "Layer snare note 38 with note 50."
         }
       ]
+    },
+    {
+      "id": "mirrored-melody",
+      "name": "Mirrored Melody",
+      "category": "Arpeggios & movement",
+      "description": "Turn rising phrases into falling phrases around middle C.",
+      "useCase": "Explore an inverted melodic idea, then adjust the mirror centre.",
+      "steps": [
+        {
+          "type": "Pitch-Mirror",
+          "config": {
+            "centre": 60,
+            "outside": "octave-fold"
+          },
+          "summary": "Mirror intervals around MIDI note 60."
+        }
+      ]
+    },
+    {
+      "id": "parallel-fifths",
+      "name": "Parallel Fifths",
+      "category": "Chords & accompaniment",
+      "description": "Add a perfect fifth and octave to each note.",
+      "useCase": "Build open power-chord textures from a single melodic line.",
+      "steps": [
+        {
+          "type": "Interval-Stack",
+          "config": {
+            "intervals": "0, 7, 12",
+            "falloff": 15
+          },
+          "summary": "Stack a root, fifth and octave."
+        }
+      ]
+    },
+    {
+      "id": "falling-note-bounces",
+      "name": "Falling Note Bounces",
+      "category": "Rhythm & repeats",
+      "description": "Create accelerating repeats that become softer with each bounce.",
+      "useCase": "Hold a note to hear the complete bounce pattern.",
+      "steps": [
+        {
+          "type": "Note-Bouncer",
+          "config": {
+            "beats": 1,
+            "damping": 70,
+            "decay": 80,
+            "count": 8
+          },
+          "summary": "Play up to eight progressively shorter bounces."
+        }
+      ]
+    },
+    {
+      "id": "release-octaves",
+      "name": "Release Octaves",
+      "category": "Arpeggios & movement",
+      "description": "Add a short octave response whenever a key is released.",
+      "useCase": "Play short phrases and let the release notes answer them.",
+      "steps": [
+        {
+          "type": "Release-Trigger",
+          "config": {
+            "transpose": 12,
+            "beats": 0.25,
+            "dry": 1,
+            "level": 70
+          },
+          "summary": "Keep the attack and add a softer octave on release."
+        }
+      ]
+    },
+    {
+      "id": "mono-high-priority",
+      "name": "Mono High Priority",
+      "category": "Register & layering",
+      "description": "Keep only the highest held note when notes overlap.",
+      "useCase": "Extract a top line from chords or protect a monophonic instrument.",
+      "steps": [
+        {
+          "type": "Polyphony-Limiter",
+          "config": {
+            "limit": 1,
+            "priority": "lowest"
+          },
+          "summary": "Discard the lowest note when the voice limit is reached."
+        }
+      ]
+    },
+    {
+      "id": "keyboard-channel-split",
+      "name": "Keyboard Channel Split",
+      "category": "Register & layering",
+      "description": "Send the left and right sides of the keyboard to different MIDI channels.",
+      "useCase": "Use a multitimbral instrument listening on channels 1 and 2.",
+      "steps": [
+        {
+          "type": "Note-Router",
+          "config": {
+            "source": "key",
+            "split": 60,
+            "lowerChannel": 1,
+            "upperChannel": 2
+          },
+          "summary": "Route notes below middle C to channel 1 and the rest to channel 2."
+        }
+      ]
+    },
+    {
+      "id": "four-channel-voices",
+      "name": "Four Channel Voices",
+      "category": "Register & layering",
+      "description": "Distribute successive notes across four independent MIDI channels.",
+      "useCase": "Connect synth voices or multitimbral parts on channels 2 through 5.",
+      "steps": [
+        {
+          "type": "Channel-Allocator",
+          "config": {
+            "first": 2,
+            "last": 5,
+            "mode": "round-robin"
+          },
+          "summary": "Assign one note per channel and steal the oldest when full."
+        }
+      ]
+    },
+    {
+      "id": "stepped-mod-wheel",
+      "name": "Stepped Mod Wheel",
+      "category": "Rhythm & repeats",
+      "description": "Turn the modulation wheel into eight rhythmic steps.",
+      "useCase": "Use a synth that responds to CC 1, then move the wheel between beats.",
+      "steps": [
+        {
+          "type": "CC-Stepper",
+          "config": {
+            "lower": 1,
+            "upper": 1,
+            "levels": 8,
+            "beats": 0.25
+          },
+          "summary": "Quantise CC 1 to eight values on a sixteenth-note grid."
+        }
+      ]
     }
   ],
   "setups": []

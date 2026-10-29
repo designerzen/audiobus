@@ -29,6 +29,10 @@ export interface OutputFactory extends DeviceClassification {
 const loadSupportingLibrary = async (type: string) => {
 	// Create and return instance based on type
 	switch (type) {
+        case OUTPUT_TYPES.AUDIOBUS_303: return await import('./outputs/output-audiobus-303')
+		case OUTPUT_TYPES.DRUM_KIT:
+			return await import('./outputs/output-drum-kit.ts')
+        case OUTPUT_TYPES.SION: return await import("./outputs/output-sion.ts")
         case OUTPUT_TYPES.NOTE_MONITOR: return await import('./outputs/output-note-monitor')
         case OUTPUT_TYPES.SAMPLE_PLAYER: return await import('./outputs/output-sample-player')
         case OUTPUT_TYPES.EVENT_RECORDER: return await import('./outputs/output-event-recorder')
@@ -168,6 +172,14 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
  * Uses lazy loading for better performance
  */
 export const OUTPUT_FACTORIES: OutputFactory[] = [
+    { ...OUTPUT_DEFINITIONS[OUTPUT_TYPES.AUDIOBUS_303], isAvailable: () => typeof AudioWorkletNode !== 'undefined',
+        create: options => createOutput(OUTPUT_TYPES.AUDIOBUS_303, options) },
+	{
+		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.DRUM_KIT],
+		isAvailable: () => typeof AudioContext !== 'undefined',
+		create: options => createOutput(OUTPUT_TYPES.DRUM_KIT, options),
+	},
+    { ...OUTPUT_DEFINITIONS[OUTPUT_TYPES.SION], isAvailable: () => typeof AudioWorkletNode !== 'undefined', create: options => createOutput(OUTPUT_TYPES.SION, options) },
     ...[OUTPUT_TYPES.NOTE_MONITOR, OUTPUT_TYPES.EVENT_RECORDER].map(id => ({
         ...OUTPUT_DEFINITIONS[id], isAvailable: () => true, create: (options?: Record<string, any>) => createOutput(id, options),
     })),

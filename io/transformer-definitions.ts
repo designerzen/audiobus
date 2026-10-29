@@ -21,6 +21,43 @@ export interface TransformerDefinition extends DeviceClassification<'transformer
 }
 
 export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
+    [TRANSFORMER_TYPE.ID_PITCH_MIRROR]: {
+        id: TRANSFORMER_TYPE.ID_PITCH_MIRROR, name: 'Pitch Mirror', description: 'Invert melodic intervals around a chosen centre note.',
+        icon: '/icons/transformer-pitch-mirror.svg', category: 'Pitch', type: 'transformer', subtype: 'pitch',
+    },
+    [TRANSFORMER_TYPE.ID_INTERVAL_STACK]: {
+        id: TRANSFORMER_TYPE.ID_INTERVAL_STACK, name: 'Interval Stack', description: 'Build parallel harmonies from up to eight custom semitone offsets.',
+        icon: '/icons/transformer-interval-stack.svg', category: 'Harmony', type: 'transformer', subtype: 'harmony',
+    },
+    [TRANSFORMER_TYPE.ID_NOTE_BOUNCER]: {
+        id: TRANSFORMER_TYPE.ID_NOTE_BOUNCER, name: 'Note Bouncer', description: 'Generate progressively faster, softer note bounces with a finite ending.',
+        icon: '/icons/transformer-note-bouncer.svg', category: 'Pattern', type: 'transformer', subtype: 'pattern',
+    },
+    [TRANSFORMER_TYPE.ID_RELEASE_TRIGGER]: {
+        id: TRANSFORMER_TYPE.ID_RELEASE_TRIGGER, name: 'Release Trigger', description: 'Play a short note when a key is released, with optional attack passthrough.',
+        icon: '/icons/transformer-release-trigger.svg', category: 'Duration', type: 'transformer', subtype: 'duration',
+    },
+    [TRANSFORMER_TYPE.ID_POLYPHONY_LIMITER]: {
+        id: TRANSFORMER_TYPE.ID_POLYPHONY_LIMITER, name: 'Polyphony Limiter', description: 'Restrict simultaneous notes with selectable voice-stealing priorities.',
+        icon: '/icons/transformer-polyphony-limiter.svg', category: 'Range', type: 'transformer', subtype: 'range',
+    },
+    [TRANSFORMER_TYPE.ID_NOTE_ROUTER]: {
+        id: TRANSFORMER_TYPE.ID_NOTE_ROUTER, name: 'Note Router', description: 'Split notes between two MIDI channels by key or velocity.',
+        icon: '/icons/transformer-note-router.svg', category: 'Routing', type: 'transformer', subtype: 'routing',
+    },
+    [TRANSFORMER_TYPE.ID_CHANNEL_ALLOCATOR]: {
+        id: TRANSFORMER_TYPE.ID_CHANNEL_ALLOCATOR, name: 'Channel Allocator', description: 'Spread polyphony across a pool of MIDI channels, with one note per channel.',
+        icon: '/icons/transformer-channel-allocator.svg', category: 'Routing', type: 'transformer', subtype: 'routing',
+    },
+    [TRANSFORMER_TYPE.ID_CC_STEPPER]: {
+        id: TRANSFORMER_TYPE.ID_CC_STEPPER, name: 'CC Stepper', description: 'Quantise controller values and optionally coalesce updates onto a rhythmic grid.',
+        icon: '/icons/transformer-cc-stepper.svg', category: 'Modulation', type: 'transformer', subtype: 'modulation',
+    },
+    [TRANSFORMER_TYPE.ID_BROWSER_AI]: {
+        id: TRANSFORMER_TYPE.ID_BROWSER_AI, name: 'Browser AI Harmony',
+        description: 'Describe harmonies, generate a local note map with built-in browser AI, then play it live.',
+        icon: '/icons/input-prompt-ai.svg', category: 'Harmony', type: 'transformer', subtype: 'harmony',
+    },
     [TRANSFORMER_TYPE.ID_VELOCITY_SHAPER]: {
         id: TRANSFORMER_TYPE.ID_VELOCITY_SHAPER, name: 'Velocity Shaper', description: 'Shape dynamics with velocity curves, limits, fixed levels and variation.',
         icon: '/icons/transformer-velocity-shaper.svg', category: 'Variation', type: 'transformer', subtype: 'variation',

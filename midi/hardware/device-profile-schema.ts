@@ -38,6 +38,24 @@ export interface MidiGuiNode {
     children?: MidiGuiNode[]
 }
 
+export interface MidiSurfaceElement {
+    id: string
+    label: string
+    kind: 'key' | 'pad' | 'button' | 'knob' | 'fader'
+    position: { x: number; y: number; width: number; height: number }
+    control?: string
+    message?: MidiProfileMessage
+    learnable?: boolean
+    dark?: boolean
+}
+
+export interface MidiDeviceSurface {
+    src: string
+    width: number
+    height: number
+    elements: MidiSurfaceElement[]
+}
+
 export interface MidiDeviceProfile {
     id: string
     schemaVersion: 1
@@ -56,6 +74,7 @@ export interface MidiDeviceProfile {
     controls: MidiProfileControl[]
     modes: { id: string; label: string; cc: number[] }[]
     gui: MidiGuiNode
+    surface?: MidiDeviceSurface
 }
 
 export const controlMessage = (control: MidiProfileControl): MidiProfileMessage => control.message ?? { type: 'cc', number: control.cc }
@@ -144,6 +163,29 @@ export function parseMidiDeviceProfile(id: string, raw: unknown, asset: (path: s
         return { ...item, ...(item.type === 'image' ? { src: resolveAsset(item.src ?? '') } : {}), ...(item.children ? { children: item.children.map(child => node(child, depth + 1)) } : {}) }
     }
     profile.gui = node(profile.gui)
+    if (profile.surface !== undefined) {
+        const surface = profile.surface
+        requireValue(surface && integer(surface.width, 1, 8192) && integer(surface.height, 1, 8192)
+            && Array.isArray(surface.elements), 'Invalid hardware surface')
+        const ids = new Set<string>()
+        for (const item of surface.elements) {
+            requireValue(item && typeof item.id === 'string' && !!item.id && !ids.has(item.id)
+                && typeof item.label === 'string' && ['key', 'pad', 'button', 'knob', 'fader'].includes(item.kind), 'Invalid surface element')
+            ids.add(item.id)
+            requireValue(item.position && Object.values(item.position).length === 4
+                && ['x', 'y', 'width', 'height'].every(key => {
+                    const value = item.position[key as keyof typeof item.position]
+                    return Number.isFinite(value) && value >= 0 && value <= 100
+                }) && item.position.width > 0 && item.position.height > 0
+                && item.position.x + item.position.width <= 100.01 && item.position.y + item.position.height <= 100.01, 'Invalid surface position')
+            requireValue(!item.control || controls.has(item.control), 'Unknown surface control')
+            requireValue(!(item.control && item.message), 'Surface element must reference a control or a message')
+            if (item.message) message(item.message)
+            requireValue(item.learnable === undefined || typeof item.learnable === 'boolean', 'Invalid surface learning flag')
+            requireValue(item.dark === undefined || typeof item.dark === 'boolean', 'Invalid surface key style')
+        }
+        profile.surface = { ...surface, src: resolveAsset(surface.src) }
+    }
     return profile
 }
 

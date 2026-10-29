@@ -13,7 +13,7 @@
   "description": "MIDI keyboard with expressive lever, assignable knobs and pedal inputs.",
   "documentation": [
     {
-      "title": "A-49 owner’s manual: factory assignments, pages 24–32; MIDI chart, page 39",
+      "title": "A-49 owner\u2019s manual: factory assignments, pages 24\u201332; MIDI chart, page 39",
       "url": "https://static.roland.com/assets/media/pdf/A-49_eng09_W.pdf"
     }
   ],
@@ -31,7 +31,7 @@
     "D-BEAM",
     "Hold and expression pedal inputs"
   ],
-  "notice": "CC values reflect factory assignments. Reassigned knobs, pedals and D-BEAM settings may differ. Pressure represents the assignable aftertouch function, not key aftertouch. The GUI performs MIDI into this chain and does not configure the A-49.",
+  "notice": "CC values reflect factory assignments. Reassigned knobs, pedals and D-BEAM settings may differ. Pressure represents the assignable aftertouch function, not key aftertouch. The GUI performs MIDI into this chain and does not configure the A-49. Configurable surface controls use virtual defaults; match your hardware preset with MIDI learn or edit note/CC/channel mappings. Keyboard surfaces start at MIDI note 48.",
   "controls": [
     {
       "id": "pitch-bend",
@@ -82,7 +82,7 @@
     },
     {
       "id": "program",
-      "label": "Program change (0–127)",
+      "label": "Program change (0\u2013127)",
       "message": {
         "type": "programChange"
       },
@@ -130,6 +130,966 @@
       {
         "type": "guide",
         "label": "Hardware and MIDI documentation"
+      }
+    ]
+  },
+  "surface": {
+    "src": "panel.svg",
+    "width": 600,
+    "height": 240,
+    "elements": [
+      {
+        "id": "key-48",
+        "label": "Key 48",
+        "kind": "key",
+        "position": {
+          "x": 18.6667,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 48
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-50",
+        "label": "Key 50",
+        "kind": "key",
+        "position": {
+          "x": 21.31,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 50
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-52",
+        "label": "Key 52",
+        "kind": "key",
+        "position": {
+          "x": 23.9533,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 52
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-53",
+        "label": "Key 53",
+        "kind": "key",
+        "position": {
+          "x": 26.5983,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 53
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-55",
+        "label": "Key 55",
+        "kind": "key",
+        "position": {
+          "x": 29.2417,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 55
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-57",
+        "label": "Key 57",
+        "kind": "key",
+        "position": {
+          "x": 31.885,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 57
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-59",
+        "label": "Key 59",
+        "kind": "key",
+        "position": {
+          "x": 34.5283,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 59
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-60",
+        "label": "Key 60",
+        "kind": "key",
+        "position": {
+          "x": 37.1717,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 60
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-62",
+        "label": "Key 62",
+        "kind": "key",
+        "position": {
+          "x": 39.8167,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 62
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-64",
+        "label": "Key 64",
+        "kind": "key",
+        "position": {
+          "x": 42.46,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 64
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-65",
+        "label": "Key 65",
+        "kind": "key",
+        "position": {
+          "x": 45.1033,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 65
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-67",
+        "label": "Key 67",
+        "kind": "key",
+        "position": {
+          "x": 47.7467,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 67
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-69",
+        "label": "Key 69",
+        "kind": "key",
+        "position": {
+          "x": 50.39,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 69
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-71",
+        "label": "Key 71",
+        "kind": "key",
+        "position": {
+          "x": 53.035,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 71
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-72",
+        "label": "Key 72",
+        "kind": "key",
+        "position": {
+          "x": 55.6783,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 72
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-74",
+        "label": "Key 74",
+        "kind": "key",
+        "position": {
+          "x": 58.3217,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 74
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-76",
+        "label": "Key 76",
+        "kind": "key",
+        "position": {
+          "x": 60.965,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 76
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-77",
+        "label": "Key 77",
+        "kind": "key",
+        "position": {
+          "x": 63.61,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 77
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-79",
+        "label": "Key 79",
+        "kind": "key",
+        "position": {
+          "x": 66.2533,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 79
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-81",
+        "label": "Key 81",
+        "kind": "key",
+        "position": {
+          "x": 68.8967,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 81
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-83",
+        "label": "Key 83",
+        "kind": "key",
+        "position": {
+          "x": 71.54,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 83
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-84",
+        "label": "Key 84",
+        "kind": "key",
+        "position": {
+          "x": 74.1833,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 84
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-86",
+        "label": "Key 86",
+        "kind": "key",
+        "position": {
+          "x": 76.8283,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 86
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-88",
+        "label": "Key 88",
+        "kind": "key",
+        "position": {
+          "x": 79.4717,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 88
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-89",
+        "label": "Key 89",
+        "kind": "key",
+        "position": {
+          "x": 82.115,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 89
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-91",
+        "label": "Key 91",
+        "kind": "key",
+        "position": {
+          "x": 84.7583,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 91
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-93",
+        "label": "Key 93",
+        "kind": "key",
+        "position": {
+          "x": 87.4017,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 93
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-95",
+        "label": "Key 95",
+        "kind": "key",
+        "position": {
+          "x": 90.0467,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 95
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-96",
+        "label": "Key 96",
+        "kind": "key",
+        "position": {
+          "x": 92.69,
+          "y": 51.6667,
+          "width": 2.4767,
+          "height": 35.4167
+        },
+        "message": {
+          "type": "note",
+          "number": 96
+        },
+        "dark": false,
+        "learnable": true
+      },
+      {
+        "id": "key-49",
+        "label": "Key 49",
+        "kind": "key",
+        "position": {
+          "x": 20.5167,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 49
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-51",
+        "label": "Key 51",
+        "kind": "key",
+        "position": {
+          "x": 23.1617,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 51
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-54",
+        "label": "Key 54",
+        "kind": "key",
+        "position": {
+          "x": 28.4483,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 54
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-56",
+        "label": "Key 56",
+        "kind": "key",
+        "position": {
+          "x": 31.0917,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 56
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-58",
+        "label": "Key 58",
+        "kind": "key",
+        "position": {
+          "x": 33.735,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 58
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-61",
+        "label": "Key 61",
+        "kind": "key",
+        "position": {
+          "x": 39.0233,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 61
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-63",
+        "label": "Key 63",
+        "kind": "key",
+        "position": {
+          "x": 41.6667,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 63
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-66",
+        "label": "Key 66",
+        "kind": "key",
+        "position": {
+          "x": 46.9533,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 66
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-68",
+        "label": "Key 68",
+        "kind": "key",
+        "position": {
+          "x": 49.5983,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 68
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-70",
+        "label": "Key 70",
+        "kind": "key",
+        "position": {
+          "x": 52.2417,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 70
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-73",
+        "label": "Key 73",
+        "kind": "key",
+        "position": {
+          "x": 57.5283,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 73
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-75",
+        "label": "Key 75",
+        "kind": "key",
+        "position": {
+          "x": 60.1717,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 75
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-78",
+        "label": "Key 78",
+        "kind": "key",
+        "position": {
+          "x": 65.46,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 78
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-80",
+        "label": "Key 80",
+        "kind": "key",
+        "position": {
+          "x": 68.1033,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 80
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-82",
+        "label": "Key 82",
+        "kind": "key",
+        "position": {
+          "x": 70.7467,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 82
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-85",
+        "label": "Key 85",
+        "kind": "key",
+        "position": {
+          "x": 76.035,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 85
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-87",
+        "label": "Key 87",
+        "kind": "key",
+        "position": {
+          "x": 78.6783,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 87
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-90",
+        "label": "Key 90",
+        "kind": "key",
+        "position": {
+          "x": 83.965,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 90
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-92",
+        "label": "Key 92",
+        "kind": "key",
+        "position": {
+          "x": 86.61,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 92
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "key-94",
+        "label": "Key 94",
+        "kind": "key",
+        "position": {
+          "x": 89.2533,
+          "y": 51.6667,
+          "width": 1.5867,
+          "height": 20.8333
+        },
+        "message": {
+          "type": "note",
+          "number": 94
+        },
+        "dark": true,
+        "learnable": true
+      },
+      {
+        "id": "knob-1",
+        "label": "C1 cutoff",
+        "kind": "knob",
+        "position": {
+          "x": 5.0,
+          "y": 20.8333,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "control": "cutoff"
+      },
+      {
+        "id": "knob-2",
+        "label": "C2 resonance",
+        "kind": "knob",
+        "position": {
+          "x": 11.0,
+          "y": 20.8333,
+          "width": 3.3333,
+          "height": 8.3333
+        },
+        "control": "resonance"
+      },
+      {
+        "id": "control-cutoff",
+        "label": "C1 cutoff",
+        "kind": "fader",
+        "position": {
+          "x": 2.0,
+          "y": 14.1667,
+          "width": 15.8889,
+          "height": 7.5
+        },
+        "control": "cutoff"
+      },
+      {
+        "id": "control-resonance",
+        "label": "C2 resonance",
+        "kind": "fader",
+        "position": {
+          "x": 18.0,
+          "y": 14.1667,
+          "width": 15.8889,
+          "height": 7.5
+        },
+        "control": "resonance"
+      },
+      {
+        "id": "control-sustain",
+        "label": "Sustain pedal (CC64)",
+        "kind": "button",
+        "position": {
+          "x": 34.0,
+          "y": 14.1667,
+          "width": 15.8889,
+          "height": 7.5
+        },
+        "control": "sustain"
+      },
+      {
+        "id": "control-expression",
+        "label": "Expression pedal",
+        "kind": "fader",
+        "position": {
+          "x": 50.0,
+          "y": 14.1667,
+          "width": 15.8889,
+          "height": 7.5
+        },
+        "control": "expression"
+      },
+      {
+        "id": "control-pressure",
+        "label": "Assignable channel pressure",
+        "kind": "fader",
+        "position": {
+          "x": 66.0,
+          "y": 14.1667,
+          "width": 15.8889,
+          "height": 7.5
+        },
+        "control": "pressure"
+      },
+      {
+        "id": "control-program",
+        "label": "Program change (0\u2013127)",
+        "kind": "fader",
+        "position": {
+          "x": 82.0,
+          "y": 14.1667,
+          "width": 15.8889,
+          "height": 7.5
+        },
+        "control": "program"
+      },
+      {
+        "id": "lever-pitch-bend",
+        "label": "Pitch Bend",
+        "kind": "fader",
+        "position": {
+          "x": 5.5,
+          "y": 36.5,
+          "width": 4,
+          "height": 10
+        },
+        "control": "pitch-bend"
+      },
+      {
+        "id": "lever-modulation",
+        "label": "Modulation",
+        "kind": "fader",
+        "position": {
+          "x": 10.5,
+          "y": 36.5,
+          "width": 4,
+          "height": 10
+        },
+        "control": "modulation"
       }
     ]
   }
