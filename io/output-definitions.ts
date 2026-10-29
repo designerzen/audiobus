@@ -27,6 +27,11 @@ export interface OutputDefinition extends DeviceClassification {
 }
 
 export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
+    [OUTPUT_TYPES.PERFORMANCE]: {
+        id: OUTPUT_TYPES.PERFORMANCE, type: 'visual', subtype: 'visualiser', name: 'Performance',
+        description: 'Monitor IOChain event load, processing delays, FPS, main-thread pressure and Netronome timing with lag markers.',
+        icon: '/icons/output-performance.svg', category: 'Monitoring',
+    },
     [OUTPUT_TYPES.RECORDER]: {
         id: OUTPUT_TYPES.RECORDER, type: 'audio', subtype: 'utility', name: 'Recorder',
         description: 'Record the app’s master audio, review the last take and export WAV. All Recorder outputs share the recording session.',

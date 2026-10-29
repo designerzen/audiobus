@@ -1,5 +1,6 @@
 import type { IAudioCommand } from '../../audio-command-interface.ts'
 import type { AudioClockTick } from '../../timing/audio-clock-tick.ts'
+import type { ChainPerformanceMeasurement, TimerPerformanceMeasurement } from './performance-metrics.ts'
 
 export interface IAudioOutput{
 	get uuid(): string
@@ -20,6 +21,8 @@ export interface IAudioOutput{
 	readonly configurationAffectsNoteRouting?: boolean
 	onClockTick?(tick: Readonly<AudioClockTick>): void
 	stopClock?(): void
+    recordChainPerformance?(measurement: Readonly<ChainPerformanceMeasurement>): void
+    recordTimerPerformance?(measurement: Readonly<TimerPerformanceMeasurement>): void
 
 	// optional
 	readonly requiresConnectionControl?: boolean

@@ -23,6 +23,7 @@ import type InputAudioEvent from "./events/input-audio-event"
 import type { IAudioOutput } from "./outputs/output-interface"
 import type OutputAudioEvent from "./events/output-audio-event"
 import type { ITransformer } from "./transformers/interface-transformer"
+import type { ChainPerformanceMeasurement } from './outputs/performance-metrics'
 
 interface IOChainSerializedData {
     version: number
@@ -203,6 +204,19 @@ export default class IOChain extends EventTarget {
     }
 
     // Transformers ---------------------------------------
+    private async measurePerformance<T>(phase: ChainPerformanceMeasurement['phase'], events: number, operation: () => Promise<T>): Promise<T> {
+        const monitors = this.outputs.filter(output => output.recordChainPerformance && this.outputManager.isEnabled(output))
+        if (!monitors.length) return operation()
+        const started = performance.now()
+        try { return await operation() }
+        finally {
+            const measurement = { phase, events, durationMs: performance.now() - started, queueDepth: this.#audioCommandQueue.length }
+            for (const output of monitors) {
+                if (!this.#destroyed && this.outputs.includes(output) && this.outputManager.isEnabled(output)) output.recordChainPerformance!(measurement)
+            }
+        }
+    }
+
     appendTransformer(transformer: Transformer<any>) {
         this.#transformerManager.appendTransformer(transformer)
     }
@@ -223,7 +237,7 @@ export default class IOChain extends EventTarget {
      */
     transform(audioCommands: IAudioCommand[], timer: Timer) {
         const generation = this.#generation
-        return this.#transformerManager.transform(audioCommands, timer)
+        return this.measurePerformance('transform', audioCommands.length, () => this.#transformerManager.transform(audioCommands, timer))
             .then((transformedAudioCommands: IAudioCommand[]) => {
                 if (generation === this.#generation) this.addCommands(transformedAudioCommands)
             })
@@ -234,6 +248,13 @@ export default class IOChain extends EventTarget {
     }
 
     // Commands -------------------------------------------
+    private recordQueueDepth(): void {
+        for (const output of this.outputs) {
+            if (output.recordChainPerformance && this.outputManager.isEnabled(output)) {
+                output.recordChainPerformance({ phase: 'queue', durationMs: 0, events: 0, queueDepth: this.#audioCommandQueue.length })
+            }
+        }
+    }
 
     /**
      * Add a single command
@@ -242,6 +263,7 @@ export default class IOChain extends EventTarget {
     addCommand(command: IAudioCommand) {
         if (this.#destroyed || !this.isActive) return
         this.#audioCommandQueue.push(command)
+        this.recordQueueDepth()
     }
 
     /**
@@ -251,6 +273,7 @@ export default class IOChain extends EventTarget {
     addCommands(commands: IAudioCommand[]) {
         if (this.#destroyed || !this.isActive) return
         this.#audioCommandQueue.push(...commands)
+        this.recordQueueDepth()
     }
 
     /**
@@ -366,7 +389,7 @@ export default class IOChain extends EventTarget {
         if (this.#destroyed || !this.isActive) return audioCommand
         const generation = this.#generation
         if (transform) {
-            await this.transformerManager.transform([audioCommand], this.timer)
+            await this.measurePerformance('transform', 1, () => this.transformerManager.transform([audioCommand], this.timer))
                 .then((transformedAudioCommands: IAudioCommand[]) => {
                     if (generation === this.#generation) this.addCommands(transformedAudioCommands)
                 })
@@ -406,8 +429,10 @@ export default class IOChain extends EventTarget {
      * @returns 
     */
     triggerAudioCommandsOnDevice(commands: IAudioCommand[]) {
-        if (this.outputCommandHandler?.(commands)) return Promise.resolve(commands)
-        return this.outputManager.triggerAudioCommandsOnOutputs(commands)
+        return this.measurePerformance('output', commands.length, () => {
+            if (this.outputCommandHandler?.(commands)) return Promise.resolve(commands)
+            return this.outputManager.triggerAudioCommandsOnOutputs(commands)
+        })
     }
 
     // Inputs -------------------------------------------

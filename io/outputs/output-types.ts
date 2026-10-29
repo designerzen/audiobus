@@ -4,6 +4,7 @@
  */
 
 export const CONSOLE = "console" as const
+export const PERFORMANCE = 'performance' as const
 export const RECORDER = 'recorder' as const
 export const DESCRIBE = "describe" as const
 export const PINK_TROMBONE = "pink-trombone" as const
@@ -30,6 +31,7 @@ export const WEBCLAP_PREFIX = 'webclap:' as const
 export const webclapOutputId = (pluginId: string): `webclap:${string}` => `${WEBCLAP_PREFIX}${pluginId}`
 
 export type OutputId =
+    | typeof PERFORMANCE
     | typeof RECORDER
 	| `webclap:${string}`
 	| typeof CONSOLE

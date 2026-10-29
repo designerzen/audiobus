@@ -19,6 +19,7 @@ import type { ITimerControl as Timer } from "netronome"
 import type { IAudioInput } from "./inputs/input-interface"
 import type { IAudioOutput } from "./outputs/output-interface"
 import type { AudioClockTick } from '../timing/audio-clock-tick.ts'
+import type { TimerPerformanceMeasurement } from './outputs/performance-metrics'
 import type { IAudioCommand } from "audiobus/audio-command-interface"
 import type AudioEvent from "audiobus/audio-event"
 
@@ -154,6 +155,13 @@ export class IOChainManager extends EventTarget {
         if (!this.transportRunning) { this.stopClock(); return }
         this.syncClockOutputs()
         for (const output of this.#clockOutputs) output.onClockTick?.(tick)
+    }
+
+    recordTimerPerformance(measurement: Readonly<TimerPerformanceMeasurement>): void {
+        if (!this.transportRunning) return
+        const monitors = new Set(this.chains.filter(chain => chain.isActive && !chain.isDestroyed).flatMap(chain =>
+            chain.outputs.filter(output => output.recordTimerPerformance && chain.outputManager.isEnabled(output))))
+        for (const output of monitors) output.recordTimerPerformance!(measurement)
     }
 
     stopClock(): void {
