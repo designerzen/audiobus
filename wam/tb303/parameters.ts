@@ -16,7 +16,7 @@ export const TB303_PARAMETERS = {
 		choices: ["Saw", "Square"]
 	},
 	shape: { label: "Foldback Shape", defaultValue: 0.5, minValue: 0, maxValue: 1 },
-	threshold: { label: "Distortion", defaultValue: 0.5, minValue: 0, maxValue: 1 },
+	threshold: { label: "Distortion", defaultValue: 0, minValue: 0, maxValue: 1 },
 	delaySend: { label: "Delay Send", defaultValue: 0, minValue: 0, maxValue: 1 },
 	delayFeedback: { label: "Delay Feedback", defaultValue: 0, minValue: 0, maxValue: 0.85 },
 	delayTime: { label: "Delay Time", defaultValue: 0.45, minValue: 0.01, maxValue: 2, units: "s" },
@@ -27,8 +27,8 @@ export const TB303_DESCRIPTOR = {
 	name: "TB-303",
 	vendor: "Harmoneasy",
 	description:
-		"Original 303 wavetable bass synthesizer with tied-note slide, accents, foldback distortion and delay",
-	version: "1.1.0",
+		"Virtual analogue bass synthesizer with a nonlinear diode ladder, RC slide and accents, shaped envelope controls, foldback distortion and delay",
+	version: "1.2.0",
 	apiVersion: "2.0.0",
 	keywords: ["303", "acid", "bass", "monophonic"],
 	category: ["Instrument"],
