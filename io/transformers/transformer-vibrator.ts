@@ -25,7 +25,7 @@ const DEFAULT_OPTIONS: Config = {
 }
 
 /**
- * Vibrator Transformer
+ * Vibrato Transformer
  *
  * Triggers device vibration when a note within a range is played.
  * Supports two mechanisms:
@@ -41,7 +41,7 @@ export class TransformerVibrator extends Transformer<Config> implements ITransfo
     private connectedGamepads: Gamepad[] = []
 
     get name(): string {
-        return 'Vibrator'
+        return 'Vibrato'
     }
 
     get fields() {
@@ -116,7 +116,7 @@ export class TransformerVibrator extends Transformer<Config> implements ITransfo
     }
 
     get description(): string {
-        return "Trigger device vibration (mobile or gamepad) when a note within the specified range is played"
+        return "Adds vibrato by gently varying note pitch up and down"
     }
 
     constructor(config: Partial<Config> = {}) {

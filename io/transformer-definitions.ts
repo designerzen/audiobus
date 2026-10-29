@@ -228,8 +228,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 
 	[TRANSFORMER_TYPE.ID_VIBRATOR]: {
 		id: TRANSFORMER_TYPE.ID_VIBRATOR,
-		name: "Vibrator",
-		description: "Adds vibrato modulation to note pitch",
+		name: "Vibrato",
+		description: "Adds vibrato by gently varying note pitch up and down",
 		icon: "/icons/transformer-vibrator.svg",
 		category: "Modulation",
 		type: "transformer",
