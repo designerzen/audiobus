@@ -25,6 +25,15 @@ export interface InputDefinition extends DeviceClassification {
 }
 
 export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
+	[INPUT_TYPES.SCALE_EXPLORER]: {
+		id: INPUT_TYPES.SCALE_EXPLORER,
+		name: "Scale Explorer",
+		description: "Edit and audition any twelve-tone pitch set, modes and all 223 set classes",
+		type: "generator",
+		subtype: "sequencer",
+		category: "Sequencing",
+		icon: "/icons/transformer-quantise.svg"
+	},
 	...(Object.fromEntries(
 		Object.values(AI_MODELS).map((model) => [
 			model.id,

@@ -3,6 +3,7 @@ import {
 	EVENT_TRANSFORMERS_ADDED,
 	EVENT_TRANSFORMERS_REMOVED
 } from "../event-constants.ts"
+import { EVENT_TRANSFORM_FAILED } from "../event-constants"
 /**
  * Runs the live transform pipeline in input order. Expensive transformers manage
  * their own workers; live note delivery must never wait for browser idle time.
@@ -18,6 +19,7 @@ import {
 	advanceTransformers,
 	transformMidiControls
 } from "./transformer-pipeline.ts"
+import type { TransformerTrace } from "./transformer-pipeline"
 
 import type { Timer } from "netronome"
 import type { FieldConfig } from "./transformers/interface-transformer.ts"
@@ -27,6 +29,7 @@ export default class TransformerManagerWorker extends EventTarget {
 	public id: string = Transformer.getUniqueID()
 	public name: string = "TransformerManager"
 	public timer: Timer | undefined
+	trace?: TransformerTrace
 
 	#transformersMap: Map<string, Array<Transformer<any>>> = new Map()
 	#transformers: Array<Transformer<any>> = []
@@ -210,12 +213,16 @@ export default class TransformerManagerWorker extends EventTarget {
 	 */
 	async transform(commands: IAudioCommand[], timer: Timer): Promise<IAudioCommand[]> {
 		try {
-			return this.#transformers.reduce(
-				(value, transformer) => applyTransformer(transformer, value, timer),
-				commands
-			)
+			return this.#transformers.reduce((value, transformer) => {
+				const output = applyTransformer(transformer, value, timer)
+				if (value.length || output.length) {
+					this.trace?.(transformer, value.length, output.length)
+				}
+				return output
+			}, commands)
 		} catch (error) {
 			console.error("Transform error:", error)
+			this.dispatchEvent(new CustomEvent(EVENT_TRANSFORM_FAILED, { detail: String(error) }))
 			return commands
 		}
 	}
@@ -229,7 +236,7 @@ export default class TransformerManagerWorker extends EventTarget {
 	}
 
 	advanceTime(now: number, timer: Timer): IAudioCommand[] {
-		return advanceTransformers(this.#transformers, now, timer)
+		return advanceTransformers(this.#transformers, now, timer, this.trace)
 	}
 
 	transformMidiControls(commands: IAudioCommand[], timer: Timer): IAudioCommand[] {

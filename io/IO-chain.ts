@@ -1,4 +1,9 @@
 import { EVENT_CONFIGURATION_CHANGED } from "../event-constants.ts"
+import {
+	EVENT_SIGNAL_ACTIVITY,
+	EVENT_TRANSFORM_FAILED,
+	EVENT_PROCESSOR_ACTIVITY
+} from "../event-constants"
 import type { Transformer } from "./transformers/abstract-transformer"
 /**
  * A single stream of data from the inputManager
@@ -94,6 +99,35 @@ export default class IOChain extends EventTarget {
 	transportCommand?: (type: string) => void
 	inputCommandHandler?: (event: InputAudioEvent) => boolean
 	outputCommandHandler?: (commands: IAudioCommand[]) => boolean
+	#diagnosticsEnabled = false
+	get diagnosticsEnabled(): boolean {
+		return this.#diagnosticsEnabled
+	}
+	set diagnosticsEnabled(enabled: boolean) {
+		this.#diagnosticsEnabled = enabled
+		this.#transformerManager.trace = enabled
+			? (transformer, input, output) => {
+					this.dispatchEvent(
+						new CustomEvent(EVENT_PROCESSOR_ACTIVITY, {
+							detail: { id: transformer.uuid, name: transformer.name, input, output }
+						})
+					)
+				}
+			: undefined
+	}
+	private signalActivity(
+		stage: "input" | "transform" | "output" | "error",
+		count: number,
+		detail = ""
+	): void {
+		if (this.diagnosticsEnabled) {
+			this.dispatchEvent(
+				new CustomEvent(EVENT_SIGNAL_ACTIVITY, {
+					detail: { stage, count, detail, at: performance.now() }
+				})
+			)
+		}
+	}
 
 	setName(name: string): void {
 		const trimmed = name.trim().slice(0, 80)
@@ -220,6 +254,9 @@ export default class IOChain extends EventTarget {
 		this.#options = { ...DEFAULT_OPTIONS, ...options }
 
 		this.#transformerManager = new TransformerManagerWorker()
+		this.#transformerManager.addEventListener(EVENT_TRANSFORM_FAILED, (event) =>
+			this.signalActivity("error", 0, (event as CustomEvent).detail)
+		)
 		this.#inputManager = new InputManager()
 		this.#outputManager = new OutputManager()
 		this.#abortController = new AbortController()
@@ -318,6 +355,7 @@ export default class IOChain extends EventTarget {
 			this.#transformerManager.transform(audioCommands, timer)
 		)
 			.then((transformedAudioCommands: IAudioCommand[]) => {
+				this.signalActivity("transform", transformedAudioCommands.length)
 				if (generation === this.#generation) {
 					this.addCommands(transformedAudioCommands)
 				}
@@ -441,7 +479,11 @@ export default class IOChain extends EventTarget {
 			return []
 		}
 		if (this.#enabled) {
-			this.addCommands(this.#transformerManager.advanceTime(now, this.timer))
+			const advanced = this.#transformerManager.advanceTime(now, this.timer)
+			if (advanced.length) {
+				this.signalActivity("transform", advanced.length)
+			}
+			this.addCommands(advanced)
 		}
 		let activeCommands: IAudioCommand[]
 
@@ -487,11 +529,13 @@ export default class IOChain extends EventTarget {
 			return audioCommand
 		}
 		const generation = this.#generation
+		this.signalActivity("input", 1)
 		if (transform) {
 			await this.measurePerformance("transform", 1, () =>
 				this.transformerManager.transform([audioCommand], this.timer)
 			)
 				.then((transformedAudioCommands: IAudioCommand[]) => {
+					this.signalActivity("transform", transformedAudioCommands.length)
 					if (generation === this.#generation) {
 						this.addCommands(transformedAudioCommands)
 					}
@@ -539,6 +583,7 @@ export default class IOChain extends EventTarget {
 	 * @returns
 	 */
 	triggerAudioCommandsOnDevice(commands: IAudioCommand[]) {
+		this.signalActivity("output", commands.length)
 		return this.measurePerformance("output", commands.length, () => {
 			if (this.outputCommandHandler?.(commands)) {
 				return Promise.resolve(commands)

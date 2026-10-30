@@ -37,6 +37,8 @@ const loadSupportingLibrary = async (type: string) => {
 	}
 	// Create and return instance based on type
 	switch (type) {
+		case INPUT_TYPES.SCALE_EXPLORER:
+			return await import("./inputs/input-scale-explorer")
 		case INPUT_TYPES.STEP_SEQUENCER:
 			return await import("./inputs/input-step-sequencer")
 		case INPUT_TYPES.PADS:
@@ -141,7 +143,12 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		isAvailable: () => typeof Worker !== "undefined",
 		create: (options?: Record<string, any>) => createInput(id, options)
 	})),
-	...[INPUT_TYPES.STEP_SEQUENCER, INPUT_TYPES.PADS, INPUT_TYPES.EVENT_LOOP].map((id) => ({
+	...[
+		INPUT_TYPES.SCALE_EXPLORER,
+		INPUT_TYPES.STEP_SEQUENCER,
+		INPUT_TYPES.PADS,
+		INPUT_TYPES.EVENT_LOOP
+	].map((id) => ({
 		...INPUT_DEFINITIONS[id],
 		isAvailable: () => true,
 		create: (options?: Record<string, any>) => createInput(id, options)

@@ -9,6 +9,7 @@ export interface ITransformer {
 
 	transform(commands: IAudioCommand[], timer: Timer): IAudioCommand[]
 	tick?(now: number, timer: Timer): IAudioCommand[]
+	setMusicalBeat?(beat: number): void
 	readonly handlesMidiControls?: boolean
 	reset(): void
 	destroy(): void

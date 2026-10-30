@@ -21,6 +21,34 @@ export interface TransformerDefinition extends DeviceClassification<"transformer
 }
 
 export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
+	[TRANSFORMER_TYPE.ID_CHORD_TRACK]: {
+		id: TRANSFORMER_TYPE.ID_CHORD_TRACK,
+		name: "Shared Chord Track",
+		description: "Follow the workspace progression as melody, bass or chords.",
+		icon: "/icons/transformer-chordifier.svg",
+		category: "Harmony",
+		type: "transformer",
+		subtype: "harmony"
+	},
+	[TRANSFORMER_TYPE.ID_IMPROV_PARTNER]: {
+		id: TRANSFORMER_TYPE.ID_IMPROV_PARTNER,
+		name: "Improvisation Partner",
+		description: "Listen, remember your motifs and answer when you leave a gap.",
+		icon: "/icons/transformer-arpeggiator.svg",
+		category: "Variation",
+		type: "transformer",
+		subtype: "pattern"
+	},
+	[TRANSFORMER_TYPE.ID_SCALE_EXPLORER]: {
+		id: TRANSFORMER_TYPE.ID_SCALE_EXPLORER,
+		name: "Scale Explorer",
+		description:
+			"Map incoming notes to any twelve-tone pitch set, its modes and set operations.",
+		icon: "/icons/transformer-quantise.svg",
+		category: "Tuning",
+		type: "transformer",
+		subtype: "pitch"
+	},
 	[TRANSFORMER_TYPE.ID_PITCH_MIRROR]: {
 		id: TRANSFORMER_TYPE.ID_PITCH_MIRROR,
 		name: "Pitch Mirror",

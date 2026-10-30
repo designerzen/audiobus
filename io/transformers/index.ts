@@ -4,6 +4,7 @@
  */
 
 export type { ITransformer } from "./interface-transformer.ts"
+export { TransformerScaleExplorer } from "./transformer-scale-explorer"
 export { default as Transformer } from "./abstract-transformer.ts"
 export { TransformerVelocityShaper } from "./transformer-velocity-shaper.ts"
 export { TransformerStrummer } from "./transformer-strummer.ts"

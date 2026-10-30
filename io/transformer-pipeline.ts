@@ -2,6 +2,7 @@ import type { ITransformer } from "./transformers/interface-transformer.ts"
 import type { IAudioCommand } from "../audio-command-interface.ts"
 import type { Timer } from "netronome"
 import { NOTE_ON, NOTE_OFF } from "../commands"
+export type TransformerTrace = (transformer: ITransformer, input: number, output: number) => void
 
 export function applyTransformer(
 	transformer: ITransformer,
@@ -38,15 +39,19 @@ export function applyTransformer(
 export function advanceTransformers(
 	transformers: ITransformer[],
 	now: number,
-	timer: Timer
+	timer: Timer,
+	trace?: TransformerTrace
 ): IAudioCommand[] {
-	return transformers.reduce<IAudioCommand[]>(
-		(commands, transformer) => [
+	return transformers.reduce<IAudioCommand[]>((commands, transformer) => {
+		const output = [
 			...applyTransformer(transformer, commands, timer),
 			...(transformer.tick?.(now, timer) ?? [])
-		],
-		[]
-	)
+		]
+		if (commands.length || output.length) {
+			trace?.(transformer, commands.length, output.length)
+		}
+		return output
+	}, [])
 }
 
 export function transformMidiControls(

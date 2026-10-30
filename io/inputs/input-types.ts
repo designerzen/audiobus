@@ -4,6 +4,7 @@
  */
 
 export const KEYBOARD = "keyboard" as const
+export const SCALE_EXPLORER = "scale-explorer" as const
 export const MIDI_FILE = "midi-file" as const
 export const STEP_SEQUENCER = "step-sequencer" as const
 export const PADS = "pads" as const
@@ -33,6 +34,7 @@ export const MICROPHONE_PITCH = "microphone-pitch" as const
 export const DVS_CONTROL_VINYL = "dvs-control-vinyl" as const
 
 export type InputId =
+	| typeof SCALE_EXPLORER
 	| (string & {})
 	| typeof AI_IMPROV
 	| typeof AI_MELODY

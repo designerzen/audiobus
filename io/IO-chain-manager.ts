@@ -16,6 +16,10 @@ export {
 	EVENT_CHAINS_UPDATED
 } from "../event-constants.ts"
 import { compressToBase64, decompressFromBase64 } from "lz-string"
+import { chordAt, defaultMusicTools, parseMusicTools, type MusicToolsState } from "./music-tools"
+import { TransformerChordTrack } from "./transformers/transformer-chord-track"
+import { TransformerImprovPartner } from "./transformers/transformer-improv-partner"
+import { EVENT_WORKSPACE_RESTORED } from "../event-constants"
 import { deviceId, deviceDefinition, defineDevice } from "./device-definition"
 import { restoreDevice, UnavailableDevice, type SavedDevice } from "./workspace-devices"
 import { EVENT_DESTROYED } from "../event-constants"
@@ -89,6 +93,31 @@ export class IOChainManager extends EventTarget {
 	#clockOutputs = new Set<IAudioOutput>()
 	#timedInputs = new Set<IAudioInput>()
 	#inputTransportRunning = false
+	#musicTools: MusicToolsState = defaultMusicTools()
+	get musicTools(): MusicToolsState {
+		return structuredClone(this.#musicTools)
+	}
+	setMusicTools(value: MusicToolsState): void {
+		this.#musicTools = parseMusicTools(value)
+		this.changed()
+	}
+	updateMusicalBeat(beat: number): void {
+		if (!Number.isFinite(beat)) {
+			return
+		}
+		const chord = chordAt(this.#musicTools.progression, beat)
+		for (const chain of this.chains) {
+			const follows = chain.transformers.some(
+				(transformer) => transformer instanceof TransformerChordTrack
+			)
+			for (const transformer of chain.transformers) {
+				transformer.setMusicalBeat?.(beat)
+				if (transformer instanceof TransformerImprovPartner) {
+					transformer.mask = follows ? chord.mask : 4095
+				}
+			}
+		}
+	}
 
 	get transportRunning(): boolean {
 		return this.externallyControlledTransport
@@ -158,6 +187,13 @@ export class IOChainManager extends EventTarget {
 			return
 		}
 		this.syncDevices()
+		for (const chain of this.chains) {
+			for (const transformer of chain.transformers) {
+				if (transformer instanceof TransformerChordTrack) {
+					transformer.setProgression(this.#musicTools.progression)
+				}
+			}
+		}
 		this.dispatchEvent(new Event(EVENT_CHAINS_UPDATED))
 	}
 
@@ -374,6 +410,7 @@ export class IOChainManager extends EventTarget {
 		}))
 		return {
 			version: 2,
+			musicTools: parseMusicTools(this.#musicTools),
 			activeChainId: this.activeChainId,
 			devices,
 			chains: this.entries.map(([id, chain]) => ({
@@ -392,6 +429,7 @@ export class IOChainManager extends EventTarget {
 	}
 
 	async restoreWorkspace(encoded: string): Promise<void> {
+		let musicTools = defaultMusicTools()
 		const staged = new Map<string, IOChain>()
 		const devices = new Map<string, any>()
 		const warnings: string[] = []
@@ -414,6 +452,7 @@ export class IOChainManager extends EventTarget {
 				}
 			} else {
 				const data = JSON.parse(decompressFromBase64(encoded.slice("workspace:".length)))
+				musicTools = parseMusicTools(data.musicTools)
 				if (
 					data?.version !== 2 ||
 					!Array.isArray(data.chains) ||
@@ -558,8 +597,10 @@ export class IOChainManager extends EventTarget {
 			this.#activeChainId = JSON.parse(decompressFromBase64(encoded.slice(10))).activeChainId
 		}
 		this.restoreWarnings = warnings
+		this.#musicTools = musicTools
 		this.#restoring = false
 		this.changed()
+		this.dispatchEvent(new Event(EVENT_WORKSPACE_RESTORED))
 		previousDevices.forEach(([id, entry]) => {
 			if (this.#devices.get(id)?.device !== entry.device) {
 				void this.disposeDevice(id, entry.device)

@@ -1,4 +1,13 @@
 import { IdentityTransformer } from "./transformers/transformer-identity.ts"
+import { ID_CHORD_TRACK, TransformerChordTrack } from "./transformers/transformer-chord-track"
+import {
+	ID_IMPROV_PARTNER,
+	TransformerImprovPartner
+} from "./transformers/transformer-improv-partner"
+import {
+	ID_SCALE_EXPLORER,
+	TransformerScaleExplorer
+} from "./transformers/transformer-scale-explorer"
 import { TransformerQuantise, ID_QUANTISE } from "./transformers/transformer-quantise.ts"
 import { TransformerHarmoniser, ID_HARMONISER } from "./transformers/transformer-harmoniser.ts"
 import { TransformerArpeggiator, ID_ARPEGGIATOR } from "./transformers/transformer-arpeggiator.ts"
@@ -81,6 +90,12 @@ import { ID_CC_STEPPER, TransformerCCStepper } from "./transformers/transformer-
 
 export const tranformerFactory = (type: string, config: any = {}) => {
 	switch (type) {
+		case ID_CHORD_TRACK:
+			return new TransformerChordTrack(config)
+		case ID_IMPROV_PARTNER:
+			return new TransformerImprovPartner(config)
+		case ID_SCALE_EXPLORER:
+			return new TransformerScaleExplorer(config)
 		case ID_BROWSER_AI:
 			return new TransformerBrowserAI(config)
 		case ID_VELOCITY_SHAPER:
@@ -167,6 +182,9 @@ export const tranformerFactory = (type: string, config: any = {}) => {
 }
 
 export const TRANSFORMER_TYPE = {
+	ID_CHORD_TRACK,
+	ID_IMPROV_PARTNER,
+	ID_SCALE_EXPLORER,
 	ID_BROWSER_AI,
 	ID_VELOCITY_SHAPER,
 	ID_STRUMMER,
