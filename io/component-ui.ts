@@ -148,6 +148,9 @@ async function legacyControls(
 				widget: "text",
 				disabled: node.disabled
 			}
+			if (node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) {
+				descriptor.readOnly = node.readOnly
+			}
 			if (node instanceof HTMLSelectElement) {
 				descriptor.widget = "select"
 				descriptor.choices = [...node.options]
@@ -254,6 +257,10 @@ export function installComponentUi<T extends object>(target: T): T & ComponentUi
 				node = entry?.element
 			if (!node) {
 				return undefined
+			}
+			entry.descriptor.disabled = node.disabled
+			if (node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) {
+				entry.descriptor.readOnly = node.readOnly
 			}
 			if (entry.radios) {
 				return entry.radios.find((radio) => radio.checked)?.value
