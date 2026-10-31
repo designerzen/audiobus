@@ -25,6 +25,7 @@ export class TransformerChordTrack extends PerformanceTransformer {
 		}
 		const panel = devicePanel(),
 			status = document.createElement("p")
+		panel.append(await super.createGui())
 		status.setAttribute("role", "status")
 		this.editor = this.mountProgression?.(panel, status)
 		this.editor?.refresh()
@@ -32,6 +33,7 @@ export class TransformerChordTrack extends PerformanceTransformer {
 		return (this.gui = panel)
 	}
 	destroyGui(): void {
+		super.destroyGui()
 		this.editor?.destroy()
 		this.editor = undefined
 		this.gui?.remove()

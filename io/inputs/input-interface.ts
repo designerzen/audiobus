@@ -1,4 +1,5 @@
-export interface IAudioInput extends EventTarget {
+import type { ComponentUi } from "control-surface/types"
+export interface IAudioInput extends EventTarget, ComponentUi {
 	get uuid(): string
 	get name(): string
 	get description(): string

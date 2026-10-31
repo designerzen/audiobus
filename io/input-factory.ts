@@ -43,6 +43,8 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./inputs/input-step-sequencer")
 		case INPUT_TYPES.PADS:
 			return await import("./inputs/input-pads")
+		case INPUT_TYPES.COSMO_DOTS:
+			return await import("./inputs/input-cosmo-dots")
 		case INPUT_TYPES.MICROPHONE_TRIGGER:
 			return await import("./inputs/input-microphone-trigger")
 		case INPUT_TYPES.CAMERA_GESTURES:
@@ -147,6 +149,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		INPUT_TYPES.SCALE_EXPLORER,
 		INPUT_TYPES.STEP_SEQUENCER,
 		INPUT_TYPES.PADS,
+		INPUT_TYPES.COSMO_DOTS,
 		INPUT_TYPES.EVENT_LOOP
 	].map((id) => ({
 		...INPUT_DEFINITIONS[id],

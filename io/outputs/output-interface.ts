@@ -1,3 +1,4 @@
+import type { ComponentUi } from "control-surface/types"
 import type { IAudioCommand } from "../../audio-command-interface.ts"
 import type { AudioClockTick } from "../../timing/audio-clock-tick.ts"
 import type {
@@ -5,7 +6,7 @@ import type {
 	TimerPerformanceMeasurement
 } from "./performance-metrics.ts"
 
-export interface IAudioOutput {
+export interface IAudioOutput extends ComponentUi {
 	get uuid(): string
 	get name(): string
 	get description(): string

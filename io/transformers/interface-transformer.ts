@@ -1,7 +1,8 @@
 import type { IAudioCommand } from "../../audio-command-interface.ts"
 import type { Timer } from "netronome"
 
-export interface ITransformer {
+import type { ComponentUi } from "control-surface/types"
+export interface ITransformer extends ComponentUi {
 	uuid: string
 	fields: FieldConfig[]
 	name: string
@@ -24,6 +25,9 @@ export interface FieldConfig {
 	help?: string
 	placeholder?: string
 	type: string
+	min?: number
+	max?: number
+	step?: number
 	enabled?: boolean
 	values?: Array<string | number | { name: string; value: string | number | number[] }>
 	default?: string | number | boolean | number[]

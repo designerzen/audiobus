@@ -97,7 +97,9 @@ export abstract class PerformanceTransformer extends Transformer<Settings> {
 				label: control.label,
 				group: "Performance",
 				help: control.help,
-				type: control.values ? "select" : "text",
+				type: control.values ? "select" : typeof value === "number" ? "number" : "text",
+				min: control.min,
+				max: control.max,
 				enabled: true,
 				values: control.values ?? [],
 				default: typeof value === "boolean" ? Number(value) : value

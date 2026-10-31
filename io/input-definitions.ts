@@ -25,6 +25,15 @@ export interface InputDefinition extends DeviceClassification {
 }
 
 export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
+	[INPUT_TYPES.COSMO_DOTS]: {
+		id: INPUT_TYPES.COSMO_DOTS,
+		name: "Cosmo Dots",
+		description: "Eight configurable keyboard and onscreen triggers for Cosmo Dots",
+		type: "controller",
+		subtype: "pads",
+		category: "Device",
+		icon: "/icons/input-cosmo-dots.svg"
+	},
 	[INPUT_TYPES.SCALE_EXPLORER]: {
 		id: INPUT_TYPES.SCALE_EXPLORER,
 		name: "Scale Explorer",

@@ -1,3 +1,5 @@
+import { installComponentUi } from "./component-ui"
+
 export interface DeviceDefinition {
 	factory:
 		| "input"
@@ -51,6 +53,7 @@ export function defineDevice<T extends object>(
 	if (id) {
 		ids.set(device, id)
 	}
+	installComponentUi(device)
 	return device
 }
 

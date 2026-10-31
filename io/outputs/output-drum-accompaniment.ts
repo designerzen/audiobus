@@ -1,9 +1,11 @@
 import type { IAudioCommand } from "../../audio-command-interface.ts"
 import type { IAudioOutput } from "./output-interface.ts"
+import type { ControlDescriptor, ControlValue, UiDescriptor } from "control-surface/types"
+import { subscribeControls } from "../component-ui"
 import type { IPercussionOutput } from "../../timing/percussion-types.ts"
 import type { AudioClockTick } from "../../timing/audio-clock-tick.ts"
 import { NOTE_ON, MIDI_STOP, PLAYBACK_STOP } from "../../commands.ts"
-import { EVENT_CONFIGURATION_CHANGED } from "../../event-constants.ts"
+import { EVENT_CONFIGURATION_CHANGED, EVENT_CONTROL_SCHEMA_CHANGED } from "../../event-constants.ts"
 import { DRUM_GROOVES } from "../../timing/drum-patterns.ts"
 import { DrumBreakPlayer } from "../../timing/drum-break-player.ts"
 import { PercussionSynth } from "../../instruments/percussion/percussion-synth.ts"
@@ -51,6 +53,56 @@ export default class OutputDrumAccompaniment extends EventTarget implements IAud
 	}
 	get options(): DrumAccompanimentSettings {
 		return { ...this.settings }
+	}
+	getUiDescriptor(): UiDescriptor {
+		const controls: ControlDescriptor[] = Object.entries(this.settings)
+			.filter(([id]) => !["genre", "groove"].includes(id))
+			.map(([id, value]) => {
+				const compressor =
+					DRUM_COMPRESSOR_PARAMETERS[id as keyof typeof DRUM_COMPRESSOR_PARAMETERS]
+				return {
+					id,
+					label: id.replace(/([A-Z])/g, " $1"),
+					group: id.startsWith("compressor") ? "Compressor" : "Performance",
+					widget:
+						typeof value === "boolean" ? "toggle" : id === "volume" ? "slider" : "dial",
+					min: compressor?.min ?? 0,
+					max: compressor?.max ?? (id === "tuningNote" ? 127 : 1),
+					step: compressor?.step ?? (id === "tuningNote" ? 1 : 0.01),
+					defaultValue:
+						DEFAULT_DRUM_ACCOMPANIMENT_SETTINGS[id as keyof DrumAccompanimentSettings]
+				}
+			})
+		controls.unshift(
+			{
+				id: "genre",
+				label: "Genre",
+				widget: "select",
+				choices: Object.entries(DRUM_GENRES).map(([value, genre]) => ({
+					label: genre.title,
+					value
+				}))
+			},
+			{
+				id: "groove",
+				label: "Groove",
+				widget: "select",
+				choices: DRUM_GENRES[this.settings.genre].grooves.map((value) => ({
+					label: value,
+					value
+				}))
+			}
+		)
+		return { title: this.name, controls }
+	}
+	getControlValue(id: string): ControlValue | undefined {
+		return this.settings[id as keyof DrumAccompanimentSettings]
+	}
+	setControlValue(id: string, value: ControlValue): void {
+		this.configure({ [id]: value })
+	}
+	subscribeControls(listener: () => void): () => void {
+		return subscribeControls(this, listener)
 	}
 	get isPlaying(): boolean {
 		return this.playing
@@ -127,6 +179,9 @@ export default class OutputDrumAccompaniment extends EventTarget implements IAud
 		this.synth?.setCompressor(next)
 		this.settings.tuningNote = Math.round(this.settings.tuningNote)
 		this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
+		if (previous.genre !== next.genre) {
+			this.dispatchEvent(new Event(EVENT_CONTROL_SCHEMA_CHANGED))
+		}
 	}
 
 	onClockTick(tick: Readonly<AudioClockTick>): void {

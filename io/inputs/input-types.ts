@@ -8,6 +8,7 @@ export const SCALE_EXPLORER = "scale-explorer" as const
 export const MIDI_FILE = "midi-file" as const
 export const STEP_SEQUENCER = "step-sequencer" as const
 export const PADS = "pads" as const
+export const COSMO_DOTS = "cosmo-dots" as const
 export const MICROPHONE_TRIGGER = "microphone-trigger" as const
 export const CAMERA_GESTURES = "camera-gestures" as const
 export const EVENT_LOOP = "event-loop" as const
@@ -43,6 +44,7 @@ export type InputId =
 	| typeof AI_TRIO
 	| typeof STEP_SEQUENCER
 	| typeof PADS
+	| typeof COSMO_DOTS
 	| typeof MICROPHONE_TRIGGER
 	| typeof CAMERA_GESTURES
 	| typeof EVENT_LOOP

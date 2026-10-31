@@ -59,6 +59,7 @@
 		"visualisation"
 	],
 	"dependencies": {
+		"control-surface": "workspace:^",
 		"@grame/faustwasm": "^0.15.7",
 		"@harmoneasy/shared-config": "workspace:^",
 		"@magenta/music": "^1.23.1",

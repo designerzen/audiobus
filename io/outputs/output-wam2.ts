@@ -1,6 +1,13 @@
-import { EVENT_CONFIGURATION_CHANGED } from "../../event-constants"
+import { EVENT_CONFIGURATION_CHANGED, EVENT_CONTROL_SCHEMA_CHANGED } from "../../event-constants"
 import { commandToMidi } from "../../midi/midi-command-conversion"
-import { initializeHost, WAM_MIDI_EVENT } from "../../wam/host"
+import { initializeHost, WAM_MIDI_EVENT, WAM_AUTOMATION_EVENT } from "../../wam/host"
+import type {
+	ComponentUi,
+	ControlDescriptor,
+	ControlValue,
+	UiDescriptor
+} from "control-surface/types"
+import { installComponentUi, subscribeControls } from "../component-ui"
 import wam2Registry, { type WAM2PluginDescriptor } from "../../wam/registry"
 import type { IAudioCommand } from "../../audio-command-interface"
 import type { IAudioOutput } from "./output-interface"
@@ -23,6 +30,8 @@ export default class OutputWAM2 extends EventTarget implements IAudioOutput {
 	#silentSource: ConstantSourceNode | null = null
 	#silentInput: GainNode | null = null
 	#activeNotes = new Set<string>()
+	#controlRead?: Promise<Record<string, { value: number }>>
+	#legacyControlUi?: ComponentUi
 
 	constructor(
 		context: AudioContext,
@@ -56,6 +65,71 @@ export default class OutputWAM2 extends EventTarget implements IAudioOutput {
 	}
 	get pluginNode() {
 		return this.#plugin?.audioNode ?? null
+	}
+	async getUiDescriptor(): Promise<UiDescriptor> {
+		if (!this.pluginNode) {
+			return { title: this.name, controls: [] }
+		}
+		if (typeof this.pluginNode.getParameterInfo !== "function") {
+			this.#legacyControlUi ??= installComponentUi({
+				name: this.name,
+				createGui: () => this.createGui()
+			})
+			return this.#legacyControlUi.getUiDescriptor!()
+		}
+		const info = await this.pluginNode.getParameterInfo()
+		return {
+			title: this.name,
+			controls: Object.entries(info).map(([id, entry]) => {
+				const p = entry as any
+				return {
+					id,
+					label: p.label || id,
+					widget: p.choices?.length ? "select" : "dial",
+					min: p.minValue,
+					max: p.maxValue,
+					step: p.discreteStep || 0,
+					defaultValue: p.defaultValue,
+					unit: p.units,
+					scale: p.units === "Hz" && p.minValue > 0 ? "log" : "linear",
+					choices: p.choices?.map((label: string, value: number) => ({ label, value }))
+				} as ControlDescriptor
+			})
+		}
+	}
+	async getControlValue(id: string): Promise<ControlValue | undefined> {
+		if (!this.pluginNode) {
+			return undefined
+		}
+		if (this.#legacyControlUi) {
+			return this.#legacyControlUi.getControlValue!(id)
+		}
+		this.#controlRead ??= this.pluginNode.getParameterValues(false).finally(() => {
+			this.#controlRead = undefined
+		})
+		return (await this.#controlRead)![id]?.value
+	}
+	setControlValue(id: string, value: ControlValue): void | Promise<void> {
+		if (!this.pluginNode) {
+			throw new Error("Connect the instrument first")
+		}
+		if (this.#legacyControlUi) {
+			return this.#legacyControlUi.setControlValue!(id, value)
+		}
+		this.pluginNode.scheduleEvents({
+			type: WAM_AUTOMATION_EVENT,
+			time: this.context.currentTime,
+			data: { id, value, normalized: false }
+		})
+	}
+	subscribeControls(listener: () => void): () => void {
+		const node = this.pluginNode
+		node?.addEventListener(WAM_AUTOMATION_EVENT, listener)
+		const unsubscribe = subscribeControls(this, listener)
+		return () => {
+			node?.removeEventListener(WAM_AUTOMATION_EVENT, listener)
+			unsubscribe()
+		}
 	}
 	get options() {
 		return { pluginUrl: this.#url }
@@ -134,6 +208,7 @@ export default class OutputWAM2 extends EventTarget implements IAudioOutput {
 			this.#plugin = plugin
 			this.#name = `${plugin.descriptor?.name ?? this.label} (${this.label})`
 			this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
+			this.dispatchEvent(new Event(EVENT_CONTROL_SCHEMA_CHANGED))
 			await this.showPluginGui()
 		})()
 		try {
@@ -207,6 +282,8 @@ export default class OutputWAM2 extends EventTarget implements IAudioOutput {
 		await this.destroyPluginGui()
 		const plugin = this.#plugin
 		this.#plugin = null
+		this.#legacyControlUi = undefined
+		this.#controlRead = undefined
 		this.clearSilentInput()
 		try {
 			plugin?.audioNode.disconnect()
@@ -214,6 +291,7 @@ export default class OutputWAM2 extends EventTarget implements IAudioOutput {
 			await plugin?.audioNode.destroy?.()
 		}
 		this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
+		this.dispatchEvent(new Event(EVENT_CONTROL_SCHEMA_CHANGED))
 	}
 	private clearSilentInput() {
 		try {

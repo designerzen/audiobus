@@ -1,4 +1,6 @@
 import { EVENT_CONFIGURATION_CHANGED } from "../event-constants.ts"
+import type { SurfaceState } from "control-surface/types"
+import { validSurfaces } from "control-surface/model"
 import {
 	EVENT_SIGNAL_ACTIVITY,
 	EVENT_TRANSFORM_FAILED,
@@ -58,6 +60,7 @@ interface IOChainSerializedData {
 }
 
 interface IOChainOptions {
+	controlSurfaces?: SurfaceState[]
 	active?: boolean
 	name?: string
 	layout?: string | null
@@ -190,11 +193,20 @@ export default class IOChain extends EventTarget {
 		if (config.options.name !== undefined && typeof config.options.name !== "string") {
 			throw new Error("Invalid chain name")
 		}
+		if (
+			config.options.controlSurfaces !== undefined &&
+			!validSurfaces(config.options.controlSurfaces)
+		) {
+			throw new Error("Invalid control surfaces")
+		}
 		this.#transformerManager.importConfig(config.transformers)
 		this.#options = structuredClone(config.options)
 	}
 
 	setGraphOptions(options: Partial<IOChainOptions>): void {
+		if (options.controlSurfaces !== undefined && !validSurfaces(options.controlSurfaces)) {
+			throw new Error("Invalid control surfaces")
+		}
 		this.#options = { ...this.#options, ...options }
 		this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
 	}
