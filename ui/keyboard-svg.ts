@@ -118,7 +118,7 @@ export default class SVGKeyboard extends AbstractInteractive {
 		viewport.innerHTML = svg
 		const higher = pianoElement.appendChild(makeButton("piano-octave", "Up one octave", "+8ve"))
 		const retract = pianoElement.appendChild(
-			makeButton("piano-retract", "Retract keyboard", "⌄")
+			makeButton("piano-retract", "Show top third of keyboard", "⌄")
 		)
 		retract.setAttribute("aria-controls", viewport.id)
 		retract.setAttribute("aria-expanded", "true")
@@ -151,16 +151,22 @@ export default class SVGKeyboard extends AbstractInteractive {
 		higher.addEventListener(EVENT_CLICK, () => shiftOctave(1), {
 			signal: this.controlsController.signal
 		})
+		let visibilityMode = 0
 		retract.addEventListener(
 			EVENT_CLICK,
 			() => {
 				this.allNotesOff()
-				const collapsed = pianoElement.classList.toggle("piano-retracted")
+				visibilityMode = (visibilityMode + 1) % 3
+				const collapsed = visibilityMode === 2
+				pianoElement.classList.toggle("piano-peeking", visibilityMode === 1)
+				pianoElement.classList.toggle("piano-retracted", collapsed)
 				viewport.inert = collapsed
 				lower.hidden = collapsed
 				higher.hidden = collapsed
 				retract.setAttribute("aria-expanded", String(!collapsed))
-				const label = collapsed ? "Show keyboard" : "Retract keyboard"
+				const label = ["Show top third of keyboard", "Hide keyboard", "Show full keyboard"][
+					visibilityMode
+				]
 				retract.setAttribute("aria-label", label)
 				retract.title = label
 				retract.textContent = collapsed ? "⌃" : "⌄"
