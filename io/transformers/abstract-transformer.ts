@@ -64,7 +64,11 @@ export abstract class Transformer<Config = TransformerConfig> implements ITransf
 	}
 	async createGui(): Promise<HTMLElement> {
 		if (!this.generatedGui) {
-			this.generatedGui = createDomGui(await componentBindings(this, this.midiControlId))
+			const bindings = await componentBindings(this, this.midiControlId)
+			// The graph title bar owns the enable switch; retain its binding for control surfaces.
+			this.generatedGui = createDomGui(
+				bindings.filter((binding) => binding.descriptor.id !== "enabled")
+			)
 		}
 		return this.generatedGui.element
 	}
