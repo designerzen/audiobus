@@ -40,15 +40,29 @@ export default class OutputSamplePlayer extends EventTarget implements IAudioOut
 	private pending = new Map<string, object>()
 	setHarmony(state: HarmonicState): void {
 		this.harmony = { ...state }
-		if (this.options.follow !== "scale" && this.options.follow !== "chord") return
+		if (this.options.follow !== "scale" && this.options.follow !== "chord") {
+			return
+		}
 		for (const voice of this.voices.values()) {
 			const pitch = this.targetPitch(voice.note)
-			voice.gain.gain.setTargetAtTime(pitch === undefined ? 0 : voice.level, this.context.currentTime, 0.02)
-			if (pitch !== undefined) voice.source.playbackRate.setTargetAtTime(2 ** ((pitch - this.options.root) / 12), this.context.currentTime, 0.02)
+			voice.gain.gain.setTargetAtTime(
+				pitch === undefined ? 0 : voice.level,
+				this.context.currentTime,
+				0.02
+			)
+			if (pitch !== undefined) {
+				voice.source.playbackRate.setTargetAtTime(
+					2 ** ((pitch - this.options.root) / 12),
+					this.context.currentTime,
+					0.02
+				)
+			}
 		}
 	}
 	protected targetPitch(note: number): number | undefined {
-		if (this.options.follow === "scale" || this.options.follow === "chord") return quantisePitchSet(note, this.harmony[this.options.follow as "scale" | "chord"], 0)
+		if (this.options.follow === "scale" || this.options.follow === "chord") {
+			return quantisePitchSet(note, this.harmony[this.options.follow as "scale" | "chord"], 0)
+		}
 		return note
 	}
 	get isConnected() {
@@ -151,15 +165,22 @@ export default class OutputSamplePlayer extends EventTarget implements IAudioOut
 			return
 		}
 		const generation = this.generation
-		const request = {}; this.pending.set(key, request)
+		const request = {}
+		this.pending.set(key, request)
 		try {
 			const buffer = await this.decodeSaved()
-			if (generation !== this.generation || !this.connected || this.pending.get(key) !== request) {
+			if (
+				generation !== this.generation ||
+				!this.connected ||
+				this.pending.get(key) !== request
+			) {
 				return
 			}
 			this.pending.delete(key)
 			const pitch = this.targetPitch(command.number)
-			if (pitch === undefined) return
+			if (pitch === undefined) {
+				return
+			}
 			this.release(key)
 			if (this.voices.size >= 32) {
 				this.release(this.voices.keys().next().value!)
@@ -176,7 +197,12 @@ export default class OutputSamplePlayer extends EventTarget implements IAudioOut
 			)
 			source.connect(gain)
 			gain.connect(this.output)
-			const voice = { source, gain, note: command.number, level: Math.max(0, Math.min(127, command.velocity)) / 127 }
+			const voice = {
+				source,
+				gain,
+				note: command.number,
+				level: Math.max(0, Math.min(127, command.velocity)) / 127
+			}
 			this.voices.set(key, voice)
 			source.addEventListener(
 				EVENT_ENDED,

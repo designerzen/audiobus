@@ -50,9 +50,20 @@ export class TransformerChordTrack extends PerformanceTransformer {
 	}
 	constructor(config: Settings = {}) {
 		super(
-			{ role: "melody", follow: "chord", source: "track", transpose: 0, progression: JSON.stringify(DEFAULT_CHORDS) },
+			{
+				role: "melody",
+				follow: "chord",
+				source: "track",
+				transpose: 0,
+				progression: JSON.stringify(DEFAULT_CHORDS)
+			},
 			[
-				{ name: "source", label: "Harmony source", values: ["track", "live"], help: "Track uses the chord progression. Live follows the Harmony workspace or conductor." },
+				{
+					name: "source",
+					label: "Harmony source",
+					values: ["track", "live"],
+					help: "Track uses the chord progression. Live follows the Harmony workspace or conductor."
+				},
 				{ name: "follow", label: "Melody follows", values: ["chord", "scale"] },
 				{ name: "role", label: "Follow as", values: ["melody", "bass", "chords"] },
 				{
@@ -77,11 +88,15 @@ export class TransformerChordTrack extends PerformanceTransformer {
 	protected noteOn(voice: Voice) {
 		const step = chordAt(this.progression, this.beat)
 		const live = this.options.source === "live"
-		const chord = live ? { mask: this.harmony.chord, root: this.harmony.root, scale: this.harmony.scale } : step
+		const chord = live
+			? { mask: this.harmony.chord, root: this.harmony.root, scale: this.harmony.scale }
+			: step
 		const transpose = Math.round(Number(this.options.transpose))
 		const input = voice.input.number
-		const mask = this.options.role === "melody" && this.options.follow === "scale"
-			? chord.scale ?? this.harmony.scale : chord.mask
+		const mask =
+			this.options.role === "melody" && this.options.follow === "scale"
+				? (chord.scale ?? this.harmony.scale)
+				: chord.mask
 		const nearest = quantisePitchSet(input, mask, 0)
 		if (nearest === undefined) {
 			return []

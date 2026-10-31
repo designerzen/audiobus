@@ -91,6 +91,7 @@ export class IOChainManager extends EventTarget {
 	sessionInputHandler?: (chainId: string, command: IAudioCommand) => boolean
 	sessionOutputHandler?: (chainId: string, commands: IAudioCommand[]) => boolean
 	externallyControlledTransport = false
+	externallyControlledHarmony = false
 	#handledControls = new WeakMap<object, boolean>()
 	#clockOutputs = new Set<IAudioOutput>()
 	#timedInputs = new Set<IAudioInput>()
@@ -100,25 +101,34 @@ export class IOChainManager extends EventTarget {
 		return structuredClone(this.#musicTools)
 	}
 	setMusicTools(value: MusicToolsState): void {
+		const before = this.harmony
 		this.#musicTools = parseMusicTools(value)
 		this.changed()
-		this.applyHarmony()
 		this.dispatchEvent(new Event(EVENT_HARMONY_SETTINGS_CHANGED))
+		if (!sameHarmony(before, this.harmony)) {
+			this.dispatchEvent(new Event(EVENT_HARMONY_CHANGED))
+		}
 	}
 	get harmony(): HarmonicState {
 		return { ...this.#musicTools.harmony }
 	}
 	setHarmony(value: HarmonicState): void {
 		const next = parseHarmony(value)
-		if (sameHarmony(next, this.#musicTools.harmony)) return
+		if (sameHarmony(next, this.#musicTools.harmony)) {
+			return
+		}
 		this.#musicTools.harmony = next
 		this.applyHarmony()
 		this.dispatchEvent(new Event(EVENT_HARMONY_CHANGED))
 	}
 	private applyHarmony(): void {
 		for (const chain of this.chains) {
-			for (const transformer of chain.transformers) transformer.setHarmony?.(this.harmony)
-			for (const output of chain.outputs) output.setHarmony?.(this.harmony)
+			for (const transformer of chain.transformers) {
+				transformer.setHarmony?.(this.harmony)
+			}
+			for (const output of chain.outputs) {
+				output.setHarmony?.(this.harmony)
+			}
 		}
 	}
 	updateMusicalBeat(beat: number): void {
@@ -126,8 +136,13 @@ export class IOChainManager extends EventTarget {
 			return
 		}
 		const chord = chordAt(this.#musicTools.progression, beat)
-		const section = this.#musicTools.playSections ? sectionAt(this.#musicTools.sections, beat) : undefined
-		if (section) this.setHarmony(section)
+		const section =
+			this.#musicTools.playSections && !this.externallyControlledHarmony
+				? sectionAt(this.#musicTools.sections, beat)
+				: undefined
+		if (section) {
+			this.setHarmony(section)
+		}
 		for (const chain of this.chains) {
 			const follows = chain.transformers.some(
 				(transformer) => transformer instanceof TransformerChordTrack

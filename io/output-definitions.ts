@@ -28,9 +28,14 @@ export interface OutputDefinition extends DeviceClassification {
 
 export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 	[OUTPUT_TYPES.HARMONY_SAMPLER]: {
-		id: OUTPUT_TYPES.HARMONY_SAMPLER, name: "Harmony Sampler",
-		description: "Samples and loops that follow shared harmony, eight granular emitters and a sample timeline",
-		type: "engine", subtype: "instrument", category: "Audio", icon: "/icons/output-recorder.svg"
+		id: OUTPUT_TYPES.HARMONY_SAMPLER,
+		name: "Harmony Sampler",
+		description:
+			"Samples and loops that follow shared harmony, eight granular emitters and a sample timeline",
+		type: "engine",
+		subtype: "instrument",
+		category: "Audio",
+		icon: "/icons/output-recorder.svg"
 	},
 	[OUTPUT_TYPES.SYNTH_303]: {
 		id: OUTPUT_TYPES.SYNTH_303,

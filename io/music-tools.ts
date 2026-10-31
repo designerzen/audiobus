@@ -1,5 +1,11 @@
 import { mod12, pitchClasses, pitchSetMask } from "../tuning/pitch-class-set"
-import { DEFAULT_HARMONY, parseHarmony, parseSections, type HarmonicState, type HarmonicSection } from "./harmony"
+import {
+	DEFAULT_HARMONY,
+	parseHarmony,
+	parseSections,
+	type HarmonicState,
+	type HarmonicSection
+} from "./harmony"
 import { NOTE_ON, NOTE_OFF } from "../commands"
 import { clipCommand, parseEventClip, type EventClip } from "./event-clip"
 

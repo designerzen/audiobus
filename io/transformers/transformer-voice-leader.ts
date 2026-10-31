@@ -73,7 +73,9 @@ export class TransformerVoiceLeader extends PerformanceTransformer {
 	private chords = new Map<string, Voice[]>()
 	private previous = new Map<string, number[]>()
 	private harmony = { ...DEFAULT_HARMONY }
-	setHarmony(state: HarmonicState): void { this.harmony = { ...state } }
+	setHarmony(state: HarmonicState): void {
+		this.harmony = { ...state }
+	}
 	get name() {
 		return "Voice Leader"
 	}
@@ -82,11 +84,37 @@ export class TransformerVoiceLeader extends PerformanceTransformer {
 	}
 	constructor(config: Settings = {}) {
 		super(
-			{ lower: 48, upper: 84, leap: 12, common: 1, collect: 30, style: "smooth", parallels: 1, leadingTone: 1 },
+			{
+				lower: 48,
+				upper: 84,
+				leap: 12,
+				common: 1,
+				collect: 30,
+				style: "smooth",
+				parallels: 1,
+				leadingTone: 1
+			},
 			[
-				{ name: "style", label: "Voice-leading style", values: ["smooth", "classical"], help: "Classical produces four SATB voices, preserves chord tones, enforces ranges and spacing, and stays silent when no legal voicing exists." },
-				{ name: "parallels", label: "Forbid parallel fifths and octaves", values: [0, 1], min: 0, max: 1 },
-				{ name: "leadingTone", label: "Resolve leading tones up to the shared tonic", values: [0, 1], min: 0, max: 1 },
+				{
+					name: "style",
+					label: "Voice-leading style",
+					values: ["smooth", "classical"],
+					help: "Classical produces four SATB voices, preserves chord tones, enforces ranges and spacing, and stays silent when no legal voicing exists."
+				},
+				{
+					name: "parallels",
+					label: "Forbid parallel fifths and octaves",
+					values: [0, 1],
+					min: 0,
+					max: 1
+				},
+				{
+					name: "leadingTone",
+					label: "Resolve leading tones up to the shared tonic",
+					values: [0, 1],
+					min: 0,
+					max: 1
+				},
 				{ name: "lower", label: "Lowest note", values: numbers(0, 127), min: 0, max: 127 },
 				{ name: "upper", label: "Highest note", values: numbers(0, 127), min: 0, max: 127 },
 				{
@@ -128,23 +156,44 @@ export class TransformerVoiceLeader extends PerformanceTransformer {
 					const low = Math.min(Number(this.options.lower), Number(this.options.upper)),
 						high = Math.max(Number(this.options.lower), Number(this.options.upper))
 					const classical = this.options.style === "classical"
-					const pitches = classical ? classicalVoicing(voices.map((voice) => voice.input.number), this.previous.get(key) ?? [], {
-						lower: low, upper: high, leap: Number(this.options.leap), common: Boolean(this.options.common),
-						root: this.harmony.root, leadingTone: Boolean(this.options.leadingTone), parallels: Boolean(this.options.parallels)
-					}) : leadVoices(
-						voices.map((voice) => voice.input.number),
-						this.previous.get(key) ?? [],
-						low,
-						high,
-						Number(this.options.leap),
-						Boolean(this.options.common)
-					)
-					if (!pitches.length) return []
+					const pitches = classical
+						? classicalVoicing(
+								voices.map((voice) => voice.input.number),
+								this.previous.get(key) ?? [],
+								{
+									lower: low,
+									upper: high,
+									leap: Number(this.options.leap),
+									common: Boolean(this.options.common),
+									root: this.harmony.root,
+									leadingTone: Boolean(this.options.leadingTone),
+									parallels: Boolean(this.options.parallels)
+								}
+							)
+						: leadVoices(
+								voices.map((voice) => voice.input.number),
+								this.previous.get(key) ?? [],
+								low,
+								high,
+								Number(this.options.leap),
+								Boolean(this.options.common)
+							)
+					if (!pitches.length) {
+						return []
+					}
 					this.previous.set(
 						key,
 						[...pitches].sort((a, b) => a - b)
 					)
-					return classical ? pitches.map((pitch) => this.start(voices.find((voice) => (pitch - voice.input.number) % 12 === 0)!, pitch))
+					return classical
+						? pitches.map((pitch) =>
+								this.start(
+									voices.find(
+										(voice) => (pitch - voice.input.number) % 12 === 0
+									)!,
+									pitch
+								)
+							)
 						: voices.map((voice, i) => this.start(voice, pitches[i]))
 				},
 				undefined,
