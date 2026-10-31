@@ -1,4 +1,5 @@
 import AbstractInteractive from "./abstract-interactive.ts"
+import { EVENT_CLICK } from "../event-constants.ts"
 
 const DEFAULT_TITLE = "Piano Keyboard with 12 keys"
 
@@ -22,6 +23,25 @@ interface KeyboardResult {
 
 export default class SVGKeyboard extends AbstractInteractive {
 	static uniqueID: number = 0
+	private static displays = new Set<SVGKeyboard>()
+	private static playedNotes = new Map<number, string | undefined>()
+
+	static setPlayedNote(noteNumber: number, active: boolean, colour?: string): void {
+		if (active) {
+			this.playedNotes.set(noteNumber, colour)
+		} else {
+			this.playedNotes.delete(noteNumber)
+		}
+		for (const display of this.displays) {
+			display.showPlayedNote(noteNumber, active, colour)
+		}
+	}
+
+	static clearPlayedNotes(): void {
+		for (const note of this.playedNotes.keys()) {
+			this.setPlayedNote(note, false)
+		}
+	}
 
 	keyElements: Element[] = []
 	htmlElement!: DocumentFragment
@@ -38,7 +58,7 @@ export default class SVGKeyboard extends AbstractInteractive {
 	keyMap: Map<number, Element> = new Map()
 	private noteMap = new Map<number, KeyInfo>()
 	readonly asElement: HTMLDivElement
-	private rangeController = new AbortController()
+	private controlsController = new AbortController()
 	private resizeObserver: ResizeObserver
 	private layoutFrame = 0
 
@@ -80,33 +100,72 @@ export default class SVGKeyboard extends AbstractInteractive {
 		this.asElement = pianoElement
 		pianoElement.className = "piano"
 		pianoElement.setAttribute("data-piano", "true")
+		const makeButton = (className: string, label: string, text: string) => {
+			const button = document.createElement("button")
+			button.type = "button"
+			button.className = className
+			button.title = label
+			button.setAttribute("aria-label", label)
+			button.textContent = text
+			return button
+		}
+		const lower = pianoElement.appendChild(
+			makeButton("piano-octave", "Down one octave", "−8ve")
+		)
 		const viewport = pianoElement.appendChild(document.createElement("div"))
+		viewport.id = `${unique}-viewport`
 		viewport.className = "piano-viewport"
 		viewport.innerHTML = svg
+		const higher = pianoElement.appendChild(makeButton("piano-octave", "Up one octave", "+8ve"))
+		const retract = pianoElement.appendChild(
+			makeButton("piano-retract", "Retract keyboard", "⌄")
+		)
+		retract.setAttribute("aria-controls", viewport.id)
+		retract.setAttribute("aria-expanded", "true")
 		pianoElement.style.setProperty(
 			"--piano-white-keys",
 			String(notes.filter((note) => !note.accidental).length)
 		)
-		const range = pianoElement.appendChild(document.createElement("input"))
-		range.type = "range"
-		range.className = "piano-range"
-		range.min = "0"
-		range.max = "100"
-		range.step = "any"
-		range.value = "50"
-		range.setAttribute("aria-label", "Keyboard range, low to high notes")
+		const whiteKeys = notes.filter((note) => !note.accidental)
+		let firstWhiteKey = Math.max(
+			0,
+			whiteKeys.findIndex((note) => note.noteNumber >= 48)
+		)
 		const positionKeyboard = () => {
+			const width = viewport.scrollWidth / Math.max(1, whiteKeys.length)
 			const overflow = Math.max(0, viewport.scrollWidth - viewport.clientWidth)
-			range.disabled = overflow === 0
-			viewport.scrollLeft = (overflow * Number(range.value)) / 100
+			viewport.scrollLeft = Math.min(overflow, firstWhiteKey * width)
+			lower.disabled = viewport.scrollLeft <= 0
+			higher.disabled = viewport.scrollLeft >= overflow
 		}
-		range.addEventListener(
-			"input",
+		const shiftOctave = (direction: number) => {
+			this.allNotesOff()
+			const width = viewport.scrollWidth / Math.max(1, whiteKeys.length)
+			const current = Math.round(viewport.scrollLeft / Math.max(1, width))
+			firstWhiteKey = Math.max(0, Math.min(whiteKeys.length - 1, current + direction * 7))
+			positionKeyboard()
+		}
+		lower.addEventListener(EVENT_CLICK, () => shiftOctave(-1), {
+			signal: this.controlsController.signal
+		})
+		higher.addEventListener(EVENT_CLICK, () => shiftOctave(1), {
+			signal: this.controlsController.signal
+		})
+		retract.addEventListener(
+			EVENT_CLICK,
 			() => {
 				this.allNotesOff()
-				positionKeyboard()
+				const collapsed = pianoElement.classList.toggle("piano-retracted")
+				viewport.inert = collapsed
+				lower.hidden = collapsed
+				higher.hidden = collapsed
+				retract.setAttribute("aria-expanded", String(!collapsed))
+				const label = collapsed ? "Show keyboard" : "Retract keyboard"
+				retract.setAttribute("aria-label", label)
+				retract.title = label
+				retract.textContent = collapsed ? "⌃" : "⌄"
 			},
-			{ signal: this.rangeController.signal }
+			{ signal: this.controlsController.signal }
 		)
 		this.resizeObserver = new ResizeObserver(() => {
 			cancelAnimationFrame(this.layoutFrame)
@@ -123,10 +182,22 @@ export default class SVGKeyboard extends AbstractInteractive {
 			this.keyMap.set(noteNum, value)
 		})
 
+		SVGKeyboard.displays.add(this)
+		for (const [note, colour] of SVGKeyboard.playedNotes) {
+			this.showPlayedNote(note, true, colour)
+		}
 		this.firstNoteNumber = notes[0]?.noteNumber ?? 0
 		this.noteMap = new Map(notes.map((note) => [note.noteNumber, note]))
 		this.svgString = svg
 		this.addInteractivity(this.keyElements, noteOn, noteOff)
+	}
+
+	private showPlayedNote(noteNumber: number, active: boolean, colour?: string): void {
+		const key = this.keyMap.get(noteNumber)
+		key?.classList.toggle("playing", active)
+		if (active && colour) {
+			key?.setAttribute("style", `--col-accent: ${colour};`)
+		}
 	}
 
 	getNoteFromKey(button: Element): KeyInfo {
@@ -327,7 +398,8 @@ export default class SVGKeyboard extends AbstractInteractive {
 
 	destroy(): void {
 		super.destroy()
-		this.rangeController.abort()
+		this.controlsController.abort()
+		SVGKeyboard.displays.delete(this)
 		this.resizeObserver.disconnect()
 		cancelAnimationFrame(this.layoutFrame)
 		this.asElement.remove()

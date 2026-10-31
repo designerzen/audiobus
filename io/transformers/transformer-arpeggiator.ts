@@ -82,6 +82,8 @@ export class TransformerArpeggiator extends Transformer<Config> implements ITran
 			},
 			{
 				name: "pattern",
+				label: "Pattern",
+				help: "Choose the order in which held notes play, or Chord to play them together.",
 				type: "select",
 				values: [
 					{ name: "Up", value: "up" },
@@ -95,6 +97,8 @@ export class TransformerArpeggiator extends Transformer<Config> implements ITran
 			},
 			{
 				name: "rate",
+				label: "Rate",
+				help: "Set the spacing between notes as a note division synced to the current tempo.",
 				type: "select",
 				values: [
 					{ name: "1/4", value: "1/4" },
@@ -107,6 +111,8 @@ export class TransformerArpeggiator extends Transformer<Config> implements ITran
 			},
 			{
 				name: "octaves",
+				label: "Octaves",
+				help: "Choose how many octaves the pattern spans, starting at the held notes and extending upward.",
 				type: "select",
 				values: [1, 2, 3, 4],
 				default: DEFAULT_OPTIONS.octaves
