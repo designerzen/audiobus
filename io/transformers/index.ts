@@ -4,6 +4,12 @@
  */
 
 export type { ITransformer } from "./interface-transformer.ts"
+export { TransformerProgressionStepper } from "./transformer-progression-stepper"
+export { TransformerHarmonicBridge } from "./transformer-harmonic-bridge"
+export { TransformerCadenceWeaver } from "./transformer-cadence-weaver"
+export { TransformerKeyTraveller } from "./transformer-key-traveller"
+export { TransformerTensionArc } from "./transformer-tension-arc"
+export { TransformerMelodicMediator } from "./transformer-melodic-mediator"
 export { TransformerScaleExplorer } from "./transformer-scale-explorer"
 export { default as Transformer } from "./abstract-transformer.ts"
 export { TransformerAIMusic } from "./transformer-ai-music"

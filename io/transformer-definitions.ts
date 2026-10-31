@@ -24,6 +24,66 @@ export interface TransformerDefinition extends DeviceClassification<"transformer
 }
 
 export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
+	[TRANSFORMER_TYPE.ID_PROGRESSION_STEPPER]: {
+		id: TRANSFORMER_TYPE.ID_PROGRESSION_STEPPER,
+		name: "Progression Stepper",
+		description:
+			"Advance Roman-numeral or named-chord progressions by gesture, beats or pedal.",
+		icon: "/icons/transformer-progression-stepper.svg",
+		category: "Harmony",
+		type: "transformer",
+		subtype: "harmony"
+	},
+	[TRANSFORMER_TYPE.ID_HARMONIC_BRIDGE]: {
+		id: TRANSFORMER_TYPE.ID_HARMONIC_BRIDGE,
+		name: "Harmonic Bridge",
+		description:
+			"Connect played destinations through classical harmonic preparations, sequences and modulation.",
+		icon: "/icons/transformer-harmonic-bridge.svg",
+		category: "Harmony",
+		type: "transformer",
+		subtype: "harmony"
+	},
+	[TRANSFORMER_TYPE.ID_CADENCE_WEAVER]: {
+		id: TRANSFORMER_TYPE.ID_CADENCE_WEAVER,
+		name: "Cadence Weaver",
+		description:
+			"Prepare played destinations with authentic, plagal, deceptive, half or Phrygian cadences.",
+		icon: "/icons/transformer-cadence-weaver.svg",
+		category: "Harmony",
+		type: "transformer",
+		subtype: "harmony"
+	},
+	[TRANSFORMER_TYPE.ID_KEY_TRAVELLER]: {
+		id: TRANSFORMER_TYPE.ID_KEY_TRAVELLER,
+		name: "Key Traveller",
+		description:
+			"Connect tonal centres with shared pivots, common tones and diminished-seventh reinterpretation.",
+		icon: "/icons/transformer-key-traveller.svg",
+		category: "Harmony",
+		type: "transformer",
+		subtype: "harmony"
+	},
+	[TRANSFORMER_TYPE.ID_TENSION_ARC]: {
+		id: TRANSFORMER_TYPE.ID_TENSION_ARC,
+		name: "Tension Arc",
+		description:
+			"Shape phrases through mild, predominant, chromatic and resolving harmonic preparations.",
+		icon: "/icons/transformer-tension-arc.svg",
+		category: "Harmony",
+		type: "transformer",
+		subtype: "harmony"
+	},
+	[TRANSFORMER_TYPE.ID_MELODIC_MEDIATOR]: {
+		id: TRANSFORMER_TYPE.ID_MELODIC_MEDIATOR,
+		name: "Melodic Mediator",
+		description:
+			"Join notes and chord voices through passing tones, neighbours, suspensions and anticipations.",
+		icon: "/icons/transformer-melodic-mediator.svg",
+		category: "Harmony",
+		type: "transformer",
+		subtype: "harmony"
+	},
 	...Object.fromEntries(
 		Object.entries(AI_TRANSFORMER_MODELS).map(([id, modelId]) => {
 			const model = AI_MODELS[modelId]

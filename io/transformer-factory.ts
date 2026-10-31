@@ -1,5 +1,23 @@
 import { IdentityTransformer } from "./transformers/transformer-identity.ts"
 import {
+	ID_PROGRESSION_STEPPER,
+	TransformerProgressionStepper
+} from "./transformers/transformer-progression-stepper"
+import {
+	ID_HARMONIC_BRIDGE,
+	TransformerHarmonicBridge
+} from "./transformers/transformer-harmonic-bridge"
+import {
+	ID_CADENCE_WEAVER,
+	TransformerCadenceWeaver
+} from "./transformers/transformer-cadence-weaver"
+import { ID_KEY_TRAVELLER, TransformerKeyTraveller } from "./transformers/transformer-key-traveller"
+import { ID_TENSION_ARC, TransformerTensionArc } from "./transformers/transformer-tension-arc"
+import {
+	ID_MELODIC_MEDIATOR,
+	TransformerMelodicMediator
+} from "./transformers/transformer-melodic-mediator"
+import {
 	TransformerAIMusic,
 	AI_TRANSFORMER_MODELS,
 	ID_AI_IMPROV,
@@ -110,6 +128,18 @@ import {
 
 export const tranformerFactory = (type: string, config: any = {}) => {
 	switch (type) {
+		case ID_PROGRESSION_STEPPER:
+			return new TransformerProgressionStepper(config)
+		case ID_HARMONIC_BRIDGE:
+			return new TransformerHarmonicBridge(config)
+		case ID_CADENCE_WEAVER:
+			return new TransformerCadenceWeaver(config)
+		case ID_KEY_TRAVELLER:
+			return new TransformerKeyTraveller(config)
+		case ID_TENSION_ARC:
+			return new TransformerTensionArc(config)
+		case ID_MELODIC_MEDIATOR:
+			return new TransformerMelodicMediator(config)
 		case ID_AI_IMPROV:
 		case ID_AI_MELODY:
 		case ID_AI_DRUMS:
@@ -218,6 +248,12 @@ export const tranformerFactory = (type: string, config: any = {}) => {
 }
 
 export const TRANSFORMER_TYPE = {
+	ID_PROGRESSION_STEPPER,
+	ID_HARMONIC_BRIDGE,
+	ID_CADENCE_WEAVER,
+	ID_KEY_TRAVELLER,
+	ID_TENSION_ARC,
+	ID_MELODIC_MEDIATOR,
 	ID_AI_IMPROV,
 	ID_AI_MELODY,
 	ID_AI_DRUMS,

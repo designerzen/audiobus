@@ -11,6 +11,9 @@ import type { IAudioCommand } from "../../audio-command-interface.ts"
 export const ID_MIDI_FILE_PLAYER = "MIDI-File-Player"
 
 interface Config {
+	playbackMode: "file" | "step"
+	trackIndex: number
+	loop: boolean
 	midiFileUrl: string
 	enabled: boolean
 	// Whether to align the loaded MIDI file to incoming note timing
@@ -20,6 +23,9 @@ interface Config {
 }
 
 const DEFAULT_OPTIONS: Config = {
+	playbackMode: "file",
+	trackIndex: -1,
+	loop: true,
 	midiFileUrl: "",
 	enabled: true,
 	alignToIncoming: true,
@@ -35,26 +41,62 @@ const DEFAULT_OPTIONS: Config = {
  *
  * When a NOTE_ON is received, it triggers playback of the loaded MIDI file.
  * The file's timing is maintained relative to the first incoming command.
+ * Step mode advances the selected melody track per key press and maps each
+ * key release back to its assigned melody pitch, wrapping when looping is on.
  */
 export class TransformerMIDIFilePlayer extends Transformer<Config> implements ITransformer {
 	type = ID_MIDI_FILE_PLAYER
 
-	private midiData: any = null
+	private midiData: Midi | null = null
 	private midiCommands: IAudioCommand[] = []
 	private isLoading = false
+	private loadRevision = 0
+	private cursor = 0
+	private melody: { midi: number; velocity: number }[] = []
+	private heldNotes = new Map<string, IAudioCommand>()
 
 	get name(): string {
 		return "MIDI File Player"
 	}
 
 	get description(): string {
-		return "Replace notes with commands from a loaded MIDI file"
+		return "Replace notes with a MIDI file, or advance its melody one note per key press"
 	}
 
 	category = TRANSFORMER_CATEGORY_TIMING
 
 	get fields(): FieldConfig[] {
 		return [
+			{
+				name: "playbackMode",
+				label: "Playback",
+				type: "select",
+				values: [
+					{ name: "Whole file", value: "file" },
+					{ name: "Next melody note per key press", value: "step" }
+				],
+				default: DEFAULT_OPTIONS.playbackMode
+			},
+			{
+				name: "trackIndex",
+				label: "Melody track (-1 = automatic, otherwise zero-based)",
+				help: "Automatic chooses a named melody, vocal or lead track, then the first non-drum track with notes.",
+				type: "number",
+				min: -1,
+				max: 255,
+				step: 1,
+				default: DEFAULT_OPTIONS.trackIndex
+			},
+			{
+				name: "loop",
+				label: "Repeat melody",
+				type: "select",
+				values: [
+					{ name: "Yes", value: 1 },
+					{ name: "No", value: 0 }
+				],
+				default: 1
+			},
 			{
 				name: "enabled",
 				type: "select",
@@ -101,38 +143,133 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 		}
 	}
 
+	override setConfig(key: string, value: unknown): void {
+		super.setConfig(key, value)
+		if (key === "midiFileUrl") {
+			void this.loadMIDIFile(String(value ?? ""))
+		} else if (key === "trackIndex" && this.midiData) {
+			this.selectMelody()
+		} else if (key === "playbackMode" && this.heldNotes) {
+			this.cursor = 0
+		}
+	}
+
+	private selectMelody(): void {
+		const tracks = this.midiData?.tracks ?? []
+		const melodic = tracks.filter((track) => track.channel !== 9 && track.notes.length > 0)
+		const track =
+			this.config.trackIndex >= 0
+				? tracks[this.config.trackIndex]
+				: (melodic.find((track) => /melody|vocal|lead/i.test(track.name)) ?? melodic[0])
+		this.melody = (track?.notes ?? [])
+			.slice()
+			.sort((a, b) => a.time - b.time)
+			.map((note) => ({ midi: note.midi, velocity: Math.round(note.velocity * 127) }))
+		this.cursor = 0
+	}
+
+	/** One press advances one note; its release belongs to the pitch assigned to that press. */
+	private stepMelody(commands: IAudioCommand[]): IAudioCommand[] {
+		const result: IAudioCommand[] = []
+		for (const command of commands) {
+			const key = JSON.stringify([command.from, command.channel, command.number])
+			const release =
+				command.type === Commands.NOTE_OFF ||
+				(command.type === Commands.NOTE_ON && command.velocity === 0)
+			if (command.type !== Commands.NOTE_ON && !release) {
+				result.push(command)
+				continue
+			}
+			const now = (command.startAt ?? command.time ?? 0) + this.config.timeOffset
+			const held = this.heldNotes.get(key)
+			if (held) {
+				result.push(
+					Object.assign(new AudioCommand(), {
+						type: Commands.NOTE_OFF,
+						number: held.number,
+						channel: held.channel,
+						from: held.from,
+						velocity: 0,
+						startAt: now,
+						time: now
+					})
+				)
+				this.heldNotes.delete(key)
+			}
+			if (!this.config.enabled) {
+				if (!release || !held) {
+					result.push(command)
+				}
+				continue
+			}
+			if (release || this.isLoading || !this.melody.length) {
+				continue
+			}
+			if (this.cursor >= this.melody.length) {
+				if (!this.config.loop) {
+					continue
+				}
+				this.cursor = 0
+			}
+			const note = this.melody[this.cursor++]
+			const output = Object.assign(new AudioCommand(), {
+				type: Commands.NOTE_ON,
+				number: note.midi,
+				channel: command.channel || 1,
+				velocity: command.velocity ?? note.velocity,
+				from: command.from,
+				startAt: now,
+				time: now
+			})
+			this.heldNotes.set(key, Object.assign(new AudioCommand(), output))
+			result.push(output)
+		}
+		return result
+	}
+
 	/**
 	 * Load a MIDI file from the given URL
 	 */
 	async loadMIDIFile(url: string): Promise<void> {
-		if (this.isLoading) {
-			return
-		}
-
+		const revision = ++this.loadRevision
 		this.isLoading = true
 
 		try {
 			// Fetch the MIDI file from the URL
-			const response = await fetch(url)
+			// Public asset paths are relative to the application, including on nested preset pages.
+			const resolved = /^(?:[a-z][a-z\d+.-]*:|\/)/i.test(url)
+				? url
+				: `${import.meta.env.BASE_URL}${url}`
+			const response = await fetch(resolved)
 			if (!response.ok) {
 				throw new Error(`Failed to fetch MIDI file: ${response.statusText}`)
 			}
 
 			const arrayBuffer = await response.arrayBuffer()
+			if (revision !== this.loadRevision) {
+				return
+			}
 
 			// Parse MIDI using @tonejs/midi library
 			this.midiData = new Midi(arrayBuffer)
 
 			// Extract NOTE_ON and NOTE_OFF commands from the loaded data
 			this.extractMIDICommands()
+			this.selectMelody()
 
-			this.setConfig("midiFileUrl", url)
+			super.setConfig("midiFileUrl", url)
 		} catch (error) {
+			if (revision !== this.loadRevision) {
+				return
+			}
 			console.error(`Failed to load MIDI file from ${url}:`, error)
 			this.midiData = null
 			this.midiCommands = []
+			this.melody = []
 		} finally {
-			this.isLoading = false
+			if (revision === this.loadRevision) {
+				this.isLoading = false
+			}
 		}
 	}
 
@@ -184,6 +321,41 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 	 * Transform incoming commands by replacing NOTE_ON/OFF with MIDI file notes
 	 */
 	transform(commands: IAudioCommand[], _timer: Timer): IAudioCommand[] {
+		if (this.config.playbackMode === "step") {
+			return this.stepMelody(commands)
+		}
+		const releases: IAudioCommand[] = []
+		const remaining = commands.filter((command) => {
+			const key = JSON.stringify([command.from, command.channel, command.number])
+			const held = this.heldNotes.get(key)
+			if (
+				!held ||
+				!(
+					command.type === Commands.NOTE_OFF ||
+					(command.type === Commands.NOTE_ON && command.velocity === 0)
+				)
+			) {
+				return true
+			}
+			const now = (command.startAt ?? command.time ?? 0) + this.config.timeOffset
+			releases.push(
+				Object.assign(new AudioCommand(), {
+					type: Commands.NOTE_OFF,
+					number: held.number,
+					channel: held.channel,
+					from: held.from,
+					velocity: 0,
+					startAt: now,
+					time: now
+				})
+			)
+			this.heldNotes.delete(key)
+			return false
+		})
+		return [...releases, ...this.playFile(remaining)].sort((a, b) => a.startAt - b.startAt)
+	}
+
+	private playFile(commands: IAudioCommand[]): IAudioCommand[] {
 		if (!this.config.enabled || this.midiCommands.length === 0 || this.isLoading) {
 			return commands
 		}
@@ -252,14 +424,19 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 	 * Reset the transformer state
 	 */
 	reset(): void {
-		// No state to reset
+		this.cursor = 0
+		this.heldNotes.clear()
 	}
 
 	/**
 	 * Cleanup resources
 	 */
 	destroy(): void {
+		this.loadRevision++
+		this.reset()
+		super.destroy()
 		this.midiData = null
 		this.midiCommands = []
+		this.melody = []
 	}
 }

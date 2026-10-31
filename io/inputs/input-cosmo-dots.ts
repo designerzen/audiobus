@@ -50,7 +50,7 @@ export function cosmoDotConfiguration(value: any, index: number): CosmoDotConfig
 		trigger:
 			typeof value?.trigger === "string" && value.trigger.length > 0
 				? value.trigger
-				: String(index),
+				: String(index + 1),
 		duration: Math.round(bounded(value?.duration, 200, 20, 10000)),
 		command: {
 			type: COMMAND_TYPES.includes(command?.type) ? command.type : COMMANDS.NOTE_ON,

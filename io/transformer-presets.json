@@ -1375,6 +1375,851 @@
 					}
 				}
 			]
+		},
+		{
+			"id": "classical-authentic",
+			"name": "Dominant–tonic",
+			"category": "Chords & accompaniment",
+			"description": "Prepare the destination with its dominant seventh.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Cadence-Weaver",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"cadence": "authentic"
+					},
+					"summary": "Prepare the destination with its dominant seventh."
+				}
+			]
+		},
+		{
+			"id": "classical-predominant",
+			"name": "Predominant–dominant–tonic",
+			"category": "Chords & accompaniment",
+			"description": "Introduce predominant function before the dominant.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Cadence-Weaver",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"cadence": "predominant"
+					},
+					"summary": "Introduce predominant function before the dominant."
+				}
+			]
+		},
+		{
+			"id": "classical-plagal",
+			"name": "Plagal approach",
+			"category": "Chords & accompaniment",
+			"description": "Approach the destination through its subdominant.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Cadence-Weaver",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"cadence": "plagal"
+					},
+					"summary": "Approach the destination through its subdominant."
+				}
+			]
+		},
+		{
+			"id": "classical-minor-plagal",
+			"name": "Borrowed minor subdominant",
+			"category": "Chords & accompaniment",
+			"description": "Use the parallel minor's subdominant before arrival.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "minor-plagal"
+					},
+					"summary": "Use the parallel minor's subdominant before arrival."
+				}
+			]
+		},
+		{
+			"id": "classical-cadential-six-four",
+			"name": "Cadential six-four",
+			"category": "Chords & accompaniment",
+			"description": "Place tonic over dominant bass before dominant resolution.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Cadence-Weaver",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"cadence": "cadential-six-four"
+					},
+					"summary": "Place tonic over dominant bass before dominant resolution."
+				}
+			]
+		},
+		{
+			"id": "classical-deceptive",
+			"name": "Deceptive arrival",
+			"category": "Chords & accompaniment",
+			"description": "Interpret the played destination as vi in relative major, or VI in relative minor.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Cadence-Weaver",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"cadence": "deceptive"
+					},
+					"summary": "Interpret the played destination as vi in relative major, or VI in relative minor."
+				}
+			]
+		},
+		{
+			"id": "classical-half",
+			"name": "Half-cadence approach",
+			"category": "Chords & accompaniment",
+			"description": "Interpret a major destination chord as a dominant, rather than as a tonic.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Cadence-Weaver",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"cadence": "half"
+					},
+					"summary": "Interpret a major destination chord as a dominant, rather than as a tonic."
+				}
+			]
+		},
+		{
+			"id": "classical-phrygian-half",
+			"name": "Phrygian half cadence",
+			"category": "Chords & accompaniment",
+			"description": "Approach a major dominant from iv6 in the associated minor key.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Cadence-Weaver",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"cadence": "phrygian-half"
+					},
+					"summary": "Approach a major dominant from iv6 in the associated minor key."
+				}
+			]
+		},
+		{
+			"id": "classical-picardy",
+			"name": "Picardy-third arrival",
+			"category": "Chords & accompaniment",
+			"description": "Prepare a major tonic through a minor-key subdominant and dominant.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Cadence-Weaver",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"cadence": "picardy"
+					},
+					"summary": "Prepare a major tonic through a minor-key subdominant and dominant."
+				}
+			]
+		},
+		{
+			"id": "classical-applied-dominant",
+			"name": "Applied dominant",
+			"category": "Chords & accompaniment",
+			"description": "Temporarily tonicize the actual destination, including chromatic roots.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "applied-dominant"
+					},
+					"summary": "Temporarily tonicize the actual destination, including chromatic roots."
+				}
+			]
+		},
+		{
+			"id": "classical-double-dominant",
+			"name": "Dominant of the dominant",
+			"category": "Chords & accompaniment",
+			"description": "Resolve V7/V into V7, then into the destination.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "double-dominant"
+					},
+					"summary": "Resolve V7/V into V7, then into the destination."
+				}
+			]
+		},
+		{
+			"id": "classical-dominant-chain",
+			"name": "Chain of applied dominants",
+			"category": "Chords & accompaniment",
+			"description": "Traverse three descending-fifth dominant resolutions.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "dominant-chain"
+					},
+					"summary": "Traverse three descending-fifth dominant resolutions."
+				}
+			]
+		},
+		{
+			"id": "classical-leading-tone",
+			"name": "Diminished leading-tone seventh",
+			"category": "Chords & accompaniment",
+			"description": "Approach from a fully diminished seventh a semitone below the tonic.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "leading-tone"
+					},
+					"summary": "Approach from a fully diminished seventh a semitone below the tonic."
+				}
+			]
+		},
+		{
+			"id": "classical-half-diminished",
+			"name": "Half-diminished leading-tone seventh",
+			"category": "Chords & accompaniment",
+			"description": "Use the diatonic leading-tone seventh of a major destination.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "half-diminished"
+					},
+					"summary": "Use the diatonic leading-tone seventh of a major destination."
+				}
+			]
+		},
+		{
+			"id": "classical-applied-leading-tone",
+			"name": "Applied leading-tone preparation",
+			"category": "Chords & accompaniment",
+			"description": "Resolve the leading-tone seventh of V into the dominant.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "applied-leading-tone"
+					},
+					"summary": "Resolve the leading-tone seventh of V into the dominant."
+				}
+			]
+		},
+		{
+			"id": "classical-neapolitan",
+			"name": "Neapolitan-sixth approach",
+			"category": "Chords & accompaniment",
+			"description": "Use the flattened-supertonic major triad in first inversion.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "neapolitan"
+					},
+					"summary": "Use the flattened-supertonic major triad in first inversion."
+				}
+			]
+		},
+		{
+			"id": "classical-neapolitan-leading",
+			"name": "Neapolitan with applied leading tone",
+			"category": "Chords & accompaniment",
+			"description": "Elaborate the Neapolitan with the diminished leading-tone seventh of V.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "neapolitan-leading"
+					},
+					"summary": "Elaborate the Neapolitan with the diminished leading-tone seventh of V."
+				}
+			]
+		},
+		{
+			"id": "classical-italian-sixth",
+			"name": "Italian augmented sixth",
+			"category": "Chords & accompaniment",
+			"description": "Flat 6 and sharp 4 surround the dominant; tonic completes the Italian sixth.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "italian-sixth"
+					},
+					"summary": "Flat 6 and sharp 4 surround the dominant; tonic completes the Italian sixth."
+				}
+			]
+		},
+		{
+			"id": "classical-french-sixth",
+			"name": "French augmented sixth",
+			"category": "Chords & accompaniment",
+			"description": "Add scale degree 2 to the Italian augmented-sixth collection.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "french-sixth"
+					},
+					"summary": "Add scale degree 2 to the Italian augmented-sixth collection."
+				}
+			]
+		},
+		{
+			"id": "classical-german-sixth",
+			"name": "German sixth via cadential six-four",
+			"category": "Chords & accompaniment",
+			"description": "Resolve through a cadential six-four before V, avoiding the direct German-sixth/V fifths pattern.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "german-sixth"
+					},
+					"summary": "Resolve through a cadential six-four before V, avoiding the direct German-sixth/V fifths pattern."
+				}
+			]
+		},
+		{
+			"id": "classical-common-tone-diminished",
+			"name": "Common-tone diminished seventh",
+			"category": "Chords & accompaniment",
+			"description": "Keep the destination root as a common tone with a diminished-seventh embellishment.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "common-tone-diminished"
+					},
+					"summary": "Keep the destination root as a common tone with a diminished-seventh embellishment."
+				}
+			]
+		},
+		{
+			"id": "classical-modal-mixture",
+			"name": "Parallel-minor mixture",
+			"category": "Chords & accompaniment",
+			"description": "Borrow the lowered sixth and minor subdominant before a tonal cadence.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "modal-mixture"
+					},
+					"summary": "Borrow the lowered sixth and minor subdominant before a tonal cadence."
+				}
+			]
+		},
+		{
+			"id": "classical-descending-fifths",
+			"name": "Descending-fifths sequence",
+			"category": "Chords & accompaniment",
+			"description": "Join successive roots by descending fifths before the tonic.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "descending-fifths"
+					},
+					"summary": "Join successive roots by descending fifths before the tonic."
+				}
+			]
+		},
+		{
+			"id": "classical-full-fifths",
+			"name": "Diatonic circle sequence",
+			"category": "Chords & accompaniment",
+			"description": "Traverse the diatonic circle; a diminished fifth occurs where required by the scale.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "full-fifths"
+					},
+					"summary": "Traverse the diatonic circle; a diminished fifth occurs where required by the scale."
+				}
+			]
+		},
+		{
+			"id": "classical-descending-thirds",
+			"name": "Descending-third sequence",
+			"category": "Chords & accompaniment",
+			"description": "Move through descending thirds into a predominant and dominant.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "descending-thirds"
+					},
+					"summary": "Move through descending thirds into a predominant and dominant."
+				}
+			]
+		},
+		{
+			"id": "classical-ascending-five-six",
+			"name": "Ascending 5–6 sequence",
+			"category": "Chords & accompaniment",
+			"description": "Alternate root-position triads and first inversions above a stepwise rising bass.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"concept": "ascending-five-six"
+					},
+					"summary": "Alternate root-position triads and first inversions above a stepwise rising bass."
+				}
+			]
+		},
+		{
+			"id": "classical-lament",
+			"name": "Descending lament bass",
+			"category": "Chords & accompaniment",
+			"description": "Use the minor-key descending tetrachord, then resolve the dominant.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Harmonic-Bridge",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "minor",
+						"concept": "lament"
+					},
+					"summary": "Use the minor-key descending tetrachord, then resolve the dominant."
+				}
+			]
+		},
+		{
+			"id": "classical-pivot",
+			"name": "Diatonic pivot modulation",
+			"category": "Chords & accompaniment",
+			"description": "Find a triad shared by the old and new keys, then cadence in the destination key.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Key-Traveller",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"method": "pivot"
+					},
+					"summary": "Find a triad shared by the old and new keys, then cadence in the destination key."
+				}
+			]
+		},
+		{
+			"id": "classical-enharmonic-diminished",
+			"name": "Enharmonic diminished-seventh pivot",
+			"category": "Chords & accompaniment",
+			"description": "Reinterpret a symmetrical diminished seventh when both keys support that common collection.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Key-Traveller",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"method": "enharmonic-diminished"
+					},
+					"summary": "Reinterpret a symmetrical diminished seventh when both keys support that common collection."
+				}
+			]
+		},
+		{
+			"id": "classical-common-tone-modulation",
+			"name": "Common-tone modulation",
+			"category": "Chords & accompaniment",
+			"description": "Retain an actual shared pitch, introduce the new dominant and arrive in the new key.",
+			"useCase": "Play a starting chord, then the root or chord you want to reach. Cadence presets prepare even the first gesture.",
+			"steps": [
+				{
+					"type": "Key-Traveller",
+					"config": {
+						"single": "chord-root",
+						"step": 0.5,
+						"finalBeats": 2,
+						"hold": "phrase",
+						"mode": "major",
+						"method": "common-tone-modulation"
+					},
+					"summary": "Retain an actual shared pitch, introduce the new dominant and arrive in the new key."
+				}
+			]
+		},
+		{
+			"id": "roman-gesture-stepper",
+			"name": "Roman Progression: Gesture Steps",
+			"category": "Chords & accompaniment",
+			"description": "Play I, vi, ii6 and V7 with successive gestures.",
+			"useCase": "Play one key or a chord per progression step.",
+			"steps": [
+				{
+					"type": "Progression-Stepper",
+					"config": {
+						"progression": "I:2 vi:2 ii6:1 V7:1",
+						"advance": "gesture"
+					},
+					"summary": "Advance one chord per gesture in the chosen key."
+				}
+			]
+		},
+		{
+			"id": "roman-beat-stepper",
+			"name": "Roman Progression: Beat Cycle",
+			"category": "Chords & accompaniment",
+			"description": "Play a complete cadence on the beat clock.",
+			"useCase": "Press a key to start; release behaviour is set to complete one bounded cycle.",
+			"steps": [
+				{
+					"type": "Progression-Stepper",
+					"config": {
+						"progression": "I:2 IV:1 ii6:1 I64:1 V7:1 I:2",
+						"advance": "beats",
+						"loop": 0
+					},
+					"summary": "Play a tonic–predominant–cadential-six-four cycle."
+				}
+			]
+		},
+		{
+			"id": "roman-pedal-stepper",
+			"name": "Roman Progression: Pedal Steps",
+			"category": "Chords & accompaniment",
+			"description": "Advance I, vi, IV and V7 by tapping MIDI CC 64.",
+			"useCase": "Play to establish the sound, then tap the sustain pedal. The advance CC is consumed.",
+			"steps": [
+				{
+					"type": "Progression-Stepper",
+					"config": {
+						"progression": "I vi IV V7",
+						"advance": "pedal",
+						"pedal": 64
+					},
+					"summary": "Advance on pedal-down edges, consuming the pedal controller."
+				}
+			]
+		},
+		{
+			"id": "classical-tension-arch",
+			"name": "Classical Tension Arch",
+			"category": "Chords & accompaniment",
+			"description": "Shape four gestures through plagal, predominant, Neapolitan and dominant preparations.",
+			"useCase": "Play destination roots or chords and allow each short preparation to complete.",
+			"steps": [
+				{
+					"type": "Tension-Arc",
+					"config": {
+						"shape": "arch",
+						"peak": "neapolitan",
+						"step": 0.5
+					},
+					"summary": "Cycle through mild, building, chromatic and resolving approaches."
+				}
+			]
+		},
+		{
+			"id": "melodic-diatonic",
+			"name": "Diatonic Passing Connection",
+			"category": "Chords & accompaniment",
+			"description": "Mediate a played transition using diatonic passing connection.",
+			"useCase": "Play a starting note or chord, then a destination. Suspensions require an appropriate prepared soprano.",
+			"steps": [
+				{
+					"type": "Melodic-Mediator",
+					"config": {
+						"approach": "diatonic",
+						"step": 0.25,
+						"finalBeats": 1
+					},
+					"summary": "Connect played sounds using diatonic passing connection."
+				}
+			]
+		},
+		{
+			"id": "melodic-chromatic",
+			"name": "Chromatic Passing Connection",
+			"category": "Chords & accompaniment",
+			"description": "Mediate a played transition using chromatic passing connection.",
+			"useCase": "Play a starting note or chord, then a destination. Suspensions require an appropriate prepared soprano.",
+			"steps": [
+				{
+					"type": "Melodic-Mediator",
+					"config": {
+						"approach": "chromatic",
+						"step": 0.25,
+						"finalBeats": 1
+					},
+					"summary": "Connect played sounds using chromatic passing connection."
+				}
+			]
+		},
+		{
+			"id": "melodic-double-neighbour",
+			"name": "Double-Neighbour Arrival",
+			"category": "Chords & accompaniment",
+			"description": "Mediate a played transition using double-neighbour arrival.",
+			"useCase": "Play a starting note or chord, then a destination. Suspensions require an appropriate prepared soprano.",
+			"steps": [
+				{
+					"type": "Melodic-Mediator",
+					"config": {
+						"approach": "double-neighbour",
+						"step": 0.25,
+						"finalBeats": 1
+					},
+					"summary": "Connect played sounds using double-neighbour arrival."
+				}
+			]
+		},
+		{
+			"id": "melodic-appoggiatura",
+			"name": "Appoggiatura Arrival",
+			"category": "Chords & accompaniment",
+			"description": "Mediate a played transition using appoggiatura arrival.",
+			"useCase": "Play a starting note or chord, then a destination. Suspensions require an appropriate prepared soprano.",
+			"steps": [
+				{
+					"type": "Melodic-Mediator",
+					"config": {
+						"approach": "appoggiatura",
+						"step": 0.25,
+						"finalBeats": 1
+					},
+					"summary": "Connect played sounds using appoggiatura arrival."
+				}
+			]
+		},
+		{
+			"id": "melodic-suspension",
+			"name": "Prepared Suspension",
+			"category": "Chords & accompaniment",
+			"description": "Mediate a played transition using prepared suspension.",
+			"useCase": "Play a starting note or chord, then a destination. Suspensions require an appropriate prepared soprano.",
+			"steps": [
+				{
+					"type": "Melodic-Mediator",
+					"config": {
+						"approach": "suspension",
+						"step": 0.25,
+						"finalBeats": 1
+					},
+					"summary": "Connect played sounds using prepared suspension."
+				}
+			]
+		},
+		{
+			"id": "melodic-retardation",
+			"name": "Prepared Retardation",
+			"category": "Chords & accompaniment",
+			"description": "Mediate a played transition using prepared retardation.",
+			"useCase": "Play a starting note or chord, then a destination. Suspensions require an appropriate prepared soprano.",
+			"steps": [
+				{
+					"type": "Melodic-Mediator",
+					"config": {
+						"approach": "retardation",
+						"step": 0.25,
+						"finalBeats": 1
+					},
+					"summary": "Connect played sounds using prepared retardation."
+				}
+			]
+		},
+		{
+			"id": "melodic-anticipation",
+			"name": "Anticipated Arrival",
+			"category": "Chords & accompaniment",
+			"description": "Mediate a played transition using anticipated arrival.",
+			"useCase": "Play a starting note or chord, then a destination. Suspensions require an appropriate prepared soprano.",
+			"steps": [
+				{
+					"type": "Melodic-Mediator",
+					"config": {
+						"approach": "anticipation",
+						"step": 0.25,
+						"finalBeats": 1
+					},
+					"summary": "Connect played sounds using anticipated arrival."
+				}
+			]
+		},
+		{
+			"id": "melodic-oblique",
+			"name": "Oblique Voice Movement",
+			"category": "Chords & accompaniment",
+			"description": "Move one voice toward the destination while the other voices stay still.",
+			"useCase": "Play a starting note or chord, then a destination. Suspensions require an appropriate prepared soprano.",
+			"steps": [
+				{
+					"type": "Melodic-Mediator",
+					"config": {
+						"approach": "oblique",
+						"step": 0.25,
+						"finalBeats": 1
+					},
+					"summary": "Connect the chords using oblique voice movement."
+				}
+			]
 		}
 	],
 	"setups": []
