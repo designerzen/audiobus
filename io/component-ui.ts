@@ -47,22 +47,26 @@ export function fieldsDescriptor(fields: FieldConfig[]): UiDescriptor {
 	}
 }
 
-const listeners = new WeakMap<object, Set<() => void>>()
-export function notifyControls(component: object): void {
+const listeners = new WeakMap<object, Set<(id?: string) => void>>()
+export function notifyControls(component: object, id?: string): void {
 	for (const listener of listeners.get(component) ?? []) {
-		listener()
+		listener(id)
 	}
 }
-export function subscribeControls(component: Component, listener: () => void): () => void {
+export function subscribeControls(
+	component: Component,
+	listener: (id?: string) => void
+): () => void {
 	let set = listeners.get(component)
 	if (!set) {
 		listeners.set(component, (set = new Set()))
 	}
 	set.add(listener)
-	component.addEventListener?.(EVENT_CONFIGURATION_CHANGED, listener)
+	const changed = () => listener()
+	component.addEventListener?.(EVENT_CONFIGURATION_CHANGED, changed)
 	return () => {
 		set!.delete(listener)
-		component.removeEventListener?.(EVENT_CONFIGURATION_CHANGED, listener)
+		component.removeEventListener?.(EVENT_CONFIGURATION_CHANGED, changed)
 	}
 }
 
@@ -280,7 +284,7 @@ export function installComponentUi<T extends object>(target: T): T & ComponentUi
 		component.setControlValue = async (id, value) => {
 			if (component.fields) {
 				await component.setConfig?.(id, value)
-				notifyControls(component)
+				notifyControls(component, id)
 				return
 			}
 			const entry = legacy.get(id)
@@ -309,7 +313,7 @@ export function installComponentUi<T extends object>(target: T): T & ComponentUi
 				element.dispatchEvent(new Event(EVENT_INPUT, { bubbles: true }))
 				element.dispatchEvent(new Event(EVENT_CHANGE, { bubbles: true }))
 			}
-			notifyControls(component)
+			notifyControls(component, id)
 		}
 	}
 	if (!component.subscribeControls) {
@@ -361,10 +365,18 @@ export async function componentBindings(
 			sourceLabel: component.name ?? descriptor.title ?? "Component",
 			descriptor: d,
 			read: () => component.getControlValue!(d.id),
-			async write(value) {
-				await component.setControlValue!(d.id, validateValue(d, value))
-				notifyControls(component)
+			write(value) {
+				const result = component.setControlValue!(d.id, validateValue(d, value))
+				if (result) {
+					return result.then(() => notifyControls(component, d.id))
+				}
+				notifyControls(component, d.id)
 			},
-			subscribe: (listener) => component.subscribeControls!(listener)
+			subscribe: (listener) =>
+				component.subscribeControls!((id?: string) => {
+					if (typeof id !== "string" || id === d.id) {
+						listener()
+					}
+				})
 		}))
 }
