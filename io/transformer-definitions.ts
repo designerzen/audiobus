@@ -448,7 +448,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 	[TRANSFORMER_TYPE.ID_CONSTRICTOR]: {
 		id: TRANSFORMER_TYPE.ID_CONSTRICTOR,
 		name: "Constrictor",
-		description: "Limits notes to a specified range",
+		description:
+			"Experimental: currently passes notes through; octave range folding is not implemented.",
 		icon: "/icons/transformer-constrictor.svg",
 		category: "Range",
 		type: "transformer",
@@ -458,7 +459,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 	[TRANSFORMER_TYPE.ID_TIMING_HUMANISER]: {
 		id: TRANSFORMER_TYPE.ID_TIMING_HUMANISER,
 		name: "Timing Humaniser",
-		description: "Adds humanlike timing variations to notes",
+		description:
+			"Experimental: timing variation is not implemented; the legacy distance setting shifts pitch.",
 		icon: "/icons/transformer-timing-humaniser.svg",
 		category: "Timing",
 		type: "transformer",

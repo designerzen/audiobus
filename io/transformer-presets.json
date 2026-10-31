@@ -1161,7 +1161,7 @@
 			"name": "Slow Chord Bloom",
 			"category": "Chords & accompaniment",
 			"description": "Let each held note gradually grow a fifth, octave and upper fifth.",
-			"useCase": "Hold single notes or sparse chords to create a sustained harmonic texture.",
+			"useCase": "Hold single notes or sparse chords to create a sustained harmonic texture. Use a sustained sound; releasing the key ends the voices and cancels the rest of the bloom.",
 			"steps": [
 				{
 					"type": "Chord-Bloom",
@@ -1218,7 +1218,7 @@
 			"name": "Three-Five Weave",
 			"category": "Rhythm & repeats",
 			"description": "Weave an every-third-gesture strand with an every-fifth-gesture strand.",
-			"useCase": "Play a steady sequence of notes or chords; both strands meet every fifteen gestures.",
+			"useCase": "Play a steady sequence of notes or chords; both strands meet every fifteen gestures. This counts your attacks rather than generating notes on the transport.",
 			"steps": [
 				{
 					"type": "Rhythm-Weave",
@@ -1238,7 +1238,7 @@
 			"name": "Orbiting Pitch Classes",
 			"category": "Register & layering",
 			"description": "Keep the pitch classes of your playing while their octaves move through a register.",
-			"useCase": "Repeat a short idea and listen to its register evolve.",
+			"useCase": "Repeat a short idea and listen to its register evolve between MIDI notes 48 and 84. Chord attacks within 25 ms share one octave target.",
 			"steps": [
 				{
 					"type": "Register-Orbit",
@@ -1249,6 +1249,130 @@
 						"collect": 25
 					},
 					"summary": "Move the octave target by seven semitones per gesture, wrapping within the register."
+				}
+			]
+		},
+		{
+			"id": "soft-echo-trail",
+			"name": "Soft Echo Trail",
+			"category": "Rhythm & repeats",
+			"description": "Add four fading note echoes at fixed 250 ms intervals.",
+			"useCase": "Play short, sparse notes through a synth or MIDI output. Echo timing stays fixed when tempo changes.",
+			"steps": [
+				{
+					"type": "Note-Reverb",
+					"summary": "Note Reverb — repeat each note four times, retaining 60% velocity per echo.",
+					"config": {
+						"repeats": 4,
+						"delay": 250,
+						"decay": 0.6
+					}
+				}
+			]
+		},
+		{
+			"id": "pentatonic-shadow",
+			"name": "Pentatonic Shadow",
+			"category": "Play in key",
+			"description": "Pair a C major pentatonic melody with a quieter remembered bass line.",
+			"useCase": "Play a melody on the keyboard, pads or Music Mouse; after two attacks its earlier pitches return an octave lower.",
+			"steps": [
+				{
+					"type": "Harmoniser",
+					"summary": "Harmoniser — fit notes to C major pentatonic.",
+					"config": {
+						"root": 0,
+						"mode": [0, 2, 4, 7, 9]
+					}
+				},
+				{
+					"type": "Melody-Shadow",
+					"summary": "Melody Shadow — recall the pitch from two attacks ago one octave below.",
+					"config": {
+						"lag": 2,
+						"transpose": -12,
+						"level": 50,
+						"dry": 1
+					}
+				}
+			]
+		},
+		{
+			"id": "open-fifth-bloom",
+			"name": "Open Fifth Bloom",
+			"category": "Chords & accompaniment",
+			"description": "Let held notes unfold into open fifths and octaves.",
+			"useCase": "Hold a single key with a sustained synth or organ. Release to end the whole bloom and cancel pending voices.",
+			"steps": [
+				{
+					"type": "Chord-Bloom",
+					"summary": "Chord Bloom — add fifth and octave voices one beat apart.",
+					"config": {
+						"intervals": "0, 7, 12, 19",
+						"step": 1,
+						"falloff": 20
+					}
+				}
+			]
+		},
+		{
+			"id": "woven-register",
+			"name": "Woven Register",
+			"category": "Register & layering",
+			"description": "Send interlocking two- and three-gesture rhythms through an orbiting register.",
+			"useCase": "Play a steady stream of notes or chords. This selects your gestures; it does not generate a clocked sequence.",
+			"steps": [
+				{
+					"type": "Rhythm-Weave",
+					"summary": "Rhythm Weave — keep either the two-gesture or three-gesture strand.",
+					"config": {
+						"cycleA": 2,
+						"cycleB": 3,
+						"mode": "union",
+						"accent": 120,
+						"level": 85,
+						"collect": 25
+					}
+				},
+				{
+					"type": "Register-Orbit",
+					"summary": "Register Orbit — move surviving pitch classes through notes 48–84.",
+					"config": {
+						"lower": 48,
+						"upper": 84,
+						"stride": 5,
+						"collect": 25
+					}
+				}
+			]
+		},
+		{
+			"id": "expressive-shadow",
+			"name": "Expressive Shadow",
+			"category": "Register & layering",
+			"description": "Shape melodic dynamics and add a softer one-attack memory voice.",
+			"useCase": "Try a velocity-sensitive synth. Rising notes receive more emphasis; each new key also recalls the previous pitch.",
+			"steps": [
+				{
+					"type": "Contour-Dynamics",
+					"summary": "Contour Dynamics — lift rising notes and soften falling notes.",
+					"config": {
+						"rising": 120,
+						"falling": 80,
+						"repeated": 95,
+						"leap": 10,
+						"gap": 4
+					}
+				},
+				{
+					"type": "Melody-Shadow",
+					"summary": "Melody Shadow — add the previous pitch at 50% velocity.",
+					"config": {
+						"lag": 1,
+						"transpose": 0,
+						"level": 50,
+						"dry": 1
+					}
 				}
 			]
 		}
