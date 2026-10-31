@@ -13,6 +13,8 @@ import {
 	type PolySynthSettings
 } from "./polyphonic-settings.ts"
 import { createPolySynthGui } from "./polyphonic-gui.ts"
+import type { ControlValue, UiDescriptor } from "control-surface/types"
+import { subscribeControls } from "../io/component-ui"
 
 export default class PolySynth extends EventTarget implements IAudioOutput {
 	static ID = 0
@@ -62,6 +64,51 @@ export default class PolySynth extends EventTarget implements IAudioOutput {
 
 	get isHidden(): boolean {
 		return false
+	}
+	getUiDescriptor(): UiDescriptor {
+		return {
+			title: this.name,
+			controls: [
+				{
+					id: "shape",
+					label: "Waveform",
+					widget: "select",
+					choices: POLYSYNTH_WAVEFORMS.map((value) => ({ label: value, value }))
+				},
+				...Object.entries(POLYSYNTH_PARAMETERS).map(([id, parameter]) => ({
+					id,
+					label: parameter.label,
+					widget: id === "volume" ? ("slider" as const) : ("dial" as const),
+					min: parameter.min,
+					max: parameter.max,
+					step: parameter.step,
+					defaultValue: parameter.default,
+					unit: parameter.unit
+				})),
+				{ id: "Random waveform", label: "Random waveform", widget: "button" },
+				{ id: "All notes off", label: "All notes off", widget: "button" }
+			]
+		}
+	}
+	getControlValue(id: string): ControlValue | undefined {
+		return id === "shape" || Object.hasOwn(POLYSYNTH_PARAMETERS, id)
+			? this.options[id as keyof PolySynthSettings]
+			: undefined
+	}
+	setControlValue(id: string, value: ControlValue): void | Promise<void> {
+		if (id === "Random waveform") {
+			return this.setRandomTimbre()
+		}
+		if (id === "All notes off") {
+			this.allNotesOff()
+			return
+		}
+		if (id === "shape" || Object.hasOwn(POLYSYNTH_PARAMETERS, id)) {
+			this.configure({ [id]: value })
+		}
+	}
+	subscribeControls(listener: () => void): () => void {
+		return subscribeControls(this, listener)
 	}
 
 	async #initializeDefaults() {

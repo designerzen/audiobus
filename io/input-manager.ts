@@ -5,6 +5,7 @@ import {
 	EVENT_DEVICE_LIST_CHANGED
 } from "../event-constants.ts"
 export { EVENT_INPUTS_UPDATED } from "../event-constants.ts"
+import { configurationUpdate } from "./configuration-events"
 /**
  * Combine input mechanisms and dispatch
  * directly from this instance. Allows
@@ -45,7 +46,12 @@ export default class InputManager extends AbstractInput {
 	}
 	#inputMap: Map<string, IAudioInput> = new Map()
 	#abortController: AbortController
-	#inputChanged = () => this.dispatchEvent(new Event(EVENT_INPUTS_UPDATED))
+	#inputChanged = (event: Event) =>
+		this.dispatchEvent(
+			event.type === EVENT_CONFIGURATION_CHANGED
+				? configurationUpdate(EVENT_INPUTS_UPDATED)
+				: new Event(EVENT_INPUTS_UPDATED)
+		)
 
 	get inputs(): IAudioInput[] {
 		return this.#inputs

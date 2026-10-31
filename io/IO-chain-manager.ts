@@ -34,6 +34,7 @@ import { INPUT_EVENT, PLAYBACK_TOGGLE, PLAYBACK_STOP, MIDI_STOP, CONTROL_CHANGE 
  * Handles creation, persistence, and lifecycle of multiple IO chains
  */
 import IOChain from "./IO-chain"
+import { isConfigurationUpdate } from "./configuration-events"
 import IOChainFactory, { type IOChainPreset } from "./IO-chain-factory"
 
 import type { Timer } from "netronome"
@@ -82,6 +83,7 @@ export class IOChainManager extends EventTarget {
 		{ device: any; direction: "input" | "output"; chains: Set<string> }
 	>()
 	#restoring = false
+	#configurationTimer?: ReturnType<typeof setTimeout>
 	restoreWarnings: string[] = []
 	#transportQueue: Promise<void> = Promise.resolve()
 	#transportRunning: boolean | undefined
@@ -219,8 +221,18 @@ export class IOChainManager extends EventTarget {
 		}
 	}
 
-	private changed = () => {
+	private changed = (event?: Event) => {
 		if (this.#restoring) {
+			return
+		}
+		clearTimeout(this.#configurationTimer)
+		if (isConfigurationUpdate(event)) {
+			// Persist the edited values after the gesture settles. Sound edits do
+			// not rebuild device ownership, harmony, pickers, and workspace tabs.
+			this.#configurationTimer = setTimeout(() => {
+				this.#configurationTimer = undefined
+				this.dispatchEvent(new Event(EVENT_CHAINS_UPDATED))
+			}, 160)
 			return
 		}
 		this.syncDevices()
@@ -1094,6 +1106,7 @@ export class IOChainManager extends EventTarget {
 	 * Stop all chains and clear them
 	 */
 	destroy(): void {
+		clearTimeout(this.#configurationTimer)
 		this.stopClock()
 		this.dispatchEvent(new Event(EVENT_DESTROYED))
 		this.#subscriptions.forEach((controller) => controller.abort())

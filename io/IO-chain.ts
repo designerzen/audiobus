@@ -1026,7 +1026,7 @@ export default class IOChain extends EventTarget {
 	 */
 	onInputsUpdated(inputEvent: CustomEvent) {
 		inputEvent.preventDefault()
-		this.dispatchEvent(new CustomEvent(inputEvent.type))
+		this.dispatchEvent(new CustomEvent(inputEvent.type, { detail: inputEvent.detail }))
 	}
 
 	/**
@@ -1056,6 +1056,6 @@ export default class IOChain extends EventTarget {
 	 */
 	onOutputsUpdated(outputEvent: CustomEvent): void {
 		outputEvent.preventDefault()
-		this.dispatchEvent(new CustomEvent(outputEvent.type))
+		this.dispatchEvent(new CustomEvent(outputEvent.type, { detail: outputEvent.detail }))
 	}
 }

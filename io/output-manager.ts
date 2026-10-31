@@ -1,6 +1,7 @@
 import { EVENT_OUTPUTS_UPDATED, EVENT_CONFIGURATION_CHANGED } from "../event-constants.ts"
 export { EVENT_OUTPUTS_UPDATED } from "../event-constants.ts"
 import { NOTE_OFF, NOTE_ON } from "../commands"
+import { configurationUpdate } from "./configuration-events"
 import OutputAudioEvent from "./events/output-audio-event.ts"
 
 import AudioCommand from "../audio-command"
@@ -114,7 +115,7 @@ export default class OutputManager extends EventTarget implements IAudioOutput {
 					owners.delete(output)
 					noteCommands.delete(output)
 				}
-				this.dispatchEvent(new CustomEvent(EVENT_OUTPUTS_UPDATED))
+				this.dispatchEvent(configurationUpdate(EVENT_OUTPUTS_UPDATED))
 			}
 			this.#configurationListeners.set(output, changed)
 			output.addEventListener(EVENT_CONFIGURATION_CHANGED, changed)
