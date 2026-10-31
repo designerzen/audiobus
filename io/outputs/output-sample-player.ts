@@ -5,26 +5,30 @@ import { EVENT_CHANGE, EVENT_ENDED } from "../../event-constants"
 import { bounded, changed, devicePanel, numberControl } from "../device-controls"
 import { getAudioDestination } from "../../audio-destination"
 import { musicalCommand } from "../event-clip"
+import { DEFAULT_HARMONY, type HarmonicState } from "../harmony"
+import { quantisePitchSet } from "../../tuning/pitch-class-set"
 
 const MAX_SAMPLE_BYTES = 4 * 1024 * 1024
 interface SampleVoice {
 	source: AudioBufferSourceNode
 	gain: GainNode
+	note: number
+	level: number
 }
 
 export default class OutputSamplePlayer extends EventTarget implements IAudioOutput {
 	readonly uuid = `Output-SamplePlayer-${crypto.randomUUID()}`
-	readonly name = "Sample Player"
-	readonly description = "Load your own audio sample and play it across the keyboard"
+	readonly name: string = "Sample Player"
+	readonly description: string = "Load your own audio sample and play it across the keyboard"
 	readonly isHidden = false
 	readonly requiresConnectionControl = false
 	readonly configurationAffectsNoteRouting = false
 	readonly options: Record<string, any>
 	readonly output: GainNode
-	private context: AudioContext
+	protected context: AudioContext
 	private destination: AudioNode
 	private connected = true
-	private buffer?: AudioBuffer
+	protected buffer?: AudioBuffer
 	private loading?: Promise<AudioBuffer>
 	private generation = 0
 	private sampleRevision = 0
@@ -32,6 +36,21 @@ export default class OutputSamplePlayer extends EventTarget implements IAudioOut
 	private gui?: HTMLElement
 	private status?: HTMLElement
 	private destroyed = false
+	protected harmony = { ...DEFAULT_HARMONY }
+	private pending = new Map<string, object>()
+	setHarmony(state: HarmonicState): void {
+		this.harmony = { ...state }
+		if (this.options.follow !== "scale" && this.options.follow !== "chord") return
+		for (const voice of this.voices.values()) {
+			const pitch = this.targetPitch(voice.note)
+			voice.gain.gain.setTargetAtTime(pitch === undefined ? 0 : voice.level, this.context.currentTime, 0.02)
+			if (pitch !== undefined) voice.source.playbackRate.setTargetAtTime(2 ** ((pitch - this.options.root) / 12), this.context.currentTime, 0.02)
+		}
+	}
+	protected targetPitch(note: number): number | undefined {
+		if (this.options.follow === "scale" || this.options.follow === "chord") return quantisePitchSet(note, this.harmony[this.options.follow as "scale" | "chord"], 0)
+		return note
+	}
 	get isConnected() {
 		return this.connected
 	}
@@ -63,7 +82,7 @@ export default class OutputSamplePlayer extends EventTarget implements IAudioOut
 	getNoteKey(command: IAudioCommand): string {
 		return `${command.channel}:${command.number}`
 	}
-	private decodeSaved(): Promise<AudioBuffer> {
+	protected decodeSaved(): Promise<AudioBuffer> {
 		if (this.buffer) {
 			return Promise.resolve(this.buffer)
 		}
@@ -119,6 +138,7 @@ export default class OutputSamplePlayer extends EventTarget implements IAudioOut
 		}
 		const key = this.getNoteKey(command)
 		if (command.type === NOTE_OFF || (command.type === NOTE_ON && command.velocity === 0)) {
+			this.pending.delete(key)
 			this.release(key)
 			return
 		}
@@ -131,11 +151,15 @@ export default class OutputSamplePlayer extends EventTarget implements IAudioOut
 			return
 		}
 		const generation = this.generation
+		const request = {}; this.pending.set(key, request)
 		try {
 			const buffer = await this.decodeSaved()
-			if (generation !== this.generation || !this.connected) {
+			if (generation !== this.generation || !this.connected || this.pending.get(key) !== request) {
 				return
 			}
+			this.pending.delete(key)
+			const pitch = this.targetPitch(command.number)
+			if (pitch === undefined) return
 			this.release(key)
 			if (this.voices.size >= 32) {
 				this.release(this.voices.keys().next().value!)
@@ -144,7 +168,7 @@ export default class OutputSamplePlayer extends EventTarget implements IAudioOut
 				gain = this.context.createGain()
 			source.buffer = buffer
 			source.loop = this.options.loop
-			source.playbackRate.value = 2 ** ((command.number - this.options.root) / 12)
+			source.playbackRate.value = 2 ** ((pitch - this.options.root) / 12)
 			gain.gain.setValueAtTime(0, this.context.currentTime)
 			gain.gain.linearRampToValueAtTime(
 				Math.max(0, Math.min(127, command.velocity)) / 127,
@@ -152,7 +176,7 @@ export default class OutputSamplePlayer extends EventTarget implements IAudioOut
 			)
 			source.connect(gain)
 			gain.connect(this.output)
-			const voice = { source, gain }
+			const voice = { source, gain, note: command.number, level: Math.max(0, Math.min(127, command.velocity)) / 127 }
 			this.voices.set(key, voice)
 			source.addEventListener(
 				EVENT_ENDED,
@@ -191,6 +215,7 @@ export default class OutputSamplePlayer extends EventTarget implements IAudioOut
 		this.release(`1:${number}`)
 	}
 	allNotesOff(): void {
+		this.pending.clear()
 		++this.generation
 		for (const key of this.voices.keys()) {
 			this.release(key)

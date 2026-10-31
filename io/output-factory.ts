@@ -39,6 +39,8 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./outputs/output-note-monitor")
 		case OUTPUT_TYPES.SAMPLE_PLAYER:
 			return await import("./outputs/output-sample-player")
+		case OUTPUT_TYPES.HARMONY_SAMPLER:
+			return await import("./outputs/output-harmony-sampler")
 		case OUTPUT_TYPES.EVENT_RECORDER:
 			return await import("./outputs/output-event-recorder")
 		case OUTPUT_TYPES.OSC:
@@ -206,6 +208,11 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.SAMPLE_PLAYER],
 		isAvailable: () => typeof AudioContext !== "undefined",
 		create: (options) => createOutput(OUTPUT_TYPES.SAMPLE_PLAYER, options)
+	},
+	{
+		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.HARMONY_SAMPLER],
+		isAvailable: () => typeof AudioContext !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.HARMONY_SAMPLER, options)
 	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.OSC],

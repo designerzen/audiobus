@@ -24,6 +24,7 @@ export interface IAudioOutput {
 	readonly configurationAffectsNoteRouting?: boolean
 	onClockTick?(tick: Readonly<AudioClockTick>): void
 	stopClock?(): void
+	setHarmony?(state: import("../harmony").HarmonicState): void
 	recordChainPerformance?(measurement: Readonly<ChainPerformanceMeasurement>): void
 	recordTimerPerformance?(measurement: Readonly<TimerPerformanceMeasurement>): void
 

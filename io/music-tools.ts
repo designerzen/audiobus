@@ -1,9 +1,11 @@
 import { mod12, pitchClasses, pitchSetMask } from "../tuning/pitch-class-set"
+import { DEFAULT_HARMONY, parseHarmony, parseSections, type HarmonicState, type HarmonicSection } from "./harmony"
 import { NOTE_ON, NOTE_OFF } from "../commands"
 import { clipCommand, parseEventClip, type EventClip } from "./event-clip"
 
 export interface ChordStep {
 	mask: number
+	scale?: number
 	beats: number
 	root: number
 	name: string
@@ -27,6 +29,9 @@ export interface GrooveTemplate {
 }
 export interface MusicToolsState {
 	version: 1
+	harmony: HarmonicState
+	sections: HarmonicSection[]
+	playSections: boolean
 	progression: ChordStep[]
 	macros: PerformanceMacro[]
 	grooves: GrooveTemplate[]
@@ -40,6 +45,9 @@ export const DEFAULT_CHORDS: ChordStep[] = [
 export function defaultMusicTools(): MusicToolsState {
 	return {
 		version: 1,
+		harmony: { ...DEFAULT_HARMONY },
+		sections: [],
+		playSections: false,
 		progression: structuredClone(DEFAULT_CHORDS),
 		grooves: [],
 		macros: ["Density", "Harmony", "Brightness", "Variation"].map((name) => ({
@@ -70,6 +78,7 @@ export function parseProgression(value: unknown): ChordStep[] {
 		}
 		return {
 			mask: pitchSetMask(step.mask),
+			...(step.scale === undefined ? {} : { scale: pitchSetMask(step.scale) }),
 			beats: step.beats,
 			root: step.root,
 			name: step.name
@@ -127,6 +136,9 @@ export function parseMusicTools(value: unknown): MusicToolsState {
 	})
 	return {
 		version: 1,
+		harmony: parseHarmony(data.harmony ?? DEFAULT_HARMONY),
+		sections: parseSections(data.sections ?? []),
+		playSections: data.playSections === true,
 		progression: parseProgression(data.progression),
 		macros,
 		grooves: data.grooves.map(parseGroove)

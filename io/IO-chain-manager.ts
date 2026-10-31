@@ -20,6 +20,8 @@ import { chordAt, defaultMusicTools, parseMusicTools, type MusicToolsState } fro
 import { TransformerChordTrack } from "./transformers/transformer-chord-track"
 import { TransformerImprovPartner } from "./transformers/transformer-improv-partner"
 import { EVENT_WORKSPACE_RESTORED } from "../event-constants"
+import { EVENT_HARMONY_CHANGED, EVENT_HARMONY_SETTINGS_CHANGED } from "../event-constants"
+import { parseHarmony, sameHarmony, sectionAt, type HarmonicState } from "./harmony"
 import { deviceId, deviceDefinition, defineDevice } from "./device-definition"
 import { restoreDevice, UnavailableDevice, type SavedDevice } from "./workspace-devices"
 import { EVENT_DESTROYED } from "../event-constants"
@@ -100,12 +102,32 @@ export class IOChainManager extends EventTarget {
 	setMusicTools(value: MusicToolsState): void {
 		this.#musicTools = parseMusicTools(value)
 		this.changed()
+		this.applyHarmony()
+		this.dispatchEvent(new Event(EVENT_HARMONY_SETTINGS_CHANGED))
+	}
+	get harmony(): HarmonicState {
+		return { ...this.#musicTools.harmony }
+	}
+	setHarmony(value: HarmonicState): void {
+		const next = parseHarmony(value)
+		if (sameHarmony(next, this.#musicTools.harmony)) return
+		this.#musicTools.harmony = next
+		this.applyHarmony()
+		this.dispatchEvent(new Event(EVENT_HARMONY_CHANGED))
+	}
+	private applyHarmony(): void {
+		for (const chain of this.chains) {
+			for (const transformer of chain.transformers) transformer.setHarmony?.(this.harmony)
+			for (const output of chain.outputs) output.setHarmony?.(this.harmony)
+		}
 	}
 	updateMusicalBeat(beat: number): void {
 		if (!Number.isFinite(beat)) {
 			return
 		}
 		const chord = chordAt(this.#musicTools.progression, beat)
+		const section = this.#musicTools.playSections ? sectionAt(this.#musicTools.sections, beat) : undefined
+		if (section) this.setHarmony(section)
 		for (const chain of this.chains) {
 			const follows = chain.transformers.some(
 				(transformer) => transformer instanceof TransformerChordTrack
@@ -187,6 +209,7 @@ export class IOChainManager extends EventTarget {
 			return
 		}
 		this.syncDevices()
+		this.applyHarmony()
 		for (const chain of this.chains) {
 			for (const transformer of chain.transformers) {
 				if (transformer instanceof TransformerChordTrack) {

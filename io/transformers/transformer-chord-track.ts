@@ -2,12 +2,17 @@ import { devicePanel } from "../device-controls"
 import { PerformanceTransformer, type Settings, type Voice } from "./performance-transformer"
 import { chordAt, DEFAULT_CHORDS, parseProgression, type ChordStep } from "../music-tools"
 import { pitchClasses, quantisePitchSet, mod12 } from "../../tuning/pitch-class-set"
+import { DEFAULT_HARMONY, parseHarmony, type HarmonicState } from "../harmony"
 
 export const ID_CHORD_TRACK = "Shared-Chord-Track"
 export class TransformerChordTrack extends PerformanceTransformer {
 	type = ID_CHORD_TRACK
 	category = "Harmony"
 	beat = 0
+	private harmony = { ...DEFAULT_HARMONY }
+	setHarmony(state: HarmonicState): void {
+		this.harmony = parseHarmony(state)
+	}
 	private gui?: HTMLElement
 	private editor?: { refresh(): void; destroy(): void }
 	mountProgression?: (
@@ -45,8 +50,10 @@ export class TransformerChordTrack extends PerformanceTransformer {
 	}
 	constructor(config: Settings = {}) {
 		super(
-			{ role: "melody", transpose: 0, progression: JSON.stringify(DEFAULT_CHORDS) },
+			{ role: "melody", follow: "chord", source: "track", transpose: 0, progression: JSON.stringify(DEFAULT_CHORDS) },
 			[
+				{ name: "source", label: "Harmony source", values: ["track", "live"], help: "Track uses the chord progression. Live follows the Harmony workspace or conductor." },
+				{ name: "follow", label: "Melody follows", values: ["chord", "scale"] },
 				{ name: "role", label: "Follow as", values: ["melody", "bass", "chords"] },
 				{
 					name: "transpose",
@@ -68,10 +75,14 @@ export class TransformerChordTrack extends PerformanceTransformer {
 		this.beat = beat
 	}
 	protected noteOn(voice: Voice) {
-		const chord = chordAt(this.progression, this.beat)
+		const step = chordAt(this.progression, this.beat)
+		const live = this.options.source === "live"
+		const chord = live ? { mask: this.harmony.chord, root: this.harmony.root, scale: this.harmony.scale } : step
 		const transpose = Math.round(Number(this.options.transpose))
 		const input = voice.input.number
-		const nearest = quantisePitchSet(input, chord.mask, 0)
+		const mask = this.options.role === "melody" && this.options.follow === "scale"
+			? chord.scale ?? this.harmony.scale : chord.mask
+		const nearest = quantisePitchSet(input, mask, 0)
 		if (nearest === undefined) {
 			return []
 		}

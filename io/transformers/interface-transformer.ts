@@ -10,6 +10,7 @@ export interface ITransformer {
 	transform(commands: IAudioCommand[], timer: Timer): IAudioCommand[]
 	tick?(now: number, timer: Timer): IAudioCommand[]
 	setMusicalBeat?(beat: number): void
+	setHarmony?(state: import("../harmony").HarmonicState): void
 	readonly handlesMidiControls?: boolean
 	reset(): void
 	destroy(): void
