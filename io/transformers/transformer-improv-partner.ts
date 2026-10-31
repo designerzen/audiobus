@@ -37,6 +37,9 @@ export class TransformerImprovPartner extends PerformanceTransformer {
 	get description() {
 		return "Listen to a phrase, leave a gap, then answer using a bounded memory of your motifs."
 	}
+	get instructions() {
+		return "Start transport, play a phrase, then leave a gap to hear a reply through this chain’s outputs. Play again to interrupt. Listen mode remembers phrases without replying."
+	}
 	get status() {
 		return this.response
 			? "Responding; play to interrupt"
@@ -212,6 +215,24 @@ export class TransformerImprovPartner extends PerformanceTransformer {
 			owner
 		)
 		return [...output, ...super.tick(now, timer)]
+	}
+	override get fields() {
+		return [
+			...super.fields,
+			{
+				name: "forget",
+				label: "Forget remembered phrases",
+				type: "button",
+				group: "Performance"
+			}
+		]
+	}
+	override setConfig(key: string, value: unknown): void {
+		if (key === "forget") {
+			this.clearMemory()
+			return
+		}
+		super.setConfig(key, value)
 	}
 	clearMemory(): void {
 		this.memory = []

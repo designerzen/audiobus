@@ -1,3 +1,4 @@
+import { devicePanel } from "../device-controls"
 import { PerformanceTransformer, type Settings, type Voice } from "./performance-transformer"
 import { chordAt, DEFAULT_CHORDS, parseProgression, type ChordStep } from "../music-tools"
 import { pitchClasses, quantisePitchSet, mod12 } from "../../tuning/pitch-class-set"
@@ -7,6 +8,34 @@ export class TransformerChordTrack extends PerformanceTransformer {
 	type = ID_CHORD_TRACK
 	category = "Harmony"
 	beat = 0
+	private gui?: HTMLElement
+	private editor?: { refresh(): void; destroy(): void }
+	mountProgression?: (
+		host: HTMLElement,
+		status: HTMLElement
+	) => { refresh(): void; destroy(): void }
+	async createGui(): Promise<HTMLElement> {
+		if (this.gui) {
+			return this.gui
+		}
+		const panel = devicePanel(),
+			status = document.createElement("p")
+		status.setAttribute("role", "status")
+		this.editor = this.mountProgression?.(panel, status)
+		this.editor?.refresh()
+		panel.append(status)
+		return (this.gui = panel)
+	}
+	destroyGui(): void {
+		this.editor?.destroy()
+		this.editor = undefined
+		this.gui?.remove()
+		this.gui = undefined
+	}
+	override destroy(): void {
+		this.destroyGui()
+		super.destroy()
+	}
 	private progression: ChordStep[] = structuredClone(DEFAULT_CHORDS)
 	get name() {
 		return "Shared Chord Track"

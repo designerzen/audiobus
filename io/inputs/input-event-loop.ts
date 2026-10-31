@@ -13,6 +13,8 @@ export default class InputEventLoop extends AbstractInput {
 	private held = new Map<string, IAudioCommand>()
 	private channels = new Set<number>()
 	private gui?: HTMLElement
+	private tools?: { refresh(): void; destroy(): void }
+	mountTools?: (host: HTMLElement, status: HTMLElement) => { refresh(): void; destroy(): void }
 	get name() {
 		return "Event Loop"
 	}
@@ -156,9 +158,13 @@ export default class InputEventLoop extends AbstractInput {
 		})
 		label.append("Load event loop ", file)
 		panel.append(label, status)
+		this.tools = this.mountTools?.(panel, status)
+		this.tools?.refresh()
 		return (this.gui = panel)
 	}
 	async destroyGui(): Promise<void> {
+		this.tools?.destroy()
+		this.tools = undefined
 		this.gui?.remove()
 		this.gui = undefined
 	}

@@ -16,6 +16,11 @@ export default class InputScaleExplorer extends NoteInput {
 	private nextStep = 0
 	private releaseAt?: number
 	private gui?: HTMLElement
+	mountRoutes?: (
+		host: HTMLElement,
+		audition: (mask: number) => Promise<void>,
+		status: HTMLElement
+	) => void
 	get name() {
 		return "Scale Explorer"
 	}
@@ -222,6 +227,29 @@ export default class InputScaleExplorer extends NoteInput {
 				this.pulse(note, this.options.velocity, 600, this.options.channel)
 			}
 		})
+		if (this.mountRoutes) {
+			const routes = document.createElement("details"),
+				summary = document.createElement("summary"),
+				host = devicePanel(),
+				message = document.createElement("p")
+			summary.textContent = "Harmonic routes"
+			message.setAttribute("role", "status")
+			routes.append(summary, host, message)
+			this.mountRoutes(
+				host,
+				async (mask) => {
+					this.allNotesOff()
+					for (const pitch of pitchClasses(mask)) {
+						const note = (this.options.octave + 1) * 12 + pitch
+						if (note <= 127) {
+							this.pulse(note, this.options.velocity, 600, this.options.channel)
+						}
+					}
+				},
+				message
+			)
+			panel.append(routes)
+		}
 		refresh()
 		return (this.gui = panel)
 	}
