@@ -1,4 +1,13 @@
 import { IdentityTransformer } from "./transformers/transformer-identity.ts"
+import {
+	TransformerAIMusic,
+	AI_TRANSFORMER_MODELS,
+	ID_AI_IMPROV,
+	ID_AI_MELODY,
+	ID_AI_DRUMS,
+	ID_AI_MELODY_VARIATION,
+	ID_AI_TRIO_VARIATION
+} from "./transformers/transformer-ai-music"
 import { ID_CHORD_TRACK, TransformerChordTrack } from "./transformers/transformer-chord-track"
 import {
 	ID_IMPROV_PARTNER,
@@ -101,6 +110,12 @@ import {
 
 export const tranformerFactory = (type: string, config: any = {}) => {
 	switch (type) {
+		case ID_AI_IMPROV:
+		case ID_AI_MELODY:
+		case ID_AI_DRUMS:
+		case ID_AI_MELODY_VARIATION:
+		case ID_AI_TRIO_VARIATION:
+			return new TransformerAIMusic(config, AI_TRANSFORMER_MODELS[type])
 		case ID_CHORD_BLOOM:
 			return new TransformerChordBloom(config)
 		case ID_MELODY_SHADOW:
@@ -203,6 +218,11 @@ export const tranformerFactory = (type: string, config: any = {}) => {
 }
 
 export const TRANSFORMER_TYPE = {
+	ID_AI_IMPROV,
+	ID_AI_MELODY,
+	ID_AI_DRUMS,
+	ID_AI_MELODY_VARIATION,
+	ID_AI_TRIO_VARIATION,
 	ID_CHORD_BLOOM,
 	ID_MELODY_SHADOW,
 	ID_CONTOUR_DYNAMICS,

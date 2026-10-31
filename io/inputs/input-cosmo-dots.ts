@@ -11,6 +11,7 @@ import {
 } from "../../event-constants"
 import { bounded, changed, devicePanel, numberControl } from "../device-controls"
 import AbstractInput from "./abstract-input"
+import type { ControlValue, UiDescriptor } from "control-surface/types"
 
 export interface CosmoDotCommand {
 	type: string
@@ -68,7 +69,8 @@ export function cosmoDotConfiguration(value: any, index: number): CosmoDotConfig
 export default class InputCosmoDots extends AbstractInput {
 	private events = new AbortController()
 	private gui?: HTMLElement
-	private buttons: HTMLButtonElement[] = []
+	private views = new Map<HTMLElement, HTMLButtonElement[]>()
+	private countControl?: HTMLInputElement
 	private dialog?: HTMLDialogElement
 	private editing = false
 	private active = new Map<
@@ -88,9 +90,11 @@ export default class InputCosmoDots extends AbstractInput {
 
 	constructor(options: Record<string, any> = {}) {
 		super(options)
-		this.options.dots = Array.from({ length: 8 }, (_, i) =>
-			cosmoDotConfiguration(options.dots?.[i], i)
+		this.options.dots = Array.from(
+			{ length: Math.round(bounded(options.dotCount ?? options.dots?.length, 8, 1, 8)) },
+			(_, i) => cosmoDotConfiguration(options.dots?.[i], i)
 		)
+		this.options.dotCount = this.options.dots.length
 		const { signal } = this.events
 		if (typeof window !== "undefined") {
 			window.addEventListener(
@@ -141,13 +145,46 @@ export default class InputCosmoDots extends AbstractInput {
 	}
 
 	setDot(index: number, configuration: CosmoDotConfiguration): void {
-		if (!Number.isInteger(index) || index < 0 || index >= 8) {
+		if (!Number.isInteger(index) || index < 0 || index >= this.configuration.length) {
 			return
 		}
 		this.stop(index)
 		this.options.dots[index] = cosmoDotConfiguration(configuration, index)
 		this.refresh()
 		changed(this)
+	}
+
+	setDotCount(value: number): void {
+		this.stopAll()
+		const count = Math.round(bounded(value, this.configuration.length, 1, 8))
+		this.options.dots = Array.from({ length: count }, (_, i) =>
+			cosmoDotConfiguration(this.options.dots[i], i)
+		)
+		this.options.dotCount = count
+		this.refresh()
+		changed(this)
+	}
+	getUiDescriptor(): UiDescriptor {
+		return {
+			controls: [
+				{
+					id: "dotCount",
+					label: "Number of Cosmo Dots",
+					widget: "number",
+					min: 1,
+					max: 8,
+					step: 1
+				}
+			]
+		}
+	}
+	getControlValue(id: string): ControlValue | undefined {
+		return id === "dotCount" ? this.configuration.length : undefined
+	}
+	setControlValue(id: string, value: ControlValue): void {
+		if (id === "dotCount" && typeof value === "number") {
+			this.setDotCount(value)
+		}
 	}
 
 	activate(index: number): void {
@@ -157,7 +194,7 @@ export default class InputCosmoDots extends AbstractInput {
 			this.dialog ||
 			!Number.isInteger(index) ||
 			index < 0 ||
-			index >= 8
+			index >= this.configuration.length
 		) {
 			return
 		}
@@ -213,14 +250,57 @@ export default class InputCosmoDots extends AbstractInput {
 		}
 	}
 	private refresh(): void {
-		this.buttons.forEach((button, i) => {
-			const dot = this.configuration[i]
-			button.textContent = dot.trigger === " " ? "Space" : dot.trigger
-			button.title = `${this.editing ? "Edit" : "Activate"} dot ${i + 1}: ${dot.command.type}, ${dot.command.number}`
-			button.setAttribute("aria-label", `${button.title}; trigger ${button.textContent}`)
-			button.style.filter = this.active.has(i) ? "brightness(1.6)" : ""
-			button.style.boxShadow = this.active.has(i) ? "0 0 0 4px currentColor" : ""
+		if (this.countControl) {
+			this.countControl.value = String(this.configuration.length)
+		}
+		for (const [grid, previous] of this.views) {
+			const buttons =
+				previous.length === this.configuration.length ? previous : this.renderDots(grid)
+			buttons.forEach((button, i) => {
+				const dot = this.configuration[i]
+				const text = dot.trigger === " " ? "Space" : dot.trigger
+				button.querySelector("span")!.textContent = text
+				button.title = `${this.editing ? "Edit" : "Activate"} dot ${i + 1}: ${dot.command.type}, ${dot.command.number}`
+				button.setAttribute("aria-label", `${button.title}; trigger ${text}`)
+				button.setAttribute("aria-pressed", String(this.active.has(i)))
+				button.dataset.active = String(this.active.has(i))
+				button.style.filter = this.active.has(i) ? "brightness(1.6)" : ""
+				button.style.boxShadow = this.active.has(i) ? "0 0 0 4px currentColor" : ""
+			})
+		}
+	}
+	private renderDots(grid: HTMLElement): HTMLButtonElement[] {
+		grid.replaceChildren()
+		const buttons = this.configuration.map((_, i) => {
+			const button = document.createElement("button")
+			button.type = "button"
+			button.dataset.cosmoDot = String(i)
+			button.style.cssText = `position:relative;border-radius:50%;aspect-ratio:1;min-height:64px;border:0;background:transparent;color:${COLOURS[i]};font-weight:bold;font-size:1.2rem;touch-action:manipulation`
+			button.innerHTML =
+				'<svg viewBox="0 0 100 100" aria-hidden="true" style="display:block;width:100%;height:auto"><ellipse cx="50" cy="82" rx="43" ry="12" fill="#121826"/><path d="M7 54v18c0 28 86 28 86 0V54" fill="currentColor" opacity=".6"/><ellipse cx="50" cy="53" rx="43" ry="34" fill="currentColor"/><ellipse cx="50" cy="46" rx="34" ry="24" fill="white" opacity=".16"/><path d="M27 33q23-18 46 0" fill="none" stroke="white" stroke-width="3" opacity=".5"/></svg><span style="position:absolute;inset:38% 8% auto;color:white;overflow-wrap:anywhere;pointer-events:none"></span>'
+			button.addEventListener(EVENT_CLICK, () =>
+				this.editing ? this.editDot(i) : this.activate(i)
+			)
+			grid.append(button)
+			return button
 		})
+		this.views.set(grid, buttons)
+		return buttons
+	}
+	createSurfaceView(): { element: HTMLElement; destroy(): void } {
+		const grid = document.createElement("div")
+		grid.setAttribute("aria-label", "Cosmo Dots")
+		grid.style.cssText =
+			"display:grid;grid-template-columns:repeat(auto-fit,minmax(72px,100px));justify-content:center;gap:16px;padding:12px;width:100%;box-sizing:border-box;max-width:1000px;margin:auto"
+		this.renderDots(grid)
+		this.refresh()
+		return {
+			element: grid,
+			destroy: () => {
+				this.views.delete(grid)
+				grid.remove()
+			}
+		}
 	}
 
 	async createGui(): Promise<HTMLElement> {
@@ -240,24 +320,16 @@ export default class InputCosmoDots extends AbstractInput {
 			this.refresh()
 		})
 		label.append(edit, " Edit dots")
-		const grid = document.createElement("div")
-		grid.style.cssText =
-			"display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:6px"
-		this.buttons = this.configuration.map((_, i) => {
-			const button = document.createElement("button")
-			button.type = "button"
-			button.style.cssText = `border-radius:50%;aspect-ratio:1;min-height:56px;border:2px solid #ffffff80;background:${COLOURS[i]};color:white;font-weight:bold;font-size:1.2rem;overflow-wrap:anywhere;touch-action:manipulation`
-			button.addEventListener(EVENT_CLICK, () => {
-				if (this.editing) {
-					this.editDot(i)
-				} else {
-					this.activate(i)
-				}
-			})
-			grid.append(button)
-			return button
-		})
-		panel.append(help, label, grid)
+		panel.append(help, label)
+		this.countControl = numberControl(
+			panel,
+			"Number of dots",
+			this.configuration.length,
+			1,
+			8,
+			(value) => this.setDotCount(value)
+		)
+		panel.append(this.createSurfaceView().element)
 		this.gui = panel
 		this.refresh()
 		return panel
@@ -417,13 +489,19 @@ export default class InputCosmoDots extends AbstractInput {
 		this.dialog?.remove()
 		this.dialog = undefined
 		this.editing = false
+		for (const grid of this.views.keys()) {
+			if (this.gui?.contains(grid)) {
+				this.views.delete(grid)
+			}
+		}
 		this.gui?.remove()
 		this.gui = undefined
-		this.buttons = []
+		this.countControl = undefined
 	}
 	destroy(): void {
 		void this.destroyGui()
 		this.events.abort()
+		this.views.clear()
 		this.setAsDisconnected()
 	}
 }

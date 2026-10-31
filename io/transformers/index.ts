@@ -6,6 +6,7 @@
 export type { ITransformer } from "./interface-transformer.ts"
 export { TransformerScaleExplorer } from "./transformer-scale-explorer"
 export { default as Transformer } from "./abstract-transformer.ts"
+export { TransformerAIMusic } from "./transformer-ai-music"
 export { TransformerVelocityShaper } from "./transformer-velocity-shaper.ts"
 export { TransformerStrummer } from "./transformer-strummer.ts"
 export { TransformerProbabilityGate } from "./transformer-probability-gate.ts"

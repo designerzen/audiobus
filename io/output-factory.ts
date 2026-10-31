@@ -159,7 +159,14 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
 		if (!options?.audioContext) {
 			throw new Error("YOSHIMI output requires audioContext in options")
 		}
-		return new Class(options.audioContext, options.name, options.mixer)
+		const output = new Class(options.audioContext, options.name, options.mixer, options)
+		try {
+			await output.connect()
+			return output
+		} catch (error) {
+			await output.destroy()
+			throw error
+		}
 	} else if (type === OUTPUT_TYPES.SUPERSONIC) {
 		const output = new Class(
 			options?.audioContext ? getAudioDestination(options.audioContext) : undefined

@@ -1,4 +1,6 @@
-import type { DeviceClassification } from "./device-classification.ts"
+import type { DeviceClassification, DeviceAttribution } from "./device-classification.ts"
+import { AI_TRANSFORMER_MODELS } from "./transformers/transformer-ai-music"
+import { AI_MODELS, MAGENTA_ATTRIBUTION } from "./inputs/ai-model-catalogue"
 /**
  * Transformer Definitions
  *
@@ -13,6 +15,7 @@ import type { DeviceClassification } from "./device-classification.ts"
 import { TRANSFORMER_TYPE } from "./transformer-factory"
 
 export interface TransformerDefinition extends DeviceClassification<"transformer"> {
+	attribution?: DeviceAttribution
 	id: string
 	name: string
 	description: string
@@ -21,6 +24,27 @@ export interface TransformerDefinition extends DeviceClassification<"transformer
 }
 
 export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
+	...Object.fromEntries(
+		Object.entries(AI_TRANSFORMER_MODELS).map(([id, modelId]) => {
+			const model = AI_MODELS[modelId]
+			return [
+				id,
+				{
+					id,
+					name: `${model.name} ${model.engine === "vae" ? "Variation" : "Continuation"}`,
+					description:
+						model.engine === "vae"
+							? "Capture a phrase and play a related AI variation on a bar boundary."
+							: "Capture live notes and answer with an AI continuation on a bar boundary.",
+					icon: "/icons/transformer-magenta.svg",
+					category: "Variation",
+					type: "transformer",
+					subtype: "variation",
+					attribution: model.attribution
+				}
+			]
+		})
+	),
 	[TRANSFORMER_TYPE.ID_CHORD_BLOOM]: {
 		id: TRANSFORMER_TYPE.ID_CHORD_BLOOM,
 		name: "Chord Bloom",
@@ -317,6 +341,7 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		subtype: "duration"
 	},
 	[TRANSFORMER_TYPE.ID_MAGENTA]: {
+		attribution: MAGENTA_ATTRIBUTION,
 		id: TRANSFORMER_TYPE.ID_MAGENTA,
 		name: "Magenta Melody",
 		description: "Adds AI-generated melodies conditioned on your playing and harmony",

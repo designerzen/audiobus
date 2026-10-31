@@ -1,4 +1,7 @@
 import { Transformer } from "./abstract-transformer.ts"
+import { musicAttribution } from "../inputs/ai-music-attribution"
+import { AI_MODELS } from "../inputs/ai-model-catalogue"
+import { AI_IMPROV, AI_MELODY } from "../inputs/input-types"
 import { TRANSFORMER_CATEGORY_TUNING } from "./transformer-categories.ts"
 import { NOTE_ON, NOTE_OFF } from "../../commands"
 import { cloneAudioCommand } from "../../audio-command-factory.ts"
@@ -56,6 +59,21 @@ export class TransformerMagenta extends Transformer<Config> {
 	private ready?: MelodyNote[]
 	private history: { pitch: number; time: number }[] = []
 	private nextPhraseAt = -Infinity
+	private credits?: HTMLElement
+	override async createGui(): Promise<HTMLElement> {
+		const gui = await super.createGui()
+		if (!this.credits) {
+			this.credits = musicAttribution(
+				AI_MODELS[this.config.model === "basic_rnn" ? AI_MELODY : AI_IMPROV]
+			)
+			gui.append(this.credits)
+		}
+		return gui
+	}
+	override destroyGui(): void {
+		this.credits = undefined
+		super.destroyGui()
+	}
 
 	get name() {
 		return "Magenta Melody"
@@ -253,6 +271,13 @@ export class TransformerMagenta extends Transformer<Config> {
 			value = Number.isFinite(number) ? number : DEFAULT_OPTIONS[field]
 		}
 		super.setConfig(key, value)
+		if (key === "model" && this.credits) {
+			const credits = musicAttribution(
+				AI_MODELS[value === "basic_rnn" ? AI_MELODY : AI_IMPROV]
+			)
+			this.credits.replaceWith(credits)
+			this.credits = credits
+		}
 		// The base constructor also calls setConfig before subclass state exists.
 		if (key in DEFAULT_OPTIONS && this.requestId !== undefined) {
 			this.reset()
@@ -450,5 +475,6 @@ export class TransformerMagenta extends Transformer<Config> {
 	destroy(): void {
 		this.reset()
 		this.destroyed = true
+		super.destroy()
 	}
 }

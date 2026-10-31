@@ -60,6 +60,7 @@ interface IOChainSerializedData {
 }
 
 interface IOChainOptions {
+	mainSurfaceId?: string
 	controlSurfaces?: SurfaceState[]
 	active?: boolean
 	name?: string
@@ -199,6 +200,14 @@ export default class IOChain extends EventTarget {
 		) {
 			throw new Error("Invalid control surfaces")
 		}
+		if (
+			config.options.mainSurfaceId !== undefined &&
+			!config.options.controlSurfaces?.some(
+				(surface) => surface.id === config.options.mainSurfaceId
+			)
+		) {
+			throw new Error("Invalid main control surface")
+		}
 		this.#transformerManager.importConfig(config.transformers)
 		this.#options = structuredClone(config.options)
 	}
@@ -207,7 +216,14 @@ export default class IOChain extends EventTarget {
 		if (options.controlSurfaces !== undefined && !validSurfaces(options.controlSurfaces)) {
 			throw new Error("Invalid control surfaces")
 		}
-		this.#options = { ...this.#options, ...options }
+		const next = { ...this.#options, ...options }
+		if (
+			next.mainSurfaceId !== undefined &&
+			!next.controlSurfaces?.some((surface) => surface.id === next.mainSurfaceId)
+		) {
+			throw new Error("Invalid main control surface")
+		}
+		this.#options = next
 		this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
 	}
 

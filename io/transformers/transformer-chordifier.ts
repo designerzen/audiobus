@@ -50,6 +50,15 @@ export class TransformerChordifier extends Transformer<Config> implements ITrans
 	get fields() {
 		return [
 			{
+				name: "simultaneous",
+				label: "Notes per chord",
+				type: "number",
+				min: 1,
+				max: 8,
+				step: 1,
+				default: DEFAULT_OPTIONS.simultaneous
+			},
+			{
 				name: "enabled",
 				type: "select",
 				values: [

@@ -1,5 +1,6 @@
 import NoteInput from "./note-input"
-import { AI_MODELS, AI_MODEL_INDEX_URL } from "./ai-model-catalogue"
+import { AI_MODELS } from "./ai-model-catalogue"
+import { musicAttribution } from "./ai-music-attribution"
 import { AI_IMPROV } from "./input-types"
 import {
 	AI_MUSIC_GENERATE,
@@ -30,6 +31,7 @@ export function parseAIPrimer(value: string): number[] {
 
 export default class InputAIMusic extends NoteInput {
 	private worker?: Worker
+	private busy = false
 	private requestId = 0
 	private gui?: HTMLElement
 	private statusElement?: HTMLElement
@@ -70,6 +72,19 @@ export default class InputAIMusic extends NoteInput {
 			(Array.isArray(options.notes) && options.notes.length === 0)
 				? []
 				: validateMusicNotes(options.notes, this.model.steps)
+		// Earlier versions persisted the protobuf default as velocity 1 for
+		// every generated note. Repair those phrases once when restoring them.
+		if (
+			!options.velocityVersion &&
+			this.options.notes.length &&
+			this.options.notes.every((note: AIMusicNote) => note.velocity === 1)
+		) {
+			this.options.notes = this.options.notes.map((note: AIMusicNote) => ({
+				...note,
+				velocity: 100
+			}))
+		}
+		this.options.velocityVersion = 1
 		this.rebuildEvents()
 		if (this.options.notes.length) {
 			this.status = "Saved phrase ready. Use transport Play."
@@ -96,8 +111,7 @@ export default class InputAIMusic extends NoteInput {
 		if (this.disposed) {
 			return
 		}
-		this.cancelGeneration()
-		this.stopClock()
+		if (this.busy) this.cancelGeneration()
 		try {
 			const seed = this.model.engine === "rnn" ? parseAIPrimer(this.options.primer) : []
 			const chords = String(this.options.chords)
@@ -110,11 +124,12 @@ export default class InputAIMusic extends NoteInput {
 			) {
 				throw new Error("Enter 1–32 chord symbols, such as C, Am, F, G.")
 			}
-			const worker = (this.worker = new Worker(
+			const worker = (this.worker ??= new Worker(
 				new URL("./ai-music.worker.ts", import.meta.url),
 				{ type: "module" }
 			))
 			const id = ++this.requestId
+			this.busy = true
 			worker.onmessage = ({ data }: MessageEvent<AIMusicResponse>) => {
 				if (this.disposed || this.worker !== worker || data.id !== id) {
 					return
@@ -130,9 +145,11 @@ export default class InputAIMusic extends NoteInput {
 							throw new Error("Unexpected phrase length")
 						}
 						const notes = validateMusicNotes(data.notes, data.steps)
+						const resume = this.playing
 						this.stopClock()
 						this.options.notes = notes
 						this.rebuildEvents()
+						if (resume) this.startClock()
 						changed(this)
 						this.setStatus(
 							`${notes.length} notes ready. Use transport Play.` +
@@ -145,7 +162,7 @@ export default class InputAIMusic extends NoteInput {
 							`Generation failed: ${error instanceof Error ? error.message : String(error)}`
 						)
 					}
-					this.cancelGeneration()
+					this.busy = false
 				}
 			}
 			worker.onerror = () => {
@@ -172,6 +189,7 @@ export default class InputAIMusic extends NoteInput {
 		}
 	}
 	private cancelGeneration(): void {
+		this.busy = false
 		this.requestId++
 		this.worker?.terminate()
 		this.worker = undefined
@@ -277,26 +295,10 @@ export default class InputAIMusic extends NoteInput {
 		action(panel, "Generate phrase", () => this.generate(), status)
 		action(panel, "Cancel generation / stop notes", () => this.stop(), status)
 		panel.append(status)
-		const attribution = document.createElement("p")
-		attribution.className = "ai-model-attribution"
-		attribution.append(`By ${this.model.attribution.author}. `)
-		const link = (label: string, url: string) => {
-			const anchor = document.createElement("a")
-			anchor.textContent = label
-			anchor.href = url
-			anchor.target = "_blank"
-			anchor.rel = "noopener noreferrer"
-			attribution.append(anchor, " ")
-		}
-		link("Source", this.model.attribution.sourceUrl)
-		link("Model and checkpoint credits", AI_MODEL_INDEX_URL)
-		link(this.model.attribution.license, this.model.attribution.licenseUrls[0])
-		link("Checkpoint configuration", `${this.model.checkpoint}/config.json`)
-		panel.append(attribution)
+		panel.append(musicAttribution(this.model))
 		return (this.gui = panel)
 	}
 	async destroyGui(): Promise<void> {
-		this.stop()
 		this.gui?.remove()
 		this.gui = undefined
 		this.statusElement = undefined
@@ -307,6 +309,7 @@ export default class InputAIMusic extends NoteInput {
 	}
 	destroy(): void {
 		this.disposed = true
+		this.stop()
 		void this.destroyGui()
 		super.destroy()
 	}

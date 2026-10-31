@@ -17,6 +17,10 @@ export interface AIMusicRequest {
 	seed: number[]
 	chords: string[]
 	temperature: number
+	notes?: AIMusicNote[]
+	seedSteps?: number
+	operation?: "variation"
+	similarity?: number
 }
 export type AIMusicResponse =
 	| { kind: typeof AI_MUSIC_RESULT; id: number; notes: AIMusicNote[]; steps: number }

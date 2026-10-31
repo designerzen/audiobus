@@ -25,6 +25,7 @@ export interface PresetSetup {
 	name: string
 	description: string
 	activeChainId: string | null
+	clock?: { bpm: number; swing: number; divisions: number; bars: number }
 	devices: { id: string; direction: "input" | "output"; definition: DeviceDefinition }[]
 	chains: {
 		id: string
@@ -81,6 +82,13 @@ function steps(value: any) {
 }
 function options(value: any) {
 	object(value)
+	if (
+		value.mainSurfaceId !== undefined &&
+		(!Array.isArray(value.controlSurfaces) ||
+			!value.controlSurfaces.some((surface: any) => surface?.id === value.mainSurfaceId))
+	) {
+		throw new Error("Invalid main control surface")
+	}
 	if (value.name !== undefined) {
 		text(value.name, "chain name")
 	}
@@ -130,6 +138,13 @@ export function parsePresetLibrary(json: string): PresetLibrary {
 	for (const setup of data.setups) {
 		text(setup.name, "setup name")
 		text(setup.description, "setup description", false)
+		if (setup.clock !== undefined) {
+			object(setup.clock)
+			const { bpm, swing, divisions, bars } = setup.clock
+			if (!Number.isFinite(bpm) || bpm < 10 || bpm > 303 || !Number.isFinite(swing) || swing < 0 || swing > 1 || !Number.isInteger(divisions) || divisions < 1 || divisions > 960 || !Number.isInteger(bars) || bars < 1 || bars > 32) {
+				throw new Error("Invalid setup clock")
+			}
+		}
 		if (!Array.isArray(setup.devices) || !Array.isArray(setup.chains)) {
 			throw new Error("Invalid setup chains or devices")
 		}

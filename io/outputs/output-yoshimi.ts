@@ -1,8 +1,16 @@
 import { loadYoshimi, yoshimiAsset } from "../../wam/yoshimi-assets"
 import { commandToMidi } from "../../midi/midi-command-conversion"
 import type { IAudioCommand } from "../../audio-command-interface"
-import { EVENT_PRESET_CHANGED } from "../../event-constants.ts"
+import { EVENT_PRESET_CHANGED, EVENT_CONFIGURATION_CHANGED } from "../../event-constants.ts"
 import type { IAudioOutput } from "./output-interface.ts"
+import type { ControlValue, UiDescriptor } from "control-surface/types"
+
+const YOSHIMI_CONTROLLERS = {
+	cutoff: { cc: 74, label: "Filter cutoff", default: 64 },
+	resonance: { cc: 71, label: "Filter resonance", default: 64 },
+	modulation: { cc: 1, label: "Modulation", default: 0 },
+	pan: { cc: 10, label: "Pan", default: 64 }
+} as const
 
 export interface YoshimiBank {
 	name: string
@@ -55,6 +63,84 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 	#banks: YoshimiBank[] = []
 	#guiContainer: HTMLElement | null = null
 	#presetsLoaded: boolean = false
+	private settings: Record<string, number> = {
+		volume: 1,
+		...Object.fromEntries(
+			Object.entries(YOSHIMI_CONTROLLERS).map(([key, control]) => [key, control.default])
+		)
+	}
+	get options() {
+		return { bank: this.#currentBank, preset: this.#currentPreset, ...this.settings }
+	}
+	configure(options: Record<string, any>): void {
+		if (typeof options.bank === "string") {
+			this.#currentBank = options.bank
+		}
+		if (typeof options.preset === "string") {
+			this.#currentPreset = options.preset
+		}
+		for (const key of Object.keys(this.settings)) {
+			if (typeof options[key] === "number" && Number.isFinite(options[key])) {
+				this.settings[key] = Math.max(0, Math.min(key === "volume" ? 1 : 127, options[key]))
+			}
+		}
+		this.#output.gain.value = this.settings.volume
+		if (this.#isConnected) {
+			this.applyControllers()
+		}
+		this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
+	}
+	private applyControllers(): void {
+		for (const [key, control] of Object.entries(YOSHIMI_CONTROLLERS)) {
+			this.processMidi([0xb0, control.cc, Math.round(this.settings[key])])
+		}
+	}
+	async getUiDescriptor(): Promise<UiDescriptor> {
+		await this.connect()
+		return {
+			title: this.name,
+			controls: [
+				{
+					id: "instrument",
+					label: "Instrument",
+					widget: "select",
+					choices: this.#banks.flatMap((bank) =>
+						bank.instruments.map((instrument) => ({
+							label: `${bank.name} / ${instrument.replace(/^\d+-|\.xiz$/g, "")}`,
+							value: `${bank.name}/${instrument}`
+						}))
+					)
+				},
+				{ id: "volume", label: "Volume", widget: "slider", min: 0, max: 1, step: 0.01 },
+				...Object.entries(YOSHIMI_CONTROLLERS).map(([id, control]) => ({
+					id,
+					label: control.label,
+					widget: "dial" as const,
+					min: 0,
+					max: 127,
+					step: 1
+				}))
+			]
+		}
+	}
+	getControlValue(id: string): ControlValue | undefined {
+		return id === "instrument"
+			? `${this.#currentBank}/${this.#currentPreset}`
+			: this.settings[id]
+	}
+	async setControlValue(id: string, value: ControlValue): Promise<void> {
+		if (id === "instrument" && typeof value === "string") {
+			const [bank, preset] = value.split("/")
+			if (
+				!this.#banks.some((item) => item.name === bank && item.instruments.includes(preset))
+			) {
+				throw new Error("Unknown Yoshimi instrument")
+			}
+			await this.loadPreset(bank, preset)
+		} else if (id in this.settings && typeof value === "number") {
+			this.configure({ [id]: value })
+		}
+	}
 
 	get uuid(): string {
 		return this.#uuid
@@ -92,10 +178,16 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 		return this.#banks
 	}
 
-	constructor(audioContext: AudioContext, name?: string, destination?: AudioNode | null) {
+	constructor(
+		audioContext: AudioContext,
+		name?: string,
+		destination?: AudioNode | null,
+		options: Record<string, any> = {}
+	) {
 		super()
 		this.#audioContext = audioContext
 		this.#output = audioContext.createGain()
+		this.configure(options)
 		if (destination !== null) {
 			this.#output.connect(destination ?? audioContext.destination)
 		}
@@ -319,6 +411,8 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 			if (part === 0) {
 				this.#currentBank = bankName
 				this.#currentPreset = instrumentFilename
+				this.applyControllers()
+				this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
 			}
 
 			console.info(`Loaded Yoshimi preset: ${bankName} / ${instrumentFilename}`)
