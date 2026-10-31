@@ -2,6 +2,7 @@ import type { ITransformer } from "./transformers/interface-transformer.ts"
 import type { IAudioCommand } from "../audio-command-interface.ts"
 import type { Timer } from "netronome"
 import { NOTE_ON, NOTE_OFF } from "../commands"
+import { cloneAudioCommand } from "../audio-command-factory"
 export type TransformerTrace = (transformer: ITransformer, input: number, output: number) => void
 
 export function applyTransformer(
@@ -21,7 +22,9 @@ export function applyTransformer(
 	let notes: IAudioCommand[] = []
 	for (const command of commands) {
 		if (command.type === NOTE_ON || command.type === NOTE_OFF) {
-			notes.push(command)
+			// Some legacy effects mutate their inputs. Upstream effects retain
+			// these commands to match releases, so give legacy stages their own copy.
+			notes.push(cloneAudioCommand(command))
 		} else {
 			if (notes.length) {
 				result.push(...transformer.transform(notes, timer))
@@ -59,9 +62,11 @@ export function transformMidiControls(
 	commands: IAudioCommand[],
 	timer: Timer
 ): IAudioCommand[] {
+	// A controller event can also flush a clock-driven effect's pending notes.
+	// Those notes still need every downstream stage; applyTransformer already
+	// protects the controller itself from legacy note-only effects.
 	return transformers.reduce(
-		(value, transformer) =>
-			transformer.handlesMidiControls ? transformer.transform(value, timer) : value,
+		(value, transformer) => applyTransformer(transformer, value, timer),
 		commands
 	)
 }

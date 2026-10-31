@@ -21,6 +21,54 @@ export interface TransformerDefinition extends DeviceClassification<"transformer
 }
 
 export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
+	[TRANSFORMER_TYPE.ID_CHORD_BLOOM]: {
+		id: TRANSFORMER_TYPE.ID_CHORD_BLOOM,
+		name: "Chord Bloom",
+		description: "Grow held notes into harmony, adding one sustained interval at a time.",
+		icon: "/icons/transformer-chord-bloom.svg",
+		category: "Harmony",
+		type: "transformer",
+		subtype: "harmony"
+	},
+	[TRANSFORMER_TYPE.ID_MELODY_SHADOW]: {
+		id: TRANSFORMER_TYPE.ID_MELODY_SHADOW,
+		name: "Melody Shadow",
+		description: "Play remembered pitches to the rhythm and releases of your current melody.",
+		icon: "/icons/transformer-melody-shadow.svg",
+		category: "Variation",
+		type: "transformer",
+		subtype: "variation"
+	},
+	[TRANSFORMER_TYPE.ID_CONTOUR_DYNAMICS]: {
+		id: TRANSFORMER_TYPE.ID_CONTOUR_DYNAMICS,
+		name: "Contour Dynamics",
+		description:
+			"Accent rising, falling and repeated pitches differently, with extra emphasis on leaps.",
+		icon: "/icons/transformer-contour-dynamics.svg",
+		category: "Variation",
+		type: "transformer",
+		subtype: "variation"
+	},
+	[TRANSFORMER_TYPE.ID_RHYTHM_WEAVE]: {
+		id: TRANSFORMER_TYPE.ID_RHYTHM_WEAVE,
+		name: "Rhythm Weave",
+		description:
+			"Interlock two gesture-counting cycles to select and accent parts of your playing.",
+		icon: "/icons/transformer-rhythm-weave.svg",
+		category: "Pattern",
+		type: "transformer",
+		subtype: "pattern"
+	},
+	[TRANSFORMER_TYPE.ID_REGISTER_ORBIT]: {
+		id: TRANSFORMER_TYPE.ID_REGISTER_ORBIT,
+		name: "Register Orbit",
+		description:
+			"Move played pitch classes around a bounded register using an orbiting octave target.",
+		icon: "/icons/transformer-register-orbit.svg",
+		category: "Pitch",
+		type: "transformer",
+		subtype: "pitch"
+	},
 	[TRANSFORMER_TYPE.ID_CHORD_TRACK]: {
 		id: TRANSFORMER_TYPE.ID_CHORD_TRACK,
 		name: "Shared Chord Track",

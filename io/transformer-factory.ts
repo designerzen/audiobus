@@ -87,9 +87,30 @@ import {
 	TransformerChannelAllocator
 } from "./transformers/transformer-channel-allocator.ts"
 import { ID_CC_STEPPER, TransformerCCStepper } from "./transformers/transformer-cc-stepper.ts"
+import { ID_CHORD_BLOOM, TransformerChordBloom } from "./transformers/transformer-chord-bloom"
+import { ID_MELODY_SHADOW, TransformerMelodyShadow } from "./transformers/transformer-melody-shadow"
+import {
+	ID_CONTOUR_DYNAMICS,
+	TransformerContourDynamics
+} from "./transformers/transformer-contour-dynamics"
+import { ID_RHYTHM_WEAVE, TransformerRhythmWeave } from "./transformers/transformer-rhythm-weave"
+import {
+	ID_REGISTER_ORBIT,
+	TransformerRegisterOrbit
+} from "./transformers/transformer-register-orbit"
 
 export const tranformerFactory = (type: string, config: any = {}) => {
 	switch (type) {
+		case ID_CHORD_BLOOM:
+			return new TransformerChordBloom(config)
+		case ID_MELODY_SHADOW:
+			return new TransformerMelodyShadow(config)
+		case ID_CONTOUR_DYNAMICS:
+			return new TransformerContourDynamics(config)
+		case ID_RHYTHM_WEAVE:
+			return new TransformerRhythmWeave(config)
+		case ID_REGISTER_ORBIT:
+			return new TransformerRegisterOrbit(config)
 		case ID_CHORD_TRACK:
 			return new TransformerChordTrack(config)
 		case ID_IMPROV_PARTNER:
@@ -182,6 +203,11 @@ export const tranformerFactory = (type: string, config: any = {}) => {
 }
 
 export const TRANSFORMER_TYPE = {
+	ID_CHORD_BLOOM,
+	ID_MELODY_SHADOW,
+	ID_CONTOUR_DYNAMICS,
+	ID_RHYTHM_WEAVE,
+	ID_REGISTER_ORBIT,
 	ID_CHORD_TRACK,
 	ID_IMPROV_PARTNER,
 	ID_SCALE_EXPLORER,
