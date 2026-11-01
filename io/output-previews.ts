@@ -1,4 +1,8 @@
 export const OUTPUT_PREVIEWS: Record<string, string> = {
+	"output:webclap:com.aquanodemusic.droplets":
+		"/previews/outputs/output--webclap--com.aquanodemusic.droplets.jpg",
+	"output:webclap:com.andremichelle.radar":
+		"/previews/outputs/output--webclap--com.andremichelle.radar.jpg",
 	"output:describe": "/previews/outputs/output--describe.jpg",
 	"output:notation": "/previews/outputs/output--notation.jpg",
 	"output:vibrator": "/previews/outputs/output--vibrator.jpg",

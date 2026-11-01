@@ -659,6 +659,46 @@ export const CLAP_PATCHES: CLAPPatch[] = [
 		}
 	},
 	{
+		id: "com.aquanodemusic.droplets",
+		name: "Droplets",
+		author: "aquanode",
+		description:
+			"Generate drips, splashes and rivers with a physically modeled water bubble synthesizer.",
+		url: "/webclap/plugins/open-webclap-droplets.wclap.tar.gz",
+		factory: "com.aquanodemusic.droplets",
+		features: ["instrument", "synthesizer", "stereo", "physical modeling"],
+		category: "Synthesizers",
+		title: "Droplets — aquanode WebCLAP",
+		type: "engine",
+		subtype: "instrument",
+		attribution: {
+			author: "aquanode",
+			sourceUrl: "https://github.com/andremichelle/open-webclap/tree/main/ports/droplets",
+			license: "AGPL-3.0 (JUCE bundle)",
+			licenseUrls: ["/webclap/plugins/open-webclap-droplets-LICENSE.txt"]
+		}
+	},
+	{
+		id: "com.andremichelle.radar",
+		name: "Radar",
+		author: "André Michelle",
+		description:
+			"Play a sample loop with playback positions shaped by a ray bouncing between drawn segments. Starts empty: load a sample and choose Play Note for MIDI triggering.",
+		url: "/webclap/plugins/open-webclap-radar.wclap.tar.gz",
+		factory: "com.andremichelle.radar",
+		features: ["instrument", "sampler", "stereo", "granular", "opendaw:device-panel"],
+		category: "Samplers",
+		title: "Radar — André Michelle WebCLAP",
+		type: "engine",
+		subtype: "instrument",
+		attribution: {
+			author: "André Michelle",
+			sourceUrl: "https://github.com/andremichelle/open-webclap/tree/main/ports/radar",
+			license: "AGPL-3.0 (JUCE bundle)",
+			licenseUrls: ["/webclap/plugins/open-webclap-radar-LICENSE.txt"]
+		}
+	},
+	{
 		id: "de.polarity-music.polarity-sc-dark",
 		name: "Polarity SC Dark",
 		author: "Polarity",
