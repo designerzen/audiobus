@@ -24,6 +24,12 @@ const NOTE_COLORS: Color[] = Array.from({ length: 12 }, (_, note) => {
 })
 const BARK: Color = [0.64, 0.48, 0.31]
 const WATER: Color = [0.4, 0.8, 0.98]
+// One envelope per MIDI velocity keeps overlapping flashes bounded. A soft note
+// can retrigger the tree without cutting short an earlier, stronger flash.
+const FLASH_DURATIONS = Float64Array.from(
+	{ length: 128 },
+	(_, velocity) => 0.12 + 1.5 * (velocity / 127) ** 1.3
+)
 
 interface TreeOptions {
 	audioContext?: Pick<AudioContext, "currentTime">
@@ -61,6 +67,43 @@ export default class OutputSongTree implements IAudioOutput {
 	private scale = 1
 	private zoomLabel?: HTMLOutputElement
 	private submittedBatch = false
+	private flashTimes = new Float64Array(128).fill(-Infinity)
+	private litColors = NOTE_COLORS.map((color) => [...color] as [number, number, number])
+	private litBark: [number, number, number] = [...BARK]
+
+	private triggerNote(note: number, velocity: number, channel: number): void {
+		const now = this.now
+		this.model.noteOn(note, velocity, channel, now)
+		if (
+			Number.isInteger(note) &&
+			note >= 0 &&
+			note <= 127 &&
+			Number.isFinite(velocity) &&
+			velocity > 0
+		) {
+			this.flashTimes[Math.max(1, Math.min(127, Math.round(velocity)))] = now
+		}
+	}
+	private updateFlash(now: number): void {
+		let strength = 0
+		for (let velocity = 1; velocity <= 127; velocity++) {
+			const age = now - this.flashTimes[velocity]
+			if (age >= 0 && age < FLASH_DURATIONS[velocity]) {
+				const remaining = 1 - age / FLASH_DURATIONS[velocity]
+				strength = Math.max(
+					strength,
+					(0.15 + (0.7 * velocity) / 127) * remaining * remaining
+				)
+			}
+		}
+		for (let channel = 0; channel < 3; channel++) {
+			this.litBark[channel] = BARK[channel] + (1 - BARK[channel]) * strength
+			for (let pitch = 0; pitch < 12; pitch++) {
+				this.litColors[pitch][channel] =
+					NOTE_COLORS[pitch][channel] + (1 - NOTE_COLORS[pitch][channel]) * strength
+			}
+		}
+	}
 
 	private zoomBy(factor: number): void {
 		this.zoom = Math.min(8, Math.max(0.000001, this.scale * factor))
@@ -104,14 +147,14 @@ export default class OutputSongTree implements IAudioOutput {
 			return
 		}
 		if (command.type === NOTE_ON) {
-			this.model.noteOn(command.number, command.velocity, command.channel, this.now)
+			this.triggerNote(command.number, command.velocity, command.channel)
 		} else if (command.type === NOTE_OFF) {
 			this.model.noteOff(command.number, command.channel, this.now)
 		}
 	}
 	noteOn(note: number, velocity: number): void {
 		if (this.connected) {
-			this.model.noteOn(note, velocity, 1, this.now)
+			this.triggerNote(note, velocity, 1)
 		}
 	}
 	noteOff(note: number): void {
@@ -175,6 +218,7 @@ export default class OutputSongTree implements IAudioOutput {
 		}
 		this.count = 0
 		this.submittedBatch = false
+		this.updateFlash(now)
 		const elapsed = now - (this.lastFrame || now)
 		const dt = Math.max(0, Math.min(0.1, elapsed))
 		this.lastFrame = now
@@ -200,7 +244,7 @@ export default class OutputSongTree implements IAudioOutput {
 				const origin = branch.stem
 					? branchPoint(branch.stem, branch.forkAt!)
 					: branch.origin
-				const reach = 42 + (branch.note % 12) * 3 + Math.abs(branch.drift) + 16
+				const reach = branch.spread + Math.abs(branch.drift) + 16
 				minX = Math.min(minX, origin.x - reach)
 				maxX = Math.max(maxX, origin.x + reach)
 				top = Math.max(top, branchPoint(branch, now).y)
@@ -250,7 +294,7 @@ export default class OutputSongTree implements IAudioOutput {
 				center,
 				ground - trunk * scale,
 				Math.max(0.35, 5 * scale),
-				BARK
+				this.litBark
 			)
 			// A cubic flare meets the ground broadly and eases into the straight trunk.
 			const flareHeight = Math.min(32, trunk),
@@ -266,7 +310,7 @@ export default class OutputSongTree implements IAudioOutput {
 						center + radius,
 						y,
 						Math.max(0.35, ((flareHeight * scale) / flareSteps) * 0.65),
-						BARK
+						this.litBark
 					)
 				}
 			}
@@ -281,7 +325,7 @@ export default class OutputSongTree implements IAudioOutput {
 				if (ground - tip.y * scale > this.height + 24 || ground - origin.y * scale < -24) {
 					continue
 				}
-				const color = NOTE_COLORS[branch.note % 12],
+				const color = this.litColors[branch.note % 12],
 					radius = 0.8 + (branch.velocity / 127) * 4
 				const parent = branch.stem ?? branch.junction
 				const collar = parent ? (0.8 + (parent.velocity / 127) * 4) * 0.95 : 4.75
@@ -441,6 +485,7 @@ export default class OutputSongTree implements IAudioOutput {
 		panel.append(controls)
 		action(panel, "Plant a new tree", () => {
 			this.model.reset()
+			this.flashTimes.fill(-Infinity)
 			this.cameraX = this.cameraY = 0
 			this.lastFrame = 0
 			this.viewMode = "follow"

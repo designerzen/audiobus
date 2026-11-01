@@ -16,6 +16,7 @@ export interface TreeBranch {
 	side: number
 	parent?: number
 	drift: number
+	spread: number
 	stem?: TreeBranch
 	forkAt?: number
 	junction?: TreeBranch
@@ -34,10 +35,7 @@ export function branchPoint(branch: TreeBranch, time: number): TreePoint {
 	const age = Math.max(0, end - (branch.forkAt ?? branch.start))
 	const bend = 1 - Math.exp(-age / 0.8)
 	return {
-		x:
-			origin.x +
-			branch.side * (42 + (branch.note % 12) * 3) * bend * bend +
-			branch.drift * bend,
+		x: origin.x + branch.side * branch.spread * bend * bend + branch.drift * bend,
 		y: origin.y + age * TREE_SPEED
 	}
 }
@@ -59,6 +57,7 @@ export class TreeModel {
 	private previousRoot?: TreeBranch
 	private previousChord = false
 	private attachment?: TreeBranch
+	private groupSpacing = 1
 
 	noteOn(note: number, velocity: number, channel: number, now: number): void {
 		if (!Number.isInteger(note) || note < 0 || note > 127 || !Number.isFinite(velocity)) {
@@ -72,6 +71,10 @@ export class TreeModel {
 		this.noteOff(note, channel, now)
 		this.started ??= now
 		if (now - this.groupAt > GROUP_WINDOW) {
+			// Closely spaced onsets cluster the vertical shoots. Longer gaps open
+			// them gently; saturation keeps even a long rest from making a wide tree.
+			const gap = Number.isFinite(this.groupAt) ? Math.max(0, now - this.groupAt) : 0.25
+			this.groupSpacing = 0.72 + 0.28 * (1 - Math.exp(-gap / 0.4))
 			this.previousRoot = this.group.find((branch) => branch.parent === this.attachment?.id)
 			this.previousChord = this.group.length > 1
 			this.group = []
@@ -87,7 +90,8 @@ export class TreeModel {
 			start: now,
 			origin: { x: 0, y: (now - this.started) * TREE_SPEED },
 			side: this.side,
-			drift: 0
+			drift: 0,
+			spread: (40 + (note % 12) * 1.5) * this.groupSpacing
 		}
 		this.group.push(branch)
 		this.held.set(key, branch)
@@ -130,7 +134,10 @@ export class TreeModel {
 			}
 			branch.parent = root.id
 			branch.stem = root
-			branch.forkAt = Math.max(branch.start, root.start + 0.25 + index * 0.12)
+			branch.forkAt = Math.max(
+				branch.start,
+				root.start + 0.2 + index * (0.04 + 0.08 * this.groupSpacing)
+			)
 			branch.origin = branchPoint(root, branch.forkAt)
 			branch.side = ++index % 2 ? -root.side : root.side
 			branch.drift = joiningDrift(root, branch.forkAt)
@@ -161,5 +168,6 @@ export class TreeModel {
 		this.attachment = undefined
 		this.previousChord = false
 		this.side = -1
+		this.groupSpacing = 1
 	}
 }
