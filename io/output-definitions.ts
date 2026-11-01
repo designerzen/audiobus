@@ -27,6 +27,15 @@ export interface OutputDefinition extends DeviceClassification {
 }
 
 export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
+	[OUTPUT_TYPES.SONG_TREE]: {
+		id: OUTPUT_TYPES.SONG_TREE,
+		name: "Song Tree",
+		description: "Grow a living tree from notes, chords, velocity and the transport beat",
+		type: "visual",
+		subtype: "visualiser",
+		category: "Visual",
+		icon: "/icons/output-song-tree.svg"
+	},
 	[OUTPUT_TYPES.HARMONY_SAMPLER]: {
 		id: OUTPUT_TYPES.HARMONY_SAMPLER,
 		name: "Harmony Sampler",

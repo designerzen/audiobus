@@ -8,9 +8,12 @@ import type {
 	UiDescriptor
 } from "control-surface/types"
 import { EVENT_CHANGE, EVENT_INPUT, EVENT_CONFIGURATION_CHANGED } from "../event-constants"
+import { performanceBindings } from "./performance-controls"
 import type { FieldConfig } from "./transformers/interface-transformer"
 
 type Component = ComponentUi & {
+	noteOn?(note: number, velocity: number): unknown
+	noteOff?(note: number): void
 	name?: string
 	fields?: FieldConfig[]
 	options?: unknown
@@ -358,7 +361,7 @@ export async function componentBindings(
 ): Promise<ControlBinding[]> {
 	installComponentUi(component)
 	const descriptor = await component.getUiDescriptor!()
-	return descriptor.controls
+	const controls: ControlBinding[] = descriptor.controls
 		.filter((d) => !d.hidden)
 		.map((d) => ({
 			key: bindingKey(componentId, d.id),
@@ -380,4 +383,12 @@ export async function componentBindings(
 					}
 				})
 		}))
+	return [
+		...controls,
+		...performanceBindings(
+			component,
+			componentId,
+			component.name ?? descriptor.title ?? "Component"
+		).filter((binding) => !controls.some((control) => control.key === binding.key))
+	]
 }

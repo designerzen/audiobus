@@ -37,6 +37,8 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./outputs/output-sion.ts")
 		case OUTPUT_TYPES.NOTE_MONITOR:
 			return await import("./outputs/output-note-monitor")
+		case OUTPUT_TYPES.SONG_TREE:
+			return await import("./outputs/output-song-tree")
 		case OUTPUT_TYPES.SAMPLE_PLAYER:
 			return await import("./outputs/output-sample-player")
 		case OUTPUT_TYPES.HARMONY_SAMPLER:
@@ -206,11 +208,13 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		isAvailable: () => typeof AudioWorkletNode !== "undefined",
 		create: (options) => createOutput(OUTPUT_TYPES.SION, options)
 	},
-	...[OUTPUT_TYPES.NOTE_MONITOR, OUTPUT_TYPES.EVENT_RECORDER].map((id) => ({
-		...OUTPUT_DEFINITIONS[id],
-		isAvailable: () => true,
-		create: (options?: Record<string, any>) => createOutput(id, options)
-	})),
+	...[OUTPUT_TYPES.NOTE_MONITOR, OUTPUT_TYPES.SONG_TREE, OUTPUT_TYPES.EVENT_RECORDER].map(
+		(id) => ({
+			...OUTPUT_DEFINITIONS[id],
+			isAvailable: () => true,
+			create: (options?: Record<string, any>) => createOutput(id, options)
+		})
+	),
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.SAMPLE_PLAYER],
 		isAvailable: () => typeof AudioContext !== "undefined",
