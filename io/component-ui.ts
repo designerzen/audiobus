@@ -362,6 +362,7 @@ export async function componentBindings(
 		.filter((d) => !d.hidden)
 		.map((d) => ({
 			key: bindingKey(componentId, d.id),
+			sourceId: componentId,
 			sourceLabel: component.name ?? descriptor.title ?? "Component",
 			descriptor: d,
 			read: () => component.getControlValue!(d.id),
