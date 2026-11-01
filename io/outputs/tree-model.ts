@@ -18,6 +18,7 @@ export interface TreeBranch {
 	drift: number
 	stem?: TreeBranch
 	forkAt?: number
+	junction?: TreeBranch
 }
 
 export const TREE_SPEED = 42
@@ -77,6 +78,7 @@ export class TreeModel {
 			this.groupAt = now
 			this.attachment = undefined
 		}
+		this.group = this.group.filter((branch) => branch.end === undefined)
 		const branch: TreeBranch = {
 			id: this.serial++,
 			key,
@@ -90,19 +92,11 @@ export class TreeModel {
 		this.group.push(branch)
 		this.held.set(key, branch)
 		this.branches.push(branch)
-		this.arrangeGroup(now)
-		// Keep held notes, but bound completed history even in a long-running session.
-		if (this.branches.length > 1024) {
-			const removable = this.branches.findIndex(
-				(item) => item.end !== undefined && !this.group.includes(item)
-			)
-			if (removable >= 0) {
-				this.branches.splice(removable, 1)
-			}
-		}
+		this.arrangeGroup()
+		// Retain song history for zooming out; rendering uses bounded GPU batches.
 	}
 
-	private arrangeGroup(now: number): void {
+	private arrangeGroup(): void {
 		const notes = this.group.map((branch) => branch.note)
 		const rootPitch = describeChord(notes).root ?? this.harmony?.root
 		const root =
@@ -111,16 +105,17 @@ export class TreeModel {
 		if (this.group.length === 1) {
 			this.side *= -1
 		}
-		// Consecutive chords continue the previous root, including across short rests.
+		// Only a still-held root can sprout a new chord; released branches are final.
 		if (
 			this.group.length > 1 &&
 			this.previousChord &&
 			this.previousRoot &&
-			this.groupAt - (this.previousRoot.end ?? now) < 4
+			this.previousRoot.end === undefined
 		) {
 			this.attachment = this.previousRoot
 		}
 		root.parent = this.attachment?.id
+		root.junction = this.attachment
 		root.stem = undefined
 		root.forkAt = undefined
 		root.origin = this.attachment

@@ -1,7 +1,7 @@
 /** One instance per round-ended segment or leaf. All geometry is drawn in one GPU call. */
 export interface TreeRenderer {
 	readonly backend: string
-	draw(data: Float32Array, count: number, width: number, height: number): void
+	draw(data: Float32Array, count: number, width: number, height: number, append?: boolean): void
 	destroy(): void
 }
 
@@ -112,7 +112,7 @@ struct Out {
 		})
 		return {
 			backend: "WebGPU",
-			draw(data, count, width, height) {
+			draw(data, count, width, height, append = false) {
 				if (lost) {
 					throw new Error("Tree WebGPU device lost")
 				}
@@ -124,7 +124,7 @@ struct Out {
 						{
 							view: context.getCurrentTexture().createView(),
 							clearValue: BACKGROUND,
-							loadOp: "clear",
+							loadOp: append ? "load" : "clear",
 							storeOp: "store"
 						}
 					]
@@ -225,13 +225,15 @@ void main() {
 		return {
 			backend: "WebGL2",
 			destroy,
-			draw(data, count, width, height) {
+			draw(data, count, width, height, append = false) {
 				if (gl.isContextLost()) {
 					throw new Error("Tree WebGL context lost")
 				}
 				gl.viewport(0, 0, canvas.width, canvas.height)
 				gl.clearColor(...BACKGROUND)
-				gl.clear(gl.COLOR_BUFFER_BIT)
+				if (!append) {
+					gl.clear(gl.COLOR_BUFFER_BIT)
+				}
 				gl.useProgram(program)
 				gl.bindVertexArray(vao)
 				gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
@@ -256,10 +258,12 @@ function canvas2d(canvas: HTMLCanvasElement): TreeRenderer | undefined {
 	return {
 		backend: "Canvas",
 		destroy() {},
-		draw(data, count, width, height) {
+		draw(data, count, width, height, append = false) {
 			context.setTransform(canvas.width / width, 0, 0, canvas.height / height, 0, 0)
 			context.fillStyle = "rgb(6,14,19)"
-			context.fillRect(0, 0, width, height)
+			if (!append) {
+				context.fillRect(0, 0, width, height)
+			}
 			context.lineCap = "round"
 			context.lineJoin = "round"
 			for (let i = 0; i < count * 12; i += 12) {

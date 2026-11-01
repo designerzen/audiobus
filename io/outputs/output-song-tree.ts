@@ -56,6 +56,30 @@ export default class OutputSongTree implements IAudioOutput {
 	private cameraX = 0
 	private cameraY = 0
 	private lastFrame = 0
+	private viewMode: "follow" | "fit" | "manual" = "follow"
+	private zoom = 1
+	private scale = 1
+	private zoomLabel?: HTMLOutputElement
+	private submittedBatch = false
+
+	private zoomBy(factor: number): void {
+		this.zoom = Math.min(8, Math.max(0.000001, this.scale * factor))
+		if (this.viewMode === "fit") {
+			this.viewMode = "manual"
+		}
+		this.draw(this.now)
+	}
+	private flush(): void {
+		this.renderer!.draw(
+			this.instances,
+			this.count,
+			this.width,
+			this.height,
+			this.submittedBatch
+		)
+		this.submittedBatch = true
+		this.count = 0
+	}
 
 	constructor(private readonly options: TreeOptions = {}) {
 		this.beatAnchor = this.now
@@ -130,7 +154,7 @@ export default class OutputSongTree implements IAudioOutput {
 		leaf = false
 	): void {
 		if (this.count >= TREE_INSTANCE_CAPACITY) {
-			return
+			this.flush()
 		}
 		const i = this.count++ * 12,
 			data = this.instances
@@ -150,6 +174,7 @@ export default class OutputSongTree implements IAudioOutput {
 			return
 		}
 		this.count = 0
+		this.submittedBatch = false
 		const elapsed = now - (this.lastFrame || now)
 		const dt = Math.max(0, Math.min(0.1, elapsed))
 		this.lastFrame = now
@@ -167,10 +192,45 @@ export default class OutputSongTree implements IAudioOutput {
 			}
 		}
 		const follow = elapsed > 0.5 ? 1 : 1 - Math.exp(-dt * 6)
-		this.cameraY += (Math.max(0, top - this.height * 0.52) - this.cameraY) * (dt ? follow : 1)
-		this.cameraX += (topX - this.cameraX) * (dt ? follow : 1)
-		const center = this.width / 2 - this.cameraX,
-			ground = this.height * 0.84 + this.cameraY
+		this.scale = this.zoom
+		if (this.viewMode === "fit" && this.model.started !== undefined) {
+			let minX = -16,
+				maxX = 16
+			for (const branch of this.model.branches) {
+				const origin = branch.stem
+					? branchPoint(branch.stem, branch.forkAt!)
+					: branch.origin
+				const reach = 42 + (branch.note % 12) * 3 + Math.abs(branch.drift) + 16
+				minX = Math.min(minX, origin.x - reach)
+				maxX = Math.max(maxX, origin.x + reach)
+				top = Math.max(top, branchPoint(branch, now).y)
+			}
+			this.scale = Math.min(
+				1,
+				(this.width - 48) / (maxX - minX),
+				(this.height - 48) / (top + 32)
+			)
+			this.cameraX = (minX + maxX) / 2
+			this.cameraY = top / 2
+		} else if (this.viewMode === "follow" || this.model.started === undefined) {
+			this.cameraY +=
+				(Math.max(
+					(this.height * 0.34) / this.scale,
+					top - (this.height * 0.18) / this.scale
+				) -
+					this.cameraY) *
+				(dt ? follow : 1)
+			this.cameraX += (topX - this.cameraX) * (dt ? follow : 1)
+		}
+		const scale = this.scale
+		if (this.zoomLabel) {
+			const label = `${this.viewMode === "fit" ? "Whole song · " : ""}${(scale * 100).toFixed(scale < 0.01 ? 3 : 0)}%`
+			if (this.zoomLabel.value !== label) {
+				this.zoomLabel.value = label
+			}
+		}
+		const center = this.width / 2 - this.cameraX * scale,
+			ground = this.height / 2 + this.cameraY * scale
 		this.segment(0, ground, this.width, ground, 1, [0.18, 0.29, 0.26])
 		if (this.model.started === undefined) {
 			const phase =
@@ -186,52 +246,76 @@ export default class OutputSongTree implements IAudioOutput {
 		} else {
 			this.segment(
 				center,
-				Math.min(this.height + 10, ground),
+				Math.min(this.height + 10, ground - Math.min(5, trunk / 2) * scale),
 				center,
-				ground - trunk,
-				5,
+				ground - trunk * scale,
+				Math.max(0.35, 5 * scale),
 				BARK
 			)
-			// Newest growth gets the budget first. Offscreen geometry is never submitted.
-			for (let index = this.model.branches.length - 1; index >= 0; index--) {
-				if (this.count >= TREE_INSTANCE_CAPACITY - 65) {
-					break
+			// A cubic flare meets the ground broadly and eases into the straight trunk.
+			const flareHeight = Math.min(32, trunk),
+				flareSteps = Math.max(1, Math.ceil(flareHeight * scale))
+			if (ground >= -24 && ground - flareHeight * scale <= this.height + 24) {
+				for (let step = 0; step < flareSteps; step++) {
+					const t = (step + 0.5) / flareSteps
+					const radius = (5 + 14 * (1 - t) ** 3) * scale
+					const y = ground - t * flareHeight * scale
+					this.segment(
+						center - radius,
+						y,
+						center + radius,
+						y,
+						Math.max(0.35, ((flareHeight * scale) / flareSteps) * 0.65),
+						BARK
+					)
 				}
+			}
+			// Cull outside the view and reduce curve detail at distant zoom levels.
+			// Flush bounded batches rather than dropping older parts of the song.
+			for (let index = this.model.branches.length - 1; index >= 0; index--) {
 				const branch = this.model.branches[index],
 					end = branch.end ?? now
 				const growthStart = branch.forkAt ?? branch.start
 				const tip = branchPoint(branch, end)
-				if (ground - tip.y > this.height + 24 || ground - branch.origin.y < -24) {
+				const origin = branch.stem ? branchPoint(branch.stem, growthStart) : branch.origin
+				if (ground - tip.y * scale > this.height + 24 || ground - origin.y * scale < -24) {
 					continue
 				}
 				const color = NOTE_COLORS[branch.note % 12],
 					radius = 0.8 + (branch.velocity / 127) * 4
+				const parent = branch.stem ?? branch.junction
+				const collar = parent ? (0.8 + (parent.velocity / 127) * 4) * 0.95 : 4.75
 				const first = Math.max(
 					growthStart,
-					growthStart + (ground - this.height - 24 - branch.origin.y) / TREE_SPEED
+					growthStart + ((ground - this.height - 24) / scale - origin.y) / TREE_SPEED
 				)
 				const last = Math.min(
 					end,
-					growthStart + (ground + 24 - branch.origin.y) / TREE_SPEED
+					growthStart + ((ground + 24) / scale - origin.y) / TREE_SPEED
 				)
-				const steps = Math.max(1, Math.min(64, Math.ceil((last - first) * 14)))
+				const steps = Math.max(1, Math.min(64, Math.ceil((last - first) * 14 * scale)))
 				let previous = branchPoint(branch, first)
 				for (let step = 1; last >= first && step <= steps; step++) {
-					const point = branchPoint(branch, first + ((last - first) * step) / steps)
+					const time = first + ((last - first) * step) / steps
+					const point = branchPoint(branch, time)
+					// Match the parent width and tangent at the fork, then ease into
+					// the note's own width: the silhouette has a rounded crotch, not a butt joint.
+					const age = Math.max(0, time - growthStart)
+					const joinRadius = radius + (collar - radius) * Math.exp(-((age / 0.45) ** 2))
 					this.segment(
-						center + previous.x,
-						ground - previous.y,
-						center + point.x,
-						ground - point.y,
-						radius,
+						center + previous.x * scale,
+						ground - previous.y * scale,
+						center + point.x * scale,
+						ground - point.y * scale,
+						Math.max(0.3, joinRadius * scale),
 						color
 					)
 					previous = point
 				}
 				if (branch.end !== undefined) {
-					const size = 4 + (branch.velocity / 127) * 12,
-						x = center + tip.x,
-						y = ground - tip.y
+					const size = Math.max(1, (4 + (branch.velocity / 127) * 12) * scale),
+						x = center + tip.x * scale,
+						y = ground - tip.y * scale
 					this.segment(
 						x - branch.side * size * 0.35,
 						y + size * 0.7,
@@ -244,7 +328,7 @@ export default class OutputSongTree implements IAudioOutput {
 				}
 			}
 		}
-		this.renderer.draw(this.instances, this.count, this.width, this.height)
+		this.flush()
 	}
 
 	private resize(): void {
@@ -336,10 +420,31 @@ export default class OutputSongTree implements IAudioOutput {
 		this.status.textContent = "Preparing song tree…"
 		this.status.setAttribute("role", "status")
 		panel.append(this.status)
+		const controls = document.createElement("div")
+		controls.style.cssText = "display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center"
+		action(controls, "Zoom out", () => this.zoomBy(1 / 1.4))
+		action(controls, "Zoom in", () => this.zoomBy(1.4))
+		action(controls, "Fit whole song", () => {
+			this.viewMode = "fit"
+			this.draw(this.now)
+		})
+		action(controls, "Follow growth", () => {
+			this.viewMode = "follow"
+			this.zoom = 1
+			this.lastFrame = 0
+			this.draw(this.now)
+		})
+		this.zoomLabel = document.createElement("output")
+		this.zoomLabel.setAttribute("aria-label", "Tree zoom")
+		this.zoomLabel.value = "100%"
+		controls.append(this.zoomLabel)
+		panel.append(controls)
 		action(panel, "Plant a new tree", () => {
 			this.model.reset()
 			this.cameraX = this.cameraY = 0
 			this.lastFrame = 0
+			this.viewMode = "follow"
+			this.zoom = 1
 		})
 		await this.startRenderer()
 		return panel
@@ -356,6 +461,7 @@ export default class OutputSongTree implements IAudioOutput {
 		this.gui = undefined
 		this.canvas = undefined
 		this.status = undefined
+		this.zoomLabel = undefined
 		this.recovering = false
 	}
 	async disconnect(): Promise<void> {
