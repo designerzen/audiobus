@@ -151,10 +151,19 @@ export default class OPFSStorage {
 				return []
 			}
 			const encodedCommands = (result as WorkerResponse).commands as number[][]
-			const audioCommands = encodedCommands.map((encoded) => {
-				const uint8Array = new Uint8Array(encoded)
-				return decodeAudioCommand(uint8Array)
-			})
+			const audioCommands: IAudioCommand[] = []
+			let skipped = 0
+			for (const encoded of encodedCommands) {
+				try {
+					audioCommands.push(decodeAudioCommand(new Uint8Array(encoded)))
+				} catch {
+					// A damaged record must not discard the rest of the saved session.
+					skipped++
+				}
+			}
+			if (skipped) {
+				console.warn(`Skipped ${skipped} unreadable saved audio command(s).`)
+			}
 
 			return audioCommands
 		} catch (error) {
