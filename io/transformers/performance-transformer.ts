@@ -319,6 +319,7 @@ export abstract class PerformanceTransformer extends Transformer<Settings> {
 		this.clearState()
 	}
 	override destroy(): void {
+		super.destroy()
 		this.reset()
 		this.destroyed = true
 	}

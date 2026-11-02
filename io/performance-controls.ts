@@ -12,6 +12,7 @@ import { bindingKey, validateValue } from "control-surface/model"
 import type { ControlBinding, ControlValue } from "control-surface/types"
 
 interface NoteSource {
+	transform?: unknown
 	dispatchEvent?(event: Event): boolean
 	noteOn?(note: number, velocity: number): unknown
 	noteOff?(note: number): void
@@ -31,7 +32,9 @@ export function performanceBindings(
 	componentId: string,
 	sourceLabel: string
 ): ControlBinding[] {
-	if (!component.noteOn || !component.noteOff) {
+	// Transformers can have internal noteOn/noteOff voice handlers. They consume
+	// commands through transform(), not the instrument's public note API.
+	if (typeof component.transform === "function" || !component.noteOn || !component.noteOff) {
 		return []
 	}
 	let state = states.get(component)
