@@ -1,4 +1,8 @@
-import { EVENT_OUTPUTS_UPDATED, EVENT_CONFIGURATION_CHANGED } from "../event-constants.ts"
+import {
+	EVENT_CONTROL_SURFACE_NOTES,
+	EVENT_OUTPUTS_UPDATED,
+	EVENT_CONFIGURATION_CHANGED
+} from "../event-constants.ts"
 export { EVENT_OUTPUTS_UPDATED } from "../event-constants.ts"
 import { NOTE_OFF, NOTE_ON } from "../commands"
 import { configurationUpdate } from "./configuration-events"
@@ -177,6 +181,9 @@ export default class OutputManager extends EventTarget implements IAudioOutput {
 	 * All Notes OFF
 	 */
 	allNotesOff(): void {
+		this.dispatchEvent(
+			new CustomEvent(EVENT_CONTROL_SURFACE_NOTES, { detail: { reset: true } })
+		)
 		this.#outputs.forEach((output) => this.release(output))
 	}
 

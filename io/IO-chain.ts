@@ -1,4 +1,4 @@
-import { EVENT_CONFIGURATION_CHANGED } from "../event-constants.ts"
+import { EVENT_CONTROL_SURFACE_NOTES, EVENT_CONFIGURATION_CHANGED } from "../event-constants.ts"
 import type { SurfaceState } from "control-surface/types"
 import { validSurfaces } from "control-surface/model"
 import {
@@ -20,6 +20,7 @@ import { EVENT_TRANSFORMERS_UPDATED } from "./transformer-manager"
 import TransformerManagerWorker from "./transformer-manager-worker"
 
 import {
+	CONTROL_CHANGE,
 	INPUT_EVENT,
 	NOTE_OFF,
 	NOTE_ON,
@@ -611,6 +612,15 @@ export default class IOChain extends EventTarget {
 	 * @returns
 	 */
 	triggerAudioCommandsOnDevice(commands: IAudioCommand[]) {
+		const notes = commands.filter(
+			(command) =>
+				command.type === NOTE_ON ||
+				command.type === NOTE_OFF ||
+				(command.type === CONTROL_CHANGE && [120, 123].includes(command.number))
+		)
+		if (notes.length) {
+			this.dispatchEvent(new CustomEvent(EVENT_CONTROL_SURFACE_NOTES, { detail: notes }))
+		}
 		this.signalActivity("output", commands.length)
 		return this.measurePerformance("output", commands.length, () => {
 			if (this.outputCommandHandler?.(commands)) {

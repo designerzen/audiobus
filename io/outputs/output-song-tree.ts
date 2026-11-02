@@ -3,8 +3,24 @@ import type { IAudioCommand } from "../../audio-command-interface"
 import type { AudioClockTick } from "../../timing/audio-clock-tick"
 import type { HarmonicState } from "../harmony"
 import { NOTE_ON, NOTE_OFF } from "../../commands"
-import { action, devicePanel } from "../device-controls"
-import { TreeModel, TREE_SPEED, branchPoint } from "./tree-model"
+import { action, devicePanel, numberControl } from "../device-controls"
+import {
+	TreeModel,
+	TREE_SPEED,
+	TREE_FORK_HEIGHT,
+	branchPoint,
+	branchPathPoint,
+	branchHeight,
+	type TreeBranch
+} from "./tree-model"
+import {
+	EVENT_POINTER_DOWN,
+	EVENT_POINTER_MOVE,
+	EVENT_POINTER_UP,
+	EVENT_POINTER_CANCEL,
+	EVENT_KEY_DOWN
+} from "../../event-constants"
+import { NOTE_NAMES } from "../harmony"
 import { createTreeRenderer, TREE_INSTANCE_CAPACITY, type TreeRenderer } from "./tree-renderer"
 
 type Color = readonly [number, number, number]
@@ -70,6 +86,80 @@ export default class OutputSongTree implements IAudioOutput {
 	private flashTimes = new Float64Array(128).fill(-Infinity)
 	private litColors = NOTE_COLORS.map((color) => [...color] as [number, number, number])
 	private litBark: [number, number, number] = [...BARK]
+	private selectedBranch?: TreeBranch
+	private branchControl?: HTMLInputElement
+	private branchDetails?: HTMLElement
+
+	private focusBranch(index: number): void {
+		const branches = this.model.branches
+		if (!branches.length) {
+			return
+		}
+		const selected = Math.max(0, Math.min(branches.length - 1, Math.round(index)))
+		const branch = (this.selectedBranch = branches[selected])
+		this.viewMode = "manual"
+		this.zoom = Math.max(1, this.scale)
+		this.cameraX = branch.targetX
+		this.cameraY = branch.origin.y + branchHeight(branch, this.now) / 2
+		if (this.branchControl) {
+			this.branchControl.value = String(selected + 1)
+		}
+		this.draw(this.now)
+	}
+
+	private bindNavigation(canvas: HTMLCanvasElement): void {
+		canvas.tabIndex = 0
+		canvas.style.touchAction = "none"
+		canvas.style.cursor = "grab"
+		let drag: { id: number; x: number; y: number } | undefined
+		canvas.addEventListener(EVENT_POINTER_DOWN, (event) => {
+			if (event.button !== 0) {
+				return
+			}
+			event.stopPropagation()
+			canvas.focus()
+			canvas.setPointerCapture(event.pointerId)
+			drag = { id: event.pointerId, x: event.clientX, y: event.clientY }
+			this.viewMode = "manual"
+			this.zoom = this.scale
+			canvas.style.cursor = "grabbing"
+		})
+		canvas.addEventListener(EVENT_POINTER_MOVE, (event) => {
+			if (!drag || drag.id !== event.pointerId) {
+				return
+			}
+			event.stopPropagation()
+			this.cameraX -= (event.clientX - drag.x) / this.scale
+			this.cameraY += (event.clientY - drag.y) / this.scale
+			drag.x = event.clientX
+			drag.y = event.clientY
+			this.draw(this.now)
+		})
+		const release = () => {
+			drag = undefined
+			canvas.style.cursor = "grab"
+		}
+		canvas.addEventListener(EVENT_POINTER_UP, release)
+		canvas.addEventListener(EVENT_POINTER_CANCEL, release)
+		canvas.addEventListener(EVENT_KEY_DOWN, (event) => {
+			const direction = {
+				ArrowLeft: [-1, 0],
+				ArrowRight: [1, 0],
+				ArrowUp: [0, 1],
+				ArrowDown: [0, -1]
+			}[event.key]
+			if (!direction) {
+				return
+			}
+			event.preventDefault()
+			event.stopPropagation()
+			this.viewMode = "manual"
+			this.zoom = this.scale
+			this.cameraX += (direction[0] * 40) / this.scale
+			this.cameraY += (direction[1] * 40) / this.scale
+			this.draw(this.now)
+		})
+	}
 
 	private triggerNote(note: number, velocity: number, channel: number): void {
 		const now = this.now
@@ -219,13 +309,14 @@ export default class OutputSongTree implements IAudioOutput {
 		this.count = 0
 		this.submittedBatch = false
 		this.updateFlash(now)
+		this.model.layout()
 		const elapsed = now - (this.lastFrame || now)
 		const dt = Math.max(0, Math.min(0.1, elapsed))
 		this.lastFrame = now
 		const trunk =
 			this.model.started === undefined
 				? 0
-				: Math.max(2, (now - this.model.started) * TREE_SPEED)
+				: Math.max(2, this.model.trunkTop, this.model.heightAt(now))
 		let top = trunk,
 			topX = 0
 		for (const branch of this.model.held.values()) {
@@ -241,12 +332,8 @@ export default class OutputSongTree implements IAudioOutput {
 			let minX = -16,
 				maxX = 16
 			for (const branch of this.model.branches) {
-				const origin = branch.stem
-					? branchPoint(branch.stem, branch.forkAt!)
-					: branch.origin
-				const reach = branch.spread + Math.abs(branch.drift) + 16
-				minX = Math.min(minX, origin.x - reach)
-				maxX = Math.max(maxX, origin.x + reach)
+				minX = Math.min(minX, branch.origin.x - 8, branch.targetX - 8)
+				maxX = Math.max(maxX, branch.origin.x + 8, branch.targetX + 8)
 				top = Math.max(top, branchPoint(branch, now).y)
 			}
 			this.scale = Math.min(
@@ -267,6 +354,15 @@ export default class OutputSongTree implements IAudioOutput {
 			this.cameraX += (topX - this.cameraX) * (dt ? follow : 1)
 		}
 		const scale = this.scale
+		if (this.branchControl) {
+			this.branchControl.max = String(Math.max(1, this.model.branches.length))
+		}
+		if (this.branchDetails) {
+			const branch = this.selectedBranch
+			this.branchDetails.textContent = branch
+				? `${NOTE_NAMES[branch.note % 12]}${Math.floor(branch.note / 12) - 1} · channel ${branch.key.split(":")[0]} · velocity ${branch.velocity} · ${branch.end === undefined ? "held" : "released"}`
+				: `${this.model.branches.length} branches · Drag or use arrow keys to pan; choose a branch to inspect it.`
+		}
 		if (this.zoomLabel) {
 			const label = `${this.viewMode === "fit" ? "Whole song · " : ""}${(scale * 100).toFixed(scale < 0.01 ? 3 : 0)}%`
 			if (this.zoomLabel.value !== label) {
@@ -293,7 +389,7 @@ export default class OutputSongTree implements IAudioOutput {
 				Math.min(this.height + 10, ground - Math.min(5, trunk / 2) * scale),
 				center,
 				ground - trunk * scale,
-				Math.max(0.35, 5 * scale),
+				5 * scale,
 				this.litBark
 			)
 			// A cubic flare meets the ground broadly and eases into the straight trunk.
@@ -309,7 +405,7 @@ export default class OutputSongTree implements IAudioOutput {
 						y,
 						center + radius,
 						y,
-						Math.max(0.35, ((flareHeight * scale) / flareSteps) * 0.65),
+						((flareHeight * scale) / flareSteps) * 0.65,
 						this.litBark
 					)
 				}
@@ -319,56 +415,54 @@ export default class OutputSongTree implements IAudioOutput {
 			for (let index = this.model.branches.length - 1; index >= 0; index--) {
 				const branch = this.model.branches[index],
 					end = branch.end ?? now
-				const growthStart = branch.forkAt ?? branch.start
 				const tip = branchPoint(branch, end)
-				const origin = branch.stem ? branchPoint(branch.stem, growthStart) : branch.origin
+				const origin = branch.origin
 				if (ground - tip.y * scale > this.height + 24 || ground - origin.y * scale < -24) {
 					continue
 				}
-				const color = this.litColors[branch.note % 12],
+				const color: Color =
+						branch === this.selectedBranch
+							? [1, 1, 1]
+							: this.litColors[branch.note % 12],
 					radius = 0.8 + (branch.velocity / 127) * 4
 				const parent = branch.stem ?? branch.junction
 				const collar = parent ? (0.8 + (parent.velocity / 127) * 4) * 0.95 : 4.75
-				const first = Math.max(
-					growthStart,
-					growthStart + ((ground - this.height - 24) / scale - origin.y) / TREE_SPEED
+				const first = Math.max(0, (ground - this.height - 24) / scale - origin.y)
+				const last = Math.min(branchHeight(branch, end), (ground + 24) / scale - origin.y)
+				const forkEnd = Math.min(last, TREE_FORK_HEIGHT)
+				const curveSteps =
+					first < forkEnd
+						? Math.max(
+								4,
+								Math.min(
+									24,
+									Math.ceil((Math.abs(branch.targetX - origin.x) * scale) / 3)
+								)
+							)
+						: 0
+				const heights = Array.from(
+					{ length: curveSteps },
+					(_, step) => first + ((forkEnd - first) * (step + 1)) / curveSteps
 				)
-				const last = Math.min(
-					end,
-					growthStart + ((ground + 24) / scale - origin.y) / TREE_SPEED
-				)
-				const steps = Math.max(1, Math.min(64, Math.ceil((last - first) * 14 * scale)))
-				let previous = branchPoint(branch, first)
-				for (let step = 1; last >= first && step <= steps; step++) {
-					const time = first + ((last - first) * step) / steps
-					const point = branchPoint(branch, time)
+				if (last >= first && last > forkEnd) {
+					heights.push(last)
+				}
+				let previous = branchPathPoint(branch, first)
+				for (const height of heights) {
+					const point = branchPathPoint(branch, height)
 					// Match the parent width and tangent at the fork, then ease into
 					// the note's own width: the silhouette has a rounded crotch, not a butt joint.
-					const age = Math.max(0, time - growthStart)
+					const age = height / TREE_SPEED
 					const joinRadius = radius + (collar - radius) * Math.exp(-((age / 0.45) ** 2))
 					this.segment(
 						center + previous.x * scale,
 						ground - previous.y * scale,
 						center + point.x * scale,
 						ground - point.y * scale,
-						Math.max(0.3, joinRadius * scale),
+						joinRadius * scale,
 						color
 					)
 					previous = point
-				}
-				if (branch.end !== undefined) {
-					const size = Math.max(1, (4 + (branch.velocity / 127) * 12) * scale),
-						x = center + tip.x * scale,
-						y = ground - tip.y * scale
-					this.segment(
-						x - branch.side * size * 0.35,
-						y + size * 0.7,
-						x + branch.side * size * 0.35,
-						y - size * 0.7,
-						size * 0.42,
-						color,
-						true
-					)
 				}
 			}
 		}
@@ -420,7 +514,7 @@ export default class OutputSongTree implements IAudioOutput {
 				canvas.setAttribute("role", "img")
 				canvas.setAttribute(
 					"aria-label",
-					"Song tree: curved coloured branches grow with held notes; leaves mark released notes. A falling droplet follows the beat before playing."
+					"Song tree: separate vertical note lanes with curved forks. Drag or use arrow keys to pan. Use branch controls to inspect any note."
 				)
 				return canvas
 			}, skip)
@@ -430,6 +524,7 @@ export default class OutputSongTree implements IAudioOutput {
 			}
 			this.canvas?.remove()
 			this.canvas = result.canvas
+			this.bindNavigation(this.canvas)
 			this.renderer = result.renderer
 			this.gui.prepend(this.canvas)
 			this.observer?.disconnect()
@@ -439,7 +534,7 @@ export default class OutputSongTree implements IAudioOutput {
 			}
 			this.resize()
 			if (this.status) {
-				this.status.textContent = `Notes grow branches · Release to leaf · ${this.renderer.backend}`
+				this.status.textContent = `Vertical note lanes · Release stops growth · ${this.renderer.backend}`
 			}
 		} catch {
 			if (generation === this.generation && this.status) {
@@ -483,6 +578,24 @@ export default class OutputSongTree implements IAudioOutput {
 		this.zoomLabel.value = "100%"
 		controls.append(this.zoomLabel)
 		panel.append(controls)
+		const branchControls = document.createElement("div")
+		branchControls.style.cssText = "display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center"
+		this.branchControl = numberControl(
+			branchControls,
+			"Branch",
+			1,
+			1,
+			Number.MAX_SAFE_INTEGER,
+			(value) => this.focusBranch(value - 1)
+		)
+		action(branchControls, "Previous branch", () =>
+			this.focusBranch(Number(this.branchControl?.value ?? 1) - 2)
+		)
+		action(branchControls, "Next branch", () =>
+			this.focusBranch(Number(this.branchControl?.value ?? 0))
+		)
+		this.branchDetails = document.createElement("small")
+		panel.append(branchControls, this.branchDetails)
 		action(panel, "Plant a new tree", () => {
 			this.model.reset()
 			this.flashTimes.fill(-Infinity)
@@ -490,6 +603,7 @@ export default class OutputSongTree implements IAudioOutput {
 			this.lastFrame = 0
 			this.viewMode = "follow"
 			this.zoom = 1
+			this.selectedBranch = undefined
 		})
 		await this.startRenderer()
 		return panel
@@ -507,6 +621,8 @@ export default class OutputSongTree implements IAudioOutput {
 		this.canvas = undefined
 		this.status = undefined
 		this.zoomLabel = undefined
+		this.branchControl = undefined
+		this.branchDetails = undefined
 		this.recovering = false
 	}
 	async disconnect(): Promise<void> {

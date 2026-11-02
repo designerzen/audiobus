@@ -1,3 +1,5 @@
+import { EVENT_CONTROL_SURFACE_NOTES } from "../event-constants"
+import { NOTE_ON, NOTE_OFF } from "../commands"
 import {
 	createGuitarTabControl,
 	createPianoRollControl,
@@ -10,6 +12,7 @@ import { bindingKey, validateValue } from "control-surface/model"
 import type { ControlBinding, ControlValue } from "control-surface/types"
 
 interface NoteSource {
+	dispatchEvent?(event: Event): boolean
 	noteOn?(note: number, velocity: number): unknown
 	noteOff?(note: number): void
 }
@@ -35,6 +38,22 @@ export function performanceBindings(
 	if (!state) {
 		state = { values: new Map(), notes: new Map(), listeners: new Set(), plucks: new Map() }
 		states.set(component, state)
+	}
+	const noteOff = (note: number) => {
+		component.noteOff!(note)
+		component.dispatchEvent?.(
+			new CustomEvent(EVENT_CONTROL_SURFACE_NOTES, {
+				detail: [{ type: NOTE_OFF, number: note, velocity: 0 }]
+			})
+		)
+	}
+	const noteOn = async (note: number, velocity: number) => {
+		await component.noteOn!(note, velocity)
+		component.dispatchEvent?.(
+			new CustomEvent(EVENT_CONTROL_SURFACE_NOTES, {
+				detail: [{ type: NOTE_ON, number: note, velocity }]
+			})
+		)
 	}
 	const shared = state
 	const descriptors = [
@@ -125,16 +144,16 @@ export function performanceBindings(
 				const next = union()
 				for (const note of previous.keys()) {
 					if (!next.has(note)) {
-						component.noteOff!(note)
+						noteOff(note)
 					}
 				}
 				try {
 					for (const [note, velocity] of next) {
 						if (!previous.has(note) || pluck?.note === note) {
 							if (previous.has(note) && pluck?.note === note) {
-								component.noteOff!(note)
+								noteOff(note)
 							}
-							await component.noteOn!(note, Math.max(1, Math.round(velocity * 127)))
+							await noteOn(note, Math.max(1, Math.round(velocity * 127)))
 						}
 					}
 				} catch (error) {
@@ -148,7 +167,7 @@ export function performanceBindings(
 					}
 					for (const note of voices.keys()) {
 						if (!Array.from(shared.notes.values()).some((notes) => notes.has(note))) {
-							component.noteOff!(note)
+							noteOff(note)
 						}
 					}
 					throw error
@@ -174,7 +193,7 @@ export function performanceBindings(
 								notes.has(current.note)
 							)
 						) {
-							component.noteOff!(current.note)
+							noteOff(current.note)
 						}
 					}, strumOptions(descriptor.strum).duration)
 				}
