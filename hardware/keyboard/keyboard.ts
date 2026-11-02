@@ -94,14 +94,27 @@ export const addKeyboardDownEvents = (
 	window.addEventListener(
 		EVENT_KEY_DOWN,
 		(event) => {
-			if (event.defaultPrevented || event.repeat || held.has(keyId(event))) {
+			if (
+				event.defaultPrevented ||
+				event.isComposing ||
+				event.repeat ||
+				held.has(keyId(event))
+			) {
 				return
 			}
 			const target = document.activeElement
+			// Performance surfaces opt non-text controls into musical keys. Text entry
+			// and dialogs always retain their normal editing behaviour.
+			const performance = !!target?.closest("[data-keyboard-notes]")
 			if (
 				target?.closest(
-					"input, select, textarea, [contenteditable]:not([contenteditable='false']), dialog"
-				)
+					"textarea, [contenteditable]:not([contenteditable='false']), dialog"
+				) ||
+				(target?.closest("input, select") &&
+					(!performance ||
+						!target.matches(
+							"select, input:is([type='range'], [type='checkbox'], [type='radio'], [type='button'], [type='color'])"
+						)))
 			) {
 				return
 			}
@@ -119,6 +132,9 @@ export const addKeyboardDownEvents = (
 				} else if (configuration.mode !== "notes") {
 					binding = SHORTCUTS[key]
 				}
+			}
+			if (performance && binding?.command !== Commands.NOTE_ON) {
+				return
 			}
 			window.dispatchEvent(new CustomEvent(EVENT_KEYBOARD_KEY_DOWN, { detail: { key } }))
 			if (!binding) {
