@@ -69,6 +69,7 @@ export abstract class Transformer<Config = TransformerConfig> implements ITransf
 			this.generatedGui = createDomGui(
 				bindings.filter((binding) => binding.descriptor.id !== "enabled")
 			)
+			this.generatedGui.element.classList.add("transformer-controls")
 		}
 		return this.generatedGui.element
 	}
