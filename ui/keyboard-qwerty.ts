@@ -313,8 +313,6 @@ export default class QwertyKeyboard extends AbstractInteractive {
 		height: number
 	): string {
 		const isSpecial = key.special || false
-		const fillColor = isSpecial ? "#555" : "#ccc"
-		const textColor = isSpecial ? "#fff" : "#000"
 
 		return `<g class="qwerty-key-group" data-key-code="${key.keyCode}">
 					<rect 
@@ -323,10 +321,8 @@ export default class QwertyKeyboard extends AbstractInteractive {
 						width="${width}" 
 						height="${height}" 
 						rx="4"
-						class="qwerty-key"
+						class="qwerty-key${isSpecial ? " qwerty-key-special" : ""}"
 						data-key-code="${key.keyCode}"
-						fill="${fillColor}"
-						stroke="#999"
 						stroke-width="1"
 						style="cursor: pointer; user-select: none;"
 					/>
@@ -337,8 +333,6 @@ export default class QwertyKeyboard extends AbstractInteractive {
 						dominant-baseline="middle"
 						class="qwerty-key-label"
 						font-size="12"
-						font-family="Arial, sans-serif"
-						fill="${textColor}"
 						pointer-events="none"
 					>${key.display}</text>
 				</g>`

@@ -14,6 +14,14 @@ const rowHeight = 14
 const gutter = 48
 const ruler = 24
 const names = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"]
+const palette = {
+	background: "#151923",
+	naturalRow: "#242b39",
+	sharpRow: "#1b202c",
+	grid: "#364052",
+	label: "#c7d1e4",
+	playhead: "#f5f7ff"
+}
 const now = () =>
 	origin === undefined ? 0 : (performance.timeOrigin + performance.now() - origin) / 1000
 const width = () => Math.max(1, canvas.width - gutter)
@@ -23,7 +31,7 @@ function render() {
 	if (follow) {
 		offset = Math.max(0, time - (width() / scale) * 0.9)
 	}
-	context.fillStyle = "#151923"
+	context.fillStyle = palette.background
 	context.fillRect(0, 0, canvas.width, canvas.height)
 	context.font = "11px sans-serif"
 	for (let row = 0; row * rowHeight < canvas.height - ruler; row++) {
@@ -32,17 +40,19 @@ function render() {
 			break
 		}
 		const y = ruler + row * rowHeight
-		context.fillStyle = [1, 3, 6, 8, 10].includes(note % 12) ? "#1b202c" : "#242b39"
+		context.fillStyle = [1, 3, 6, 8, 10].includes(note % 12)
+			? palette.sharpRow
+			: palette.naturalRow
 		context.fillRect(gutter, y, width(), rowHeight - 1)
-		context.fillStyle = "#b8c2d6"
+		context.fillStyle = palette.label
 		context.fillText(`${names[note % 12]}${Math.floor(note / 12) - 1}`, 6, y + 11)
 	}
 	const step = 2 ** Math.ceil(Math.log2(65 / scale))
 	for (let t = Math.ceil(offset / step) * step; t <= offset + width() / scale; t += step) {
 		const x = gutter + (t - offset) * scale
-		context.fillStyle = "#364052"
+		context.fillStyle = palette.grid
 		context.fillRect(x, ruler, 1, canvas.height - ruler)
-		context.fillStyle = "#c7d1e4"
+		context.fillStyle = palette.label
 		context.fillText(`${Number(t.toFixed(2))}s`, x + 4, 16)
 	}
 	context.save()
@@ -62,17 +72,21 @@ function render() {
 		context.fillStyle = event.colour
 		context.fillRect(x, y + 1, Math.max(2, (end - event.start) * scale), rowHeight - 2)
 	}
-	context.fillStyle = "#f5f7ff"
+	context.fillStyle = palette.playhead
 	context.fillRect(gutter + (time - offset) * scale, ruler, 1, canvas.height - ruler)
 	context.restore()
 	if (!timeline.notes.length) {
-		context.fillStyle = "#d1d9e8"
+		context.fillStyle = palette.label
 		context.fillText("Play notes to build a timeline", gutter + 16, ruler + 30)
 	}
 	requestAnimationFrame(render)
 }
 
 globalThis.onmessage = ({ data }) => {
+	if (data.palette) {
+		Object.assign(palette, data.palette)
+		return
+	}
 	if (data.canvas) {
 		canvas = data.canvas
 		context = canvas.getContext("2d")!

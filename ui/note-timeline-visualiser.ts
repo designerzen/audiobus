@@ -4,6 +4,16 @@ import TIMELINE_WORKER from "./note-timeline-worker.ts?worker"
 import { AbstractResizeable } from "./abstract-resizeable-canvas"
 import { convertNoteNumberToColour } from "../conversion/note-to-colour"
 
+/** Canvas colours from the page's design tokens, with the worker's own as a fallback. */
+const PALETTE_TOKENS = {
+	background: "--col-surface-sunken",
+	naturalRow: "--col-surface",
+	sharpRow: "--col-surface-raised",
+	grid: "--col-line",
+	label: "--col-muted",
+	playhead: "--col-fg"
+}
+
 export default class NoteTimelineVisualiser extends AbstractResizeable {
 	private interactions = new AbortController()
 	private observer: ResizeObserver
@@ -11,6 +21,34 @@ export default class NoteTimelineVisualiser extends AbstractResizeable {
 	constructor(canvas: HTMLCanvasElement) {
 		super(canvas, TIMELINE_WORKER)
 		const signal = this.interactions.signal
+		// Canvas cannot read custom properties, so resolve each token through a probe element.
+		const syncPalette = () => {
+			const probe = document.createElement("span")
+			probe.hidden = true
+			canvas.parentElement!.append(probe)
+			const palette = Object.fromEntries(
+				Object.entries(PALETTE_TOKENS).map(([role, token]) => {
+					probe.style.color = `var(${token})`
+					return [role, getComputedStyle(probe).color]
+				})
+			)
+			probe.remove()
+			if (Object.values(palette).every(Boolean)) {
+				this.worker.postMessage({ palette })
+			}
+		}
+		if (typeof document !== "undefined") {
+			syncPalette()
+			const themeObserver = new MutationObserver(syncPalette)
+			themeObserver.observe(document.documentElement, {
+				attributes: true,
+				attributeFilter: ["style", "data-theme-mode"]
+			})
+			signal.addEventListener("abort", () => themeObserver.disconnect(), { once: true })
+			matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncPalette, {
+				signal
+			})
+		}
 		canvas.setAttribute("aria-describedby", "note-timeline-hint")
 		const pan = (x: number, y: number) => this.worker.postMessage({ type: "pan", x, y })
 		const zoom = (factor: number, anchor = 0.5) =>
