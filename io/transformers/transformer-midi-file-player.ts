@@ -3,6 +3,7 @@ import { Transformer } from "./abstract-transformer.ts"
 import AudioCommand from "../../audio-command.ts"
 import * as Commands from "../../commands"
 import { Midi } from "@tonejs/midi"
+import { EVENT_CHANGE, EVENT_CLICK, EVENT_LOAD, EVENT_ERROR } from "../../event-constants"
 
 import type { Timer } from "netronome"
 import type { ITransformer, FieldConfig } from "./interface-transformer.ts"
@@ -15,6 +16,7 @@ interface Config {
 	trackIndex: number
 	loop: boolean
 	midiFileUrl: string
+	midiFileName?: string
 	enabled: boolean
 	// Whether to align the loaded MIDI file to incoming note timing
 	alignToIncoming: boolean
@@ -54,6 +56,144 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 	private cursor = 0
 	private melody: { midi: number; velocity: number }[] = []
 	private heldNotes = new Map<string, IAudioCommand>()
+	private fileControls?: HTMLElement
+	private syncFiles?: () => void
+	private unsubscribeFiles?: () => void
+	private loadError = ""
+
+	override getControlValue(id: string) {
+		// Uploaded bytes live in the saved configuration, not in the editable URL box.
+		if (id === "midiFileUrl" && this.config.midiFileUrl.startsWith("data:")) {
+			return ""
+		}
+		return super.getControlValue(id)
+	}
+
+	override async createGui(): Promise<HTMLElement> {
+		const gui = await super.createGui()
+		if (this.fileControls) {
+			return gui
+		}
+		const controls = document.createElement("div")
+		controls.className = "component-control"
+		const label = document.createElement("label")
+		label.textContent = "Local MIDI songs"
+		const select = document.createElement("select")
+		const songsByFile = new Map<string, { trackIndex?: number; route?: string }>()
+		select.setAttribute("aria-label", "Local MIDI songs")
+		const addSong = (name: string, value: string) => {
+			const option = document.createElement("option")
+			option.textContent = name
+			option.value = value
+			select.add(option)
+		}
+		addSong("Choose a local MIDI song…", "")
+		label.append(select)
+		const upload = document.createElement("button")
+		upload.type = "button"
+		upload.textContent = "Upload MIDI file"
+		const input = document.createElement("input")
+		input.type = "file"
+		input.accept = ".mid,.midi,audio/midi,audio/x-midi"
+		input.hidden = true
+		input.setAttribute("aria-label", "Upload MIDI file")
+		const status = document.createElement("span")
+		status.setAttribute("role", "status")
+		const songLink = document.createElement("a")
+		songLink.textContent = "Open song preset"
+		songLink.hidden = true
+		select.addEventListener(EVENT_CHANGE, () => {
+			if (select.value) {
+				this.setConfig("midiFileUrl", select.value)
+				this.setConfig("trackIndex", songsByFile.get(select.value)?.trackIndex ?? -1)
+			}
+		})
+		upload.addEventListener(EVENT_CLICK, () => input.click())
+		input.addEventListener(EVENT_CHANGE, () => {
+			const file = input.files?.[0]
+			if (file) {
+				void this.loadMIDIUpload(file).catch((error: Error) => {
+					status.textContent = error.message
+				})
+			}
+			input.value = ""
+		})
+		this.syncFiles = () => {
+			select.value = this.config.midiFileUrl
+			const route = songsByFile.get(select.value)?.route
+			songLink.hidden = !route
+			if (route) {
+				songLink.href = `${import.meta.env.BASE_URL}${route}/`
+			}
+			status.textContent = this.isLoading
+				? "Loading MIDI file…"
+				: this.loadError ||
+					(this.midiData
+						? `Loaded: ${this.config.midiFileName || select.selectedOptions[0]?.textContent || this.config.midiFileUrl}`
+						: "Choose a song or upload a MIDI file.")
+		}
+		this.unsubscribeFiles = this.subscribeControls(this.syncFiles)
+		controls.append(label, upload, input, status, songLink)
+		gui.prepend(controls)
+		this.fileControls = controls
+		this.syncFiles()
+		try {
+			const response = await fetch(`${import.meta.env.BASE_URL}midi/index.json`)
+			if (!response.ok) {
+				throw new Error("Song library unavailable")
+			}
+			const songs: { name: string; file: string; trackIndex?: number; route?: string }[] =
+				await response.json()
+			for (const song of songs) {
+				songsByFile.set(`midi/${song.file}`, song)
+				addSong(song.name, `midi/${song.file}`)
+			}
+			this.syncFiles?.()
+		} catch {
+			select.disabled = true
+			select.options[0].textContent = "Local song library unavailable"
+		}
+		return gui
+	}
+
+	override destroyGui(): void {
+		this.unsubscribeFiles?.()
+		this.unsubscribeFiles = undefined
+		this.syncFiles = undefined
+		this.fileControls = undefined
+		super.destroyGui()
+	}
+
+	async loadMIDIUpload(file: File): Promise<void> {
+		if (!/\.(mid|midi)$/i.test(file.name)) {
+			throw new Error("Choose a .mid or .midi file.")
+		}
+		const revision = ++this.loadRevision
+		this.isLoading = true
+		this.loadError = ""
+		this.syncFiles?.()
+		const url = await new Promise<string>((resolve, reject) => {
+			const reader = new FileReader()
+			reader.addEventListener(EVENT_LOAD, () => resolve(String(reader.result)))
+			reader.addEventListener(EVENT_ERROR, () =>
+				reject(new Error("Unable to read MIDI file."))
+			)
+			reader.readAsDataURL(file)
+		}).catch((error: Error) => {
+			if (revision === this.loadRevision) {
+				this.isLoading = false
+				this.loadError = error.message
+				this.syncFiles?.()
+			}
+			throw error
+		})
+		if (revision !== this.loadRevision) {
+			return
+		}
+		this.setConfig("trackIndex", -1)
+		super.setConfig("midiFileName", file.name)
+		await this.loadMIDIFile(url)
+	}
 
 	get name(): string {
 		return "MIDI File Player"
@@ -144,6 +284,9 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 	}
 
 	override setConfig(key: string, value: unknown): void {
+		if (key === "midiFileUrl") {
+			super.setConfig("midiFileName", "")
+		}
 		super.setConfig(key, value)
 		if (key === "midiFileUrl") {
 			void this.loadMIDIFile(String(value ?? ""))
@@ -233,8 +376,16 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 	async loadMIDIFile(url: string): Promise<void> {
 		const revision = ++this.loadRevision
 		this.isLoading = true
+		this.loadError = ""
+		this.syncFiles?.()
 
 		try {
+			if (!url) {
+				this.midiData = null
+				this.midiCommands = []
+				this.melody = []
+				return
+			}
 			// Fetch the MIDI file from the URL
 			// Public asset paths are relative to the application, including on nested preset pages.
 			const resolved = /^(?:[a-z][a-z\d+.-]*:|\/)/i.test(url)
@@ -252,6 +403,9 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 
 			// Parse MIDI using @tonejs/midi library
 			this.midiData = new Midi(arrayBuffer)
+			if (!this.midiData.tracks.some((track) => track.notes.length)) {
+				throw new Error("MIDI file contains no playable notes")
+			}
 
 			// Extract NOTE_ON and NOTE_OFF commands from the loaded data
 			this.extractMIDICommands()
@@ -262,13 +416,15 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 			if (revision !== this.loadRevision) {
 				return
 			}
-			console.error(`Failed to load MIDI file from ${url}:`, error)
+			console.error("Failed to load MIDI file:", error)
+			this.loadError = "Unable to load MIDI file. Choose a valid MIDI file or another song."
 			this.midiData = null
 			this.midiCommands = []
 			this.melody = []
 		} finally {
 			if (revision === this.loadRevision) {
 				this.isLoading = false
+				this.syncFiles?.()
 			}
 		}
 	}
