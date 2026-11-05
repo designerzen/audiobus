@@ -1,3 +1,4 @@
+import { notifyControlSchema } from "../component-ui"
 import { TRANSFORMER_CATEGORY_TIMING } from "./transformer-categories.ts"
 import { Transformer } from "./abstract-transformer.ts"
 import AudioCommand from "../../audio-command.ts"
@@ -219,12 +220,15 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 			},
 			{
 				name: "trackIndex",
-				label: "Melody track (-1 = automatic, otherwise zero-based)",
+				label: "Melody track",
 				help: "Automatic chooses a named melody, vocal or lead track, then the first non-drum track with notes.",
-				type: "number",
-				min: -1,
-				max: 255,
-				step: 1,
+				type: "select",
+				values: [
+					{ name: "Auto", value: -1 },
+					...(this.midiData?.tracks ?? []).flatMap((track, index) => track.notes.length
+						? [{ name: `${index + 1} · ${track.name || `Track ${index + 1}`}`, value: index }]
+						: [])
+				],
 				default: DEFAULT_OPTIONS.trackIndex
 			},
 			{
@@ -425,6 +429,7 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 			if (revision === this.loadRevision) {
 				this.isLoading = false
 				this.syncFiles?.()
+				notifyControlSchema(this)
 			}
 		}
 	}

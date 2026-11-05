@@ -23,35 +23,57 @@ type Component = ComponentUi & {
 }
 export function fieldsDescriptor(fields: FieldConfig[]): UiDescriptor {
 	return {
-		controls: fields.map((field) => ({
-			id: field.name,
-			label:
-				field.label ??
-				field.name
-					.replace(/([a-z0-9])([A-Z])/g, "$1 $2")
-					.replace(/[_-]+/g, " ")
-					.replace(/^./, (letter) => letter.toUpperCase()),
-			group: field.group,
-			help: field.help,
-			defaultValue: field.default,
-			disabled: field.enabled === false,
-			widget:
-				field.type === "button"
-					? "button"
-					: field.type === "select"
-						? "select"
-						: field.type === "number"
-							? "number"
-							: "text",
-			min: field.min ?? (field.type === "number" ? -1000000 : undefined),
-			max: field.max ?? (field.type === "number" ? 1000000 : undefined),
-			step: field.step,
-			choices: field.values?.map((value) =>
-				typeof value === "object"
-					? { label: value.name, value: value.value }
-					: { label: String(value), value }
+		controls: fields
+			.map(
+				(field): ControlDescriptor => ({
+					id: field.name,
+					label:
+						field.label ??
+						field.name
+							.replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+							.replace(/[_-]+/g, " ")
+							.replace(/^./, (letter) => letter.toUpperCase()),
+					group: field.group,
+					help: field.help,
+					defaultValue: field.default,
+					disabled: field.enabled === false,
+					widget:
+						field.type === "button"
+							? "button"
+							: field.type === "select"
+								? "select"
+								: field.type === "number"
+									? "number"
+									: "text",
+					min: field.min ?? (field.type === "number" ? -1000000 : undefined),
+					max: field.max ?? (field.type === "number" ? 1000000 : undefined),
+					step: field.step ?? (field.type === "number" ? 1 : undefined),
+					choices: field.values?.map((value) =>
+						typeof value === "object"
+							? { label: value.name, value: value.value }
+							: { label: String(value), value }
+					)
+				})
 			)
-		})).map(directDescriptor)
+			.map(directDescriptor)
+	}
+}
+
+const schemaListeners = new WeakMap<object, Set<() => void>>()
+export function notifyControlSchema(component: object): void {
+	// Refreshing a surface can replace its subscription during notification.
+	for (const listener of Array.from(schemaListeners.get(component) ?? [])) {
+		listener()
+	}
+}
+export function subscribeControlSchema(component: object, listener: () => void): () => void {
+	let set = schemaListeners.get(component)
+	if (!set) {
+		schemaListeners.set(component, (set = new Set()))
+	}
+	set.add(listener)
+	return () => {
+		set!.delete(listener)
 	}
 }
 

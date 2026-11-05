@@ -122,7 +122,16 @@ export default class OutputSuperSonic implements IAudioOutput {
 		return this.#connected
 	}
 
-	constructor(private destination?: AudioNode) {}
+	private mixOutput?: GainNode
+	get output(): AudioNode | undefined {
+		return this.mixOutput
+	}
+	constructor(private destination?: AudioNode) {
+		if (destination) {
+			this.mixOutput = destination.context.createGain()
+			this.mixOutput.connect(destination)
+		}
+	}
 
 	hasMidiOutput(): boolean {
 		return false
@@ -209,7 +218,7 @@ export default class OutputSuperSonic implements IAudioOutput {
 				this.bridge = (this.destination.context as AudioContext).createMediaStreamSource(
 					stream.stream
 				)
-				this.bridge.connect(this.destination)
+				this.bridge.connect(this.mixOutput!)
 			}
 
 			this.#connected = true
@@ -566,6 +575,7 @@ export default class OutputSuperSonic implements IAudioOutput {
 	 */
 	async destroy(): Promise<void> {
 		this.stopMetricsPolling()
+		this.mixOutput?.disconnect()
 		this.bridge?.disconnect()
 		this.bridge = null
 		if (this.supersonic) {
