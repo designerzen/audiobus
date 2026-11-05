@@ -1,3 +1,4 @@
+import { engineGain } from "../../instruments/engine-levels"
 import type { SiONSession } from "sion"
 import type { SiMMLTrack } from "sion/sion"
 import type { IAudioOutput } from "./output-interface"
@@ -65,7 +66,7 @@ export default class OutputSiON extends EventTarget implements IAudioOutput {
 		this.output = this.context.createGain()
 		this.panner = this.context.createStereoPanner()
 		this.panner.pan.value = this.options.pan
-		this.output.gain.value = this.options.volume
+		this.output.gain.value = this.options.volume * engineGain("sion")
 		this.output.connect(this.destination)
 		this.panner.connect(this.output)
 	}
@@ -336,7 +337,10 @@ export default class OutputSiON extends EventTarget implements IAudioOutput {
 			1,
 			(value) => {
 				this.options.volume = value
-				this.output.gain.setValueAtTime(value, this.context.currentTime)
+				this.output.gain.setValueAtTime(
+					value * engineGain("sion"),
+					this.context.currentTime
+				)
 				changed(this)
 			},
 			0.01

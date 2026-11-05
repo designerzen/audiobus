@@ -20,7 +20,7 @@ export default class OutputOnScreenKeyboard implements IAudioOutput {
 	}
 
 	get description(): string {
-		return "Onscreen Keyboard"
+		return "Show the notes being played on an onscreen keyboard"
 	}
 
 	get keyboard(): SVGKeyboard {

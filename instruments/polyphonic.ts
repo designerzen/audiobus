@@ -1,3 +1,4 @@
+import { engineGain } from "./engine-levels"
 /**
  * Lets you play many synths at once.
  * Can be of any instrument but defaults
@@ -228,7 +229,7 @@ export default class PolySynth extends EventTarget implements IAudioOutput {
 	 * saturator before this node reserves headroom for dense chords.
 	 */
 	updateMasterGain() {
-		this.#gainNode.gain.value = this.options.volume
+		this.#gainNode.gain.value = this.options.volume * engineGain("polyphonic")
 	}
 
 	configure(settings: Partial<PolySynthSettings>): void {

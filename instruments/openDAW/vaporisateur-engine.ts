@@ -123,12 +123,26 @@ export async function createVaporisateurEngine(
 		})
 		engine.wake()
 		const uuid = audioUnitBox.address.uuid
+		const held = new Set<number>()
 		return {
 			output: engine,
-			noteOn: (pitch, velocity) =>
-				engine!.noteSignal({ type: "note-on", uuid, pitch, velocity }),
-			noteOff: (pitch) => engine!.noteSignal({ type: "note-off", uuid, pitch }),
-			panic: () => engine!.panic(),
+			noteOn: (pitch, velocity) => {
+				engine!.wake()
+				held.add(pitch)
+				engine!.noteSignal({ type: "note-on", uuid, pitch, velocity })
+			},
+			noteOff: (pitch) => {
+				held.delete(pitch)
+				engine!.noteSignal({ type: "note-off", uuid, pitch })
+			},
+			panic: () => {
+				// OpenDAW's panic deliberately crashes/restarts the worklet. MIDI
+				// all-notes-off must retain the node connected to our mixer.
+				for (const pitch of held) {
+					engine!.noteSignal({ type: "note-off", uuid, pitch })
+				}
+				held.clear()
+			},
 			dispose
 		}
 	} catch (error) {

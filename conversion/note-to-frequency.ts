@@ -18,5 +18,5 @@ export const noteNumberToFrequency = (noteNumber: number, quantityOfNotes: numbe
  * Convert MIDI note number to frequency in Hz
  */
 export const midiNoteToFrequency = (noteNumber: number): number => {
-	return 440 * (2 ** (noteNumber - 69) / 12)
+	return noteNumberToFrequency(noteNumber)
 }

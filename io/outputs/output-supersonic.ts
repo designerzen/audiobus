@@ -34,31 +34,31 @@ interface SynthPreset {
 const BUILT_IN_PRESETS: SynthPreset[] = [
 	{
 		name: "Basic Sine",
-		synthdef: "default",
+		synthdef: "sonic-pi-beep",
 		description: "Simple sine wave oscillator",
 		defaultParams: { amp: 0.2, pan: 0 }
 	},
 	{
 		name: "Bright Bell",
-		synthdef: "bell",
+		synthdef: "sonic-pi-pretty_bell",
 		description: "Resonant bell-like tone",
 		defaultParams: { amp: 0.15, pan: 0, decay: 2 }
 	},
 	{
 		name: "Warm Pad",
-		synthdef: "pad",
+		synthdef: "sonic-pi-prophet",
 		description: "Warm, sustained pad sound",
 		defaultParams: { amp: 0.1, pan: 0, sustain: 4 }
 	},
 	{
 		name: "Bright Pluck",
-		synthdef: "pluck",
+		synthdef: "sonic-pi-pluck",
 		description: "Plucked string synthesis",
 		defaultParams: { amp: 0.2, pan: 0, decay: 1 }
 	},
 	{
 		name: "Ambient Texture",
-		synthdef: "ambient",
+		synthdef: "sonic-pi-dark_ambience",
 		description: "Ambient pad with modulation",
 		defaultParams: { amp: 0.08, pan: 0, filterFreq: 2000 }
 	}
@@ -190,6 +190,7 @@ export default class OutputSuperSonic implements IAudioOutput {
 
 			// Initialize the engine
 			await this.supersonic.init()
+			await this.supersonic.loadSynthDefs(BUILT_IN_PRESETS.map((preset) => preset.synthdef))
 			if (this.destination) {
 				// SuperSonic closes its context on shutdown, so keep ownership
 				// separate and bridge its stream into the application's final mix.
@@ -308,13 +309,14 @@ export default class OutputSuperSonic implements IAudioOutput {
 			const frequency = midiNoteToFrequency(midiNote)
 
 			// Get velocity as 0-1 range for amplitude
-			const amp = (midiVelocity / 127) * 0.2 // Scale to avoid clipping
+			const amp = (midiVelocity / 127) * (this.currentPreset.defaultParams?.amp ?? 0.2)
 
 			// Build synth parameters
 			const params = {
-				freq: frequency,
-				amp: amp,
-				...this.currentPreset.defaultParams
+				...this.currentPreset.defaultParams,
+				note: midiNote,
+				sustain: this.currentPreset.defaultParams?.sustain ?? 60,
+				amp
 			}
 
 			// Generate unique node ID for this note
@@ -327,7 +329,7 @@ export default class OutputSuperSonic implements IAudioOutput {
 				this.currentPreset.synthdef,
 				nodeId,
 				0,
-				1,
+				0,
 				...this.flattenParams(params)
 			)
 
@@ -360,9 +362,8 @@ export default class OutputSuperSonic implements IAudioOutput {
 		}
 
 		try {
-			// Send OSC message to release synth
-			// /n_release nodeId, releaseTime
-			ss.send("/n_release", nodeId, 0.1) // 100ms release
+			// Bundled Sonic Pi synthdefs use timed envelopes, without a gate control.
+			ss.send("/n_free", nodeId)
 
 			this.activeNotes.delete(midiNote)
 			console.debug(`Synth released: node ${nodeId}`)
@@ -384,7 +385,7 @@ export default class OutputSuperSonic implements IAudioOutput {
 		try {
 			// Release all active notes
 			for (const [, nodeId] of this.activeNotes.entries()) {
-				ss.send("/n_release", nodeId, 0.05) // 50ms release
+				ss.send("/n_free", nodeId)
 			}
 
 			this.activeNotes.clear()

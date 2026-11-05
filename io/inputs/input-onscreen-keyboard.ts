@@ -27,7 +27,7 @@ export default class InputOnScreenKeyboard extends AbstractInput implements IAud
 	}
 
 	get description(): string {
-		return "Onscreen Keyboard"
+		return "Play notes with the mouse or touch on an onscreen keyboard"
 	}
 
 	get keyboard(): SVGKeyboard {

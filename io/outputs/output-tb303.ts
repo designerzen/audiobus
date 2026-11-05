@@ -1,3 +1,4 @@
+import { engineGain } from "../../instruments/engine-levels"
 import OutputWAM2 from "./output-wam2"
 import { initializeHost } from "../../wam/host"
 import { createTB303Plugin } from "../../wam/tb303"
@@ -11,6 +12,7 @@ export default class OutputTB303 extends OutputWAM2 {
 	readonly configurationAffectsNoteRouting = false
 	constructor(context: AudioContext, destination?: AudioNode) {
 		super(context, TB303_URL, "TB-303", destination)
+		this.output.gain.value = engineGain("tb303")
 	}
 	get name() {
 		return "TB-303"

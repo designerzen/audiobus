@@ -1,3 +1,4 @@
+import { engineGain } from "../engine-levels"
 import { velocityToGain } from "../../conversion/velocity-to-gain.ts"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
 import { dbToLinear } from "../../conversion/decibels-to-linear.ts"
@@ -113,7 +114,7 @@ export default class ToneMonoSynth implements IAudioOutput {
 	set gain(value) {
 		this.options.gain = value
 		if (this.#gainNode) {
-			this.#gainNode.gain.value = value
+			this.#gainNode.gain.value = value * engineGain("tone-mono-synth")
 		}
 	}
 
@@ -157,7 +158,7 @@ export default class ToneMonoSynth implements IAudioOutput {
 		this.options = Object.assign({}, this.options, options)
 		// Expose a stable output before the first note so the mixer can connect it.
 		this.#gainNode = audioContext.createGain()
-		this.#gainNode.gain.value = this.options.gain
+		this.#gainNode.gain.value = this.options.gain * engineGain("tone-mono-synth")
 		// Lazy initialization - Tone.js will be loaded on first use
 	}
 

@@ -1,3 +1,4 @@
+import { engineGain } from "../engine-levels"
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
 import { velocityToGain } from "../../conversion/velocity-to-gain.ts"
 import { createVaporisateurEngine, type VaporisateurEngine } from "./vaporisateur-engine.ts"
@@ -48,7 +49,7 @@ export default class OpenDAWVaporisateur implements IAudioOutput {
 			...options
 		}
 		this.output = audioContext.createGain()
-		this.output.gain.value = this.options.gain
+		this.output.gain.value = this.options.gain * engineGain("opendaw-vaporisateur")
 	}
 
 	get name() {
@@ -82,7 +83,7 @@ export default class OpenDAWVaporisateur implements IAudioOutput {
 		this.options.gain = Math.max(0, value)
 		this.output.gain.cancelScheduledValues(this.now)
 		this.output.gain.setTargetAtTime(
-			this.options.gain,
+			this.options.gain * engineGain("opendaw-vaporisateur"),
 			this.now,
 			Math.max(0.001, this.options.fadeDuration)
 		)

@@ -1,4 +1,5 @@
-import { EVENT_LOAD, EVENT_CONNECTED } from "../../event-constants.ts"
+import { engineGain } from "../../instruments/engine-levels"
+import { EVENT_CONNECTED } from "../../event-constants.ts"
 import { getAudioDestination } from "../../audio-destination"
 import { midiNoteToFrequency } from "../../conversion/note-to-frequency.ts"
 import type { IAudioOutput } from "./output-interface.ts"
@@ -36,6 +37,10 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 	#audioContext: AudioContext | null = null
 	#activeNotes: Map<number, number> = new Map() // noteNumber -> frequency mapping
 	#isInitialized: boolean = false
+	#output?: GainNode
+	get output() {
+		return this.#output
+	}
 
 	get uuid(): string {
 		return this.#uuid
@@ -81,25 +86,14 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 
 			this.#audioContext = this.#config.audioContext
 
-			// Create or find Pink Trombone element
-			let element = document.querySelector("pink-trombone")
-
-			if (!element) {
-				element = document.createElement("pink-trombone")
-				document.body.appendChild(element)
-			}
-
-			this.#pinkTromboneElement = element as HTMLElement
-
-			// Wait for Pink Trombone to load
-			this.#pinkTromboneElement.addEventListener(EVENT_LOAD, () => {
-				this.onPinkTromboneLoaded()
-			})
-
-			// If already loaded, trigger initialization
-			if ((this.#pinkTromboneElement as any).audioContext) {
-				this.onPinkTromboneLoaded()
-			}
+			this.#output = this.#audioContext.createGain()
+			this.#output.gain.value = engineGain("pink-trombone")
+			this.#output.connect(getAudioDestination(this.#audioContext))
+			this.#pinkTromboneElement = document.createElement("pink-trombone")
+			document.body.appendChild(this.#pinkTromboneElement)
+			// The element dispatches load in its constructor, before listeners can
+			// be attached. Initialize it directly using the shared context.
+			this.onPinkTromboneLoaded()
 		} catch (error) {
 			console.debug("[PINK-TROMBONE] Initialization failed:", error)
 		}
@@ -315,6 +309,14 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 		this.#activeNotes.clear()
 	}
 
+	async destroy(): Promise<void> {
+		await this.disconnect()
+		;(this.#pinkTromboneElement as any)?.disconnect()
+		this.#pinkTromboneElement?.remove()
+		this.#output?.disconnect()
+		this.#isInitialized = false
+	}
+
 	/**
 	 * Create GUI controls for Pink Trombone parameters
 	 */
@@ -448,12 +450,11 @@ export default class OutputPinkTrombone extends EventTarget implements IAudioOut
 			Promise.resolve(element.setAudioContext(this.#audioContext))
 				.then(() => {
 					// Connect to audio destination
-					element.connect(getAudioDestination(this.#audioContext!))
+					element.connect(this.#output)
 
 					// Set initial parameters
-					this.updateSynthesisParameters()
-
 					this.#isInitialized = true
+					this.updateSynthesisParameters()
 					this.dispatchEvent(new CustomEvent(EVENT_CONNECTED))
 
 					console.debug("[PINK-TROMBONE] Initialized successfully")

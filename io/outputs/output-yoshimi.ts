@@ -1,3 +1,4 @@
+import { engineGain } from "../../instruments/engine-levels"
 import { loadYoshimi, yoshimiAsset } from "../../wam/yoshimi-assets"
 import { commandToMidi } from "../../midi/midi-command-conversion"
 import type { IAudioCommand } from "../../audio-command-interface"
@@ -84,7 +85,7 @@ export default class OutputYoshimi extends EventTarget implements IAudioOutput {
 				this.settings[key] = Math.max(0, Math.min(key === "volume" ? 1 : 127, options[key]))
 			}
 		}
-		this.#output.gain.value = this.settings.volume
+		this.#output.gain.value = this.settings.volume * engineGain("yoshimi")
 		if (this.#isConnected) {
 			this.applyControllers()
 		}

@@ -1,3 +1,4 @@
+import { engineGain } from "../../instruments/engine-levels"
 import OutputWAM2 from "./output-wam2"
 import { initializeHost } from "../../wam/host"
 import { createMoogPlugin } from "../../wam/moog"
@@ -10,6 +11,7 @@ export default class OutputMoog extends OutputWAM2 {
 	readonly requiresConnectionControl = false
 	constructor(context: AudioContext, destination?: AudioNode) {
 		super(context, MOOG_URL, "Moog", destination)
+		this.output.gain.value = engineGain("moog")
 	}
 	get name() {
 		return "Moog"

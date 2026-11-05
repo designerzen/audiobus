@@ -1,3 +1,4 @@
+import { engineGain } from "../engine-levels"
 import { velocityToGain } from "../../conversion/velocity-to-gain.ts"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
 import type { IAudioOutput } from "../../io/outputs/output-interface.ts"
@@ -98,7 +99,7 @@ export default class TonePluckString implements IAudioOutput {
 	set gain(value) {
 		this.options.gain = value
 		if (this.#gainNode) {
-			this.#gainNode.gain.value = value
+			this.#gainNode.gain.value = value * engineGain("tone-pluck-string")
 		}
 	}
 
@@ -140,7 +141,7 @@ export default class TonePluckString implements IAudioOutput {
 		this.options = Object.assign({}, this.options, options)
 		// Expose a stable output before the first note so the mixer can connect it.
 		this.#gainNode = audioContext.createGain()
-		this.#gainNode.gain.value = this.options.gain
+		this.#gainNode.gain.value = this.options.gain * engineGain("tone-pluck-string")
 		// Lazy initialization - Tone.js will be loaded on first use
 	}
 
@@ -210,7 +211,10 @@ export default class TonePluckString implements IAudioOutput {
 		this.activeNote = noteNumber
 
 		try {
-			this.#gainNode.gain.setValueAtTime(this.options.gain * amplitude, this.now + delay)
+			this.#gainNode.gain.setValueAtTime(
+				this.options.gain * amplitude * engineGain("tone-pluck-string"),
+				this.now + delay
+			)
 			// PluckString uses triggerAttack to pluck the string with frequency parameter
 			this.#synth.triggerAttack(frequency, "+0.1")
 		} catch (e) {
