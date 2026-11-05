@@ -1,5 +1,5 @@
 import { createDomGui } from "control-surface/dom"
-import { bindingKey, validateValue } from "control-surface/model"
+import { bindingKey, validateValue, directDescriptor } from "control-surface/model"
 import type {
 	ComponentUi,
 	ControlBinding,
@@ -51,7 +51,7 @@ export function fieldsDescriptor(fields: FieldConfig[]): UiDescriptor {
 					? { label: value.name, value: value.value }
 					: { label: String(value), value }
 			)
-		}))
+		})).map(directDescriptor)
 	}
 }
 
@@ -368,6 +368,7 @@ export async function componentBindings(
 	const descriptor = await component.getUiDescriptor!()
 	const controls: ControlBinding[] = descriptor.controls
 		.filter((d) => !d.hidden)
+		.map(directDescriptor)
 		.map((d) => ({
 			key: bindingKey(componentId, d.id),
 			sourceId: componentId,
