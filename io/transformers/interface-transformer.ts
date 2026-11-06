@@ -23,6 +23,10 @@ export interface FieldConfig {
 	label?: string
 	group?: string
 	help?: string
+	/** Control-surface glyph name; inferred from the name and label when omitted. */
+	icon?: string
+	/** 0..1 performance importance when a surface is filled automatically. */
+	priority?: number
 	placeholder?: string
 	type: string
 	min?: number

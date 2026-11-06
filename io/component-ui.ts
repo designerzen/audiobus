@@ -35,6 +35,8 @@ export function fieldsDescriptor(fields: FieldConfig[]): UiDescriptor {
 							.replace(/^./, (letter) => letter.toUpperCase()),
 					group: field.group,
 					help: field.help,
+					icon: field.icon,
+					priority: field.priority,
 					defaultValue: field.default,
 					disabled: field.enabled === false,
 					widget:
