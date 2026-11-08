@@ -64,6 +64,21 @@ const SHORTCUTS: Record<string, KeyboardBinding> = {
 	ArrowDown: { key: "ArrowDown", command: Commands.TEMPO_DECREASE, value: -1 }
 }
 
+export function defaultKeyboardBindings(
+	mode: "combined" | "notes" | "shortcuts" = "combined"
+): KeyboardBinding[] {
+	return [
+		...(mode === "shortcuts"
+			? []
+			: MAPPING_KEYS_TO_MIDI_NOTES.map((key, index) => ({
+					key,
+					command: Commands.NOTE_ON,
+					value: index + 41
+				}))),
+		...(mode === "notes" ? [] : Object.values(SHORTCUTS).map((binding) => ({ ...binding })))
+	]
+}
+
 /** Register musical keys, preserving the original binding until key release. */
 export const addKeyboardDownEvents = (
 	callback: (command: string, key: string, value: number, event?: KeyboardEvent) => void,

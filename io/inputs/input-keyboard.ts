@@ -67,6 +67,9 @@ export default class InputKeyboard extends AbstractInput implements IAudioInput 
 		this.#keyboardDisplayManager = new KeyboardDisplayManager()
 		const container = document.createElement("div")
 		container.className = "keyboard-input-gui"
+		const heading = document.createElement("strong")
+		heading.textContent = "Play with your keyboard"
+		container.append(heading, this.#keyboardDisplayManager.getElement())
 		const settings = document.createElement("div")
 		settings.className = "keyboard-input-settings"
 		this.#destroySettings = createKeyboardSettings(
@@ -75,7 +78,6 @@ export default class InputKeyboard extends AbstractInput implements IAudioInput 
 			(configuration) => this.setConfiguration(configuration)
 		)
 		container.appendChild(settings)
-		container.appendChild(this.#keyboardDisplayManager.getElement())
 		return container
 	}
 

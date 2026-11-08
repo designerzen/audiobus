@@ -1,9 +1,10 @@
-import { EVENT_CHANGE, EVENT_CLICK, EVENT_KEY_DOWN } from "../event-constants"
+import { EVENT_CHANGE, EVENT_CLICK, EVENT_KEY_DOWN, EVENT_TOGGLE } from "../event-constants"
 import {
 	KEYBOARD_MODES,
 	KEYBOARD_COMMANDS,
 	type KeyboardConfiguration
 } from "../hardware/keyboard/keyboard-configuration"
+import { defaultKeyboardBindings } from "../hardware/keyboard/keyboard"
 import { NOTE_ON, PITCH_BEND, PROGRAM_CHANGE, CONTROL_CHANGE } from "../commands"
 
 const KEYS = [
@@ -29,6 +30,8 @@ export function createKeyboardSettings(
 	const lifetime = new AbortController()
 	let events = new AbortController()
 	let learning: number | null = null
+	let selected = 0
+	let settingsOpen = false
 	const listen = (element: EventTarget, type: string, callback: EventListener) =>
 		element.addEventListener(type, callback, { signal: events.signal })
 	const select = (label: string, choices: readonly string[], value: string) => {
@@ -63,17 +66,75 @@ export function createKeyboardSettings(
 			option.textContent = KEYBOARD_MODES[option.value as keyof typeof KEYBOARD_MODES][0]
 		}
 		const description = document.createElement("p")
-		description.textContent = KEYBOARD_MODES[configuration.mode][1]
+		description.textContent =
+			configuration.mode === "custom"
+				? "Play using your saved mapping. Change individual keys in Keyboard settings."
+				: KEYBOARD_MODES[configuration.mode][1]
 		listen(mode.control, EVENT_CHANGE, () => {
 			learning = null
-			update({ ...configuration, mode: mode.control.value as KeyboardConfiguration["mode"] })
+			const nextMode = mode.control.value as KeyboardConfiguration["mode"]
+			update({
+				...configuration,
+				mode: nextMode,
+				bindings:
+					nextMode === "custom" && configuration.bindings.length === 0
+						? defaultKeyboardBindings(
+								configuration.mode === "custom" ? "combined" : configuration.mode
+							)
+						: configuration.bindings
+			})
 			render()
 		})
 		root.append(mode.field, description)
 		if (configuration.mode !== "custom") {
 			return
 		}
+		const summary = document.createElement("p")
+		summary.textContent = configuration.bindings.length
+			? `${configuration.bindings.length} custom bindings ready to use.`
+			: "No keys assigned. Choose Notes and shortcuts to play immediately, or open settings to use the standard mapping."
+		const settings = document.createElement("details")
+		settings.open = settingsOpen
+		const toggle = document.createElement("summary")
+		toggle.textContent = "Keyboard settings"
+		settings.append(toggle)
+		root.append(summary, settings)
+		listen(settings, EVENT_TOGGLE, () => {
+			if (settingsOpen === settings.open) {
+				return
+			}
+			settingsOpen = settings.open
+			learning = null
+			render()
+		})
+		if (!settingsOpen) {
+			return
+		}
+		const editor = document.createElement("div")
+		editor.className = "keyboard-binding-editor"
+		settings.append(editor)
+		if (configuration.bindings.length > 0) {
+			selected = Math.min(selected, configuration.bindings.length - 1)
+			const picker = select(
+				"Edit binding",
+				configuration.bindings.map((_, index) => String(index)),
+				String(selected)
+			)
+			for (const option of picker.control.options) {
+				const binding = configuration.bindings[Number(option.value)]
+				option.textContent = `${binding.key === " " ? "Space" : binding.key} · ${binding.command} · ${binding.value}`
+			}
+			listen(picker.control, EVENT_CHANGE, () => {
+				selected = Number(picker.control.value)
+				learning = null
+				render()
+			})
+			editor.append(picker.field)
+		}
 		configuration.bindings.forEach((binding, index) => {
+			if (index !== selected) {
+				return
+			}
 			const row = document.createElement("fieldset")
 			const legend = document.createElement("legend")
 			legend.textContent = `Binding ${index + 1}`
@@ -96,12 +157,18 @@ export function createKeyboardSettings(
 				if (!value.checkValidity() || value.value === "") {
 					return
 				}
-				const bindings = configuration.bindings.filter((_, i) => i !== index)
-				bindings.push({
-					key: key.control.value,
-					command: command.control.value,
-					value: Number(value.value)
-				})
+				const bindings = configuration.bindings
+					.map((binding, i) =>
+						i === index
+							? {
+									key: key.control.value,
+									command: command.control.value,
+									value: Number(value.value)
+								}
+							: binding
+					)
+					.filter((binding, i) => i === index || binding.key !== key.control.value)
+				selected = bindings.findIndex((binding) => binding.key === key.control.value)
 				learning = null
 				update({ ...configuration, bindings })
 				render()
@@ -132,7 +199,7 @@ export function createKeyboardSettings(
 					render()
 				})
 			)
-			root.append(row)
+			editor.append(row)
 		})
 		const status = document.createElement("p")
 		status.setAttribute("role", "status")
@@ -140,7 +207,7 @@ export function createKeyboardSettings(
 			learning === null
 				? "Value: MIDI note/program/controller number (0–127), pitch bend (−1 to 1), or command value."
 				: "Press a key to bind it. Escape cancels."
-		root.append(
+		editor.append(
 			status,
 			button("Add binding", () => {
 				const key = KEYS.find(
@@ -150,10 +217,17 @@ export function createKeyboardSettings(
 					return
 				}
 				learning = null
+				selected = configuration.bindings.length
 				update({
 					...configuration,
 					bindings: [...configuration.bindings, { key, command: NOTE_ON, value: 60 }]
 				})
+				render()
+			}),
+			button("Use standard mapping", () => {
+				learning = null
+				selected = 0
+				update({ ...configuration, bindings: defaultKeyboardBindings() })
 				render()
 			})
 		)
@@ -176,11 +250,11 @@ export function createKeyboardSettings(
 				if (binding) {
 					update({
 						...configuration,
-						bindings: [
-							...configuration.bindings.filter((_, i) => i !== learning),
-							{ ...binding, key }
-						]
+						bindings: configuration.bindings
+							.map((item, i) => (i === learning ? { ...binding, key } : item))
+							.filter((item, i) => i === learning || item.key !== key)
 					})
+					selected = getConfiguration().bindings.findIndex((item) => item.key === key)
 				}
 			}
 			learning = null
