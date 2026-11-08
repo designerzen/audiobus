@@ -4,7 +4,13 @@ import { Transformer } from "./abstract-transformer.ts"
 import AudioCommand from "../../audio-command.ts"
 import * as Commands from "../../commands"
 import { Midi } from "@tonejs/midi"
-import { EVENT_CHANGE, EVENT_CLICK, EVENT_LOAD, EVENT_ERROR } from "../../event-constants"
+import {
+	EVENT_CHANGE,
+	EVENT_CLICK,
+	EVENT_LOAD,
+	EVENT_ERROR,
+	EVENT_KEY_DOWN
+} from "../../event-constants"
 
 import type { Timer } from "netronome"
 import type { ITransformer, FieldConfig } from "./interface-transformer.ts"
@@ -18,11 +24,57 @@ interface Config {
 	loop: boolean
 	midiFileUrl: string
 	midiFileName?: string
+	// BitMidi search shown when the GUI opens, such as from a /play/{artist}/{title} link
+	searchQuery?: string
 	enabled: boolean
 	// Whether to align the loaded MIDI file to incoming note timing
 	alignToIncoming: boolean
 	// Time offset to apply to the MIDI file (in seconds)
 	timeOffset: number
+}
+
+export const BITMIDI_ORIGIN = "https://bitmidi.com"
+
+export interface BitMidiResult {
+	name: string
+	downloadUrl: string
+	url: string
+}
+
+export interface BitMidiSearch {
+	results: BitMidiResult[]
+	total: number
+	pageTotal: number
+}
+
+const fetchBitMidi = async (query: string, page: number): Promise<BitMidiSearch> => {
+	const response = await fetch(
+		`${BITMIDI_ORIGIN}/api/midi/search?q=${encodeURIComponent(query)}&page=${page}`
+	)
+	if (!response.ok) {
+		throw new Error("BitMidi search unavailable")
+	}
+	const { result } = await response.json()
+	return {
+		results: result.results.map(({ name, downloadUrl, url }: BitMidiResult) => ({
+			name,
+			downloadUrl: new URL(downloadUrl, BITMIDI_ORIGIN).href,
+			url: new URL(url, BITMIDI_ORIGIN).href
+		})),
+		total: result.total,
+		pageTotal: result.pageTotal
+	}
+}
+
+/**
+ * Search BitMidi titles. BitMidi matches any query word, so misspelt queries
+ * with no matches retry using each word's opening letters to find similar titles.
+ */
+export async function searchBitMidi(query: string, page = 0): Promise<BitMidiSearch> {
+	const words = query.trim().split(/\s+/).filter(Boolean)
+	const found = await fetchBitMidi(words.join(" "), page)
+	const similar = words.map((word) => word.slice(0, 4)).join(" ")
+	return found.total || similar === words.join(" ") ? found : fetchBitMidi(similar, page)
 }
 
 const DEFAULT_OPTIONS: Config = {
@@ -134,7 +186,7 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 						: "Choose a song or upload a MIDI file.")
 		}
 		this.unsubscribeFiles = this.subscribeControls(this.syncFiles)
-		controls.append(label, upload, input, status, songLink)
+		controls.append(label, upload, input, status, songLink, this.createBitMidiSearch())
 		gui.prepend(controls)
 		this.fileControls = controls
 		this.syncFiles()
@@ -155,6 +207,89 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 			select.options[0].textContent = "Local song library unavailable"
 		}
 		return gui
+	}
+
+	private createBitMidiSearch(): HTMLElement {
+		const search = document.createElement("div")
+		const query = document.createElement("input")
+		query.type = "search"
+		query.placeholder = "Search BitMidi songs…"
+		query.setAttribute("aria-label", "Search BitMidi")
+		const find = document.createElement("button")
+		find.type = "button"
+		find.textContent = "Search"
+		const summary = document.createElement("span")
+		summary.setAttribute("role", "status")
+		const results = document.createElement("ul")
+		results.setAttribute("aria-label", "BitMidi results")
+		const more = document.createElement("button")
+		more.type = "button"
+		more.textContent = "More results"
+		more.hidden = true
+		const credit = document.createElement("a")
+		credit.href = BITMIDI_ORIGIN
+		credit.target = "_blank"
+		credit.rel = "noopener noreferrer"
+		credit.textContent = "Songs from BitMidi"
+		let term = ""
+		let page = 0
+		let revision = 0
+		const show = async (next: number) => {
+			const current = ++revision
+			summary.textContent = "Searching BitMidi…"
+			more.hidden = true
+			try {
+				const found = await searchBitMidi(term, next)
+				if (current !== revision) {
+					return
+				}
+				page = next
+				for (const song of found.results) {
+					const item = document.createElement("li")
+					const choose = document.createElement("button")
+					choose.type = "button"
+					choose.textContent = song.name
+					choose.addEventListener(EVENT_CLICK, () => {
+						this.setConfig("trackIndex", -1)
+						this.setConfig("midiFileUrl", song.downloadUrl)
+						super.setConfig("midiFileName", song.name)
+						this.syncFiles?.()
+					})
+					item.append(choose)
+					results.append(item)
+				}
+				summary.textContent = found.total
+					? `${found.total} BitMidi matches`
+					: "No matching or similar BitMidi songs."
+				more.hidden = page + 1 >= found.pageTotal
+			} catch (error) {
+				if (current === revision) {
+					summary.textContent = (error as Error).message
+				}
+			}
+		}
+		const start = () => {
+			term = query.value.trim()
+			results.replaceChildren()
+			if (term) {
+				super.setConfig("searchQuery", term)
+				void show(0)
+			}
+		}
+		find.addEventListener(EVENT_CLICK, start)
+		query.addEventListener(EVENT_KEY_DOWN, (event) => {
+			if ((event as KeyboardEvent).key === "Enter") {
+				event.preventDefault()
+				start()
+			}
+		})
+		more.addEventListener(EVENT_CLICK, () => void show(page + 1))
+		search.append(query, find, summary, results, more, credit)
+		if (this.config.searchQuery) {
+			query.value = this.config.searchQuery
+			start()
+		}
+		return search
 	}
 
 	override destroyGui(): void {
@@ -201,7 +336,7 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 	}
 
 	get description(): string {
-		return "Replace notes with a MIDI file, or advance its melody one note per key press"
+		return "Replace notes with a MIDI file, or advance its melody one note per key press. Search songs from BitMidi (https://bitmidi.com)"
 	}
 
 	category = TRANSFORMER_CATEGORY_TIMING
@@ -225,9 +360,16 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 				type: "select",
 				values: [
 					{ name: "Auto", value: -1 },
-					...(this.midiData?.tracks ?? []).flatMap((track, index) => track.notes.length
-						? [{ name: `${index + 1} · ${track.name || `Track ${index + 1}`}`, value: index }]
-						: [])
+					...(this.midiData?.tracks ?? []).flatMap((track, index) =>
+						track.notes.length
+							? [
+									{
+										name: `${index + 1} · ${track.name || `Track ${index + 1}`}`,
+										value: index
+									}
+								]
+							: []
+					)
 				],
 				default: DEFAULT_OPTIONS.trackIndex
 			},
