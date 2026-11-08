@@ -44,7 +44,7 @@ export class AdsrShaper extends HTMLElement {
 		super()
 		this.root.innerHTML = `
 		<style>
-		:host { display:block; min-width:0; --envelope-accent:var(--instrument-color, var(--node-accent, var(--color-accent, currentColor))); font:inherit; background:#2d2d2d; color:#ccc; border-radius:6px; padding:10px 12px; }
+		:host { display:block; min-width:0; cursor:default; --envelope-accent:var(--instrument-color, var(--node-accent, var(--color-accent, currentColor))); font:inherit; background:#2d2d2d; color:#ccc; border-radius:6px; padding:10px 12px; }
 		* { box-sizing:border-box; }
 		.title { text-align:center; color:var(--envelope-accent); font-size:.9em; margin:0 0 8px; font-weight:600; }
 		.graph { position:relative; height:clamp(180px, 40vw, 250px); border-bottom:1px solid #666; }
@@ -53,11 +53,11 @@ export class AdsrShaper extends HTMLElement {
 		.line { fill:none; stroke:var(--envelope-accent); stroke-width:2.5; stroke-linejoin:round; }
 		.fill { display:none; }
 		.off { display:none; }
-		.handle { position:absolute; width:36px; height:36px; transform:translate(-50%,-50%); border:0; padding:0; background:transparent; color:var(--envelope-accent); cursor:grab; touch-action:none; }
+		.handle { position:absolute; width:36px; height:36px; transform:translate(-50%,-50%); border:0; padding:0; background:transparent; color:var(--envelope-accent); cursor:crosshair; touch-action:none; }
 		.handle span { display:grid; place-items:center; width:22px; height:22px; margin:auto; background:var(--envelope-accent); color:#202020; border-radius:50%; font:16px/1 sans-serif; }
+		.graph.dragging { cursor:crosshair; }
 		.handle:hover span { transform:scale(1.12); }
 		.handle:focus-visible { outline:2px solid currentColor; border-radius:5px; }
-		.handle:active { cursor:grabbing; }
 		.values { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.5rem; margin-top:16px; }
 		label { display:grid; justify-items:center; gap:4px; min-width:0; font-size:.85em; }
 		.entry { display:flex; align-items:center; gap:.2em; font-size:.8em; width:100%; }
@@ -230,6 +230,7 @@ export class AdsrShaper extends HTMLElement {
 						return
 					}
 					this.drag = undefined
+					this.graph.classList.remove("dragging")
 					this.emit(EVENT_CHANGE)
 				},
 				true
@@ -260,6 +261,7 @@ export class AdsrShaper extends HTMLElement {
 	}
 	disconnectedCallback() {
 		this.drag = undefined
+		this.graph.classList.remove("dragging")
 	}
 	private max(stage: AdsrStage) {
 		if (stage === "sustain") {
@@ -279,6 +281,8 @@ export class AdsrShaper extends HTMLElement {
 		}
 		this.handles.get(stage)!.focus()
 		this.graph.setPointerCapture(event.pointerId)
+		// Capture moves the cursor to the graph; keep the precise crosshair while dragging.
+		this.graph.classList.add("dragging")
 		this.drag = {
 			id: event.pointerId,
 			stage,
