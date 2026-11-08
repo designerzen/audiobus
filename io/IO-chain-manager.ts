@@ -89,6 +89,8 @@ export class IOChainManager extends EventTarget {
 	#transportRunning: boolean | undefined
 	transportHandler?: (type: string) => void
 	controlChangeHandler?: (command: IAudioCommand) => boolean
+	/** Hardware triggers for surface gadgets; consumed messages never reach instruments. */
+	triggerHandler?: (command: IAudioCommand) => boolean
 	clockCommandHandler?: (command: IAudioCommand) => boolean
 	sessionInputHandler?: (chainId: string, command: IAudioCommand) => boolean
 	sessionOutputHandler?: (chainId: string, commands: IAudioCommand[]) => boolean
@@ -795,12 +797,14 @@ export class IOChainManager extends EventTarget {
 			}
 			if (
 				!this.clockCommandHandler &&
+				!this.triggerHandler &&
 				(event.command.type !== CONTROL_CHANGE || !this.controlChangeHandler)
 			) {
 				return false
 			}
 			if (!this.#handledControls.has(event.origin)) {
 				const consumed =
+					this.triggerHandler?.(event.command) ||
 					this.clockCommandHandler?.(event.command) ||
 					(event.command.type === CONTROL_CHANGE &&
 						this.controlChangeHandler?.(event.command)) ||
