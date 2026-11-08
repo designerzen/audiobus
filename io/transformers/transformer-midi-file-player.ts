@@ -9,7 +9,10 @@ import {
 	EVENT_CLICK,
 	EVENT_LOAD,
 	EVENT_ERROR,
-	EVENT_KEY_DOWN
+	EVENT_KEY_DOWN,
+	EVENT_DRAG_OVER,
+	EVENT_DRAG_LEAVE,
+	EVENT_DROP
 } from "../../event-constants"
 
 import type { Timer } from "netronome"
@@ -109,9 +112,9 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 	private cursor = 0
 	private melody: { midi: number; velocity: number }[] = []
 	private heldNotes = new Map<string, IAudioCommand>()
-	private fileControls?: HTMLElement
-	private syncFiles?: () => void
-	private unsubscribeFiles?: () => void
+	private gui?: HTMLElement
+	private sync?: () => void
+	private unsubscribe?: () => void
 	private loadError = ""
 
 	override getControlValue(id: string) {
@@ -122,38 +125,44 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 		return super.getControlValue(id)
 	}
 
+	/**
+	 * One source mode is shown at a time (library, BitMidi search or upload),
+	 * followed by the loaded song and the three playback settings.
+	 */
 	override async createGui(): Promise<HTMLElement> {
-		const gui = await super.createGui()
-		if (this.fileControls) {
-			return gui
+		if (this.gui) {
+			return this.gui
 		}
-		const controls = document.createElement("div")
-		controls.className = "component-control"
-		const label = document.createElement("label")
-		label.textContent = "Local MIDI songs"
-		const select = document.createElement("select")
+		const element = <K extends keyof HTMLElementTagNameMap>(
+			tag: K,
+			className = "",
+			text = ""
+		) => {
+			const node = document.createElement(tag)
+			node.className = className
+			node.textContent = text
+			return node
+		}
+		const option = (text: string, value: string) => {
+			const node = element("option", "", text)
+			node.value = value
+			return node
+		}
+		const field = (text: string, control: HTMLElement) => {
+			const label = element("label", "midi-file-player-field")
+			label.append(element("span", "", text), control)
+			return label
+		}
+		const gui = element("div", "transformer-controls midi-file-player")
+
+		// Library
+		const library = element("div", "midi-file-player-panel")
+		const select = element("select")
 		const songsByFile = new Map<string, { trackIndex?: number; route?: string }>()
 		select.setAttribute("aria-label", "Local MIDI songs")
-		const addSong = (name: string, value: string) => {
-			const option = document.createElement("option")
-			option.textContent = name
-			option.value = value
-			select.add(option)
-		}
-		addSong("Choose a local MIDI song…", "")
-		label.append(select)
-		const upload = document.createElement("button")
-		upload.type = "button"
-		upload.textContent = "Upload MIDI file"
-		const input = document.createElement("input")
-		input.type = "file"
-		input.accept = ".mid,.midi,audio/midi,audio/x-midi"
-		input.hidden = true
-		input.setAttribute("aria-label", "Upload MIDI file")
-		const status = document.createElement("span")
-		status.setAttribute("role", "status")
-		const songLink = document.createElement("a")
-		songLink.textContent = "Open song preset"
+		const addSong = (name: string, value: string) => select.add(option(name, value))
+		addSong("Choose a song…", "")
+		const songLink = element("a", "midi-file-player-link", "Open song preset")
 		songLink.hidden = true
 		select.addEventListener(EVENT_CHANGE, () => {
 			if (select.value) {
@@ -161,35 +170,132 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 				this.setConfig("trackIndex", songsByFile.get(select.value)?.trackIndex ?? -1)
 			}
 		})
-		upload.addEventListener(EVENT_CLICK, () => input.click())
-		input.addEventListener(EVENT_CHANGE, () => {
-			const file = input.files?.[0]
+		library.append(select, songLink)
+
+		// Upload
+		const upload = element("div", "midi-file-player-panel")
+		const drop = element("button", "midi-file-player-drop", "Upload MIDI file")
+		drop.type = "button"
+		const input = element("input")
+		input.type = "file"
+		input.accept = ".mid,.midi,audio/midi,audio/x-midi"
+		input.hidden = true
+		input.setAttribute("aria-label", "Upload MIDI file")
+		const loadFile = (file?: File) => {
 			if (file) {
 				void this.loadMIDIUpload(file).catch((error: Error) => {
-					status.textContent = error.message
+					this.loadError = error.message
+					this.sync?.()
 				})
 			}
+		}
+		drop.addEventListener(EVENT_CLICK, () => input.click())
+		drop.addEventListener(EVENT_DRAG_OVER, (event) => {
+			event.preventDefault()
+			drop.classList.add("is-dragging")
+		})
+		drop.addEventListener(EVENT_DRAG_LEAVE, () => drop.classList.remove("is-dragging"))
+		drop.addEventListener(EVENT_DROP, (event) => {
+			event.preventDefault()
+			drop.classList.remove("is-dragging")
+			loadFile((event as DragEvent).dataTransfer?.files[0])
+		})
+		input.addEventListener(EVENT_CHANGE, () => {
+			loadFile(input.files?.[0])
 			input.value = ""
 		})
-		this.syncFiles = () => {
-			select.value = this.config.midiFileUrl
+		upload.append(drop, input, element("small", "", "or drop a .mid file here"))
+
+		// Source modes
+		const panels = { library, search: this.createBitMidiSearch(), upload }
+		type Mode = keyof typeof panels
+		const tabs = element("div", "midi-file-player-modes")
+		tabs.setAttribute("role", "tablist")
+		tabs.setAttribute("aria-label", "MIDI source")
+		const tabButtons = new Map<Mode, HTMLButtonElement>()
+		const showMode = (mode: Mode) => {
+			for (const [key, tab] of tabButtons) {
+				tab.setAttribute("aria-selected", String(key === mode))
+				panels[key].hidden = key !== mode
+			}
+		}
+		for (const [mode, text] of [
+			["library", "Library"],
+			["search", "Search"],
+			["upload", "Upload"]
+		] as [Mode, string][]) {
+			const tab = element("button", "", text)
+			tab.type = "button"
+			tab.setAttribute("role", "tab")
+			tab.addEventListener(EVENT_CLICK, () => showMode(mode))
+			tabButtons.set(mode, tab)
+			tabs.append(tab)
+		}
+		const url = this.config.midiFileUrl
+		showMode(
+			this.config.searchQuery || /^https?:/.test(url)
+				? "search"
+				: url.startsWith("data:")
+					? "upload"
+					: "library"
+		)
+
+		// Loaded song
+		const status = element("p", "midi-file-player-status")
+		status.setAttribute("role", "status")
+
+		// Settings
+		const playback = element("select")
+		playback.setAttribute("aria-label", "Playback")
+		playback.add(option("Whole file", "file"))
+		playback.add(option("One note per key", "step"))
+		playback.addEventListener(EVENT_CHANGE, () =>
+			this.setControlValue("playbackMode", playback.value)
+		)
+		const track = element("select")
+		track.setAttribute("aria-label", "Melody track")
+		track.title =
+			"Auto chooses a named melody, vocal or lead track, then the first non-drum track with notes."
+		track.addEventListener(EVENT_CHANGE, () =>
+			this.setControlValue("trackIndex", Number(track.value))
+		)
+		const loop = element("input")
+		loop.type = "checkbox"
+		loop.addEventListener(EVENT_CHANGE, () => this.setControlValue("loop", loop.checked ? 1 : 0))
+		const repeat = element("label", "midi-file-player-check")
+		repeat.append(loop, element("span", "", "Repeat"))
+		const settings = element("div", "midi-file-player-settings")
+		settings.append(field("Playback", playback), field("Track", track), repeat)
+
+		this.sync = () => {
+			select.value = songsByFile.has(this.config.midiFileUrl) ? this.config.midiFileUrl : ""
 			const route = songsByFile.get(select.value)?.route
 			songLink.hidden = !route
 			if (route) {
 				songLink.href = `${import.meta.env.BASE_URL}${route}/`
 			}
+			status.classList.toggle("is-error", !!this.loadError)
 			status.textContent = this.isLoading
 				? "Loading MIDI file…"
 				: this.loadError ||
 					(this.midiData
 						? `Loaded: ${this.config.midiFileName || select.selectedOptions[0]?.textContent || this.config.midiFileUrl}`
-						: "Choose a song or upload a MIDI file.")
+						: "No song loaded")
+			playback.value = this.config.playbackMode
+			track.replaceChildren(option("Auto", "-1"))
+			for (const [index, { name, notes }] of (this.midiData?.tracks ?? []).entries()) {
+				if (notes.length) {
+					track.add(option(`${index + 1} · ${name || `Track ${index + 1}`}`, String(index)))
+				}
+			}
+			track.value = String(this.config.trackIndex)
+			track.disabled = !this.midiData
+			loop.checked = !!Number(this.config.loop)
 		}
-		this.unsubscribeFiles = this.subscribeControls(this.syncFiles)
-		controls.append(label, upload, input, status, songLink, this.createBitMidiSearch())
-		gui.prepend(controls)
-		this.fileControls = controls
-		this.syncFiles()
+		this.unsubscribe = this.subscribeControls(this.sync)
+		gui.append(tabs, ...Object.values(panels), status, settings)
+		this.gui = gui
+		this.sync()
 		try {
 			const response = await fetch(`${import.meta.env.BASE_URL}midi/index.json`)
 			if (!response.ok) {
@@ -201,32 +307,38 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 				songsByFile.set(`midi/${song.file}`, song)
 				addSong(song.name, `midi/${song.file}`)
 			}
-			this.syncFiles?.()
+			this.sync?.()
 		} catch {
 			select.disabled = true
-			select.options[0].textContent = "Local song library unavailable"
+			select.options[0].textContent = "Song library unavailable"
 		}
 		return gui
 	}
 
 	private createBitMidiSearch(): HTMLElement {
 		const search = document.createElement("div")
+		search.className = "midi-file-player-panel"
+		const form = document.createElement("div")
+		form.className = "midi-file-player-search"
 		const query = document.createElement("input")
 		query.type = "search"
-		query.placeholder = "Search BitMidi songs…"
+		query.placeholder = "Artist or song…"
 		query.setAttribute("aria-label", "Search BitMidi")
 		const find = document.createElement("button")
 		find.type = "button"
 		find.textContent = "Search"
-		const summary = document.createElement("span")
-		summary.setAttribute("role", "status")
+		form.append(query, find)
+		const summary = document.createElement("small")
+		summary.setAttribute("aria-live", "polite")
 		const results = document.createElement("ul")
+		results.className = "midi-file-player-results"
 		results.setAttribute("aria-label", "BitMidi results")
 		const more = document.createElement("button")
 		more.type = "button"
 		more.textContent = "More results"
 		more.hidden = true
 		const credit = document.createElement("a")
+		credit.className = "midi-file-player-link"
 		credit.href = BITMIDI_ORIGIN
 		credit.target = "_blank"
 		credit.rel = "noopener noreferrer"
@@ -236,7 +348,7 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 		let revision = 0
 		const show = async (next: number) => {
 			const current = ++revision
-			summary.textContent = "Searching BitMidi…"
+			summary.textContent = "Searching…"
 			more.hidden = true
 			try {
 				const found = await searchBitMidi(term, next)
@@ -248,18 +360,23 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 					const item = document.createElement("li")
 					const choose = document.createElement("button")
 					choose.type = "button"
-					choose.textContent = song.name
+					choose.textContent = song.name.replace(/\.midi?$/i, "")
+					choose.title = song.name
 					choose.addEventListener(EVENT_CLICK, () => {
+						results
+							.querySelector("[aria-current]")
+							?.removeAttribute("aria-current")
+						choose.setAttribute("aria-current", "true")
 						this.setConfig("trackIndex", -1)
 						this.setConfig("midiFileUrl", song.downloadUrl)
 						super.setConfig("midiFileName", song.name)
-						this.syncFiles?.()
+						this.sync?.()
 					})
 					item.append(choose)
 					results.append(item)
 				}
 				summary.textContent = found.total
-					? `${found.total} BitMidi matches`
+					? `${found.total} matches`
 					: "No matching or similar BitMidi songs."
 				more.hidden = page + 1 >= found.pageTotal
 			} catch (error) {
@@ -284,7 +401,7 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 			}
 		})
 		more.addEventListener(EVENT_CLICK, () => void show(page + 1))
-		search.append(query, find, summary, results, more, credit)
+		search.append(form, summary, results, more, credit)
 		if (this.config.searchQuery) {
 			query.value = this.config.searchQuery
 			start()
@@ -293,10 +410,10 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 	}
 
 	override destroyGui(): void {
-		this.unsubscribeFiles?.()
-		this.unsubscribeFiles = undefined
-		this.syncFiles = undefined
-		this.fileControls = undefined
+		this.unsubscribe?.()
+		this.unsubscribe = undefined
+		this.sync = undefined
+		this.gui = undefined
 		super.destroyGui()
 	}
 
@@ -307,7 +424,7 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 		const revision = ++this.loadRevision
 		this.isLoading = true
 		this.loadError = ""
-		this.syncFiles?.()
+		this.sync?.()
 		const url = await new Promise<string>((resolve, reject) => {
 			const reader = new FileReader()
 			reader.addEventListener(EVENT_LOAD, () => resolve(String(reader.result)))
@@ -319,7 +436,7 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 			if (revision === this.loadRevision) {
 				this.isLoading = false
 				this.loadError = error.message
-				this.syncFiles?.()
+				this.sync?.()
 			}
 			throw error
 		})
@@ -523,7 +640,7 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 		const revision = ++this.loadRevision
 		this.isLoading = true
 		this.loadError = ""
-		this.syncFiles?.()
+		this.sync?.()
 
 		try {
 			if (!url) {
@@ -570,7 +687,7 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 		} finally {
 			if (revision === this.loadRevision) {
 				this.isLoading = false
-				this.syncFiles?.()
+				this.sync?.()
 				notifyControlSchema(this)
 			}
 		}
