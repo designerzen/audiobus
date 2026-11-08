@@ -1,3 +1,4 @@
+import { withEnvelopeBindings } from "control-surface/envelope-bindings"
 import { createDomGui } from "control-surface/dom"
 import { bindingKey, validateValue, directDescriptor } from "control-surface/model"
 import type {
@@ -413,12 +414,12 @@ export async function componentBindings(
 					}
 				})
 		}))
-	return [
+	return withEnvelopeBindings([
 		...controls,
 		...performanceBindings(
 			component,
 			componentId,
 			component.name ?? descriptor.title ?? "Component"
 		).filter((binding) => !controls.some((control) => control.key === binding.key))
-	]
+	])
 }

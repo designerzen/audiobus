@@ -1,4 +1,5 @@
 import type PolySynth from "./polyphonic.ts"
+import { AdsrShaper, ADSR_STAGES } from "../ui/controls/adsr-shaper/adsr-shaper.ts"
 import {
 	POLYSYNTH_PARAMETERS,
 	POLYSYNTH_WAVEFORMS,
@@ -85,8 +86,22 @@ export function createPolySynthGui(device: PolySynth) {
 	controls.set("shape", waveform)
 	label("Waveform", waveform, oscillator)
 	const envelope = group("Amplitude envelope")
+	const shaper = new AdsrShaper()
+	shaper.style.gridColumn = "1 / -1"
+	for (const stage of ADSR_STAGES) {
+		if (stage !== "sustain") {
+			shaper.setAttribute(`${stage}-max`, String(POLYSYNTH_PARAMETERS[stage].max))
+		}
+	}
+	shaper.addEventListener(EVENT_INPUT, () => device.configure(shaper.value), {
+		signal: events.signal
+	})
+	envelope.append(shaper)
 	const filter = group("Low-pass filter")
 	for (const [key, parameter] of Object.entries(POLYSYNTH_PARAMETERS)) {
+		if (ADSR_STAGES.includes(key as (typeof ADSR_STAGES)[number])) {
+			continue
+		}
 		const input = document.createElement("input")
 		input.type = "range"
 		input.name = key
@@ -123,6 +138,7 @@ export function createPolySynthGui(device: PolySynth) {
 	}
 	element.append(actions)
 	const sync = () => {
+		shaper.value = device.options
 		for (const [key, control] of controls) {
 			control.value = String(device.options[key])
 			if (key === "shape") {
