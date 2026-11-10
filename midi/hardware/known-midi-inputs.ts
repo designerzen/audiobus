@@ -35,8 +35,17 @@ export interface MidiDeviceLoss {
 	name: string
 	chains: string[]
 }
+export interface MidiDeviceArrival {
+	id: string
+	name: string
+	profileId?: string
+	transport: MidiProfileTransport
+}
 interface DiscoveryOptions {
 	onDeviceDisconnected?: (loss: MidiDeviceLoss) => void
+	// Hot-plugged devices are offered to the chains this returns; an empty
+	// list ignores the device until it is next plugged in.
+	onDeviceConnected?: (device: MidiDeviceArrival) => Promise<IOChain[]>
 }
 export interface MidiInputDiscovery {
 	(): Promise<void>
@@ -79,6 +88,8 @@ export async function startKnownMidiInputs(
 	const detached = new Map<string, DetachedInput[]>()
 	const removed = new Map<string, Set<object>>()
 	const managed = new Set<any>()
+	// Ports present at startup join the active chain without asking.
+	let startup: Set<string> | undefined
 	const key = (transport: string, id: string) => JSON.stringify([transport, id])
 	const notifyLoss = (id: string, name: string, active: Set<object>) => {
 		const chains = new Set<string>()
@@ -147,6 +158,15 @@ export async function startKnownMidiInputs(
 		const present = new Set(ports.map((port) => key(port.transport, port.id)))
 		if (stopped) {
 			return
+		}
+		if (startup) {
+			for (const id of startup) {
+				if (!present.has(id)) {
+					startup.delete(id)
+				}
+			}
+		} else {
+			startup = present
 		}
 		// Keep actual disconnect events, even when a rapid reconnect arrives
 		// before an asynchronous profile lookup has finished.
@@ -266,8 +286,27 @@ export async function startKnownMidiInputs(
 				continue
 			}
 			if (!input) {
-				const chain = manager.activeChain
-				if (!chain) {
+				const ask = options.onDeviceConnected && !startup.has(id)
+				const active = manager.activeChain
+				const chosen = ask
+					? await options.onDeviceConnected!({
+							id: port.id,
+							name: port.name,
+							profileId: port.profileId,
+							transport: port.transport
+						})
+					: active
+						? [active]
+						: []
+				if (stopped) {
+					return
+				}
+				if (ask && !chosen.length) {
+					observed.set(id, { input: undefined, routingId: port.routingId, connected: false })
+					continue
+				}
+				const chains = chosen.filter((chain) => !chain.isDestroyed)
+				if (!chains.length) {
 					continue
 				}
 				const { createInputById } = await import("../../io/input-factory")
@@ -280,11 +319,15 @@ export async function startKnownMidiInputs(
 					listenToAllDevices: false,
 					deviceName: port.name
 				})
-				if (stopped || chain.isDestroyed) {
+				if (stopped || chains.every((chain) => chain.isDestroyed)) {
 					await input.destroy?.()
 					continue
 				}
-				manager.addDevice(chain, input, "input")
+				for (const chain of chains) {
+					if (!chain.isDestroyed) {
+						manager.addDevice(chain, input, "input")
+					}
+				}
 			}
 			if (input instanceof InputProfiledMidiDevice) {
 				input.options.transport = port.transport

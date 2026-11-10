@@ -12,105 +12,148 @@ export interface TreeBranch {
 	velocity: number
 	start: number
 	end?: number
-	endY?: number
+	/** Tree height at the moment the note was released. */
+	releaseY?: number
+	/** Where the branch leaves its parent branch, or the trunk. */
 	origin: TreePoint
-	side: number
-	parent?: number
-	spread: number
+	/** The lane the branch grows up vertically once its arc is complete. */
 	targetX: number
-	minimumHeight: number
-	onset: number
-	projectTime: (time: number) => number
-	stem?: TreeBranch
-	forkAt?: number
-	junction?: TreeBranch
+	/** Height of the curved fork. Zero when the branch carries a released stem onwards. */
+	arc: number
+	/** Lowest height the tip may stop at, so short notes stay visible and forks stay attached. */
+	floor: number
+	side: number
+	lane: number
+	/** Whether sub-branches prefer lanes away from (1) or towards (-1) the trunk. */
+	direction: number
+	parent?: TreeBranch
+	/** A chord progression carries the released root of the previous chord onwards. */
+	continues?: TreeBranch
+	continuedBy?: TreeBranch
+	/** The branch that used this lane before, restored if the chord is rearranged. */
+	under?: TreeBranch
 }
 
 export const TREE_SPEED = 42
-export const TREE_FORK_HEIGHT = 14
+/** The trunk's leading shoot stays this far above the branch tips. */
+export const TREE_TRUNK_LEAD = 16
 const GROUP_WINDOW = 0.055
+/** A chord released this recently is still carried onwards by the next chord. */
+const LEGATO = 0.2
 const LANE_WIDTH = 22
+const TRUNK_GAP = 30
+const FORK_STEP = 12
+/** Each onset makes the whole tree surge, so a new chord unfurls at once. */
+const SPURT = 0.3
 
-/** A short, smooth lane change followed by an exactly vertical stem. */
-export function branchPathPoint(branch: TreeBranch, height: number): TreePoint {
-	const u = Math.max(0, Math.min(1, height / TREE_FORK_HEIGHT))
-	const curve = u * u * u * (10 + u * (-15 + 6 * u))
+const arcHeight = (distance: number): number => Math.min(72, 14 + Math.abs(distance) * 0.6)
+export const forkX = (u: number): number => u * u * (3 - 2 * u)
+export const forkY = (u: number): number => {
+	const v = 1 - u
+	return 3 * v * v * u * 0.3 + 3 * v * u * u * 0.35 + u * u * u
+}
+
+/** A point on the fork: it leaves the parent along its direction, swings out, and
+ * arrives in its lane already vertical. There are no corners anywhere on the path. */
+export function branchArcPoint(branch: TreeBranch, u: number): TreePoint {
 	return {
-		x: branch.origin.x + (branch.targetX - branch.origin.x) * curve,
-		y: branch.origin.y + Math.max(0, height)
+		x: branch.origin.x + (branch.targetX - branch.origin.x) * forkX(u),
+		y: branch.origin.y + branch.arc * forkY(u)
 	}
 }
-export function branchHeight(branch: TreeBranch, time: number): number {
-	return Math.max(
-		branch.minimumHeight,
-		(branch.end !== undefined && time >= branch.end
-			? (branch.endY ?? branch.projectTime(branch.end))
-			: branch.projectTime(time)) - branch.origin.y
-	)
+export function branchPathPoint(branch: TreeBranch, height: number): TreePoint {
+	if (height >= branch.arc) {
+		return { x: branch.targetX, y: branch.origin.y + Math.max(0, height) }
+	}
+	let low = 0,
+		high = 1
+	for (let step = 0; step < 20; step++) {
+		const middle = (low + high) / 2
+		if (forkY(middle) * branch.arc < height) {
+			low = middle
+		} else {
+			high = middle
+		}
+	}
+	return branchArcPoint(branch, Math.max(0, height) <= 0 ? 0 : (low + high) / 2)
 }
-export function branchPoint(branch: TreeBranch, time: number): TreePoint {
-	return branchPathPoint(branch, branchHeight(branch, time))
+/** The height a branch stops at. A held branch has no limit yet. */
+export function branchLimit(branch: TreeBranch): number {
+	return branch.end === undefined ? Infinity : Math.max(branch.releaseY ?? 0, branch.floor)
+}
+export function leafLength(branch: TreeBranch): number {
+	return 10 + (branch.velocity / 127) * 14
 }
 
 export class TreeModel {
 	readonly held = new Map<string, TreeBranch>()
-	private history: TreeBranch[] = []
-	get branches(): TreeBranch[] {
-		this.layout()
-		return this.history
-	}
+	readonly branches: TreeBranch[] = []
 	started?: number
-	trunkTop = 0
 	harmony?: HarmonicState
 	private serial = 0
 	private side = -1
+	private sideBefore = -1
 	private group: TreeBranch[] = []
 	private groupAt = -Infinity
+	private groupY = 0
+	private groupOffset = 0
+	private root?: TreeBranch
+	private previous: TreeBranch[] = []
 	private previousRoot?: TreeBranch
-	private previousChord = false
-	private attachment?: TreeBranch
-	private groupSpacing = 1
-	private dirty = false
-	private rows: Array<{ at: number; y: number }> = []
+	/** The newest branch in each lane, indexed by lane number, for the left and right side. */
+	private lanes: Array<Array<TreeBranch | undefined>> = [[], []]
+	private spurtAt: number[] = []
+	private spurtSize: number[] = []
+	private spurtSum: number[] = []
+
+	/** Height of the growing tips: steady growth plus a surge for every onset. */
 	heightAt = (time: number): number => {
-		let low = 0,
-			high = this.rows.length
-		while (low < high) {
-			const middle = (low + high) >>> 1
-			if (this.rows[middle].at <= time) {
-				low = middle + 1
-			} else {
-				high = middle
+		if (this.started === undefined) {
+			return 0
+		}
+		let y = Math.max(0, time - this.started) * TREE_SPEED,
+			index = this.spurtAt.length - 1
+		for (; index >= 0 && time - this.spurtAt[index] < SPURT; index--) {
+			const progress = (time - this.spurtAt[index]) / SPURT
+			if (progress > 0) {
+				y += this.spurtSize[index] * (1 - (1 - progress) ** 3)
 			}
 		}
-		const row = this.rows[low - 1]
-		return row ? row.y + Math.max(0, time - row.at) * TREE_SPEED : 0
+		return index < 0 ? y : y + this.spurtSum[index] + this.spurtSize[index]
+	}
+	tipY(branch: TreeBranch, time: number): number {
+		return Math.max(branch.origin.y, Math.min(branchLimit(branch), this.heightAt(time)))
+	}
+	tip(branch: TreeBranch, time: number): TreePoint {
+		return branchPathPoint(branch, this.tipY(branch, time) - branch.origin.y)
 	}
 
 	noteOn(note: number, velocity: number, channel: number, now: number): void {
 		if (!Number.isInteger(note) || note < 0 || note > 127 || !Number.isFinite(velocity)) {
 			return
 		}
+		this.noteOff(note, channel, now)
 		if (velocity <= 0) {
-			this.noteOff(note, channel, now)
 			return
 		}
 		const key = `${channel}:${note}`
-		this.noteOff(note, channel, now)
 		this.started ??= now
-		if (now - this.groupAt > GROUP_WINDOW) {
+		if (
+			now - this.groupAt > GROUP_WINDOW ||
+			!this.group.some((branch) => branch.end === undefined)
+		) {
 			const gap = Number.isFinite(this.groupAt) ? Math.max(0, now - this.groupAt) : 0.25
-			this.groupSpacing = 0.72 + 0.28 * (1 - Math.exp(-gap / 0.4))
-			this.previousRoot = this.group.find((branch) => branch.parent === this.attachment?.id)
-			this.previousChord = this.group.length > 1
+			// Onsets close together sit slightly tighter than those after a pause.
+			this.groupOffset = (0.5 - Math.exp(-gap / 0.4)) * 6
+			this.previous = this.group
+			this.previousRoot = this.root
 			this.group = []
 			this.groupAt = now
-			this.attachment = undefined
-		}
-		this.group = this.group.filter((branch) => branch.end === undefined)
-		if (!this.group.length) {
-			this.groupAt = now
-			this.attachment = undefined
+			this.groupY = this.heightAt(now)
+			this.sideBefore = this.side
+			this.spurtSum.push((this.spurtSum.at(-1) ?? 0) + (this.spurtSize.at(-1) ?? 0))
+			this.spurtAt.push(now)
+			this.spurtSize.push(0)
 		}
 		const branch: TreeBranch = {
 			id: this.serial++,
@@ -118,215 +161,230 @@ export class TreeModel {
 			note,
 			velocity: Math.min(127, velocity),
 			start: now,
-			origin: { x: 0, y: (now - this.started) * TREE_SPEED },
-			side: this.side,
-			spread: (40 + (note % 12) * 1.5) * this.groupSpacing,
+			origin: { x: 0, y: this.groupY },
 			targetX: 0,
-			minimumHeight: TREE_FORK_HEIGHT + 8,
-			onset: this.groupAt,
-			projectTime: this.heightAt
+			arc: 0,
+			floor: 0,
+			side: this.side,
+			lane: 0,
+			direction: 1
 		}
 		this.group.push(branch)
 		this.held.set(key, branch)
-		this.history.push(branch)
-		this.arrangeGroup()
-		this.dirty = true
+		this.branches.push(branch)
+		this.arrange()
 	}
 
-	private arrangeGroup(): void {
+	private lanesOf(side: number): Array<TreeBranch | undefined> {
+		return this.lanes[side < 0 ? 0 : 1]
+	}
+	/** The height above which a lane is free again, leaf included. */
+	private top(branch?: TreeBranch): number {
+		return branch ? branchLimit(branch) + leafLength(branch) + 6 : -Infinity
+	}
+	private occupy(branch: TreeBranch, side: number, lane: number): void {
+		const lanes = this.lanesOf(side)
+		branch.side = side
+		branch.lane = lane
+		branch.under = lanes[lane]
+		lanes[lane] = branch
+	}
+	private laneX(side: number, lane: number): number {
+		return side * (TRUNK_GAP + (lane - 1) * LANE_WIDTH + this.groupOffset)
+	}
+
+	private live(side: number, lane: number): boolean {
+		const branch = this.lanesOf(side)[lane]
+		return branch !== undefined && branch.end === undefined
+	}
+	/** The growing branch furthest from the trunk: nothing beyond it can be crossed. */
+	private outermost(side: number): TreeBranch | undefined {
+		const lanes = this.lanesOf(side)
+		for (let lane = lanes.length - 1; lane >= 1; lane--) {
+			if (this.live(side, lane)) {
+				return lanes[lane]
+			}
+		}
+	}
+	/** Fork a branch from its parent into a lane, no lower than `base` and clear
+	 * of the leaf of whatever grew in that lane before. */
+	private fork(branch: TreeBranch, parent: TreeBranch, lane: number, base: number): number {
+		const side = parent.side,
+			targetX = this.laneX(side, lane),
+			arc = arcHeight(targetX - parent.targetX)
+		const y = Math.max(
+			base,
+			parent.origin.y + (parent.arc ? parent.arc * 0.7 : 6),
+			this.top(this.lanesOf(side)[lane]) - arc / 2
+		)
+		branch.parent = parent
+		branch.origin = { x: branchPathPoint(parent, y - parent.origin.y).x, y }
+		branch.targetX = targetX
+		branch.arc = arc
+		branch.floor = y + arc
+		parent.floor = Math.max(parent.floor, y + 8)
+		this.occupy(branch, side, lane)
+		return y
+	}
+
+	/** Lay out the current chord. Notes of one chord arrive one at a time, so the
+	 * chord is laid out again from scratch whenever another note joins it. */
+	private arrange(): void {
+		const group = this.group,
+			y = this.groupY
+		for (const branch of group) {
+			const lanes = this.lanesOf(branch.side)
+			if (lanes[branch.lane] === branch) {
+				lanes[branch.lane] = branch.under
+			}
+			if (branch.continues) {
+				branch.continues.continuedBy = undefined
+			}
+			branch.under = branch.continues = branch.parent = undefined
+		}
 		const rootPitch =
-			describeChord(this.group.map((branch) => branch.note)).root ?? this.harmony?.root
-		const root =
-			this.group.find((branch) => branch.note % 12 === rootPitch) ??
-			this.group.reduce((a, b) => (a.note < b.note ? a : b))
-		if (this.group.length === 1) {
-			this.side *= -1
-		}
-		if (
-			this.group.length > 1 &&
-			this.previousChord &&
-			this.previousRoot?.end === undefined &&
-			this.previousRoot &&
-			!this.attachment
-		) {
-			this.side *= -1
-			this.attachment = this.previousRoot
-		}
-		// An existing fork may remain connected after its parent ends, but a new
-		// root must never be attached to that closed parent.
-		if (this.attachment?.end !== undefined && root.parent !== this.attachment.id) {
-			this.attachment = undefined
-		}
-		root.parent = this.attachment?.id
-		root.junction = this.attachment
-		root.stem = undefined
-		root.forkAt = undefined
-		root.origin = {
-			x: 0,
-			y: this.attachment
-				? branchPoint(this.attachment, this.groupAt).y
-				: (root.start - this.started!) * TREE_SPEED
-		}
-		root.side = this.attachment?.side ?? this.side
-		let index = 0
-		for (const branch of this.group) {
-			if (branch === root) {
-				continue
+			describeChord(group.map((branch) => branch.note)).root ?? this.harmony?.root
+		const root = (this.root =
+			group.find((branch) => branch.note % 12 === rootPitch) ??
+			group.reduce((a, b) => (a.note < b.note ? a : b)))
+		const progression = group.length > 1 && this.previous.length > 1
+		const held = this.previous.filter((branch) => branch.end === undefined)
+		const last = this.previousRoot
+		this.side = this.sideBefore
+		root.direction = 1
+		if (progression && held.length) {
+			// The previous chord still sounds: fork from it, weaving back into the
+			// lanes of older, finished chords when there is room, else outwards.
+			const side = held[0].side
+			const inner = held.reduce((a, b) => (a.lane < b.lane ? a : b))
+			let inward = inner.lane - group.length >= 1
+			for (let lane = inner.lane - 1; inward && lane >= inner.lane - group.length; lane--) {
+				inward = !this.live(side, lane)
 			}
-			const offset = 12 + index++ * (12 + 2 * this.groupSpacing)
-			branch.parent = root.id
-			branch.stem = root
-			branch.junction = undefined
-			branch.forkAt = root.start + offset / TREE_SPEED
-			branch.origin = { x: 0, y: root.origin.y + offset }
-			branch.side = root.side
+			const parent = inward ? inner : this.outermost(side)!
+			root.direction = inward ? -1 : 1
+			this.fork(root, parent, parent.lane + root.direction, y - 6)
+		} else if (
+			progression &&
+			last?.end !== undefined &&
+			this.groupAt - last.end <= LEGATO &&
+			this.lanesOf(last.side)[last.lane] === last
+		) {
+			// The previous chord has just been released: its root stem carries on.
+			last.continuedBy = root
+			root.continues = last
+			root.direction = last.direction
+			root.origin = { x: last.targetX, y: branchLimit(last) }
+			root.targetX = last.targetX
+			root.arc = 0
+			root.floor = root.origin.y + 8
+			this.occupy(root, last.side, last.lane)
+		} else {
+			// A new bough from the trunk, on alternating sides. When a growing
+			// branch is in the way on both sides, fork from the outermost one
+			// instead: a new branch never crosses one that is still growing.
+			const preferred = -this.sideBefore
+			const reach = (side: number) =>
+				this.top(this.lanesOf(side)[1]) - arcHeight(this.laneX(side, 1)) / 2
+			let side = [preferred, -preferred].find((side) => reach(side) <= y + 12)
+			if (side === undefined) {
+				const a = this.outermost(preferred),
+					b = this.outermost(-preferred)
+				const parent = a && b ? (a.lane <= b.lane ? a : b) : (a ?? b)
+				if (parent) {
+					this.side = parent.side
+					this.fork(root, parent, parent.lane + 1, y - 6)
+				} else {
+					side = preferred
+				}
+			}
+			if (side !== undefined) {
+				this.side = side
+				root.origin = { x: 0, y: Math.max(y, Math.min(y + 12, reach(side))) }
+				root.targetX = this.laneX(side, 1)
+				root.arc = arcHeight(root.targetX)
+				root.floor = root.origin.y + root.arc
+				this.occupy(root, side, 1)
+			}
 		}
+
+		// Sub-branches take the free lanes next to their root. The furthest forks
+		// lowest, so no fork ever has to cross a sibling.
+		const children = group.filter((branch) => branch !== root).sort((a, b) => a.note - b.note)
+		const side = root.side,
+			chosen: number[] = []
+		for (const direction of [root.direction, -root.direction]) {
+			for (
+				let lane = root.lane + direction;
+				chosen.length < children.length && lane >= 1 && !this.live(side, lane);
+				lane += direction
+			) {
+				chosen.push(lane)
+			}
+		}
+		const next = [0, 0]
+		const order = chosen
+			.map((_, index) => index)
+			.sort((a, b) => Math.abs(chosen[b] - root.lane) - Math.abs(chosen[a] - root.lane))
+		for (const index of order) {
+			const outward = Number(chosen[index] > root.lane)
+			next[outward] =
+				this.fork(children[index], root, chosen[index], next[outward]) + FORK_STEP
+		}
+		// With no free lane left beside the root, the rest fork beyond whatever
+		// is still growing on this side.
+		for (const child of children.slice(chosen.length)) {
+			const parent = this.outermost(side)
+			this.fork(
+				child,
+				parent ?? root,
+				parent ? parent.lane + 1 : this.lanesOf(side).length,
+				y - 6
+			)
+		}
+		let highest = 0
+		for (const branch of group) {
+			branch.direction = root.direction
+			highest = Math.max(highest, branch.floor)
+		}
+		const spurt = this.spurtSize.length - 1
+		this.spurtSize[spurt] = Math.max(this.spurtSize[spurt], 14, (highest - y) * 0.7)
 	}
 
-	/** Pack non-overlapping time intervals into reusable Git-style lane blocks.
-	 * Within a family, newer forks sit inside older forks, so their short
-	 * connectors never cut across an existing vertical stem. No work per frame
-	 * is needed until notes or releases change the topology. */
-	layout(): void {
-		if (!this.dirty) {
-			return
-		}
-		// Give every start/release a graph row. Simultaneous chord notes share
-		// their time but receive separate fork rows, with the detected root first.
-		// Real time still contributes to spacing and to growth between events.
-		const events = this.history.flatMap((branch) =>
-			branch.end === undefined
-				? [{ branch, at: branch.onset, on: true }]
-				: [
-						{ branch, at: branch.onset, on: true },
-						{ branch, at: branch.end, on: false }
-					]
-		)
-		events.sort(
-			(a, b) =>
-				a.at - b.at ||
-				Number(a.on) - Number(b.on) ||
-				Number(!!a.branch.stem) - Number(!!b.branch.stem) ||
-				a.branch.id - b.branch.id
-		)
-		this.rows = []
-		let y = -26,
-			previous = this.started ?? 0
-		for (const event of events) {
-			y += 26 + Math.max(0, event.at - previous) * TREE_SPEED
-			if (event.on) {
-				event.branch.origin.y = y
-			} else {
-				event.branch.endY = y
-			}
-			const last = this.rows.at(-1)
-			if (last?.at === event.at) {
-				last.y = y
-			} else {
-				this.rows.push({ at: event.at, y })
-			}
-			previous = event.at
-		}
-		const children = new Map<number, TreeBranch[]>()
-		const roots: TreeBranch[] = []
-		for (const branch of this.history) {
-			if (branch.parent === undefined) {
-				roots.push(branch)
-			} else {
-				const siblings = children.get(branch.parent) ?? []
-				siblings.push(branch)
-				children.set(branch.parent, siblings)
-			}
-		}
-		for (const siblings of children.values()) {
-			siblings.sort((a, b) => b.origin.y - a.origin.y || b.id - a.id)
-		}
-		const floors = new Map<number, number[]>([
-			[-1, []],
-			[1, []]
-		])
-		this.trunkTop = 0
-		for (const root of roots) {
-			this.trunkTop = Math.max(this.trunkTop, root.origin.y)
-		}
-		for (let i = roots.length - 1; i >= 0; i--) {
-			const root = roots[i],
-				family: TreeBranch[] = [],
-				stack = [root]
-			let top = root.origin.y
-			while (stack.length) {
-				const branch = stack.pop()!
-				family.push(branch)
-				top =
-					branch.end === undefined
-						? Infinity
-						: Math.max(top, branchPoint(branch, branch.end).y)
-				const descendants = children.get(branch.id) ?? []
-				for (let child = descendants.length - 1; child >= 0; child--) {
-					stack.push(descendants[child])
-				}
-			}
-			const columns = floors.get(root.side)!
-			let column = 0
-			for (;;) {
-				let conflict = -1
-				for (let offset = 0; offset < family.length; offset++) {
-					if (
-						columns[column + offset] !== undefined &&
-						top + 12 >= columns[column + offset]
-					) {
-						conflict = column + offset
-						break
-					}
-				}
-				if (conflict < 0) {
-					break
-				}
-				column = conflict + 1
-			}
-			for (let offset = 0; offset < family.length; offset++) {
-				const branch = family[offset]
-				branch.targetX =
-					root.side *
-					((column + offset + 1) * LANE_WIDTH +
-						(branch.spread / (40 + (branch.note % 12) * 1.5) - 0.72) * 10)
-				branch.origin.x = (branch.stem ?? branch.junction)?.targetX ?? 0
-				branch.side = root.side
-				columns[column + offset] = root.origin.y
-			}
-		}
-		this.dirty = false
-	}
 	noteOff(note: number, channel: number, now: number): void {
 		const key = `${channel}:${note}`,
 			branch = this.held.get(key)
 		if (branch) {
-			branch.end = Math.max(branch.start, now)
+			this.release(branch, now)
 			this.held.delete(key)
-			this.dirty = true
 		}
 	}
 	allNotesOff(now: number): void {
 		for (const branch of this.held.values()) {
-			branch.end = Math.max(branch.start, now)
+			this.release(branch, now)
 		}
 		this.held.clear()
-		this.dirty = true
+	}
+	private release(branch: TreeBranch, now: number): void {
+		branch.end = Math.max(branch.start, now)
+		branch.releaseY = this.heightAt(branch.end)
 	}
 	reset(): void {
-		this.history = []
+		this.branches.length = 0
 		this.held.clear()
 		this.started = undefined
 		this.serial = 0
 		this.group = []
 		this.groupAt = -Infinity
+		this.groupY = 0
+		this.groupOffset = 0
+		this.root = undefined
+		this.previous = []
 		this.previousRoot = undefined
-		this.attachment = undefined
-		this.previousChord = false
-		this.side = -1
-		this.groupSpacing = 1
-		this.trunkTop = 0
-		this.rows = []
-		this.dirty = false
+		this.side = this.sideBefore = -1
+		this.lanes = [[], []]
+		this.spurtAt = []
+		this.spurtSize = []
+		this.spurtSum = []
 	}
 }

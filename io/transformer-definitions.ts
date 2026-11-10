@@ -24,6 +24,16 @@ export interface TransformerDefinition extends DeviceClassification<"transformer
 }
 
 export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
+	[TRANSFORMER_TYPE.ID_GROOVE]: {
+		id: TRANSFORMER_TYPE.ID_GROOVE,
+		name: "Groove",
+		description:
+			"Reshape input timing with swing, triplet shuffle and curved groove functions.",
+		icon: "/icons/transformer-groove.svg",
+		category: "Timing",
+		type: "transformer",
+		subtype: "timing"
+	},
 	[TRANSFORMER_TYPE.ID_PROGRESSION_STEPPER]: {
 		id: TRANSFORMER_TYPE.ID_PROGRESSION_STEPPER,
 		name: "Progression Stepper",

@@ -6,11 +6,11 @@ import { NOTE_ON, NOTE_OFF } from "../../commands"
 import { action, devicePanel, numberControl } from "../device-controls"
 import {
 	TreeModel,
-	TREE_SPEED,
-	TREE_FORK_HEIGHT,
-	branchPoint,
-	branchPathPoint,
-	branchHeight,
+	TREE_TRUNK_LEAD,
+	branchLimit,
+	forkX,
+	forkY,
+	leafLength,
 	type TreeBranch
 } from "./tree-model"
 import {
@@ -100,7 +100,7 @@ export default class OutputSongTree implements IAudioOutput {
 		this.viewMode = "manual"
 		this.zoom = Math.max(1, this.scale)
 		this.cameraX = branch.targetX
-		this.cameraY = branch.origin.y + branchHeight(branch, this.now) / 2
+		this.cameraY = (branch.origin.y + this.model.tipY(branch, this.now)) / 2
 		if (this.branchControl) {
 			this.branchControl.value = String(selected + 1)
 		}
@@ -309,33 +309,29 @@ export default class OutputSongTree implements IAudioOutput {
 		this.count = 0
 		this.submittedBatch = false
 		this.updateFlash(now)
-		this.model.layout()
 		const elapsed = now - (this.lastFrame || now)
 		const dt = Math.max(0, Math.min(0.1, elapsed))
 		this.lastFrame = now
-		const trunk =
-			this.model.started === undefined
-				? 0
-				: Math.max(2, this.model.trunkTop, this.model.heightAt(now))
+		const growth = this.model.heightAt(now)
+		const trunk = this.model.started === undefined ? 0 : growth + TREE_TRUNK_LEAD
 		let top = trunk,
-			topX = 0
+			minX = 0,
+			maxX = 0
 		for (const branch of this.model.held.values()) {
-			const tip = branchPoint(branch, now)
-			if (tip.y > top) {
-				top = tip.y
-				topX = tip.x
-			}
+			minX = Math.min(minX, branch.targetX)
+			maxX = Math.max(maxX, branch.targetX)
 		}
+		const topX = (minX + maxX) / 2
 		const follow = elapsed > 0.5 ? 1 : 1 - Math.exp(-dt * 6)
 		this.scale = this.zoom
 		if (this.viewMode === "fit" && this.model.started !== undefined) {
-			let minX = -16,
-				maxX = 16
+			minX = -16
+			maxX = 16
 			for (const branch of this.model.branches) {
-				minX = Math.min(minX, branch.origin.x - 8, branch.targetX - 8)
-				maxX = Math.max(maxX, branch.origin.x + 8, branch.targetX + 8)
-				top = Math.max(top, branchPoint(branch, now).y)
+				minX = Math.min(minX, branch.targetX - 12)
+				maxX = Math.max(maxX, branch.targetX + 12)
 			}
+			top += 8
 			this.scale = Math.min(
 				1,
 				(this.width - 48) / (maxX - minX),
@@ -386,10 +382,10 @@ export default class OutputSongTree implements IAudioOutput {
 		} else {
 			this.segment(
 				center,
-				Math.min(this.height + 10, ground - Math.min(5, trunk / 2) * scale),
+				Math.min(this.height + 10, ground - Math.min(6, trunk / 2) * scale),
 				center,
 				ground - trunk * scale,
-				5 * scale,
+				6 * scale,
 				this.litBark
 			)
 			// A cubic flare meets the ground broadly and eases into the straight trunk.
@@ -398,7 +394,7 @@ export default class OutputSongTree implements IAudioOutput {
 			if (ground >= -24 && ground - flareHeight * scale <= this.height + 24) {
 				for (let step = 0; step < flareSteps; step++) {
 					const t = (step + 0.5) / flareSteps
-					const radius = (5 + 14 * (1 - t) ** 3) * scale
+					const radius = (6 + 14 * (1 - t) ** 3) * scale
 					const y = ground - t * flareHeight * scale
 					this.segment(
 						center - radius,
@@ -412,12 +408,13 @@ export default class OutputSongTree implements IAudioOutput {
 			}
 			// Cull outside the view and reduce curve detail at distant zoom levels.
 			// Flush bounded batches rather than dropping older parts of the song.
-			for (let index = this.model.branches.length - 1; index >= 0; index--) {
-				const branch = this.model.branches[index],
-					end = branch.end ?? now
-				const tip = branchPoint(branch, end)
-				const origin = branch.origin
-				if (ground - tip.y * scale > this.height + 24 || ground - origin.y * scale < -24) {
+			const low = (ground - this.height - 24) / scale,
+				high = (ground + 24) / scale
+			for (const branch of this.model.branches) {
+				const limit = branchLimit(branch),
+					tip = Math.min(limit, growth),
+					origin = branch.origin
+				if (tip <= origin.y || origin.y > high || tip + 24 < low) {
 					continue
 				}
 				const color: Color =
@@ -425,44 +422,70 @@ export default class OutputSongTree implements IAudioOutput {
 							? [1, 1, 1]
 							: this.litColors[branch.note % 12],
 					radius = 0.8 + (branch.velocity / 127) * 4
-				const parent = branch.stem ?? branch.junction
-				const collar = parent ? (0.8 + (parent.velocity / 127) * 4) * 0.95 : 4.75
-				const first = Math.max(0, (ground - this.height - 24) / scale - origin.y)
-				const last = Math.min(branchHeight(branch, end), (ground + 24) / scale - origin.y)
-				const forkEnd = Math.min(last, TREE_FORK_HEIGHT)
-				const curveSteps =
-					first < forkEnd
-						? Math.max(
-								4,
-								Math.min(
-									24,
-									Math.ceil((Math.abs(branch.targetX - origin.x) * scale) / 3)
-								)
-							)
-						: 0
-				const heights = Array.from(
-					{ length: curveSteps },
-					(_, step) => first + ((forkEnd - first) * (step + 1)) / curveSteps
-				)
-				if (last >= first && last > forkEnd) {
-					heights.push(last)
+				// Start as wide as the parent and ease into the note's own width:
+				// the fork fills in like the crotch of a real branch, not a butt joint.
+				const collar = branch.parent ? 0.8 + (branch.parent.velocity / 127) * 4 : 6
+				const reach = branch.targetX - origin.x,
+					arcTop = origin.y + branch.arc
+				let x = origin.x,
+					y = origin.y
+				if (branch.arc && arcTop >= low) {
+					const steps = Math.max(
+						4,
+						Math.min(24, Math.ceil((Math.max(Math.abs(reach), branch.arc) * scale) / 3))
+					)
+					for (let step = 1; step <= steps && y < tip; step++) {
+						const u = step / steps
+						let nextX = origin.x + reach * forkX(u),
+							nextY = origin.y + branch.arc * forkY(u)
+						if (nextY > tip) {
+							nextX = x + ((nextX - x) * (tip - y)) / (nextY - y)
+							nextY = tip
+						}
+						this.segment(
+							center + x * scale,
+							ground - y * scale,
+							center + nextX * scale,
+							ground - nextY * scale,
+							(radius + (collar - radius) * (1 - u) ** 2) * scale,
+							color
+						)
+						x = nextX
+						y = nextY
+					}
+				} else {
+					x = branch.targetX
+					y = arcTop
 				}
-				let previous = branchPathPoint(branch, first)
-				for (const height of heights) {
-					const point = branchPathPoint(branch, height)
-					// Match the parent width and tangent at the fork, then ease into
-					// the note's own width: the silhouette has a rounded crotch, not a butt joint.
-					const age = height / TREE_SPEED
-					const joinRadius = radius + (collar - radius) * Math.exp(-((age / 0.45) ** 2))
+				if (tip > arcTop) {
+					x = branch.targetX
 					this.segment(
-						center + previous.x * scale,
-						ground - previous.y * scale,
-						center + point.x * scale,
-						ground - point.y * scale,
-						joinRadius * scale,
+						center + x * scale,
+						ground - Math.max(arcTop, low) * scale,
+						center + x * scale,
+						ground - Math.min(tip, high) * scale,
+						radius * scale,
 						color
 					)
-					previous = point
+				}
+				// A released note unfurls a leaf at its tip. A stem carried onwards
+				// by the next chord of a progression has no tip to put one on.
+				if (branch.end !== undefined && !branch.continuedBy && tip >= limit) {
+					const open = 1 - (1 - Math.max(0, Math.min(1, (now - branch.end) / 0.3))) ** 3
+					const length = leafLength(branch) * open * scale
+					if (length > 0.5) {
+						const leafX = center + x * scale,
+							leafY = ground - tip * scale
+						this.segment(
+							leafX,
+							leafY,
+							leafX + branch.side * length * 0.16,
+							leafY - length,
+							length * 0.3,
+							color,
+							true
+						)
+					}
 				}
 			}
 		}
@@ -514,7 +537,7 @@ export default class OutputSongTree implements IAudioOutput {
 				canvas.setAttribute("role", "img")
 				canvas.setAttribute(
 					"aria-label",
-					"Song tree: separate vertical note lanes with curved forks. Drag or use arrow keys to pan. Use branch controls to inspect any note."
+					"Song tree: each note is a branch that arcs from the trunk and grows upwards, ending in a leaf. Drag or use arrow keys to pan. Use branch controls to inspect any note."
 				)
 				return canvas
 			}, skip)
@@ -534,7 +557,7 @@ export default class OutputSongTree implements IAudioOutput {
 			}
 			this.resize()
 			if (this.status) {
-				this.status.textContent = `Vertical note lanes · Release stops growth · ${this.renderer.backend}`
+				this.status.textContent = `Held notes grow · Released notes leaf · ${this.renderer.backend}`
 			}
 		} catch {
 			if (generation === this.generation && this.status) {
