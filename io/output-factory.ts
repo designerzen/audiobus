@@ -29,6 +29,8 @@ export interface OutputFactory extends DeviceClassification {
 const loadSupportingLibrary = async (type: string) => {
 	// Create and return instance based on type
 	switch (type) {
+		case OUTPUT_TYPES.CHROMATIC_SAMPLER:
+			return await import("./outputs/output-chromatic-sampler")
 		case OUTPUT_TYPES.SYNTH_303:
 			return await import("./outputs/output-303")
 		case OUTPUT_TYPES.DRUM_KIT:
@@ -193,6 +195,11 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
  * Uses lazy loading for better performance
  */
 export const OUTPUT_FACTORIES: OutputFactory[] = [
+	{
+		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.CHROMATIC_SAMPLER],
+		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.CHROMATIC_SAMPLER, options)
+	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.SYNTH_303],
 		isAvailable: () => typeof AudioWorkletNode !== "undefined",

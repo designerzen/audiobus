@@ -8,6 +8,7 @@ export const NOTE_MONITOR = "note-monitor" as const
 export const SONG_TREE = "song-tree" as const
 export const SION = "sion" as const
 export const SAMPLE_PLAYER = "sample-player" as const
+export const AUDIO_WORKLET_SAMPLER = "audio-worklet-sampler" as const
 export const HARMONY_SAMPLER = "harmony-sampler" as const
 export const EVENT_RECORDER = "event-recorder" as const
 export const OSC = "osc" as const
@@ -45,6 +46,7 @@ export type OutputId =
 	| typeof NOTE_MONITOR
 	| typeof SONG_TREE
 	| typeof SAMPLE_PLAYER
+	| typeof AUDIO_WORKLET_SAMPLER
 	| typeof HARMONY_SAMPLER
 	| typeof EVENT_RECORDER
 	| typeof OSC

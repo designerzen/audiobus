@@ -27,6 +27,16 @@ export interface OutputDefinition extends DeviceClassification {
 }
 
 export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
+	[OUTPUT_TYPES.CHROMATIC_SAMPLER]: {
+		id: OUTPUT_TYPES.CHROMATIC_SAMPLER,
+		name: "ChromaticSampler",
+		description:
+			"Four sample layers per key with trim, looping, ADSR, filters and velocity crossfades",
+		type: "engine",
+		subtype: "instrument",
+		category: "Audio",
+		icon: "/icons/output-recorder.svg"
+	},
 	[OUTPUT_TYPES.SONG_TREE]: {
 		id: OUTPUT_TYPES.SONG_TREE,
 		name: "Song Tree",
