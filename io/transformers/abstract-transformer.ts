@@ -8,7 +8,7 @@ import {
 	subscribeControls
 } from "../component-ui"
 import { createDomGui } from "control-surface/dom"
-import type { ControlValue } from "control-surface/types"
+import type { ControlChoice, ControlValue } from "control-surface/types"
 
 export interface TransformerConfig {
 	available?: boolean
@@ -19,6 +19,16 @@ const DEFAULT_TRANSFORMER_OPTIONS: TransformerConfig = {
 	available: false,
 	enabled: true
 }
+
+/** Two choices meaning off and on read as one switch rather than a pair of tiles. */
+const isSwitchChoices = (choices?: ControlChoice[]): boolean =>
+	choices?.length === 2 &&
+	choices.every(
+		({ label, value }) =>
+			(value === 0 && /^(0|no|off)$/i.test(label)) ||
+			(value === 1 && /^(1|yes|on)$/i.test(label))
+	) &&
+	choices[0].value !== choices[1].value
 
 export abstract class Transformer<Config = TransformerConfig> implements ITransformer {
 	static ID: number = 0
@@ -41,10 +51,16 @@ export abstract class Transformer<Config = TransformerConfig> implements ITransf
 		return []
 	}
 	private generatedGui?: ReturnType<typeof createDomGui>
+	private switches = new Set<string>()
 	getUiDescriptor() {
 		const descriptor = fieldsDescriptor(this.fields)
 		for (const control of descriptor.controls) {
-			if (control.id === "enabled" && typeof this.config.enabled === "boolean") {
+			if (
+				control.id === "enabled"
+					? typeof this.config.enabled === "boolean"
+					: isSwitchChoices(control.choices)
+			) {
+				this.switches.add(control.id)
 				control.widget = "toggle"
 				control.choices = undefined
 				control.defaultValue = Boolean(control.defaultValue)
@@ -53,10 +69,16 @@ export abstract class Transformer<Config = TransformerConfig> implements ITransf
 		return descriptor
 	}
 	getControlValue(id: string): ControlValue | undefined {
-		return this.config[id] as ControlValue | undefined
+		const value = this.config[id] as ControlValue | undefined
+		return this.switches.has(id) ? Boolean(Number(value)) : value
 	}
 	setControlValue(id: string, value: ControlValue): void {
-		this.setConfig(id, value)
+		// Saved configurations keep their 0/1 values when edited through a switch.
+		const numeric =
+			this.switches.has(id) &&
+			typeof value === "boolean" &&
+			typeof this.config[id] !== "boolean"
+		this.setConfig(id, numeric ? Number(value) : value)
 		notifyControls(this)
 	}
 	subscribeControls(listener: () => void): () => void {
