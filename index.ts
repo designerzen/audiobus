@@ -4,25 +4,25 @@
  */
 
 // Core audio commands
-export { IAudioCommand, AudioCommand, AudioCommandInterface } from "./audio-command-interface.ts"
+export { IAudioCommand, AudioCommand, AudioCommandInterface } from "./commands/audio-command-interface.ts"
 
-export { AudioCommand as AudioCommandClass } from "./audio-command.ts"
+export { AudioCommand as AudioCommandClass } from "./commands/audio-command.ts"
 
-export { AudioCommandFactory } from "./audio-command-factory.ts"
+export { AudioCommandFactory } from "./commands/audio-command-factory.ts"
 
-export { AudioCommandEncoder } from "./audio-command-encoder.ts"
+export { AudioCommandEncoder } from "./commands/audio-command-encoder.ts"
 
-export { AudioCommandDecoder } from "./audio-command-decoder.ts"
+export { AudioCommandDecoder } from "./commands/audio-command-decoder.ts"
 
 // Audio events and recording
-export { IAudioEvent, AudioEvent } from "./audio-event.ts"
+export { IAudioEvent, AudioEvent } from "./models/audio-event.ts"
 
-export { AudioEventRecorder } from "./audio-event-recorder.ts"
+export { AudioEventRecorder } from "./events/audio-event-recorder.ts"
 
 // Note and track models
-export { NoteModel } from "./note-model.ts"
+export { NoteModel } from "./models/note-model.ts"
 
-export { AudioTrack } from "./audio-track.js"
+export { AudioTrack } from "./models/audio-track.js"
 
 // IO Chain - Input, Transformation, Output
 export * from "./io/index.ts"

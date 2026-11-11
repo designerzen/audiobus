@@ -1,4 +1,4 @@
-import { EVENT_CONFIGURATION_CHANGED } from "../../event-constants.ts"
+import { EVENT_CONFIGURATION_CHANGED } from "../../events/event-constants.ts"
 import { midiToCommand } from "../../midi/midi-command-conversion.ts"
 import { BleMidiDecoder } from "../../midi/midi-ble/ble-midi-decoder.ts"
 /**
@@ -9,8 +9,8 @@ import { BleMidiDecoder } from "../../midi/midi-ble/ble-midi-decoder.ts"
 
 import { acceptsMidiInput, createMidiInputControls } from "./midi-input-controls.ts"
 import AbstractInput from "./abstract-input.ts"
-import { createAudioCommand } from "../../audio-command-factory.ts"
-import { NOTE_OFF, NOTE_ON } from "../../commands"
+import { createAudioCommand } from "../../commands/audio-command-factory.ts"
+import { NOTE_OFF, NOTE_ON } from "../../commands/commands"
 import {
 	connectToBLEDevice,
 	disconnectBLEDevice,
@@ -19,7 +19,7 @@ import {
 } from "../../midi/midi-ble/ble-connection.ts"
 import "../../midi/midi-ble/ble-constants.ts"
 
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 import type { IAudioInput } from "./input-interface.ts"
 
 export const BLE_INPUT_ID = "BLE MIDI"

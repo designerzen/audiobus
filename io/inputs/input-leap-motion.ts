@@ -1,11 +1,11 @@
-import { EVENT_FRAME, EVENT_CONNECT, EVENT_DISCONNECT } from "../../event-constants.ts"
+import { EVENT_FRAME, EVENT_CONNECT, EVENT_DISCONNECT } from "../../events/event-constants.ts"
 /**
  * Leap Motion hand tracking input
  * Maps hand positions to MIDI notes and velocities
  */
 
-import { NOTE_OFF, NOTE_ON } from "../../commands"
-import AudioCommand from "../../audio-command.ts"
+import { NOTE_OFF, NOTE_ON } from "../../commands/commands"
+import AudioCommand from "../../commands/audio-command.ts"
 import AbstractInput from "./abstract-input.ts"
 import type { IAudioInput } from "./input-interface.ts"
 

@@ -1,5 +1,5 @@
-import type { IAudioCommand } from "../audio-command-interface"
-import * as Commands from "../commands"
+import type { IAudioCommand } from "../commands/audio-command-interface"
+import * as Commands from "../commands/commands"
 import { unzipSync } from "fflate"
 
 /**

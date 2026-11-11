@@ -1,13 +1,13 @@
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 import type { IPercussionOutput } from "../../timing/percussion-types.ts"
-import { NOTE_ON, CONTROL_CHANGE, MIDI_STOP, PLAYBACK_STOP } from "../../commands.ts"
+import { NOTE_ON, CONTROL_CHANGE, MIDI_STOP, PLAYBACK_STOP } from "../../commands/commands.ts"
 import {
 	EVENT_CLICK,
 	EVENT_CONFIGURATION_CHANGED,
 	EVENT_POINTER_DOWN
-} from "../../event-constants.ts"
-import { getAudioDestination } from "../../audio-destination.ts"
+} from "../../events/event-constants.ts"
+import { getAudioDestination } from "../audio-destination.ts"
 import { PercussionSynth } from "../../instruments/percussion/percussion-synth.ts"
 import { GENERAL_MIDI_PERCUSSION_NOTES } from "../../timing/percussion-note-map.ts"
 import { bounded, devicePanel, numberControl } from "../device-controls.ts"

@@ -1,5 +1,5 @@
 import { OUTPUT_DEFINITIONS } from "./output-definitions.ts"
-import { getAudioDestination } from "../audio-destination"
+import { getAudioDestination } from "./audio-destination"
 import type { DeviceClassification, DeviceAttribution } from "./device-classification.ts"
 import { defineDevice } from "./device-definition"
 import wam2Registry, { WAM2_INSTRUMENTS, wam2OutputId } from "../wam/registry"

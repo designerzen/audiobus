@@ -1,4 +1,4 @@
-import { CONTROL_CHANGE } from "../../commands.ts"
+import { CONTROL_CHANGE } from "../../commands/commands.ts"
 import {
 	EVENT_BLUR,
 	EVENT_CHANGE,
@@ -11,7 +11,7 @@ import {
 	EVENT_POINTER_DOWN,
 	EVENT_POINTER_MOVE,
 	EVENT_VISIBILITY_CHANGE
-} from "../../event-constants.ts"
+} from "../../events/event-constants.ts"
 import {
 	dispatchInstrumentEvent,
 	instrumentEvents,

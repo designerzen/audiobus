@@ -5,7 +5,7 @@ import {
 	type Settings,
 	type Voice
 } from "./performance-transformer.ts"
-import { CONTROL_CHANGE, NOTE_OFF } from "../../commands"
+import { CONTROL_CHANGE, NOTE_OFF } from "../../commands/commands"
 
 export const ID_NOTE_MAPPER = "Note-Mapper"
 export function parseNoteMap(value: string): Map<number, number[]> {

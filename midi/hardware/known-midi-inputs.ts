@@ -16,7 +16,7 @@ import {
 	EVENT_DEVICE_LIST_CHANGED,
 	EVENT_CHAINS_UPDATED,
 	EVENT_DESTROYED
-} from "../../event-constants"
+} from "../../events/event-constants"
 
 interface KnownPort {
 	id: string

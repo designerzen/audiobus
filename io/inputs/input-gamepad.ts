@@ -7,14 +7,14 @@
  * then piped into the TransformManager for example
  */
 
-import { NOTE_OFF, NOTE_ON } from "../../commands"
+import { NOTE_OFF, NOTE_ON } from "../../commands/commands"
 import {
 	COMMANDS,
 	GAME_PAD_CONNECTED,
 	GAME_PAD_DISCONNECTED,
 	GamePadManager
 } from "../../hardware/gamepad/gamepad"
-import AudioCommand from "../../audio-command"
+import AudioCommand from "../../commands/audio-command"
 import AbstractInput from "./abstract-input"
 import { GamepadVisualizerComponent } from "../../ui/gamepad-visualizer-component.ts"
 import type { IAudioInput } from "./input-interface"

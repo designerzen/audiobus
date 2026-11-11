@@ -1,4 +1,4 @@
-import AudioCommand from "../audio-command"
+import AudioCommand from "../commands/audio-command"
 
 const regex = /([a-g])([#b])?(\d+)?(\.*)/gi
 

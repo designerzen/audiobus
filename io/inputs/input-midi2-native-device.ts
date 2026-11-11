@@ -9,7 +9,7 @@ import {
 	EVENT_PROGRAMCHANGE,
 	EVENT_POLYAFTERTOUCH,
 	EVENT_CHANNELAFTERTOUCH
-} from "../../event-constants.ts"
+} from "../../events/event-constants.ts"
 import AbstractInput from "./abstract-input.ts"
 import type { IAudioInput } from "./input-interface.ts"
 import { acceptsMidiInput, createMidiInputControls } from "./midi-input-controls.ts"

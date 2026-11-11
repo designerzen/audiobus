@@ -6,7 +6,7 @@
  * Calm emojis → sus2/sus4 chords
  */
 import { Transformer, type TransformerConfig } from "./abstract-transformer.ts"
-import { cloneAudioCommand } from "../../audio-command-factory.ts"
+import { cloneAudioCommand } from "../../commands/audio-command-factory.ts"
 import { TRANSFORMER_CATEGORY_TUNING } from "./transformer-categories.ts"
 import {
 	MAJOR_CHORD_INTERVALS,
@@ -29,7 +29,7 @@ import {
 } from "../../tuning/intervals.js"
 
 import type { Timer } from "netronome"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 import type { FieldConfig, ITransformer } from "./interface-transformer.ts"
 
 export const ID_EMOJI = "Moodifier"

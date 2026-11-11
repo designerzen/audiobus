@@ -1,8 +1,8 @@
 import { Midi } from "@tonejs/midi"
-import type RecorderAudioEvent from "../audio-event-recorder"
-import type AudioEvent from "../audio-event"
+import type RecorderAudioEvent from "../events/audio-event-recorder"
+import type AudioEvent from "../models/audio-event"
 import type { Timer } from "netronome"
-import { NOTE_ON } from "../commands"
+import { NOTE_ON } from "../commands/commands"
 
 export const saveBlobToLocalFileSystem = (blob: Blob, fileName: string) => {
 	const url = URL.createObjectURL(blob)

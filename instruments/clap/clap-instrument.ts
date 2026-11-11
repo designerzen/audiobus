@@ -3,10 +3,10 @@ import {
 	EVENT_DISCONNECTED,
 	EVENT_PATCH_LOADED,
 	EVENT_CONFIGURATION_CHANGED
-} from "../../event-constants"
-import { NOTE_ON, NOTE_OFF } from "../../commands"
+} from "../../events/event-constants"
+import { NOTE_ON, NOTE_OFF } from "../../commands/commands"
 import { commandToMidi } from "../../midi/midi-command-conversion"
-import type { IAudioCommand } from "../../audio-command-interface"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
 import type { IAudioOutput } from "../../io/outputs/output-interface"
 import type { CLAPPatch } from "./clap-types"
 import { clapRegistry, initializeCLAPRegistry } from "./clap-registry"

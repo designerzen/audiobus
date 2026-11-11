@@ -5,7 +5,7 @@ import {
 	EVENT_ERROR,
 	EVENT_MESSAGE,
 	EVENT_VISIBILITY_CHANGE
-} from "../../event-constants"
+} from "../../events/event-constants"
 
 interface Landmark {
 	x: number

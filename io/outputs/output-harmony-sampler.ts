@@ -1,8 +1,8 @@
 import OutputSamplePlayer from "./output-sample-player"
-import type { IAudioCommand } from "../../audio-command-interface"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
 import type { AudioClockTick } from "../../timing/audio-clock-tick"
-import { NOTE_OFF, NOTE_ON } from "../../commands"
-import { EVENT_CHANGE, EVENT_ENDED } from "../../event-constants"
+import { NOTE_OFF, NOTE_ON } from "../../commands/commands"
+import { EVENT_CHANGE, EVENT_ENDED } from "../../events/event-constants"
 import { action, bounded, changed, numberControl } from "../device-controls"
 import type { HarmonicState } from "../harmony"
 

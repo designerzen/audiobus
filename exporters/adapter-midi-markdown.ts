@@ -1,7 +1,7 @@
-import type RecorderAudioEvent from "../audio-event-recorder.ts"
-import type AudioEvent from "../audio-event.ts"
+import type RecorderAudioEvent from "../events/audio-event-recorder.ts"
+import type AudioEvent from "../models/audio-event.ts"
 import type { Timer } from "netronome"
-import { NOTE_ON } from "../commands.ts"
+import { NOTE_ON } from "../commands/commands.ts"
 
 /**
  * Generates a Markdown representation of MIDI events with timing and note information

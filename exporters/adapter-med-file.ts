@@ -4,10 +4,10 @@
  */
 
 import { MEDExporter } from "../formats/med/med-exporter.ts"
-import type RecorderAudioEvent from "../audio-event-recorder.ts"
-import type AudioEvent from "../audio-event.ts"
+import type RecorderAudioEvent from "../events/audio-event-recorder.ts"
+import type AudioEvent from "../models/audio-event.ts"
 import type { Timer } from "netronome"
-import { NOTE_ON } from "../commands"
+import { NOTE_ON } from "../commands/commands"
 
 /**
  * Trigger MED file download in browser

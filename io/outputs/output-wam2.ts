@@ -1,4 +1,4 @@
-import { EVENT_CONFIGURATION_CHANGED, EVENT_CONTROL_SCHEMA_CHANGED } from "../../event-constants"
+import { EVENT_CONFIGURATION_CHANGED, EVENT_CONTROL_SCHEMA_CHANGED } from "../../events/event-constants"
 import { commandToMidi } from "../../midi/midi-command-conversion"
 import { initializeHost, WAM_MIDI_EVENT, WAM_AUTOMATION_EVENT } from "../../wam/host"
 import type {
@@ -9,7 +9,7 @@ import type {
 } from "control-surface/types"
 import { installComponentUi, subscribeControls } from "../component-ui"
 import wam2Registry, { type WAM2PluginDescriptor } from "../../wam/registry"
-import type { IAudioCommand } from "../../audio-command-interface"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
 import type { IAudioOutput } from "./output-interface"
 
 export default class OutputWAM2 extends EventTarget implements IAudioOutput {

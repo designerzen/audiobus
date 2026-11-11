@@ -1,5 +1,5 @@
-import { EVENT_CHANGE, EVENT_CONFIGURATION_CHANGED } from "../../event-constants"
-import type { IAudioCommand } from "../../audio-command-interface"
+import { EVENT_CHANGE, EVENT_CONFIGURATION_CHANGED } from "../../events/event-constants"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
 import type { IAudioOutput } from "./output-interface"
 
 const filters = new WeakMap<object, number[]>()

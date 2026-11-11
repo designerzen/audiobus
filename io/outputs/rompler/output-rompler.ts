@@ -1,4 +1,4 @@
-import type { IAudioCommand } from "../../../audio-command-interface"
+import type { IAudioCommand } from "../../../commands/audio-command-interface"
 import type { IAudioOutput } from "../output-interface"
 import {
 	NOTE_ON,
@@ -8,9 +8,9 @@ import {
 	PROGRAM_CHANGE,
 	MIDI_STOP,
 	PLAYBACK_STOP
-} from "../../../commands"
-import { EVENT_CHANGE } from "../../../event-constants"
-import { getAudioDestination } from "../../../audio-destination"
+} from "../../../commands/commands"
+import { EVENT_CHANGE } from "../../../events/event-constants"
+import { getAudioDestination } from "../../audio-destination"
 import { bounded, changed, devicePanel, numberControl } from "../../device-controls"
 import { musicalCommand } from "../../event-clip"
 import {

@@ -1,4 +1,4 @@
-import { EVENT_CHANGE, EVENT_CLICK } from "../../event-constants"
+import { EVENT_CHANGE, EVENT_CLICK } from "../../events/event-constants"
 import NoteInput from "./note-input"
 import { devicePanel, numberControl, changed } from "../device-controls"
 import { MIDI_NOTES_SCHEMA, promptBrowserAI, validateMidiNotes } from "../browser-ai"

@@ -1,5 +1,5 @@
-import { EVENT_CONTROL_SURFACE_NOTES } from "../event-constants"
-import { NOTE_ON, NOTE_OFF } from "../commands"
+import { EVENT_CONTROL_SURFACE_NOTES } from "../events/event-constants"
+import { NOTE_ON, NOTE_OFF } from "../commands/commands"
 import {
 	createGuitarTabControl,
 	createPianoRollControl,

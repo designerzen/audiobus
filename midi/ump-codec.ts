@@ -1,7 +1,7 @@
-import type { IAudioCommand } from "../audio-command-interface.ts"
-import { NOTE_OFF, NOTE_ON } from "../commands"
+import type { IAudioCommand } from "../commands/audio-command-interface.ts"
+import { NOTE_OFF, NOTE_ON } from "../commands/commands"
 import { midiToCommand } from "./midi-command-conversion.ts"
-import { createAudioCommand } from "../audio-command-factory.ts"
+import { createAudioCommand } from "../commands/audio-command-factory.ts"
 
 // UMP words are unsigned integers in protocol order, never packed MIDI byte streams.
 const wordCounts = [1, 1, 1, 2, 2, 4, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4]

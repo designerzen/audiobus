@@ -1,6 +1,6 @@
 // oxlint-disable-next-line typescript/triple-slash-reference -- Bundler asset declarations.
 /// <reference path="./assets.d.ts" />
-import { EVENT_POINTER_LOCK_CHANGE } from "../../../event-constants.ts"
+import { EVENT_POINTER_LOCK_CHANGE } from "../../../events/event-constants.ts"
 import {
 	EVENT_BLUR,
 	EVENT_CHANGE,
@@ -14,7 +14,7 @@ import {
 	EVENT_POINTER_MOVE,
 	EVENT_POINTER_UP,
 	EVENT_VISIBILITY_CHANGE
-} from "../../../event-constants.ts"
+} from "../../../events/event-constants.ts"
 import styles from "./note-dial.css?inline"
 import { NoteSlider } from "../note-slider/note-slider.ts"
 

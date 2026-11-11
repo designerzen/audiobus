@@ -3,8 +3,8 @@
  * Supports MOD, XM, IT, S3M and other tracker formats via FlodJS
  */
 
-import type { IAudioCommand } from "../audio-command-interface.ts"
-import AudioCommand from "../audio-command.ts"
+import type { IAudioCommand } from "../commands/audio-command-interface.ts"
+import AudioCommand from "../commands/audio-command.ts"
 
 /**
  * Import a tracker file (MOD, XM, IT, S3M, etc.) and extract audio commands

@@ -1,4 +1,4 @@
-import { EVENT_INSTRUMENTCHANGED } from "../../event-constants.ts"
+import { EVENT_INSTRUMENTCHANGED } from "../../events/event-constants.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 import {
 	InstrumentFactory,

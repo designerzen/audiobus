@@ -1,5 +1,5 @@
 import { FilesetResolver, HandLandmarker } from "@mediapipe/tasks-vision"
-import { EVENT_MESSAGE } from "../../event-constants"
+import { EVENT_MESSAGE } from "../../events/event-constants"
 
 let detector: HandLandmarker | undefined
 self.addEventListener(EVENT_MESSAGE, async (event: MessageEvent) => {

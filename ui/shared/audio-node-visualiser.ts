@@ -1,4 +1,4 @@
-import { EVENT_VISUALISER_ERROR, EVENT_VISUALISER_READY } from "../../event-constants.ts"
+import { EVENT_VISUALISER_ERROR, EVENT_VISUALISER_READY } from "../../events/event-constants.ts"
 import { instrumentNote, type InstrumentNote } from "../interfaces/instrument.ts"
 import type { AudioNodeVisualiserInterface } from "../interfaces/audio-node-visualiser.ts"
 import { observeAudioContextOutput } from "../interfaces/audio-context-output.ts"

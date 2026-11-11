@@ -4,7 +4,7 @@ import {
 	EVENT_CONTROLCHANGE,
 	EVENT_PROGRAMCHANGE,
 	EVENT_PITCHBEND
-} from "../../event-constants.ts"
+} from "../../events/event-constants.ts"
 // MIDI Status Byte Constants
 
 // Channel Voice Messages

@@ -1,6 +1,6 @@
 import AbstractInput from "./abstract-input"
-import AudioCommand from "../../audio-command"
-import type { IAudioCommand } from "../../audio-command-interface"
+import AudioCommand from "../../commands/audio-command"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
 
 /** A saved tune, armed at the first transport tick and rewound when stopped. */
 export default class InputMIDIFile extends AbstractInput {

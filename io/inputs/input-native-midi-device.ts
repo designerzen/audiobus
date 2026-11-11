@@ -7,7 +7,7 @@ import {
 	EVENT_PROGRAMCHANGE,
 	EVENT_POLYAFTERTOUCH,
 	EVENT_CHANNELAFTERTOUCH
-} from "../../event-constants.ts"
+} from "../../events/event-constants.ts"
 import { midiToCommand } from "../../midi/midi-command-conversion.ts"
 /**
  * Native OS MIDI Device Input Adapter

@@ -1,6 +1,6 @@
 import type { IAudioOutput } from "./output-interface"
-import type { IAudioCommand } from "../../audio-command-interface"
-import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON } from "../../commands"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
+import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON } from "../../commands/commands"
 import { action, changed, devicePanel, downloadJSON } from "../device-controls"
 import {
 	clipCommand,

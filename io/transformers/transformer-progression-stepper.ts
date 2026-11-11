@@ -2,8 +2,8 @@ import { TonalProgressionTransformer } from "./tonal-progression-transformer"
 import { type ProgressionRoute } from "./progression-performer"
 import { routeKey, numbers, type Settings, type Voice } from "./performance-transformer"
 import { parseTheoryProgression } from "../../tuning/classical-progressions"
-import type { IAudioCommand } from "../../audio-command-interface"
-import { CONTROL_CHANGE } from "../../commands"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
+import { CONTROL_CHANGE } from "../../commands/commands"
 
 export const ID_PROGRESSION_STEPPER = "Progression-Stepper"
 export class TransformerProgressionStepper extends TonalProgressionTransformer {

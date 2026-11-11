@@ -3,13 +3,13 @@ import {
 	EVENT_CONFIGURATION_CHANGED,
 	EVENT_CONNECTION_CHANGED,
 	EVENT_READY
-} from "../../event-constants.ts"
+} from "../../events/event-constants.ts"
 import type { Output } from "webmidi"
 import { sharedWebMidi } from "../../midi/shared-webmidi"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 import { MidiOutputRouting } from "./midi-output-routing.ts"
-import { CONTROL_CHANGE, PROGRAM_CHANGE, PITCH_BEND } from "../../commands"
+import { CONTROL_CHANGE, PROGRAM_CHANGE, PITCH_BEND } from "../../commands/commands"
 import { CHANNEL_PRESSURE, POLYPHONIC_PRESSURE } from "../../midi/midi-command-conversion.ts"
 
 export const WEBMIDI_OUTPUT_ID = "WebMIDI"

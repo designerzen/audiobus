@@ -6,7 +6,7 @@ import type { Timer } from "netronome"
 import type { ITransformer } from "./interface-transformer.ts"
 import { Transformer } from "./abstract-transformer.ts"
 import { TRANSFORMER_CATEGORY_TIMING } from "./transformer-categories.ts"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 
 export const ID_TIMING_HUMANISER = "TimingHumaniser"
 

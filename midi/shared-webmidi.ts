@@ -6,7 +6,7 @@ import {
 	EVENT_DEVICE_LIST_CHANGED,
 	EVENT_MIDI_CHANNELS_CHANGED,
 	EVENT_READY
-} from "../event-constants"
+} from "../events/event-constants"
 
 export interface WebMidiDeviceChange {
 	inputs: Input[]

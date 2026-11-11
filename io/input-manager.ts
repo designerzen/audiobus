@@ -3,8 +3,8 @@ import {
 	EVENT_CONFIGURATION_CHANGED,
 	EVENT_CONNECTION_CHANGED,
 	EVENT_DEVICE_LIST_CHANGED
-} from "../event-constants.ts"
-export { EVENT_INPUTS_UPDATED } from "../event-constants.ts"
+} from "../events/event-constants.ts"
+export { EVENT_INPUTS_UPDATED } from "../events/event-constants.ts"
 import { configurationUpdate } from "./configuration-events"
 /**
  * Combine input mechanisms and dispatch
@@ -13,7 +13,7 @@ import { configurationUpdate } from "./configuration-events"
  * with just one single entry point
  */
 
-import { INPUT_EVENT } from "../commands"
+import { INPUT_EVENT } from "../commands/commands"
 import AbstractInput from "./inputs/abstract-input"
 import type { IAudioInput } from "./inputs/input-interface"
 import type InputAudioEvent from "./events/input-audio-event"

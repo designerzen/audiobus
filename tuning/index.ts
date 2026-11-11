@@ -10,4 +10,4 @@ export {
 	convertToIntervalArray,
 	describeMusicalMode
 } from "./chords/describe-chord.ts"
-export type { ChordDescription } from "./chords/describe-chord.ts"
+export type { ChordDescription } from "./chords/describe-chord.ts"export * from "./chord-suggestions.ts"

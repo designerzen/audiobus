@@ -8,7 +8,7 @@
  * exporter.downloadFile(buffer, 'song.med')
  */
 
-import type { IAudioCommand } from "../../audio-command-interface.js"
+import type { IAudioCommand } from "../../commands/audio-command-interface.js"
 
 export interface MEDExportOptions {
 	filename?: string

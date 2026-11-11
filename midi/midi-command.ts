@@ -1,5 +1,5 @@
-import { NOTE_ON, NOTE_OFF } from "../commands.ts"
-import AudioCommand from "../audio-command.ts"
+import { NOTE_ON, NOTE_OFF } from "../commands/commands.ts"
+import AudioCommand from "../commands/audio-command.ts"
 
 /**
  * This is a way to create a musical event

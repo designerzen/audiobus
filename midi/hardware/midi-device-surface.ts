@@ -1,5 +1,5 @@
-import type { IAudioCommand } from "../../audio-command-interface"
-import { NOTE_ON, NOTE_OFF, CONTROL_CHANGE, PITCH_BEND, PROGRAM_CHANGE } from "../../commands"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
+import { NOTE_ON, NOTE_OFF, CONTROL_CHANGE, PITCH_BEND, PROGRAM_CHANGE } from "../../commands/commands"
 import { CHANNEL_PRESSURE } from "../midi-command-conversion"
 import {
 	EVENT_BLUR,
@@ -13,7 +13,7 @@ import {
 	EVENT_POINTER_CANCEL,
 	EVENT_LOST_POINTER_CAPTURE,
 	EVENT_VISIBILITY_CHANGE
-} from "../../event-constants"
+} from "../../events/event-constants"
 import {
 	controlMessage,
 	controlRange,

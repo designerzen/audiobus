@@ -1,4 +1,4 @@
-import * as Commands from "../../commands"
+import * as Commands from "../../commands/commands"
 
 export const KEYBOARD_MODES = {
 	combined: [

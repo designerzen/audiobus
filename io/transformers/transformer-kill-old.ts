@@ -2,12 +2,12 @@
  * This simply adds a noteOff to any noteOn that has lasted more
  * than the specified bar lengths
  */
-import type AudioCommand from "../../audio-command.ts"
+import type AudioCommand from "../../commands/audio-command.ts"
 import type { Timer } from "netronome"
 import type { ITransformer } from "./interface-transformer.ts"
 import { Transformer } from "./abstract-transformer.ts"
 import { TRANSFORMER_CATEGORY_TIMING } from "./transformer-categories.ts"
-import type { IAudioCommand as _IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand as _IAudioCommand } from "../../commands/audio-command-interface.ts"
 
 const ID_KILL_OLD = "kill-old"
 

@@ -5,8 +5,8 @@
  * and response.
  *
  */
-import type { IAudioCommand } from "./audio-command-interface.ts"
-import AudioCommand from "./audio-command.ts"
+import type { IAudioCommand } from "../commands/audio-command-interface.ts"
+import AudioCommand from "../commands/audio-command.ts"
 
 export default class AudioEvent extends AudioCommand implements IAudioCommand {
 	chainId?: string

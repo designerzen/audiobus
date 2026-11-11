@@ -1,4 +1,4 @@
-import { EVENT_INSTRUMENTCHANGED } from "../../event-constants.ts"
+import { EVENT_INSTRUMENTCHANGED } from "../../events/event-constants.ts"
 /**
  * Example usage of InstrumentsOutput
  *

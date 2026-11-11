@@ -1,6 +1,6 @@
 import { Transformer } from "./abstract-transformer"
 import { beatSeconds, copyCommand, noteKey } from "./performance-transformer"
-import { NOTE_ON, NOTE_OFF } from "../../commands"
+import { NOTE_ON, NOTE_OFF } from "../../commands/commands"
 import { AI_MODELS, type AIModelDefinition } from "../inputs/ai-model-catalogue"
 import { AI_IMPROV, AI_MELODY, AI_DRUMS, AI_MUSIC_VAE, AI_TRIO } from "../inputs/input-types"
 import {
@@ -12,7 +12,7 @@ import {
 } from "../inputs/ai-music-messages"
 import type { AIMusicNote, AIMusicResponse } from "../inputs/ai-music-messages"
 import { musicAttribution } from "../inputs/ai-music-attribution"
-import type { IAudioCommand } from "../../audio-command-interface"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
 import type { FieldConfig } from "./interface-transformer"
 import type { Timer } from "netronome"
 

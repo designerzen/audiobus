@@ -1,6 +1,6 @@
 import AbstractInput from "./abstract-input.ts"
-import AudioCommand from "../../audio-command.ts"
-import { NOTE_OFF, NOTE_ON } from "../../commands"
+import AudioCommand from "../../commands/audio-command.ts"
+import { NOTE_OFF, NOTE_ON } from "../../commands/commands"
 import { noteNumberToName } from "../../conversion/note-to-name"
 import { noteNumberToKeyName } from "../../conversion/note-to-key-name"
 

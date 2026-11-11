@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { TransformerTransposer } from "../transformer-transposer"
-import { createAudioCommand } from "../../../audio-command-factory"
-import { NOTE_ON, NOTE_OFF } from "../../../commands"
+import { createAudioCommand } from "../../../commands/audio-command-factory"
+import { NOTE_ON, NOTE_OFF } from "../../../commands/commands"
 import type { Timer } from "netronome"
 
 const timer = { BPM: 120, now: 0 } as Timer

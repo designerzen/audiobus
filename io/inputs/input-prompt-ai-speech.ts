@@ -1,4 +1,4 @@
-import { EVENT_ERROR, EVENT_CLICK } from "../../event-constants.ts"
+import { EVENT_ERROR, EVENT_CLICK } from "../../events/event-constants.ts"
 import InputPromptAI from "./input-prompt-ai.ts"
 import type { IAudioInput } from "./input-interface.ts"
 

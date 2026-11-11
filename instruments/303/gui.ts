@@ -1,4 +1,4 @@
-import { EVENT_CONFIGURATION_CHANGED, EVENT_INPUT } from "../../event-constants"
+import { EVENT_CONFIGURATION_CHANGED, EVENT_INPUT } from "../../events/event-constants"
 import { devicePanel } from "../../io/device-controls"
 import { SYNTH_303_PARAMETERS, type Synth303Settings } from "./parameters"
 

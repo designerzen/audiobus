@@ -1,8 +1,8 @@
 import { notifyControlSchema } from "../component-ui"
 import { TRANSFORMER_CATEGORY_TIMING } from "./transformer-categories.ts"
 import { Transformer } from "./abstract-transformer.ts"
-import AudioCommand from "../../audio-command.ts"
-import * as Commands from "../../commands"
+import AudioCommand from "../../commands/audio-command.ts"
+import * as Commands from "../../commands/commands"
 import { Midi } from "@tonejs/midi"
 import { loadMidi, midiSong } from "../midi-song"
 import {
@@ -14,11 +14,11 @@ import {
 	EVENT_DRAG_OVER,
 	EVENT_DRAG_LEAVE,
 	EVENT_DROP
-} from "../../event-constants"
+} from "../../events/event-constants"
 
 import type { Timer } from "netronome"
 import type { ITransformer, FieldConfig } from "./interface-transformer.ts"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 
 export const ID_MIDI_FILE_PLAYER = "MIDI-File-Player"
 

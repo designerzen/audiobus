@@ -1,9 +1,9 @@
 import AbstractInput from "./abstract-input"
-import type { IAudioCommand } from "../../audio-command-interface"
-import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON } from "../../commands"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
+import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON } from "../../commands/commands"
 import { clipCommand, musicalCommand, parseEventClip } from "../event-clip"
 import { changed, devicePanel } from "../device-controls"
-import { EVENT_CHANGE } from "../../event-constants"
+import { EVENT_CHANGE } from "../../events/event-constants"
 
 export default class InputEventLoop extends AbstractInput {
 	private playing = false

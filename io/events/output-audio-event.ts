@@ -1,5 +1,5 @@
-import { OUTPUT_EVENT } from "../../commands"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import { OUTPUT_EVENT } from "../../commands/commands"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 
 export default class OutputAudioEvent extends CustomEvent<IAudioCommand> {
 	command: IAudioCommand

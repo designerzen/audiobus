@@ -8,27 +8,27 @@ import {
 	EVENT_OUTPUTS_UPDATED,
 	EVENT_TRANSFORMERS_UPDATED,
 	EVENT_CONFIGURATION_CHANGED
-} from "../event-constants.ts"
+} from "../events/event-constants.ts"
 export {
 	EVENT_CHAIN_ADDED,
 	EVENT_CHAIN_REMOVED,
 	EVENT_CHAIN_ACTIVE_CHANGED,
 	EVENT_CHAINS_UPDATED
-} from "../event-constants.ts"
+} from "../events/event-constants.ts"
 import { compressToBase64, decompressFromBase64 } from "lz-string"
 import { chordAt, defaultMusicTools, parseMusicTools, type MusicToolsState } from "./music-tools"
 import { TransformerChordTrack } from "./transformers/transformer-chord-track"
 import { TransformerImprovPartner } from "./transformers/transformer-improv-partner"
-import { EVENT_WORKSPACE_RESTORED } from "../event-constants"
-import { EVENT_HARMONY_CHANGED, EVENT_HARMONY_SETTINGS_CHANGED } from "../event-constants"
+import { EVENT_WORKSPACE_RESTORED } from "../events/event-constants"
+import { EVENT_HARMONY_CHANGED, EVENT_HARMONY_SETTINGS_CHANGED } from "../events/event-constants"
 import { parseHarmony, sameHarmony, sectionAt, type HarmonicState } from "./harmony"
 import { deviceId, deviceDefinition, defineDevice } from "./device-definition"
 import { restoreDevice, UnavailableDevice, type SavedDevice } from "./workspace-devices"
-import { EVENT_DESTROYED } from "../event-constants"
+import { EVENT_DESTROYED } from "../events/event-constants"
 import OutputManager from "./output-manager"
 import { installEnsembleControls } from "./ensemble-controls"
 import AbstractInput from "./inputs/abstract-input"
-import { INPUT_EVENT, PLAYBACK_TOGGLE, PLAYBACK_STOP, MIDI_STOP, CONTROL_CHANGE } from "../commands"
+import { INPUT_EVENT, PLAYBACK_TOGGLE, PLAYBACK_STOP, MIDI_STOP, CONTROL_CHANGE } from "../commands/commands"
 
 /**
  * Manager for managing multiple IOChain instances
@@ -43,8 +43,8 @@ import type { IAudioInput } from "./inputs/input-interface"
 import type { IAudioOutput } from "./outputs/output-interface"
 import type { AudioClockTick } from "../timing/audio-clock-tick.ts"
 import type { TimerPerformanceMeasurement } from "./outputs/performance-metrics"
-import type { IAudioCommand } from "audiobus/audio-command-interface"
-import type AudioEvent from "audiobus/audio-event"
+import type { IAudioCommand } from "audiobus/commands/audio-command-interface"
+import type AudioEvent from "audiobus/models/audio-event"
 
 export interface IOChainManagerOptions {
 	/**

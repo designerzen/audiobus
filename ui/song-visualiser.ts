@@ -1,4 +1,4 @@
-import { EVENT_RESIZE, EVENT_NOTE_CLICK } from "../event-constants.ts"
+import { EVENT_RESIZE, EVENT_NOTE_CLICK } from "../events/event-constants.ts"
 /**
  * SongVisualiser - Display an array of AudioCommands as a timeline
  *
@@ -11,10 +11,10 @@ import { EVENT_RESIZE, EVENT_NOTE_CLICK } from "../event-constants.ts"
  */
 
 import SONG_VISUALISER_WORKER from "./song-visualiser-worker.ts?worker"
-import { NOTE_ON, NOTE_OFF } from "../commands.ts"
-import NoteModel from "../note-model.ts"
+import { NOTE_ON, NOTE_OFF } from "../commands/commands.ts"
+import NoteModel from "../models/note-model.ts"
 
-import type { IAudioCommand } from "../audio-command-interface.ts"
+import type { IAudioCommand } from "../commands/audio-command-interface.ts"
 import type { IAudioOutput } from "../io/outputs/output-interface.ts"
 import type OPFSStorage from "../storage/opfs-storage.ts"
 

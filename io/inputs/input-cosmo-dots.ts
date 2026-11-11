@@ -1,5 +1,5 @@
-import AudioCommand from "../../audio-command"
-import * as COMMANDS from "../../commands"
+import AudioCommand from "../../commands/audio-command"
+import * as COMMANDS from "../../commands/commands"
 import {
 	EVENT_BLUR,
 	EVENT_CHANGE,
@@ -8,7 +8,7 @@ import {
 	EVENT_KEY_DOWN,
 	EVENT_SUBMIT,
 	EVENT_VISIBILITY_CHANGE
-} from "../../event-constants"
+} from "../../events/event-constants"
 import { bounded, changed, devicePanel, numberControl } from "../device-controls"
 import AbstractInput from "./abstract-input"
 import type { ControlValue, UiDescriptor } from "control-surface/types"

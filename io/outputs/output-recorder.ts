@@ -1,5 +1,5 @@
 import type { IAudioOutput } from "./output-interface"
-import { EVENT_CLICK, EVENT_RECORDER_TOGGLE, EVENT_RECORDER_REVIEW } from "../../event-constants"
+import { EVENT_CLICK, EVENT_RECORDER_TOGGLE, EVENT_RECORDER_REVIEW } from "../../events/event-constants"
 
 export default class OutputRecorder extends EventTarget implements IAudioOutput {
 	readonly uuid = `Output-Recorder-${crypto.randomUUID()}`

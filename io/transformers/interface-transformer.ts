@@ -1,4 +1,4 @@
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 import type { Timer } from "netronome"
 
 import type { ComponentUi } from "control-surface/types"

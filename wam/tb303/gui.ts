@@ -8,7 +8,7 @@ import {
 	EVENT_POINTER_DOWN,
 	EVENT_POINTER_MOVE,
 	EVENT_POINTER_UP
-} from "../../event-constants"
+} from "../../events/event-constants"
 
 const disposers = new WeakMap<HTMLElement, () => void>()
 export function destroyTB303Gui(gui: HTMLElement) {

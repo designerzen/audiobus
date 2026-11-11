@@ -1,9 +1,9 @@
 import { Transformer } from "./abstract-transformer.ts"
 import type { FieldConfig } from "./interface-transformer.ts"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 import type { Timer } from "netronome"
-import { NOTE_ON, NOTE_OFF, CONTROL_CHANGE } from "../../commands"
-import { cloneAudioCommand } from "../../audio-command-factory.ts"
+import { NOTE_ON, NOTE_OFF, CONTROL_CHANGE } from "../../commands/commands"
+import { cloneAudioCommand } from "../../commands/audio-command-factory.ts"
 
 export type Settings = Record<string, string | number | boolean>
 export interface Control {

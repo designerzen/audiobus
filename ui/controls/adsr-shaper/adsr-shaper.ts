@@ -7,7 +7,7 @@ import {
 	EVENT_POINTER_UP,
 	EVENT_POINTER_CANCEL,
 	EVENT_LOST_POINTER_CAPTURE
-} from "../../../event-constants.ts"
+} from "../../../events/event-constants.ts"
 
 export const ADSR_STAGES = ["attack", "decay", "sustain", "release"] as const
 export type AdsrStage = (typeof ADSR_STAGES)[number]

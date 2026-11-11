@@ -1,14 +1,14 @@
-import { EVENT_NOTE_CLICK } from "../event-constants.ts"
+import { EVENT_NOTE_CLICK } from "../events/event-constants.ts"
 /**
  * SongVisualiser Usage Examples
  */
 
 import SongVisualiser from "./song-visualiser.js"
 import { SongVisualiserUI } from "./song-visualiser-ui.js"
-import AudioCommand from "../audio-command.ts"
-import type { IAudioCommand } from "../audio-command-interface.ts"
+import AudioCommand from "../commands/audio-command.ts"
+import type { IAudioCommand } from "../commands/audio-command-interface.ts"
 import type OPFSStorage from "../storage/opfs-storage.ts"
-import { NOTE_ON, NOTE_OFF } from "../commands.ts"
+import { NOTE_ON, NOTE_OFF } from "../commands/commands.ts"
 
 /**
  * Example 1: Basic usage with manual commands

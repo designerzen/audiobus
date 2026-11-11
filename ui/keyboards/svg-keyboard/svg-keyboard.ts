@@ -1,7 +1,7 @@
 // oxlint-disable-next-line typescript/triple-slash-reference -- Bundler asset declarations.
 /// <reference path="./assets.d.ts" />
-import { EVENT_CONTEXT_MENU } from "../../../event-constants.ts"
-import { EVENT_CLICK, EVENT_KEY_DOWN, EVENT_KEY_UP } from "../../../event-constants.ts"
+import { EVENT_CONTEXT_MENU } from "../../../events/event-constants.ts"
+import { EVENT_CLICK, EVENT_KEY_DOWN, EVENT_KEY_UP } from "../../../events/event-constants.ts"
 import styles from "./svg-keyboard.css?inline"
 import { instrumentNote, type InstrumentNote } from "../../interfaces/instrument.ts"
 import { ChordController } from "../../shared/chord-controller.ts"

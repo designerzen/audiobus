@@ -8,7 +8,7 @@ import {
 	EVENT_LOST_POINTER_CAPTURE,
 	EVENT_BLUR,
 	EVENT_VISIBILITY_CHANGE
-} from "../event-constants.ts"
+} from "../events/event-constants.ts"
 
 const KEY_CODES: Record<string, string> = {
 	" ": "Space",

@@ -8,7 +8,7 @@ import {
 	type Settings,
 	type Voice
 } from "./performance-transformer"
-import type { IAudioCommand } from "../../audio-command-interface"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
 import type { SoundingStep } from "../../tuning/progression-voicing"
 import { DEFAULT_HARMONY, type HarmonicState } from "../harmony"
 

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest"
 import { TransformerMIDIFilePlayer } from "../transformer-midi-file-player.ts"
-import AudioCommand from "../../../audio-command.ts"
-import * as Commands from "../../../commands"
+import AudioCommand from "../../../commands/audio-command.ts"
+import * as Commands from "../../../commands/commands"
 import { Timer } from "netronome"
 
 describe("TransformerMIDIFilePlayer", () => {

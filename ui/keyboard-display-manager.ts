@@ -1,4 +1,4 @@
-import { EVENT_KEYBOARD_KEY_DOWN, EVENT_KEYBOARD_KEY_UP } from "../event-constants.ts"
+import { EVENT_KEYBOARD_KEY_DOWN, EVENT_KEYBOARD_KEY_UP } from "../events/event-constants.ts"
 import QwertyKeyboard from "./keyboard-qwerty.ts"
 
 /**

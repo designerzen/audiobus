@@ -1,10 +1,10 @@
-import { EVENT_CONNECTION_CHANGED } from "../../event-constants.ts"
+import { EVENT_CONNECTION_CHANGED } from "../../events/event-constants.ts"
 /**
  *
  */
 import InputAudioEvent from "../events/input-audio-event.ts"
 import type { IAudioInput } from "./input-interface.ts"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 
 const DEFAULT_OPTIONS: Record<string, any> = {
 	now: () => performance.now()

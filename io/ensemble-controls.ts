@@ -7,7 +7,7 @@ import {
 	EVENT_ABORT,
 	EVENT_TRANSFORMERS_UPDATED,
 	EVENT_CONFIGURATION_CHANGED
-} from "../event-constants"
+} from "../events/event-constants"
 import { configurationUpdate } from "./configuration-events"
 import type { SurfaceState } from "control-surface/types"
 

@@ -5,7 +5,7 @@ import {
 	type Settings,
 	type Voice
 } from "./performance-transformer"
-import type { IAudioCommand } from "../../audio-command-interface"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
 import type { Timer } from "netronome"
 import { quantisePitchSet, pitchSetMask } from "../../tuning/pitch-class-set"
 

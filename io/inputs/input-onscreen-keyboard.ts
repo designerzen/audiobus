@@ -1,8 +1,8 @@
 import AbstractInput from "./abstract-input.ts"
-import AudioCommand from "../../audio-command.ts"
-import { NOTE_OFF, NOTE_ON } from "../../commands"
+import AudioCommand from "../../commands/audio-command.ts"
+import { NOTE_OFF, NOTE_ON } from "../../commands/commands"
 import SVGKeyboard from "../../ui/keyboard-svg.ts"
-import NoteModel from "../../note-model.ts"
+import NoteModel from "../../models/note-model.ts"
 
 import type { IAudioInput } from "./input-interface.ts"
 

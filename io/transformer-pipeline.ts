@@ -1,8 +1,8 @@
 import type { ITransformer } from "./transformers/interface-transformer.ts"
-import type { IAudioCommand } from "../audio-command-interface.ts"
+import type { IAudioCommand } from "../commands/audio-command-interface.ts"
 import type { Timer } from "netronome"
-import { NOTE_ON, NOTE_OFF } from "../commands"
-import { cloneAudioCommand } from "../audio-command-factory"
+import { NOTE_ON, NOTE_OFF } from "../commands/commands"
+import { cloneAudioCommand } from "../commands/audio-command-factory"
 export type TransformerTrace = (transformer: ITransformer, input: number, output: number) => void
 
 export function applyTransformer(

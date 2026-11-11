@@ -6,7 +6,7 @@ import {
 	type HarmonicState,
 	type HarmonicSection
 } from "./harmony"
-import { NOTE_ON, NOTE_OFF } from "../commands"
+import { NOTE_ON, NOTE_OFF } from "../commands/commands"
 import { clipCommand, parseEventClip, type EventClip } from "./event-clip"
 
 export interface ChordStep {

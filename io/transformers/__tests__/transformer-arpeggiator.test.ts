@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest"
 import { TransformerArpeggiator } from "../transformer-arpeggiator"
-import type { IAudioCommand } from "../../../audio-command-interface"
-import AudioCommand from "../../../audio-command"
-import * as Commands from "../../../commands"
+import type { IAudioCommand } from "../../../commands/audio-command-interface"
+import AudioCommand from "../../../commands/audio-command"
+import * as Commands from "../../../commands/commands"
 
 const mockTimer = {
 	BPM: 120,

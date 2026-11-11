@@ -9,7 +9,7 @@ import {
 	EVENT_POINTER_DOWN,
 	EVENT_POINTER_MOVE,
 	EVENT_POINTER_UP
-} from "../../../event-constants.ts"
+} from "../../../events/event-constants.ts"
 import styles from "./pitch-surfaces.css?inline"
 import { ChordController } from "../../shared/chord-controller.ts"
 import { instrumentNote } from "../../interfaces/instrument.ts"

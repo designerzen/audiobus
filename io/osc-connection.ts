@@ -4,7 +4,7 @@ import {
 	EVENT_MESSAGE,
 	EVENT_OPEN,
 	EVENT_CHANGE
-} from "../event-constants"
+} from "../events/event-constants"
 import { oscPrefix, MAX_OSC_PACKET_BYTES } from "./osc"
 
 export class OscConnection {

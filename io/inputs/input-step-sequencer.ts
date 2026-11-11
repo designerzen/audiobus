@@ -1,6 +1,6 @@
 import NoteInput from "./note-input"
 import { bounded, changed, devicePanel, numberControl } from "../device-controls"
-import { EVENT_CHANGE } from "../../event-constants"
+import { EVENT_CHANGE } from "../../events/event-constants"
 
 export default class InputStepSequencer extends NoteInput {
 	private playing = false

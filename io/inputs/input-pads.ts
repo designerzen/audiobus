@@ -11,7 +11,7 @@ import {
 	EVENT_POINTER_DOWN,
 	EVENT_POINTER_UP,
 	EVENT_VISIBILITY_CHANGE
-} from "../../event-constants"
+} from "../../events/event-constants"
 
 const DRUMS = [36, 38, 42, 46, 41, 45, 49, 51]
 const CHORDS = [

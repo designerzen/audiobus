@@ -1,5 +1,5 @@
 import type { IAudioOutput } from "./output-interface"
-import { EVENT_CLICK, EVENT_VISIBILITY_CHANGE } from "../../event-constants"
+import { EVENT_CLICK, EVENT_VISIBILITY_CHANGE } from "../../events/event-constants"
 import {
 	PERFORMANCE_HISTORY_LIMIT,
 	performanceWarnings,

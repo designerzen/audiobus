@@ -1,6 +1,6 @@
 import AbstractInput from "./abstract-input"
-import AudioCommand from "../../audio-command"
-import { NOTE_ON, NOTE_OFF } from "../../commands"
+import AudioCommand from "../../commands/audio-command"
+import { NOTE_ON, NOTE_OFF } from "../../commands/commands"
 import {
 	EVENT_KEY_DOWN,
 	EVENT_KEY_UP,
@@ -10,7 +10,7 @@ import {
 	EVENT_POINTER_UP,
 	EVENT_POINTER_CANCEL,
 	EVENT_LOST_POINTER_CAPTURE
-} from "../../event-constants"
+} from "../../events/event-constants"
 import { GamePadManager, COMMANDS, GAME_PAD_DISCONNECTED } from "../../hardware/gamepad/gamepad"
 import { notifyControls, notifyControlSchema } from "../component-ui"
 import type { ControlValue, UiDescriptor } from "control-surface/types"

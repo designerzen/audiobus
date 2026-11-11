@@ -1,4 +1,4 @@
-import { EVENT_CHANGE, EVENT_CLICK, EVENT_CONFIGURATION_CHANGED } from "../event-constants"
+import { EVENT_CHANGE, EVENT_CLICK, EVENT_CONFIGURATION_CHANGED } from "../events/event-constants"
 
 export function devicePanel(): HTMLDivElement {
 	const panel = document.createElement("div")

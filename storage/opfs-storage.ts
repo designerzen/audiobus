@@ -1,6 +1,6 @@
-import { decodeAudioCommand } from "../audio-command-decoder.ts"
-import { encodeAudioCommand } from "../audio-command-encoder.ts"
-import type { IAudioCommand } from "../audio-command-interface.ts"
+import { decodeAudioCommand } from "../commands/audio-command-decoder.ts"
+import { encodeAudioCommand } from "../commands/audio-command-encoder.ts"
+import type { IAudioCommand } from "../commands/audio-command-interface.ts"
 import {
 	OPFS_MESSAGE_TYPE_INIT,
 	OPFS_MESSAGE_TYPE_APPEND,

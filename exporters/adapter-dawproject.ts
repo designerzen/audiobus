@@ -1,6 +1,6 @@
-import RecorderAudioEvent from "../audio-event-recorder.ts"
-import AudioEvent from "../audio-event.ts"
-import { NOTE_ON } from "../commands"
+import RecorderAudioEvent from "../events/audio-event-recorder.ts"
+import AudioEvent from "../models/audio-event.ts"
+import { NOTE_ON } from "../commands/commands"
 
 import type { Timer } from "netronome"
 

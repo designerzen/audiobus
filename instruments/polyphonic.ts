@@ -6,7 +6,7 @@ import { engineGain } from "./engine-levels"
  */
 import type { IAudioOutput } from "../io/outputs/output-interface.ts"
 import type SynthOscillator from "./oscillators/synth-oscillator.ts"
-import { EVENT_CONFIGURATION_CHANGED } from "../event-constants.ts"
+import { EVENT_CONFIGURATION_CHANGED } from "../events/event-constants.ts"
 import {
 	POLYSYNTH_DEFAULTS,
 	POLYSYNTH_PARAMETERS,

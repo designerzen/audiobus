@@ -1,5 +1,5 @@
-import type { IAudioCommand } from "../audio-command-interface"
-import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON, PITCH_BEND } from "../commands"
+import type { IAudioCommand } from "../commands/audio-command-interface"
+import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON, PITCH_BEND } from "../commands/commands"
 import { musicalCommand } from "./event-clip"
 
 export interface OscMessage {

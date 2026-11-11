@@ -1,4 +1,4 @@
-import type { IAudioCommand } from "../../audio-command-interface"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
 import type { IAudioOutput } from "./output-interface"
 import {
 	NOTE_ON,
@@ -7,8 +7,8 @@ import {
 	PITCH_BEND,
 	MIDI_STOP,
 	PLAYBACK_STOP
-} from "../../commands"
-import { getAudioDestination } from "../../audio-destination"
+} from "../../commands/commands"
+import { getAudioDestination } from "../audio-destination"
 import { bounded, changed, devicePanel, numberControl } from "../device-controls"
 import { musicalCommand } from "../event-clip"
 import {

@@ -1,4 +1,4 @@
-import { NOTE_ON, NOTE_OFF } from "../../commands.ts"
+import { NOTE_ON, NOTE_OFF } from "../../commands/commands.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 import { convertNoteNumberToColour } from "../../conversion/note-to-colour.ts"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"

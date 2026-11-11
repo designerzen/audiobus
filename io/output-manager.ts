@@ -2,15 +2,15 @@ import {
 	EVENT_CONTROL_SURFACE_NOTES,
 	EVENT_OUTPUTS_UPDATED,
 	EVENT_CONFIGURATION_CHANGED
-} from "../event-constants.ts"
-export { EVENT_OUTPUTS_UPDATED } from "../event-constants.ts"
-import { NOTE_OFF, NOTE_ON } from "../commands"
+} from "../events/event-constants.ts"
+export { EVENT_OUTPUTS_UPDATED } from "../events/event-constants.ts"
+import { NOTE_OFF, NOTE_ON } from "../commands/commands"
 import { configurationUpdate } from "./configuration-events"
 import OutputAudioEvent from "./events/output-audio-event.ts"
 
-import AudioCommand from "../audio-command"
+import AudioCommand from "../commands/audio-command"
 import { acceptsOutputChannel, outputReceiveChannels } from "./outputs/output-channel-filter"
-import type { IAudioCommand } from "../audio-command-interface"
+import type { IAudioCommand } from "../commands/audio-command-interface"
 import type { IAudioOutput } from "./outputs/output-interface.ts"
 
 // Each output receives an ordered stream; overlapping notes are held until all

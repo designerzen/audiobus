@@ -11,7 +11,7 @@ import {
 	EVENT_POINTER_MOVE,
 	EVENT_POINTER_UP,
 	EVENT_VISIBILITY_CHANGE
-} from "../../../event-constants.ts"
+} from "../../../events/event-constants.ts"
 import styles from "./audio-viz.css?inline"
 import { instrumentNote, type InstrumentNote } from "../../interfaces/instrument.ts"
 import { observeAudioContextOutput } from "../../interfaces/audio-context-output.ts"

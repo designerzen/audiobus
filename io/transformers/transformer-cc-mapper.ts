@@ -6,8 +6,8 @@ import {
 	type Settings,
 	type Voice
 } from "./performance-transformer.ts"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
-import { CONTROL_CHANGE } from "../../commands"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
+import { CONTROL_CHANGE } from "../../commands/commands"
 
 export const ID_CC_MAPPER = "CC-Mapper"
 export class TransformerCCMapper extends PerformanceTransformer {

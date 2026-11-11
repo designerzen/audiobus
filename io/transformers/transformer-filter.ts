@@ -7,9 +7,9 @@
  * - upper: Upper bound of the note range (0-127)
  */
 
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 import { Transformer } from "./abstract-transformer.ts"
-import * as Commands from "../../commands"
+import * as Commands from "../../commands/commands"
 import type { ITransformer } from "./interface-transformer.ts"
 import { TRANSFORMER_CATEGORY_TUNING } from "./transformer-categories.ts"
 

@@ -7,8 +7,8 @@
  * then piped into the TransformManager for example
  */
 
-import AudioCommand from "../../audio-command.ts"
-import { NOTE_ON } from "../../commands"
+import AudioCommand from "../../commands/audio-command.ts"
+import { NOTE_ON } from "../../commands/commands"
 import AbstractInput from "./abstract-input.ts"
 import { addKeyboardDownEvents } from "../../hardware/keyboard/keyboard"
 import KeyboardDisplayManager from "../../ui/keyboard-display-manager.ts"
@@ -18,7 +18,7 @@ import {
 	type KeyboardConfiguration
 } from "../../hardware/keyboard/keyboard-configuration"
 import { createKeyboardSettings } from "../../ui/keyboard-settings"
-import { EVENT_CONFIGURATION_CHANGED } from "../../event-constants"
+import { EVENT_CONFIGURATION_CHANGED } from "../../events/event-constants"
 
 export const KEYBOARD_INPUT_ID = "Keyboard"
 

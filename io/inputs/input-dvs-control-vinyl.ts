@@ -10,11 +10,11 @@
  */
 import AbstractInput from "./abstract-input.ts"
 import { loadCaptureWorklet } from "./load-capture-worklet.ts"
-import { createAudioCommand } from "../../audio-command-factory.ts"
-import { DVS_CLOCK, MIDI_CLOCK } from "../../commands.ts"
+import { createAudioCommand } from "../../commands/audio-command-factory.ts"
+import { DVS_CLOCK, MIDI_CLOCK } from "../../commands/commands.ts"
 
 import type { IAudioInput } from "./input-interface.ts"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 
 export const DVS_CONTROL_VINYL_INPUT_ID = "DVS Control Vinyl"
 

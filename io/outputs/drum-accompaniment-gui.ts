@@ -10,7 +10,7 @@ import {
 	EVENT_CLICK,
 	EVENT_INPUT,
 	EVENT_CONFIGURATION_CHANGED
-} from "../../event-constants.ts"
+} from "../../events/event-constants.ts"
 
 export interface DrumAccompanimentGui {
 	element: HTMLElement

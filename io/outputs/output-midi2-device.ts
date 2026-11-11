@@ -1,14 +1,14 @@
 import { MidiOutputRouting } from "./midi-output-routing.ts"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 /**
  * MIDI 2.0 Output - Universal MIDI Packet (UMP) Implementation
  * Supports high-resolution controllers, per-note effects, and MIDI-CI
  */
 
 import { centsToPitch } from "../../conversion/cents-to-pitch.ts"
-import AudioCommand from "../../audio-command.ts"
+import AudioCommand from "../../commands/audio-command.ts"
 import type { IAudioOutput } from "./output-interface.ts"
-import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON, PITCH_BEND, PROGRAM_CHANGE } from "../../commands"
+import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON, PITCH_BEND, PROGRAM_CHANGE } from "../../commands/commands"
 import {
 	type UMPPacket,
 	PER_NOTE_CONTROLLERS,

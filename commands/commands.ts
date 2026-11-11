@@ -1,4 +1,4 @@
-export { INPUT_EVENT, OUTPUT_EVENT } from "./event-constants.ts"
+export { INPUT_EVENT, OUTPUT_EVENT } from "../events/event-constants.ts"
 
 // Things that this app can do!
 

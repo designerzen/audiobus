@@ -1,5 +1,5 @@
 import type { IAudioOutput } from "./output-interface.ts"
-import { getAudioDestination } from "../../audio-destination"
+import { getAudioDestination } from "../audio-destination"
 
 export interface AudioAsset {
 	id: string

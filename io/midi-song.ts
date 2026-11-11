@@ -1,7 +1,7 @@
 import { Midi } from "@tonejs/midi"
-import AudioCommand from "../audio-command"
-import { NOTE_ON, NOTE_OFF, CONTROL_CHANGE, PROGRAM_CHANGE, PITCH_BEND } from "../commands"
-import type { IAudioCommand } from "../audio-command-interface"
+import AudioCommand from "../commands/audio-command"
+import { NOTE_ON, NOTE_OFF, CONTROL_CHANGE, PROGRAM_CHANGE, PITCH_BEND } from "../commands/commands"
+import type { IAudioCommand } from "../commands/audio-command-interface"
 
 export interface SongEvent {
 	at: number

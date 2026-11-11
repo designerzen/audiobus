@@ -1,4 +1,4 @@
-import { EVENT_AUDIO_VIZ_READY } from "../../event-constants.ts"
+import { EVENT_AUDIO_VIZ_READY } from "../../events/event-constants.ts"
 import { instrumentNote, type InstrumentNote } from "./instrument.ts"
 import type { CanvasAudioViz } from "../visualisers/audio-viz/audio-viz.ts"
 import { registerAudioContextOutput } from "./audio-context-output.ts"

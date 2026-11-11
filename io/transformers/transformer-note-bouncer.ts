@@ -4,7 +4,7 @@ import {
 	type Settings,
 	type Voice
 } from "./performance-transformer.ts"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 
 export const ID_NOTE_BOUNCER = "Note-Bouncer"
 export class TransformerNoteBouncer extends PerformanceTransformer {

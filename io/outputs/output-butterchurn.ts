@@ -1,4 +1,4 @@
-import { EVENT_RESIZE } from "../../event-constants.ts"
+import { EVENT_RESIZE } from "../../events/event-constants.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 import "./output-butterchurn.css"
 

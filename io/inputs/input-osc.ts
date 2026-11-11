@@ -1,5 +1,5 @@
 import NoteInput from "./note-input"
-import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON } from "../../commands"
+import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON } from "../../commands/commands"
 import { changed, devicePanel } from "../device-controls"
 import { decodeOSC, oscPrefix, oscToCommand } from "../osc"
 import { OscConnection, oscControls } from "../osc-connection"

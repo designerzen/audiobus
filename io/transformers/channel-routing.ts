@@ -1,6 +1,6 @@
-import { CONTROL_CHANGE, PROGRAM_CHANGE, PITCH_BEND } from "../../commands"
+import { CONTROL_CHANGE, PROGRAM_CHANGE, PITCH_BEND } from "../../commands/commands"
 import { CHANNEL_PRESSURE, POLYPHONIC_PRESSURE } from "../../midi/midi-command-conversion.ts"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 import { copyCommand } from "./performance-transformer.ts"
 
 export function routeChannelMessage(command: IAudioCommand, channels: number[]): IAudioCommand[] {

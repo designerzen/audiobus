@@ -18,7 +18,7 @@ import {
 	EVENT_SION_READY,
 	EVENT_SION_STOP,
 	EVENT_VISIBILITY_CHANGE
-} from "../../../event-constants.ts"
+} from "../../../events/event-constants.ts"
 import styles from "./sion-player.css?inline"
 import { examples } from "./sion-examples.mjs"
 import { SiONDAW } from "./sion-daw.ts"

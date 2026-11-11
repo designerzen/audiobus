@@ -1,4 +1,4 @@
-import { EVENT_RESIZE } from "../event-constants.ts"
+import { EVENT_RESIZE } from "../events/event-constants.ts"
 /**
  * Maximum canvas size before downscaling
  * Prevents performance issues on very large displays

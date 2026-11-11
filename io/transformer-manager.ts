@@ -2,12 +2,12 @@ import {
 	EVENT_TRANSFORMERS_UPDATED,
 	EVENT_TRANSFORMERS_ADDED,
 	EVENT_TRANSFORMERS_REMOVED
-} from "../event-constants.ts"
+} from "../events/event-constants.ts"
 export {
 	EVENT_TRANSFORMERS_UPDATED,
 	EVENT_TRANSFORMERS_ADDED,
 	EVENT_TRANSFORMERS_REMOVED
-} from "../event-constants.ts"
+} from "../events/event-constants.ts"
 /**
  * TRANSFORMER -----------------------------------------------
  * GOBOTS IN DISGUISE
@@ -25,7 +25,7 @@ import {
 
 import type { Timer } from "netronome"
 import type { FieldConfig } from "./transformers/interface-transformer.ts"
-import type { IAudioCommand } from "../audio-command-interface.ts"
+import type { IAudioCommand } from "../commands/audio-command-interface.ts"
 
 const DEFAULT_TRANSFORMERS = [new TransformerHarmoniser()]
 

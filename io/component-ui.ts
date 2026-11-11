@@ -8,7 +8,7 @@ import type {
 	ControlValue,
 	UiDescriptor
 } from "control-surface/types"
-import { EVENT_CHANGE, EVENT_INPUT, EVENT_CONFIGURATION_CHANGED } from "../event-constants"
+import { EVENT_CHANGE, EVENT_INPUT, EVENT_CONFIGURATION_CHANGED } from "../events/event-constants"
 import { performanceBindings } from "./performance-controls"
 import type { FieldConfig } from "./transformers/interface-transformer"
 

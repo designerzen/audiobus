@@ -1,6 +1,6 @@
-import AudioCommand from "../audio-command"
-import type { IAudioCommand } from "../audio-command-interface"
-import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON, PITCH_BEND, PROGRAM_CHANGE } from "../commands"
+import AudioCommand from "../commands/audio-command"
+import type { IAudioCommand } from "../commands/audio-command-interface"
+import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON, PITCH_BEND, PROGRAM_CHANGE } from "../commands/commands"
 
 export const MAX_CLIP_EVENTS = 20000
 export const MAX_CLIP_DURATION = 3600

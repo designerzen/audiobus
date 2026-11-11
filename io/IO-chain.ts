@@ -1,11 +1,11 @@
-import { EVENT_CONTROL_SURFACE_NOTES, EVENT_CONFIGURATION_CHANGED } from "../event-constants.ts"
+import { EVENT_CONTROL_SURFACE_NOTES, EVENT_CONFIGURATION_CHANGED } from "../events/event-constants.ts"
 import type { SurfaceState } from "control-surface/types"
 import { validSurfaces } from "control-surface/model"
 import {
 	EVENT_SIGNAL_ACTIVITY,
 	EVENT_TRANSFORM_FAILED,
 	EVENT_PROCESSOR_ACTIVITY
-} from "../event-constants"
+} from "../events/event-constants"
 import type { Transformer } from "./transformers/abstract-transformer"
 /**
  * A single stream of data from the inputManager
@@ -35,12 +35,12 @@ import {
 	MIDI_CONTINUE,
 	MIDI_START,
 	MIDI_STOP
-} from "../commands"
-import AudioEvent from "../audio-event"
-import { DVS_CLOCK } from "../commands"
+} from "../commands/commands"
+import AudioEvent from "../models/audio-event"
+import { DVS_CLOCK } from "../commands/commands"
 
 import type { Timer } from "netronome"
-import type { IAudioCommand } from "../audio-command-interface"
+import type { IAudioCommand } from "../commands/audio-command-interface"
 import type { IAudioInput } from "./inputs/input-interface"
 import type InputAudioEvent from "./events/input-audio-event"
 import type { IAudioOutput } from "./outputs/output-interface"

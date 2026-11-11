@@ -1,6 +1,6 @@
 import NoteInput from "./note-input"
 import { action, bounded, changed, devicePanel, numberControl } from "../device-controls"
-import { EVENT_CHANGE, EVENT_CLICK } from "../../event-constants"
+import { EVENT_CHANGE, EVENT_CLICK } from "../../events/event-constants"
 import {
 	SCALE_EXPLORER_DEFAULTS,
 	effectiveScaleSet,

@@ -1,8 +1,8 @@
 import { TRANSFORMER_CATEGORY_TIMING } from "./transformer-categories.ts"
 import { Transformer } from "./abstract-transformer.ts"
-import * as Commands from "../../commands"
+import * as Commands from "../../commands/commands"
 
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 import type { Timer } from "netronome"
 import type { ITransformer } from "./interface-transformer.ts"
 

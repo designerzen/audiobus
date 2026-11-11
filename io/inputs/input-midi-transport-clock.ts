@@ -4,12 +4,12 @@ import {
 	EVENT_CONFIGURATION_CHANGED,
 	EVENT_CONNECTION_CHANGED,
 	EVENT_TRANSPORT_COMMAND
-} from "../../event-constants.ts"
+} from "../../events/event-constants.ts"
 import AbstractInput from "./abstract-input"
 import InputWebMIDIDevice from "./input-webmidi-device"
 import InputMIDI2Native from "./input-midi2-native-device"
 import type InputAudioEvent from "../events/input-audio-event"
-import { MIDI_CLOCK, MIDI_START, MIDI_STOP, MIDI_CONTINUE, NOTE_ON, NOTE_OFF } from "../../commands"
+import { MIDI_CLOCK, MIDI_START, MIDI_STOP, MIDI_CONTINUE, NOTE_ON, NOTE_OFF } from "../../commands/commands"
 
 export const MIDI_TRANSPORT_CLOCK_INPUT_ID = "MIDI Transport Clock"
 

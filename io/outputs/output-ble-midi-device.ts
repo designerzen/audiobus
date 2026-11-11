@@ -1,9 +1,9 @@
-import { EVENT_CONFIGURATION_CHANGED } from "../../event-constants.ts"
+import { EVENT_CONFIGURATION_CHANGED } from "../../events/event-constants.ts"
 import { connectToBLEDevice, disconnectBLEDevice } from "../../midi/midi-ble/ble-connection.ts"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 import { MidiOutputRouting } from "./midi-output-routing.ts"
-import { CONTROL_CHANGE, PROGRAM_CHANGE, PITCH_BEND } from "../../commands"
+import { CONTROL_CHANGE, PROGRAM_CHANGE, PITCH_BEND } from "../../commands/commands"
 import { CHANNEL_PRESSURE, POLYPHONIC_PRESSURE } from "../../midi/midi-command-conversion.ts"
 
 export const BLE_OUTPUT_ID = "BLE MIDI"

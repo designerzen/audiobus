@@ -1,6 +1,6 @@
 // oxlint-disable-next-line typescript/triple-slash-reference -- Standalone bundler asset declarations.
 /// <reference path="./assets.d.ts" />
-import { EVENT_CHANGE, EVENT_CLICK, EVENT_INSTRUMENT_CHANGE } from "../../../event-constants.ts"
+import { EVENT_CHANGE, EVENT_CLICK, EVENT_INSTRUMENT_CHANGE } from "../../../events/event-constants.ts"
 import artwork from "./star-controller.svg?raw"
 import styles from "./star-controller.css?inline"
 import { ChordController } from "../../shared/chord-controller.ts"

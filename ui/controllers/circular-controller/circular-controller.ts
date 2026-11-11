@@ -1,11 +1,11 @@
 // oxlint-disable-next-line typescript/triple-slash-reference -- Standalone bundler asset declarations.
 /// <reference path="./assets.d.ts" />
-import { EVENT_CLICK, EVENT_INSTRUMENT_CHANGE, EVENT_KEY_DOWN } from "../../../event-constants.ts"
+import { EVENT_CLICK, EVENT_INSTRUMENT_CHANGE, EVENT_KEY_DOWN } from "../../../events/event-constants.ts"
 import artwork from "./circular-controller.svg?raw"
 import styles from "./circular-controller.css?inline"
 import { TUNING_MODE_NAMES } from "../../shared/chords.js"
 import { getEmojiForScaleAndMode } from "../../shared/emoji.js"
-import Note from "../../../note-model.ts"
+import Note from "../../../models/note-model.ts"
 import { dispatchInstrumentEvent, instrumentNote, range } from "../../interfaces/instrument.ts"
 import { ChordController } from "../../shared/chord-controller.ts"
 

@@ -2,7 +2,7 @@ import { noteNumberToName } from "../../conversion/note-to-name.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 import { KokoroSpeech } from "./kokoro-speech.ts"
 import { chordSpeechName } from "./speech-vocabulary.ts"
-import { getAudioDestination } from "../../audio-destination"
+import { getAudioDestination } from "../audio-destination"
 
 interface Config {
 	enabled: number // 1 for on, 0 for off

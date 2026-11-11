@@ -4,7 +4,7 @@
  * and the length specified in simultaneous
  */
 import { Transformer } from "./abstract-transformer.ts"
-import "../../audio-command.ts"
+import "../../commands/audio-command.ts"
 import { createChord, findRotationFromNote } from "../../tuning/chords/chords.js"
 import "../../tuning/chords/describe-chord.ts"
 import "../../tuning/chords/modal-chords.js"
@@ -12,10 +12,10 @@ import "../../tuning/intervals.js"
 import { TUNING_MODE_IONIAN } from "../../tuning/scales.ts"
 import { getIntervalFormulaForMode } from "../../tuning/chords/modal-chords.js"
 import { TRANSFORMER_CATEGORY_TUNING } from "./transformer-categories.ts"
-import { cloneAudioCommand } from "../../audio-command-factory.ts"
+import { cloneAudioCommand } from "../../commands/audio-command-factory.ts"
 
 import type { Timer } from "netronome"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 import type { ITransformer } from "./interface-transformer.ts"
 import { ALL_KEYBOARD_NUMBERS } from "../inputs/input-onscreen-keyboard.ts"
 

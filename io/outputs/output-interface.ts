@@ -1,5 +1,5 @@
 import type { ComponentUi } from "control-surface/types"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 import type { AudioClockTick } from "../../timing/audio-clock-tick.ts"
 import type {
 	ChainPerformanceMeasurement,

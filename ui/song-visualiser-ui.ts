@@ -1,4 +1,4 @@
-import { EVENT_NOTE_CLICK, EVENT_CLICK, EVENT_TOGGLE } from "../event-constants.ts"
+import { EVENT_NOTE_CLICK, EVENT_CLICK, EVENT_TOGGLE } from "../events/event-constants.ts"
 /**
  * Song Visualiser UI Wrapper
  *
@@ -7,7 +7,7 @@ import { EVENT_NOTE_CLICK, EVENT_CLICK, EVENT_TOGGLE } from "../event-constants.
 
 import "./song-visualiser.ts"
 import type SongVisualiser from "./song-visualiser.ts"
-import type { IAudioCommand } from "../audio-command-interface.ts"
+import type { IAudioCommand } from "../commands/audio-command-interface.ts"
 import type OPFSStorage from "../storage/opfs-storage.ts"
 
 export class SongVisualiserUI extends HTMLElement {

@@ -3,8 +3,8 @@ import { musicAttribution } from "../inputs/ai-music-attribution"
 import { AI_MODELS } from "../inputs/ai-model-catalogue"
 import { AI_IMPROV, AI_MELODY } from "../inputs/input-types"
 import { TRANSFORMER_CATEGORY_TUNING } from "./transformer-categories.ts"
-import { NOTE_ON, NOTE_OFF } from "../../commands"
-import { cloneAudioCommand } from "../../audio-command-factory.ts"
+import { NOTE_ON, NOTE_OFF } from "../../commands/commands"
+import { cloneAudioCommand } from "../../commands/audio-command-factory.ts"
 import {
 	MAGENTA_GENERATE,
 	MAGENTA_RESULT,
@@ -12,7 +12,7 @@ import {
 	MAGENTA_ERROR
 } from "./magenta-messages.ts"
 import type { MelodyNote, MagentaRequest } from "./magenta-messages.ts"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 import type { FieldConfig } from "./interface-transformer.ts"
 import type { Timer } from "netronome"
 

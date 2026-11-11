@@ -5,8 +5,8 @@ import {
 	EVENT_KEY_UP,
 	EVENT_BLUR,
 	EVENT_VISIBILITY_CHANGE
-} from "../../event-constants.ts"
-import * as Commands from "../../commands"
+} from "../../events/event-constants.ts"
+import * as Commands from "../../commands/commands"
 import type { KeyboardConfiguration, KeyboardBinding } from "./keyboard-configuration"
 
 export const MAPPING_KEYS_TO_MIDI_NOTES = [

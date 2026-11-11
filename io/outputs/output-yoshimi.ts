@@ -1,8 +1,8 @@
 import { engineGain } from "../../instruments/engine-levels"
 import { loadYoshimi, yoshimiAsset } from "../../wam/yoshimi-assets"
 import { commandToMidi } from "../../midi/midi-command-conversion"
-import type { IAudioCommand } from "../../audio-command-interface"
-import { EVENT_PRESET_CHANGED, EVENT_CONFIGURATION_CHANGED } from "../../event-constants.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
+import { EVENT_PRESET_CHANGED, EVENT_CONFIGURATION_CHANGED } from "../../events/event-constants.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 import type { ControlValue, UiDescriptor } from "control-surface/types"
 

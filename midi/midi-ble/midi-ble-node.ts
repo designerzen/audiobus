@@ -1,4 +1,4 @@
-import { EVENT_ERROR } from "../../event-constants.ts"
+import { EVENT_ERROR } from "../../events/event-constants.ts"
 /**
  * Node JS variant of MIDI over BLE using Noble library
  * NB. this allows for use outside of the browser ecosystem

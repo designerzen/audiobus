@@ -28,10 +28,10 @@
  * - Triggers: Start/stop playback
  */
 
-import { NOTE_OFF, NOTE_ON, CONTROL_CHANGE } from "../../commands"
+import { NOTE_OFF, NOTE_ON, CONTROL_CHANGE } from "../../commands/commands"
 import type GamePad from "../../hardware/gamepad/gamepad"
 import { COMMANDS, GAME_PAD_DISCONNECTED, GamePadManager } from "../../hardware/gamepad/gamepad"
-import AudioCommand from "../../audio-command"
+import AudioCommand from "../../commands/audio-command"
 import AbstractInput from "./abstract-input"
 import type { IAudioInput } from "./input-interface"
 

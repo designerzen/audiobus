@@ -1,6 +1,6 @@
-import { NOTE_ON, NOTE_OFF } from "../commands.ts"
+import { NOTE_ON, NOTE_OFF } from "../commands/commands.ts"
 // @ts-nocheck
-import { EVENT_RESIZE } from "../event-constants.ts"
+import { EVENT_RESIZE } from "../events/event-constants.ts"
 /**
  * Song Visualiser Worker
  * Handles canvas rendering for song timeline visualization

@@ -1,4 +1,4 @@
-import { EVENT_CHANGE, EVENT_CLICK, EVENT_INPUT } from "../../../event-constants.ts"
+import { EVENT_CHANGE, EVENT_CLICK, EVENT_INPUT } from "../../../events/event-constants.ts"
 import { createProject, instruments, parseProject, projectMML } from "./sion-daw-project.mjs"
 import {
 	composeSong,

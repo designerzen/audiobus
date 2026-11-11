@@ -1,7 +1,7 @@
-import { convertNoteNumberToColour } from "./conversion/note-to-colour.ts"
-import { noteNumberToFrequency } from "./conversion/note-to-frequency.ts"
-import { noteNumberToKeyName } from "./conversion/note-to-key-name.ts"
-import { noteNumberToOctave } from "./conversion/note-to-octave.ts"
+import { convertNoteNumberToColour } from "../conversion/note-to-colour.ts"
+import { noteNumberToFrequency } from "../conversion/note-to-frequency.ts"
+import { noteNumberToKeyName } from "../conversion/note-to-key-name.ts"
+import { noteNumberToOctave } from "../conversion/note-to-octave.ts"
 
 const SOUNDS_SOLFEGE = [
 	"Do",

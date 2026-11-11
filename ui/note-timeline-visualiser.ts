@@ -1,5 +1,5 @@
-import { NOTE_ON, NOTE_OFF } from "../commands.ts"
-import { EVENT_RESIZE } from "../event-constants.ts"
+import { NOTE_ON, NOTE_OFF } from "../commands/commands.ts"
+import { EVENT_RESIZE } from "../events/event-constants.ts"
 import TIMELINE_WORKER from "./note-timeline-worker.ts?worker"
 import { AbstractResizeable } from "./abstract-resizeable-canvas"
 import { convertNoteNumberToColour } from "../conversion/note-to-colour"

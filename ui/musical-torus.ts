@@ -7,7 +7,7 @@ import {
 	EVENT_POINTER_UP,
 	EVENT_POINTER_CANCEL,
 	EVENT_LOST_POINTER_CAPTURE
-} from "../event-constants"
+} from "../events/event-constants"
 import { mod12 } from "../tuning/pitch-class-set"
 import { numberControl } from "../io/device-controls"
 

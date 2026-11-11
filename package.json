@@ -6,7 +6,10 @@
 	"main": "index.ts",
 	"exports": {
 		".": "./index.ts",
-		"./commands": "./commands.ts",
+		"./commands": "./commands/commands.ts",
+		"./commands/*": "./commands/*",
+		"./models/*": "./models/*",
+		"./events/*": "./events/*",
 		"./effects": "./effects/index.ts",
 		"./effects/*": "./effects/*",
 		"./instruments": "./instruments/index.ts",
@@ -41,7 +44,9 @@
 	},
 	"files": [
 		"*.ts",
-		"*.js",
+		"commands",
+		"models",
+		"events",
 		"effects",
 		"instruments",
 		"synthesis",

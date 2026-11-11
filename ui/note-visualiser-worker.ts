@@ -1,5 +1,5 @@
-import { NOTE_ON, NOTE_OFF } from "../commands.ts"
-import { EVENT_RESIZE } from "../event-constants.ts"
+import { NOTE_ON, NOTE_OFF } from "../commands/commands.ts"
+import { EVENT_RESIZE } from "../events/event-constants.ts"
 // The original background effect: smear coloured notes across a transparent canvas.
 let canvas: OffscreenCanvas
 let context: OffscreenCanvasRenderingContext2D

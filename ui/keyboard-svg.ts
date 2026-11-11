@@ -1,5 +1,5 @@
 import AbstractInteractive from "./abstract-interactive.ts"
-import { EVENT_CLICK } from "../event-constants.ts"
+import { EVENT_CLICK } from "../events/event-constants.ts"
 
 const DEFAULT_TITLE = "Piano Keyboard with 12 keys"
 

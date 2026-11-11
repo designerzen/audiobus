@@ -4,7 +4,7 @@
  */
 import { Transformer, type TransformerConfig } from "./abstract-transformer.ts"
 import type { ITransformer } from "./interface-transformer.ts"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 import type { Timer } from "netronome"
 import { TRANSFORMER_CATEGORY_TUNING } from "./transformer-categories.ts"
 

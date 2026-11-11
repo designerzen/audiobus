@@ -1,6 +1,6 @@
 import AbstractInput from "./abstract-input"
 import { musicalCommand } from "../event-clip"
-import { NOTE_OFF, NOTE_ON } from "../../commands"
+import { NOTE_OFF, NOTE_ON } from "../../commands/commands"
 
 /** Live controllers own their note releases, including cancellation and disconnect. */
 export default abstract class NoteInput extends AbstractInput {

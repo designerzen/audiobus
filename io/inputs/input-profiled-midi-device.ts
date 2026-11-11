@@ -5,7 +5,7 @@ import {
 	EVENT_CONFIGURATION_CHANGED,
 	EVENT_CONNECTION_CHANGED,
 	EVENT_DEVICE_LIST_CHANGED
-} from "../../event-constants"
+} from "../../events/event-constants"
 import {
 	MIDI_DEVICE_PROFILES,
 	claimMidiProfilePort,

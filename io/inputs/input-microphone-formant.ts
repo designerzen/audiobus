@@ -1,4 +1,4 @@
-import { PITCH_BEND } from "../../commands.ts"
+import { PITCH_BEND } from "../../commands/commands.ts"
 /**
  * Microphone Input with Formant-based Pitch Detection
  *
@@ -8,12 +8,12 @@ import { PITCH_BEND } from "../../commands.ts"
  * - Real-time MIDI note mapping from detected pitch
  */
 import AbstractInput from "./abstract-input.ts"
-import { createAudioCommand } from "../../audio-command-factory.ts"
-import { NOTE_ON, NOTE_OFF } from "../../commands"
+import { createAudioCommand } from "../../commands/audio-command-factory.ts"
+import { NOTE_ON, NOTE_OFF } from "../../commands/commands"
 import { frequencyToNote, frequencyToNoteCents } from "../../conversion/frequency-to-note.ts"
 
 import type { IAudioInput } from "./input-interface.ts"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 
 interface PitchResult {
 	frequency: number

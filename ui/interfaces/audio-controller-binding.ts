@@ -1,5 +1,5 @@
-import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON, PITCH_BEND, PROGRAM_CHANGE } from "../../commands.ts"
-import { EVENT_INSTRUMENT_CHANGE, EVENT_INSTRUMENT_DISCONNECT } from "../../event-constants.ts"
+import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON, PITCH_BEND, PROGRAM_CHANGE } from "../../commands/commands.ts"
+import { EVENT_INSTRUMENT_CHANGE, EVENT_INSTRUMENT_DISCONNECT } from "../../events/event-constants.ts"
 import {
 	instrumentNote,
 	noteDetail,

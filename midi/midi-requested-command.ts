@@ -3,7 +3,7 @@
  *
  */
 
-import type NoteModel from "../note-model.ts"
+import type NoteModel from "../models/note-model.ts"
 import MIDICommand from "./midi-command.ts"
 
 export default class MIDIRequestedCommand extends MIDICommand {

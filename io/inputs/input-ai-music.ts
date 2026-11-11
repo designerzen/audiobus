@@ -11,7 +11,7 @@ import {
 } from "./ai-music-messages"
 import type { AIMusicNote, AIMusicResponse } from "./ai-music-messages"
 import { action, bounded, changed, devicePanel, numberControl } from "../device-controls"
-import { EVENT_CHANGE } from "../../event-constants"
+import { EVENT_CHANGE } from "../../events/event-constants"
 
 export function parseAIPrimer(value: string): number[] {
 	const notes = value

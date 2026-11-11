@@ -10,7 +10,7 @@ import {
 	EVENT_CLICK,
 	EVENT_CONFIGURATION_CHANGED,
 	EVENT_INPUT
-} from "../event-constants.ts"
+} from "../events/event-constants.ts"
 
 export function createPolySynthGui(device: PolySynth) {
 	const events = new AbortController()

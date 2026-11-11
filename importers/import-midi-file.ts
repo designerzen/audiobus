@@ -1,7 +1,7 @@
 import { Midi } from "@tonejs/midi"
-import type { IAudioCommand } from "../audio-command-interface"
-import { NOTE_OFF, NOTE_ON } from "../commands"
-import AudioCommand from "../audio-command"
+import type { IAudioCommand } from "../commands/audio-command-interface"
+import { NOTE_OFF, NOTE_ON } from "../commands/commands"
+import AudioCommand from "../commands/audio-command"
 
 export const importMIDIFile = async (file: File) => {
 	const arrayBuffer = await file.arrayBuffer()

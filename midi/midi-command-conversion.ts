@@ -1,5 +1,5 @@
-import { createAudioCommand } from "../audio-command-factory.ts"
-import type { IAudioCommand } from "../audio-command-interface.ts"
+import { createAudioCommand } from "../commands/audio-command-factory.ts"
+import type { IAudioCommand } from "../commands/audio-command-interface.ts"
 import {
 	NOTE_ON,
 	NOTE_OFF,
@@ -10,7 +10,7 @@ import {
 	MIDI_START,
 	MIDI_STOP,
 	MIDI_CONTINUE
-} from "../commands"
+} from "../commands/commands"
 
 export const POLYPHONIC_PRESSURE = "polyphonicPressure"
 export const CHANNEL_PRESSURE = "channelPressure"

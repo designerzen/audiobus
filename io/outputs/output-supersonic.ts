@@ -9,7 +9,7 @@ import {
 	EVENT_AUDIOCONTEXT_SUSPENDED,
 	EVENT_AUDIOCONTEXT_RESUMED,
 	EVENT_AUDIOCONTEXT_INTERRUPTED
-} from "../../event-constants.ts"
+} from "../../events/event-constants.ts"
 import { SuperSonic, type SuperSonicEventMap, type SuperSonicMetrics } from "supersonic-scsynth"
 import type { IAudioOutput } from "./output-interface.ts"
 import { midiNoteToFrequency } from "../../conversion/note-to-frequency.ts"

@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest"
 import { TransformerRandomiser } from "../transformer-randomiser.ts"
-import type { IAudioCommand } from "../../../audio-command-interface.ts"
-import AudioCommand from "../../../audio-command.ts"
-import * as Commands from "../../../commands"
+import type { IAudioCommand } from "../../../commands/audio-command-interface.ts"
+import AudioCommand from "../../../commands/audio-command.ts"
+import * as Commands from "../../../commands/commands"
 
 const mockTimer = {
 	BPM: 120,

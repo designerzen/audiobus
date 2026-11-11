@@ -1,6 +1,6 @@
 import NoteInput from "./note-input"
 import { action, bounded, changed, devicePanel, numberControl } from "../device-controls"
-import { EVENT_ENDED, EVENT_VISIBILITY_CHANGE } from "../../event-constants"
+import { EVENT_ENDED, EVENT_VISIBILITY_CHANGE } from "../../events/event-constants"
 
 export default class InputMicrophoneTrigger extends NoteInput {
 	readonly requiresConnectionControl = true

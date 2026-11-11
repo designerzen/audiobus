@@ -1,6 +1,6 @@
 // oxlint-disable-next-line typescript/triple-slash-reference -- Bundler asset declarations.
 /// <reference path="./assets.d.ts" />
-import { NOTE_OFF, NOTE_ON } from "../../../commands.ts"
+import { NOTE_OFF, NOTE_ON } from "../../../commands/commands.ts"
 import {
 	EVENT_BLUR,
 	EVENT_CHANGE,
@@ -12,7 +12,7 @@ import {
 	EVENT_KEY_UP,
 	EVENT_PAGE_HIDE,
 	EVENT_VISIBILITY_CHANGE
-} from "../../../event-constants.ts"
+} from "../../../events/event-constants.ts"
 import styles from "./note-slider.css?inline"
 import { PatchController } from "../../shared/patch-controller.ts"
 import {

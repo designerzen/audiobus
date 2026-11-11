@@ -1,6 +1,6 @@
-import type { IAudioCommand } from "../../audio-command-interface"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
 import type { IAudioOutput } from "./output-interface"
-import { NOTE_OFF, NOTE_ON } from "../../commands"
+import { NOTE_OFF, NOTE_ON } from "../../commands/commands"
 import { action, devicePanel } from "../device-controls"
 import { musicalCommand } from "../event-clip"
 

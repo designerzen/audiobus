@@ -1,8 +1,8 @@
 import type { IAudioOutput } from "./output-interface"
-import type { IAudioCommand } from "../../audio-command-interface"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
 import type { AudioClockTick } from "../../timing/audio-clock-tick"
 import type { HarmonicState } from "../harmony"
-import { NOTE_ON, NOTE_OFF } from "../../commands"
+import { NOTE_ON, NOTE_OFF } from "../../commands/commands"
 import { action, devicePanel, numberControl } from "../device-controls"
 import {
 	TreeModel,
@@ -19,7 +19,7 @@ import {
 	EVENT_POINTER_UP,
 	EVENT_POINTER_CANCEL,
 	EVENT_KEY_DOWN
-} from "../../event-constants"
+} from "../../events/event-constants"
 import { NOTE_NAMES } from "../harmony"
 import { createTreeRenderer, TREE_INSTANCE_CAPACITY, type TreeRenderer } from "./tree-renderer"
 

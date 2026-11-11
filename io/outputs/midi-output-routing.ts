@@ -1,5 +1,5 @@
-import type { IAudioCommand } from "../../audio-command-interface.ts"
-import { NOTE_OFF, NOTE_ON } from "../../commands"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
+import { NOTE_OFF, NOTE_ON } from "../../commands/commands"
 import { commandToMidi } from "../../midi/midi-command-conversion.ts"
 import { ALL_MIDI_CHANNELS } from "../../midi/midi-channels.ts"
 import {

@@ -5,7 +5,7 @@ import {
 	type Voice
 } from "./performance-transformer"
 import { parseIntervals } from "./transformer-interval-stack"
-import type { IAudioCommand } from "../../audio-command-interface"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
 
 export const ID_CHORD_BLOOM = "Chord-Bloom"
 

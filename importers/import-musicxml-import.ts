@@ -1,5 +1,5 @@
-import type { IAudioCommand } from "../audio-command-interface"
-import * as Commands from "../commands"
+import type { IAudioCommand } from "../commands/audio-command-interface"
+import * as Commands from "../commands/commands"
 
 /**
  * Import MusicXML file and convert to audio commands

@@ -1,4 +1,4 @@
-import { NOTE_ON, NOTE_OFF, PITCH_BEND } from "../../commands.ts"
+import { NOTE_ON, NOTE_OFF, PITCH_BEND } from "../../commands/commands.ts"
 
 /** Structural subset of the existing Note model; noteNumber is a MIDI note, frequency is Hz. */
 export interface InstrumentNote {

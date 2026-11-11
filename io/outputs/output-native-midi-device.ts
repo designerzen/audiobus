@@ -1,6 +1,6 @@
-import { EVENT_CONFIGURATION_CHANGED } from "../../event-constants.ts"
+import { EVENT_CONFIGURATION_CHANGED } from "../../events/event-constants.ts"
 import { MidiOutputRouting } from "./midi-output-routing.ts"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 /**
  * Native OS MIDI Device Output Adapter
  * Uses Windows MIDI Services, CoreMIDI (macOS), or ALSA (Linux)

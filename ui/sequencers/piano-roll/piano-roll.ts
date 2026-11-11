@@ -1,5 +1,5 @@
-import { EVENT_SEQUENCE_CHANGE, EVENT_STEP_CHANGE } from "../../../event-constants.ts"
-import { NOTE_OFF, NOTE_ON } from "../../../commands.ts"
+import { EVENT_SEQUENCE_CHANGE, EVENT_STEP_CHANGE } from "../../../events/event-constants.ts"
+import { NOTE_OFF, NOTE_ON } from "../../../commands/commands.ts"
 import {
 	EVENT_CHANGE,
 	EVENT_CLICK,
@@ -7,7 +7,7 @@ import {
 	EVENT_KEY_DOWN,
 	EVENT_PAGE_HIDE,
 	EVENT_VISIBILITY_CHANGE
-} from "../../../event-constants.ts"
+} from "../../../events/event-constants.ts"
 import {
 	dispatchInstrumentEvent,
 	instrumentNote,

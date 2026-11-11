@@ -1,5 +1,5 @@
-import { NOTE_ON, NOTE_OFF, PITCH_BEND } from "../../commands.ts"
-import { INPUT_EVENT } from "../../event-constants.ts"
+import { NOTE_ON, NOTE_OFF, PITCH_BEND } from "../../commands/commands.ts"
+import { INPUT_EVENT } from "../../events/event-constants.ts"
 /**
  * Example: Integrating Microphone Input into HarmonEasy
  *
@@ -9,7 +9,7 @@ import { INPUT_EVENT } from "../../event-constants.ts"
 
 import InputMicrophoneFormant from "./input-microphone-formant.ts"
 import InputManager from "./input-manager.ts"
-import type { IAudioCommand } from "../../audio-command-interface.ts"
+import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 
 /**
  * Example 1: Basic microphone input setup

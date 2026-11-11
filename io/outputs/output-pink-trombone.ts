@@ -1,6 +1,6 @@
 import { engineGain } from "../../instruments/engine-levels"
-import { EVENT_CONNECTED } from "../../event-constants.ts"
-import { getAudioDestination } from "../../audio-destination"
+import { EVENT_CONNECTED } from "../../events/event-constants.ts"
+import { getAudioDestination } from "../audio-destination"
 import { midiNoteToFrequency } from "../../conversion/note-to-frequency.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 

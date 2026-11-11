@@ -2,13 +2,13 @@
  * Record any sequence of audio commands
  */
 
-import { NOTE_OFF, NOTE_ON } from "./commands"
-import AudioEvent from "./audio-event.ts"
-import AudioCommand from "./audio-command.ts"
-import { createAudioCommand } from "./audio-command-factory.ts"
+import { NOTE_OFF, NOTE_ON } from "../commands/commands"
+import AudioEvent from "../models/audio-event.ts"
+import AudioCommand from "../commands/audio-command.ts"
+import { createAudioCommand } from "../commands/audio-command-factory.ts"
 
-import type OPFSStorage from "./storage/opfs-storage.ts"
-import type { IAudioCommand } from "./audio-command-interface.ts"
+import type OPFSStorage from "../storage/opfs-storage.ts"
+import type { IAudioCommand } from "../commands/audio-command-interface.ts"
 
 interface SessionMetadata {
 	name: string

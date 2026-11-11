@@ -4,13 +4,13 @@ import {
 	EVENT_DEVICE_LIST_CHANGED,
 	EVENT_MIDI_CHANNELS_CHANGED,
 	EVENT_READY
-} from "../../event-constants.ts"
+} from "../../events/event-constants.ts"
 import { midiToCommand } from "../../midi/midi-command-conversion.ts"
 import AbstractInput from "./abstract-input.ts"
-import { createAudioCommand } from "../../audio-command-factory.ts"
+import { createAudioCommand } from "../../commands/audio-command-factory.ts"
 import type { Input } from "webmidi"
 import { sharedWebMidi, type WebMidiDeviceChange } from "../../midi/shared-webmidi"
-import { NOTE_OFF, NOTE_ON } from "../../commands"
+import { NOTE_OFF, NOTE_ON } from "../../commands/commands"
 import { ALL_MIDI_CHANNELS } from "../../midi/midi-channels.ts"
 import {
 	acceptsMidiInput,

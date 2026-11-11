@@ -1,4 +1,4 @@
-import { NOTE_ON, NOTE_OFF } from "../commands.ts"
+import { NOTE_ON, NOTE_OFF } from "../commands/commands.ts"
 /**
  * Scrolling note on / off visualisation
  */
@@ -6,7 +6,7 @@ import { NOTE_ON, NOTE_OFF } from "../commands.ts"
 import NOTE_VISUALISER_CANVAS_WORKER from "./note-visualiser-worker.js?worker"
 import { AbstractResizeable } from "./abstract-resizeable-canvas.ts"
 import type { IAudioOutput } from "../io/outputs/output-interface.ts"
-import type NoteModel from "../note-model.ts"
+import type NoteModel from "../models/note-model.ts"
 import { convertNoteNumberToColour } from "../conversion/note-to-colour"
 
 export default class NoteVisualiser extends AbstractResizeable implements IAudioOutput {

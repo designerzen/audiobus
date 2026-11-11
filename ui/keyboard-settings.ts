@@ -1,11 +1,11 @@
-import { EVENT_CHANGE, EVENT_CLICK, EVENT_KEY_DOWN, EVENT_TOGGLE } from "../event-constants"
+import { EVENT_CHANGE, EVENT_CLICK, EVENT_KEY_DOWN, EVENT_TOGGLE } from "../events/event-constants"
 import {
 	KEYBOARD_MODES,
 	KEYBOARD_COMMANDS,
 	type KeyboardConfiguration
 } from "../hardware/keyboard/keyboard-configuration"
 import { defaultKeyboardBindings } from "../hardware/keyboard/keyboard"
-import { NOTE_ON, PITCH_BEND, PROGRAM_CHANGE, CONTROL_CHANGE } from "../commands"
+import { NOTE_ON, PITCH_BEND, PROGRAM_CHANGE, CONTROL_CHANGE } from "../commands/commands"
 
 const KEYS = [
 	..."`1234567890-=qwertyuiop[]\\asdfghjkl;'zxcvbnm,./",

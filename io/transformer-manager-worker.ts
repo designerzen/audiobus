@@ -2,8 +2,8 @@ import {
 	EVENT_TRANSFORMERS_UPDATED,
 	EVENT_TRANSFORMERS_ADDED,
 	EVENT_TRANSFORMERS_REMOVED
-} from "../event-constants.ts"
-import { EVENT_TRANSFORM_FAILED } from "../event-constants"
+} from "../events/event-constants.ts"
+import { EVENT_TRANSFORM_FAILED } from "../events/event-constants"
 /**
  * Runs the live transform pipeline in input order. Expensive transformers manage
  * their own workers; live note delivery must never wait for browser idle time.
@@ -23,7 +23,7 @@ import type { TransformerTrace } from "./transformer-pipeline"
 
 import type { Timer } from "netronome"
 import type { FieldConfig } from "./transformers/interface-transformer.ts"
-import type { IAudioCommand } from "../audio-command-interface.ts"
+import type { IAudioCommand } from "../commands/audio-command-interface.ts"
 
 export default class TransformerManagerWorker extends EventTarget {
 	public id: string = Transformer.getUniqueID()

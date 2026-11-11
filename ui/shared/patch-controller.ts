@@ -1,4 +1,4 @@
-import { PROGRAM_CHANGE } from "../../commands.ts"
+import { PROGRAM_CHANGE } from "../../commands/commands.ts"
 import {
 	dispatchInstrumentEvent,
 	midi2Header,
