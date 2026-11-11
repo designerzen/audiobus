@@ -145,6 +145,9 @@ export default class TransformerManagerWorker extends EventTarget {
 	 * Overwrite the whole transformers queue stack
 	 */
 	setTransformers(transformers: Array<Transformer<any>>): void {
+		const removed = this.#transformers.filter(
+			(transformer) => !transformers.includes(transformer)
+		)
 		for (const transformer of this.#transformers) {
 			if (!transformers.includes(transformer)) {
 				transformer.destroy()
@@ -155,7 +158,7 @@ export default class TransformerManagerWorker extends EventTarget {
 		transformers.forEach((transformer: Transformer<any>) =>
 			this.appendTransformer(transformer, false)
 		)
-		this.dispatchEvent(new CustomEvent(EVENT_TRANSFORMERS_UPDATED))
+		this.dispatchEvent(new CustomEvent(EVENT_TRANSFORMERS_UPDATED, { detail: { removed } }))
 	}
 
 	/**

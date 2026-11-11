@@ -10,6 +10,8 @@ export interface ITransformer extends ComponentUi {
 
 	transform(commands: IAudioCommand[], timer: Timer): IAudioCommand[]
 	tick?(now: number, timer: Timer): IAudioCommand[]
+	/** Immediate controller cleanup when transport stops or a generator is removed. */
+	stop?(now: number): IAudioCommand[]
 	setMusicalBeat?(beat: number): void
 	setHarmony?(state: import("../harmony").HarmonicState): void
 	readonly handlesMidiControls?: boolean

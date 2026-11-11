@@ -592,6 +592,16 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		subtype: "variation"
 	},
 
+	[TRANSFORMER_TYPE.ID_ENSEMBLE]: {
+		id: TRANSFORMER_TYPE.ID_ENSEMBLE,
+		name: "Ensemble",
+		description:
+			"Perform a MIDI song together with shared timing and input-to-part assignments",
+		icon: "/icons/transformer-midi-file-player.svg",
+		category: "Input",
+		type: "transformer",
+		subtype: "input"
+	},
 	[TRANSFORMER_TYPE.ID_MIDI_FILE_PLAYER]: {
 		id: TRANSFORMER_TYPE.ID_MIDI_FILE_PLAYER,
 		name: "MIDI File Player",

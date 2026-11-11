@@ -18,6 +18,7 @@ import AbstractInput from "./inputs/abstract-input"
 import type { IAudioInput } from "./inputs/input-interface"
 import type InputAudioEvent from "./events/input-audio-event"
 import { refreshMidiDeviceProfiles } from "../midi/hardware/device-profiles"
+import { deviceId } from "./device-definition"
 
 export default class InputManager extends AbstractInput {
 	async getAvailableFactories() {
@@ -138,6 +139,7 @@ export default class InputManager extends AbstractInput {
 		event.preventDefault()
 		// create a clone and dispatch
 		const clone: InputAudioEvent = event.clone()
+		clone.command.inputId ??= deviceId(event.target as object)
 		this.dispatchEvent(clone)
 	}
 }

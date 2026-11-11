@@ -132,6 +132,7 @@ export default class GamePad {
 	connectionIndex = -1
 	gamePadIndex = -1
 	gamepad: Gamepad | null = null // just a cache of the last state
+	private deviceName?: string
 	available = false
 	connected = false
 
@@ -202,6 +203,7 @@ export default class GamePad {
 		this.available = true
 		this.gamepad = gamepad
 		this.index = gamepad.index
+		this.deviceName = gamepad.id
 
 		this.standardMapping = gamepad.mapping === "standard"
 
@@ -409,7 +411,7 @@ export default class GamePad {
 	}
 
 	get id(): string {
-		return this.gamepad?.id ?? String(this.gamePadIndex)
+		return this.gamepad?.id ?? this.deviceName ?? String(this.gamePadIndex)
 	}
 
 	toStringState() {
@@ -452,7 +454,11 @@ export class GamePadManager {
 				}
 				pad.disconnect()
 				this.controllers.delete(event.gamepad.index)
-				this.held.clear()
+				for (const key of this.held.keys()) {
+					if (key.startsWith(`${pad.index}:`)) {
+						this.held.delete(key)
+					}
+				}
 				this.dispatchEvent(GAME_PAD_DISCONNECTED, 0, pad)
 			},
 			{ signal: this.abortController.signal }
@@ -476,9 +482,9 @@ export class GamePadManager {
 			}
 			if (!button.includes("stick")) {
 				if (numericValue) {
-					this.held.set(button, numericValue)
+					this.held.set(`${pad.index}:${button}`, numericValue)
 				} else {
-					this.held.delete(button)
+					this.held.delete(`${pad.index}:${button}`)
 				}
 			}
 			this.dispatchEvent(button, numericValue, pad, heldFor)
@@ -495,8 +501,10 @@ export class GamePadManager {
 		}
 		this.animationFrame = this.controllers.size ? requestAnimationFrame(this.update) : -1
 	}
-	isHeld(buttonName: string): boolean {
-		return this.held.has(buttonName)
+	isHeld(buttonName: string, index?: number): boolean {
+		return index === undefined
+			? [...this.held.keys()].some((key) => key.endsWith(`:${buttonName}`))
+			: this.held.has(`${index}:${buttonName}`)
 	}
 	dispatchEvent(key: string, value: number, gamePad: GamePad, heldFor = -1) {
 		for (const callback of this.callbacks) {

@@ -126,7 +126,6 @@ export default class InputGamePad extends AbstractInput implements IAudioInput {
 	}
 
 	/**
-	 * FIXME: Add in ability for multile gamepads
 	 * Game pad state has updated - have buttons been mashed?
 	 * @param button
 	 * @param value
@@ -142,11 +141,42 @@ export default class InputGamePad extends AbstractInput implements IAudioInput {
 		// Update visual representation
 		this.#visualizer?.updateButtonVisual(button, value > 0)
 
-		const isHeld = this.gamePadManager.isHeld(button)
+		const isHeld = value > 0
+		if (
+			this.options.gamepadIndex != null &&
+			Number(this.options.gamepadIndex) !== gamePad.index
+		) {
+			return
+		}
+		const key = `${gamePad.index}:${button}`
+		if (button === GAME_PAD_DISCONNECTED) {
+			for (const held of this.gamepadHeld.keys()) {
+				if (!held.startsWith(`${gamePad.index}:`)) {
+					continue
+				}
+				const name = held.slice(held.indexOf(":") + 1)
+				this.dispatch(
+					Object.assign(new AudioCommand(), {
+						type: NOTE_OFF,
+						number: Object.values(COMMANDS).indexOf(name),
+						velocity: 0,
+						channel: 1,
+						from: `${GAMEPAD_INPUT_ID}:${gamePad.index}:${gamePad.id}`,
+						startAt: this.now,
+						time: this.now
+					})
+				)
+				this.gamepadHeld.delete(held)
+			}
+			return
+		}
 
 		const command = new AudioCommand()
 		command.value = value
-		command.from = GAMEPAD_INPUT_ID + gamePad.id
+		command.from = `${GAMEPAD_INPUT_ID}:${gamePad.index}:${gamePad.id}`
+		command.number = Object.values(COMMANDS).indexOf(button)
+		command.velocity = isHeld ? 127 : 0
+		command.channel = 1
 		command.text = button
 		command.time = this.now // ?? gamePad.timestamp // FIXME:
 		command.startAt = this.now // ?? gamePad.timestamp
@@ -163,14 +193,14 @@ export default class InputGamePad extends AbstractInput implements IAudioInput {
 				// case COMMANDS.DOWN:
 				// case COMMANDS.LEFT:
 				// case COMMANDS.RIGHT:
-				break
+				return
 
 			// we want to preserve the state of certain buttons
 			default:
 				if (value) {
-					this.gamepadHeld.set(button, value)
+					this.gamepadHeld.set(key, value)
 				} else {
-					this.gamepadHeld.delete(button)
+					this.gamepadHeld.delete(key)
 				}
 				command.type = isHeld ? NOTE_ON : NOTE_OFF
 		}

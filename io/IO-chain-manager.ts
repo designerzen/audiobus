@@ -26,6 +26,7 @@ import { deviceId, deviceDefinition, defineDevice } from "./device-definition"
 import { restoreDevice, UnavailableDevice, type SavedDevice } from "./workspace-devices"
 import { EVENT_DESTROYED } from "../event-constants"
 import OutputManager from "./output-manager"
+import { installEnsembleControls } from "./ensemble-controls"
 import AbstractInput from "./inputs/abstract-input"
 import { INPUT_EVENT, PLAYBACK_TOGGLE, PLAYBACK_STOP, MIDI_STOP, CONTROL_CHANGE } from "../commands"
 
@@ -838,6 +839,7 @@ export class IOChainManager extends EventTarget {
 		]) {
 			chain.addEventListener(event, this.changed, { signal: controller.signal })
 		}
+		installEnsembleControls(chain, controller.signal)
 		chain.addEventListener(
 			INPUT_EVENT,
 			(event: any) => {

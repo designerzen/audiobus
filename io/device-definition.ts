@@ -1,4 +1,6 @@
 import { installComponentUi } from "./component-ui"
+import { installOutputChannelFilter, outputReceiveChannels } from "./outputs/output-channel-filter"
+import type { IAudioOutput } from "./outputs/output-interface"
 
 export interface DeviceDefinition {
 	factory:
@@ -53,6 +55,12 @@ export function defineDevice<T extends object>(
 	if (id) {
 		ids.set(device, id)
 	}
+	if (["output", "instrument", "polyphonic", "keyboard-output"].includes(definition.factory)) {
+		installOutputChannelFilter(
+			device as unknown as IAudioOutput,
+			definition.options?.receiveChannels
+		)
+	}
 	installComponentUi(device)
 	return device
 }
@@ -64,6 +72,12 @@ export function deviceDefinition(device: object): DeviceDefinition {
 	}
 	return {
 		...definition,
-		options: { ...definition.options, ...configurationData((device as any).options) }
+		options: {
+			...definition.options,
+			...configurationData((device as any).options),
+			...(outputReceiveChannels(device)
+				? { receiveChannels: outputReceiveChannels(device) }
+				: {})
+		}
 	}
 }

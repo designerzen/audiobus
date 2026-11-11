@@ -4,6 +4,7 @@
  */
 
 export const KEYBOARD = "keyboard" as const
+export const CHANNEL_TRIGGER = "channel-trigger" as const
 export const SCALE_EXPLORER = "scale-explorer" as const
 export const MIDI_FILE = "midi-file" as const
 export const STEP_SEQUENCER = "step-sequencer" as const

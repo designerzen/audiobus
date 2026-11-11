@@ -36,4 +36,6 @@ export interface IAudioCommand {
 	umpOriginal?: { type: string; number: number; velocity: number; value: number }
 	// UNOFFICIAL: From Device (uuid)
 	from: string
+	// Persistent local input identity, independent of device-supplied source labels.
+	inputId?: string
 }

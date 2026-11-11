@@ -25,6 +25,15 @@ export interface InputDefinition extends DeviceClassification {
 }
 
 export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
+	[INPUT_TYPES.CHANNEL_TRIGGER]: {
+		id: INPUT_TYPES.CHANNEL_TRIGGER,
+		name: "Song Channel Trigger",
+		description: "A song-part pad with an assigned keyboard key or gamepad",
+		type: "controller",
+		subtype: "pads",
+		category: "Device",
+		icon: "/icons/transformer-midi-file-player.svg"
+	},
 	[INPUT_TYPES.COSMO_DOTS]: {
 		id: INPUT_TYPES.COSMO_DOTS,
 		name: "Cosmo Dots",

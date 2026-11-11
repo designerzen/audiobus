@@ -9,6 +9,7 @@ export const SONG_TREE = "song-tree" as const
 export const SION = "sion" as const
 export const SAMPLE_PLAYER = "sample-player" as const
 export const CHROMATIC_SAMPLER = "chromatic-sampler" as const
+export const ROMPLER = "rompler" as const
 export const HARMONY_SAMPLER = "harmony-sampler" as const
 export const EVENT_RECORDER = "event-recorder" as const
 export const OSC = "osc" as const
@@ -47,6 +48,7 @@ export type OutputId =
 	| typeof SONG_TREE
 	| typeof SAMPLE_PLAYER
 	| typeof CHROMATIC_SAMPLER
+	| typeof ROMPLER
 	| typeof HARMONY_SAMPLER
 	| typeof EVENT_RECORDER
 	| typeof OSC

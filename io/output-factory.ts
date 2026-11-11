@@ -31,6 +31,8 @@ const loadSupportingLibrary = async (type: string) => {
 	switch (type) {
 		case OUTPUT_TYPES.CHROMATIC_SAMPLER:
 			return await import("./outputs/output-chromatic-sampler")
+		case OUTPUT_TYPES.ROMPLER:
+			return await import("./outputs/rompler/output-rompler")
 		case OUTPUT_TYPES.SYNTH_303:
 			return await import("./outputs/output-303")
 		case OUTPUT_TYPES.DRUM_KIT:
@@ -199,6 +201,11 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.CHROMATIC_SAMPLER],
 		isAvailable: () => typeof AudioWorkletNode !== "undefined",
 		create: (options) => createOutput(OUTPUT_TYPES.CHROMATIC_SAMPLER, options)
+	},
+	{
+		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.ROMPLER],
+		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.ROMPLER, options)
 	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.SYNTH_303],

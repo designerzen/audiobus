@@ -1,4 +1,5 @@
 import { IdentityTransformer } from "./transformers/transformer-identity.ts"
+import { ID_ENSEMBLE, TransformerEnsemble } from "./transformers/transformer-ensemble"
 import { ID_GROOVE, TransformerGroove } from "./transformers/transformer-groove.ts"
 import {
 	ID_PROGRESSION_STEPPER,
@@ -129,6 +130,8 @@ import {
 
 export const tranformerFactory = (type: string, config: any = {}) => {
 	switch (type) {
+		case ID_ENSEMBLE:
+			return new TransformerEnsemble(config)
 		case ID_GROOVE:
 			return new TransformerGroove(config)
 		case ID_PROGRESSION_STEPPER:
@@ -251,6 +254,7 @@ export const tranformerFactory = (type: string, config: any = {}) => {
 }
 
 export const TRANSFORMER_TYPE = {
+	ID_ENSEMBLE,
 	ID_GROOVE,
 	ID_PROGRESSION_STEPPER,
 	ID_HARMONIC_BRIDGE,

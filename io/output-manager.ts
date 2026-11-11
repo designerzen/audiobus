@@ -9,6 +9,7 @@ import { configurationUpdate } from "./configuration-events"
 import OutputAudioEvent from "./events/output-audio-event.ts"
 
 import AudioCommand from "../audio-command"
+import { acceptsOutputChannel, outputReceiveChannels } from "./outputs/output-channel-filter"
 import type { IAudioCommand } from "../audio-command-interface"
 import type { IAudioOutput } from "./outputs/output-interface.ts"
 
@@ -115,7 +116,10 @@ export default class OutputManager extends EventTarget implements IAudioOutput {
 		this.#outputs.push(output)
 		if (output instanceof EventTarget) {
 			const changed = () => {
-				if (output.sendCommand && output.configurationAffectsNoteRouting !== false) {
+				if (
+					(output.sendCommand && output.configurationAffectsNoteRouting !== false) ||
+					outputReceiveChannels(output)
+				) {
 					owners.delete(output)
 					noteCommands.delete(output)
 				}
@@ -197,7 +201,11 @@ export default class OutputManager extends EventTarget implements IAudioOutput {
 		command: IAudioCommand,
 		output: IAudioOutput
 	): Promise<IAudioCommand> {
-		if (!this.#outputs.includes(output) || !this.isEnabled(output)) {
+		if (
+			!this.#outputs.includes(output) ||
+			!this.isEnabled(output) ||
+			!acceptsOutputChannel(output, command)
+		) {
 			return command
 		}
 		if (command.type !== NOTE_ON && command.type !== NOTE_OFF) {

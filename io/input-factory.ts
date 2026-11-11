@@ -37,6 +37,8 @@ const loadSupportingLibrary = async (type: string) => {
 	}
 	// Create and return instance based on type
 	switch (type) {
+		case INPUT_TYPES.CHANNEL_TRIGGER:
+			return await import("./inputs/input-channel-trigger")
 		case INPUT_TYPES.SCALE_EXPLORER:
 			return await import("./inputs/input-scale-explorer")
 		case INPUT_TYPES.STEP_SEQUENCER:
@@ -149,6 +151,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		INPUT_TYPES.SCALE_EXPLORER,
 		INPUT_TYPES.STEP_SEQUENCER,
 		INPUT_TYPES.PADS,
+		INPUT_TYPES.CHANNEL_TRIGGER,
 		INPUT_TYPES.COSMO_DOTS,
 		INPUT_TYPES.EVENT_LOOP
 	].map((id) => ({

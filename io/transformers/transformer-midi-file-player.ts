@@ -4,6 +4,7 @@ import { Transformer } from "./abstract-transformer.ts"
 import AudioCommand from "../../audio-command.ts"
 import * as Commands from "../../commands"
 import { Midi } from "@tonejs/midi"
+import { loadMidi, midiSong } from "../midi-song"
 import {
 	EVENT_CHANGE,
 	EVENT_CLICK,
@@ -261,7 +262,9 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 		)
 		const loop = element("input")
 		loop.type = "checkbox"
-		loop.addEventListener(EVENT_CHANGE, () => this.setControlValue("loop", loop.checked ? 1 : 0))
+		loop.addEventListener(EVENT_CHANGE, () =>
+			this.setControlValue("loop", loop.checked ? 1 : 0)
+		)
 		const repeat = element("label", "midi-file-player-check")
 		repeat.append(loop, element("span", "", "Repeat"))
 		const settings = element("div", "midi-file-player-settings")
@@ -285,7 +288,9 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 			track.replaceChildren(option("Auto", "-1"))
 			for (const [index, { name, notes }] of (this.midiData?.tracks ?? []).entries()) {
 				if (notes.length) {
-					track.add(option(`${index + 1} · ${name || `Track ${index + 1}`}`, String(index)))
+					track.add(
+						option(`${index + 1} · ${name || `Track ${index + 1}`}`, String(index))
+					)
 				}
 			}
 			track.value = String(this.config.trackIndex)
@@ -363,9 +368,7 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 					choose.textContent = song.name.replace(/\.midi?$/i, "")
 					choose.title = song.name
 					choose.addEventListener(EVENT_CLICK, () => {
-						results
-							.querySelector("[aria-current]")
-							?.removeAttribute("aria-current")
+						results.querySelector("[aria-current]")?.removeAttribute("aria-current")
 						choose.setAttribute("aria-current", "true")
 						this.setConfig("trackIndex", -1)
 						this.setConfig("midiFileUrl", song.downloadUrl)
@@ -649,23 +652,13 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 				this.melody = []
 				return
 			}
-			// Fetch the MIDI file from the URL
-			// Public asset paths are relative to the application, including on nested preset pages.
-			const resolved = /^(?:[a-z][a-z\d+.-]*:|\/)/i.test(url)
-				? url
-				: `${import.meta.env.BASE_URL}${url}`
-			const response = await fetch(resolved)
-			if (!response.ok) {
-				throw new Error(`Failed to fetch MIDI file: ${response.statusText}`)
-			}
-
-			const arrayBuffer = await response.arrayBuffer()
+			const midi = await loadMidi(url)
 			if (revision !== this.loadRevision) {
 				return
 			}
 
 			// Parse MIDI using @tonejs/midi library
-			this.midiData = new Midi(arrayBuffer)
+			this.midiData = midi
 			if (!this.midiData.tracks.some((track) => track.notes.length)) {
 				throw new Error("MIDI file contains no playable notes")
 			}
@@ -697,44 +690,9 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 	 * Extract NOTE_ON and NOTE_OFF commands from the loaded MIDI data
 	 */
 	private extractMIDICommands(): void {
-		this.midiCommands = []
-
-		if (!this.midiData || !this.midiData.tracks || this.midiData.tracks.length === 0) {
-			return
-		}
-
-		// Process all tracks and extract note events
-		for (const track of this.midiData.tracks) {
-			if (!track.notes || track.notes.length === 0) {
-				continue
-			}
-
-			for (const note of track.notes) {
-				// Create NOTE_ON command
-				const noteOn = new AudioCommand()
-				noteOn.type = Commands.NOTE_ON
-				noteOn.subtype = "Note on"
-				noteOn.number = note.midi
-				// @tonejs/midi uses 0-1 for velocity, convert to 0-127
-				noteOn.velocity = Math.round((note.velocity || 0.5) * 127)
-				noteOn.startAt = note.time
-				noteOn.time = note.time
-				this.midiCommands.push(noteOn)
-
-				// Create NOTE_OFF command
-				const noteOff = new AudioCommand()
-				noteOff.type = Commands.NOTE_OFF
-				noteOff.subtype = "Note off"
-				noteOff.number = note.midi
-				noteOff.velocity = 0
-				noteOff.startAt = note.time + note.duration
-				noteOff.time = note.time + note.duration
-				this.midiCommands.push(noteOff)
-			}
-		}
-
-		// Sort commands by start time
-		this.midiCommands.sort((a, b) => a.startAt - b.startAt)
+		this.midiCommands = this.midiData
+			? midiSong(this.midiData).events.map((event) => event.command)
+			: []
 	}
 
 	/**
@@ -803,22 +761,10 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 
 		// Generate MIDI commands from the loaded file
 		for (const midiCmd of this.midiCommands) {
-			const newCmd = new AudioCommand()
-
-			// Copy MIDI command properties
-			newCmd.type = midiCmd.type
-			newCmd.subtype = midiCmd.subtype
-			newCmd.number = midiCmd.number
-			newCmd.velocity = midiCmd.velocity
-			newCmd.value = midiCmd.value
-			newCmd.pitchBend = midiCmd.pitchBend
-			newCmd.time = midiCmd.time
-			newCmd.timeCode = midiCmd.timeCode
-			newCmd.text = midiCmd.text
-
-			// Schedule relative to the first incoming NOTE_ON
-			newCmd.startAt = midiStartTime + midiCmd.startAt
-			newCmd.endAt = midiCmd.endAt
+			const newCmd = Object.assign(new AudioCommand(), midiCmd, {
+				startAt: midiStartTime + midiCmd.startAt,
+				time: midiStartTime + midiCmd.startAt
+			})
 
 			transformed.push(newCmd)
 		}

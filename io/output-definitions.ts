@@ -37,6 +37,15 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		category: "Audio",
 		icon: "/icons/output-recorder.svg"
 	},
+	[OUTPUT_TYPES.ROMPLER]: {
+		id: OUTPUT_TYPES.ROMPLER,
+		name: "Rompler",
+		description: "General MIDI soundfont instruments that stream in as you play",
+		type: "engine",
+		subtype: "instrument",
+		category: "Audio",
+		icon: "/icons/device-instrument.svg"
+	},
 	[OUTPUT_TYPES.SONG_TREE]: {
 		id: OUTPUT_TYPES.SONG_TREE,
 		name: "Song Tree",

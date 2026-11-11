@@ -441,11 +441,18 @@ export default class IOChain extends EventTarget {
 	 */
 	clearNoteCommands(): void {
 		this.#generation++
+		const cleanup = this.transformers.flatMap(
+			(transformer) => transformer.stop?.(this.timer.now) ?? []
+		)
 		this.#transformerManager.reset()
 		this.#audioCommandQueue = this.#audioCommandQueue.filter(
 			(cmd) => cmd.type !== NOTE_ON && cmd.type !== NOTE_OFF
 		)
 		this.outputManager.allNotesOff()
+		// OutputManager owns the actual transformed pitches; generators own pedal/bend state.
+		void this.triggerAudioCommandsOnDevice(
+			cleanup.filter((cmd) => cmd.type !== NOTE_ON && cmd.type !== NOTE_OFF)
+		)
 	}
 
 	/**
@@ -889,6 +896,7 @@ export default class IOChain extends EventTarget {
 		if (this.#destroyed) {
 			return
 		}
+		this.clearNoteCommands()
 		this.#destroyed = true
 		this.#generation++
 		this.#audioCommandQueue = []
@@ -1045,6 +1053,14 @@ export default class IOChain extends EventTarget {
 	 */
 	onTransformersChanged(transformerEvent: CustomEvent): void {
 		transformerEvent.preventDefault()
+		const cleanup = ((transformerEvent.detail?.removed ?? []) as ITransformer[]).flatMap(
+			(transformer) => transformer.stop?.(this.timer.now) ?? []
+		)
+		if (cleanup.length) {
+			void this.triggerAudioCommandsOnDevice(
+				cleanup.filter((cmd) => cmd.type !== NOTE_ON && cmd.type !== NOTE_OFF)
+			)
+		}
 		this.clearNoteCommands()
 		this.dispatchEvent(
 			new CustomEvent(transformerEvent.type, { detail: transformerEvent.detail })

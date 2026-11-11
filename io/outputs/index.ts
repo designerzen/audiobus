@@ -10,3 +10,4 @@ export type { OutputAudioEvent } from "../events/index.ts"
 
 export { default as OutputSiON } from "./output-sion.ts"
 export { default as ChromaticSampler } from "./output-chromatic-sampler.ts"
+export { default as Rompler } from "./rompler/output-rompler.ts"
