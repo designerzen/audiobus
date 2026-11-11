@@ -50,8 +50,8 @@ import type { IAudioInput } from "./inputs/input-interface"
 import type { IAudioOutput } from "./outputs/output-interface"
 import type { AudioClockTick } from "../timing/audio-clock-tick.ts"
 import type { TimerPerformanceMeasurement } from "./outputs/performance-metrics"
-import type { IAudioCommand } from "audiobus/commands/audio-command-interface"
-import type AudioEvent from "audiobus/models/audio-event"
+import type { IAudioCommand } from "../commands/audio-command-interface.ts"
+import type AudioEvent from "../models/audio-event.ts"
 
 export interface IOChainManagerOptions {
 	/**

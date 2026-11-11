@@ -5,7 +5,7 @@ import { midiNoteToFrequency } from "../../conversion/note-to-frequency.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 
 // import the component if it doesn't already exist
-import "../../../pink-trombone/pink-trombone.js"
+import "pink-trombone/pink-trombone.js"
 
 interface Config {
 	enabled: number // 1 for on, 0 for off
