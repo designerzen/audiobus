@@ -72,6 +72,21 @@ export default class OutputManager extends EventTarget implements IAudioOutput {
 		return "OutputManager-" + OutputManager.ID
 	}
 
+	moveAfter(output: IAudioOutput, previous: IAudioOutput): void {
+		if (
+			output === previous ||
+			!output.audioInput ||
+			!this.#outputs.includes(output) ||
+			!this.#outputs.includes(previous)
+		) {
+			return
+		}
+		const processors = this.#outputs.filter((entry) => entry.audioInput && entry !== output)
+		processors.splice(processors.indexOf(previous) + 1, 0, output)
+		this.#outputs = [...this.#outputs.filter((entry) => !entry.audioInput), ...processors]
+		this.dispatchEvent(new Event(EVENT_OUTPUTS_UPDATED))
+	}
+
 	get outputs(): IAudioOutput[] {
 		return this.#outputs
 	}

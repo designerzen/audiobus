@@ -1,3 +1,4 @@
+import { OutputAudioRouting } from "./output-audio-routing"
 import {
 	EVENT_CHAIN_ADDED,
 	EVENT_CHAIN_REMOVED,
@@ -28,7 +29,13 @@ import { EVENT_DESTROYED } from "../events/event-constants"
 import OutputManager from "./output-manager"
 import { installEnsembleControls } from "./ensemble-controls"
 import AbstractInput from "./inputs/abstract-input"
-import { INPUT_EVENT, PLAYBACK_TOGGLE, PLAYBACK_STOP, MIDI_STOP, CONTROL_CHANGE } from "../commands/commands"
+import {
+	INPUT_EVENT,
+	PLAYBACK_TOGGLE,
+	PLAYBACK_STOP,
+	MIDI_STOP,
+	CONTROL_CHANGE
+} from "../commands/commands"
 
 /**
  * Manager for managing multiple IOChain instances
@@ -250,6 +257,11 @@ export class IOChainManager extends EventTarget {
 		this.dispatchEvent(new Event(EVENT_CHAINS_UPDATED))
 	}
 
+	private audioRouting?: OutputAudioRouting
+	getOutputChannel(output: IAudioOutput): GainNode | undefined {
+		return this.audioRouting?.getChannel(output)
+	}
+
 	private syncDevices(): void {
 		const next = new Map<
 			string,
@@ -286,6 +298,8 @@ export class IOChainManager extends EventTarget {
 		removed.forEach(([id, entry]) => {
 			void this.disposeDevice(id, entry.device)
 		})
+		this.audioRouting ??= new OutputAudioRouting(this.outputMixer)
+		this.audioRouting.sync(this.chains)
 		this.syncClockOutputs()
 	}
 

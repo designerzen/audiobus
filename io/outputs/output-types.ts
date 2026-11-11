@@ -3,6 +3,7 @@
  * Single source of truth for output IDs used throughout the application
  */
 
+export const IMPULSE_RESPONSE = "impulse-response" as const
 export const CONSOLE = "console" as const
 export const NOTE_MONITOR = "note-monitor" as const
 export const SONG_TREE = "song-tree" as const
@@ -43,6 +44,7 @@ export const webclapOutputId = (pluginId: string): `webclap:${string}` =>
 	`${WEBCLAP_PREFIX}${pluginId}`
 
 export type OutputId =
+	| typeof IMPULSE_RESPONSE
 	| typeof SION
 	| typeof NOTE_MONITOR
 	| typeof SONG_TREE

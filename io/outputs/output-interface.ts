@@ -32,6 +32,8 @@ export interface IAudioOutput extends ComponentUi {
 	// optional
 	readonly requiresConnectionControl?: boolean
 	readonly output?: AudioNode | import("webmidi").Output
+	/** Audio processors receive upstream Outputs here and expose processed audio via output. */
+	readonly audioInput?: AudioNode
 	connect?(): unknown
 	disconnect?(): Promise<void | Function> | Function
 	createGui?(): Promise<HTMLElement>

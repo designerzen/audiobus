@@ -29,6 +29,8 @@ export interface OutputFactory extends DeviceClassification {
 const loadSupportingLibrary = async (type: string) => {
 	// Create and return instance based on type
 	switch (type) {
+		case OUTPUT_TYPES.IMPULSE_RESPONSE:
+			return await import("./outputs/output-impulse-response")
 		case OUTPUT_TYPES.CHROMATIC_SAMPLER:
 			return await import("./outputs/output-chromatic-sampler")
 		case OUTPUT_TYPES.ROMPLER:
@@ -133,6 +135,9 @@ const loadSupportingLibraries = async (type: string): Promise<any> => {
  */
 const createOutput = async (type: string, options?: Record<string, any>): Promise<IAudioOutput> => {
 	const Class = await loadSupportingLibraries(type)
+	if (type === OUTPUT_TYPES.IMPULSE_RESPONSE) {
+		return Class.create(options)
+	}
 
 	// Handle special cases that need parameters
 	if (type === OUTPUT_TYPES.SPECTRUM_ANALYSER) {
@@ -197,6 +202,11 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
  * Uses lazy loading for better performance
  */
 export const OUTPUT_FACTORIES: OutputFactory[] = [
+	{
+		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.IMPULSE_RESPONSE],
+		isAvailable: () => typeof AudioContext !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.IMPULSE_RESPONSE, options)
+	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.CHROMATIC_SAMPLER],
 		isAvailable: () => typeof AudioWorkletNode !== "undefined",

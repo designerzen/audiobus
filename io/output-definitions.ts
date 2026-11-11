@@ -27,6 +27,16 @@ export interface OutputDefinition extends DeviceClassification {
 }
 
 export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
+	[OUTPUT_TYPES.IMPULSE_RESPONSE]: {
+		id: OUTPUT_TYPES.IMPULSE_RESPONSE,
+		name: "Impulse Response",
+		description:
+			"Chain convolution filters for reverbs, spaces and speaker cabinets using your own impulse responses",
+		type: "audio",
+		subtype: "effect",
+		category: "Audio",
+		icon: "/icons/output-default.svg"
+	},
 	[OUTPUT_TYPES.CHROMATIC_SAMPLER]: {
 		id: OUTPUT_TYPES.CHROMATIC_SAMPLER,
 		name: "ChromaticSampler",
