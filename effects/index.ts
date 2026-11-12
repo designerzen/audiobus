@@ -10,18 +10,15 @@ export type {
 	VoxengoBiquadOptions
 } from "./biquad-voxengo.ts"
 
-export { Effect, AudioEffect } from "./effect.ts"
-
-export { Reverb, ReverbParams } from "./reverb.ts"
-
-export { Delay, DelayParams } from "./delay.ts"
-
-export { Distortion, DistortionParams } from "./distortion.ts"
-
-export { Compressor, CompressorParams } from "./compressor.ts"
-
-export { EQ, EQBand } from "./eq.ts"
-
-export { EffectFactory, createEffect, getAvailableEffects } from "./effect-factory.ts"
-
-export { EffectChain } from "./effect-chain.ts"
+export type {
+	IEffect,
+	EffectDefinition,
+	EffectParameter,
+	EffectChoice,
+	EffectValue
+} from "./effect-interface.ts"
+export { default as AbstractEffect } from "./abstract-effect.ts"
+export * from "./effect-definitions.ts"
+export { EFFECT_REGISTRY } from "./effect-registry.ts"
+export type { EffectEntry } from "./effect-registry.ts"
+export { createReverbImpulseResponse } from "./reverb.ts"

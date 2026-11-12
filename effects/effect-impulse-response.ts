@@ -1,7 +1,8 @@
-import type { IAudioOutput } from "./output-interface"
-import { EVENT_CHANGE } from "../../events/event-constants"
-import { bounded, changed, devicePanel, numberControl } from "../device-controls"
-import { createReverbImpulseResponse } from "../../effects/reverb"
+import AbstractEffect from "./abstract-effect"
+import { IMPULSE_RESPONSE } from "./effect-definitions"
+import { EVENT_CHANGE } from "../events/event-constants"
+import { changed } from "../io/device-controls"
+import { createReverbImpulseResponse } from "./reverb"
 import {
 	BUILTIN_ROOM_PRESET,
 	IMPULSE_RESPONSE_ASSET_PATH,
@@ -10,69 +11,43 @@ import {
 
 const MAX_IMPULSE_BYTES = 4 * 1024 * 1024
 
-export default class OutputImpulseResponse extends EventTarget implements IAudioOutput {
-	readonly uuid = `Output-ImpulseResponse-${crypto.randomUUID()}`
-	readonly name = "Impulse Response"
-	readonly description = "Convolution filter for reverbs, spaces and speaker cabinets"
-	readonly isHidden = false
-	readonly requiresConnectionControl = false
-	readonly configurationAffectsNoteRouting = false
-	readonly audioInput: GainNode
-	readonly output: GainNode
-	readonly options: { mix: number; preset?: string; impulse?: string; filename?: string }
+export default class EffectImpulseResponse extends AbstractEffect {
+	declare readonly options: {
+		mix: number
+		preset?: string
+		impulse?: string
+		filename?: string
+	}
 	private convolver: ConvolverNode
-	private dry: GainNode
-	private wet: GainNode
-	private connected = true
 	private revision = 0
 	private pendingPreset?: AbortController
-	private guiEvents?: AbortController
-	get isConnected() {
-		return this.connected
-	}
-	hasAudioOutput() {
-		return true
-	}
-	noteOn() {}
-	noteOff() {}
-	allNotesOff() {}
-	constructor(
-		private context: AudioContext,
-		options: Record<string, any> = {}
-	) {
-		super()
-		this.options = { mix: bounded(options.mix, 0.5, 0, 1) }
-		this.audioInput = context.createGain()
-		this.output = context.createGain()
-		this.convolver = context.createConvolver()
+	constructor(context: BaseAudioContext, options: Record<string, any> = {}) {
+		super(context, IMPULSE_RESPONSE, options)
+		this.convolver = this.node(context.createConvolver())
 		this.convolver.buffer = createReverbImpulseResponse(context, 1, 3)
-		this.dry = context.createGain()
-		this.wet = context.createGain()
-		this.audioInput.connect(this.dry).connect(this.output)
-		this.audioInput.connect(this.convolver).connect(this.wet).connect(this.output)
-		this.setMix(this.options.mix)
+		this.audioInput.connect(this.convolver).connect(this.wet)
+		this.start()
 	}
 	static async create(options: Record<string, any> = {}) {
 		if (!options.audioContext) {
 			throw new Error("Impulse Response requires an audio context")
 		}
-		const device = new OutputImpulseResponse(options.audioContext, options)
+		const effect = new EffectImpulseResponse(options.audioContext, options)
 		try {
 			if (options.impulse) {
-				await device.loadImpulse(options.impulse, options.filename)
+				await effect.loadImpulse(options.impulse, options.filename)
 			} else if (options.preset) {
-				await device.loadPreset(options.preset)
+				await effect.loadPreset(options.preset)
 			}
-			return device
+			return effect
 		} catch (error) {
-			await device.destroy()
+			await effect.destroy()
 			throw error
 		}
 	}
+	protected apply() {}
 	setMix(mix: number) {
-		this.options.mix = bounded(mix, this.options.mix, 0, 1)
-		this.dry.gain.value = 1 - this.options.mix
-		this.wet.gain.value = this.options.mix
+		this.setParameter("mix", mix)
 	}
 	async loadImpulse(encoded: string, filename = "Custom impulse response") {
 		if (typeof encoded !== "string" || encoded.length > Math.ceil(MAX_IMPULSE_BYTES / 3) * 4) {
@@ -82,13 +57,13 @@ export default class OutputImpulseResponse extends EventTarget implements IAudio
 		this.pendingPreset?.abort()
 		const bytes = Uint8Array.from(atob(encoded), (character) => character.charCodeAt(0))
 		const buffer = await this.context.decodeAudioData(bytes.buffer)
-		if (!this.connected || revision !== this.revision) {
+		if (!this.isConnected || revision !== this.revision) {
 			return
 		}
 		this.convolver.buffer = buffer
 		this.options.impulse = encoded
 		this.options.filename = filename
-		delete this.options.preset
+		this.options.preset = ""
 		changed(this)
 	}
 	async loadPreset(id: string): Promise<void> {
@@ -113,17 +88,14 @@ export default class OutputImpulseResponse extends EventTarget implements IAudio
 			} else {
 				buffer = createReverbImpulseResponse(this.context, 1, 3)
 			}
-			if (!this.connected || revision !== this.revision) {
+			if (!this.isConnected || revision !== this.revision) {
 				return
 			}
 			this.convolver.buffer = buffer
-			delete this.options.impulse
-			delete this.options.filename
-			if (preset) {
-				this.options.preset = preset.id
-			} else {
-				delete this.options.preset
-			}
+			// Empty values, not deleted keys, so saving overrides the options this was restored from.
+			this.options.impulse = ""
+			this.options.filename = ""
+			this.options.preset = preset?.id ?? BUILTIN_ROOM_PRESET
 			changed(this)
 		} finally {
 			if (this.pendingPreset === request) {
@@ -131,11 +103,7 @@ export default class OutputImpulseResponse extends EventTarget implements IAudio
 			}
 		}
 	}
-	async createGui() {
-		await this.destroyGui()
-		this.guiEvents = new AbortController()
-		const { signal } = this.guiEvents
-		const panel = devicePanel()
+	protected override decorateGui(panel: HTMLElement, signal: AbortSignal): void {
 		const presetLabel = document.createElement("label")
 		const select = document.createElement("select")
 		const addOption = (parent: HTMLElement, value: string, name: string) => {
@@ -170,7 +138,7 @@ export default class OutputImpulseResponse extends EventTarget implements IAudio
 			select.value = preset?.id ?? (this.options.impulse ? "custom" : BUILTIN_ROOM_PRESET)
 			custom.hidden = !this.options.impulse
 			status.textContent =
-				preset?.name ?? this.options.filename ?? "Built-in room impulse response"
+				preset?.name || this.options.filename || "Built-in room impulse response"
 			credit.replaceChildren()
 			if (preset) {
 				const attribution = document.createElement("a")
@@ -250,30 +218,10 @@ export default class OutputImpulseResponse extends EventTarget implements IAudio
 		)
 		refresh()
 		panel.append(presetLabel, label, status, credit)
-		numberControl(
-			panel,
-			"Wet mix",
-			this.options.mix,
-			0,
-			1,
-			(mix) => {
-				this.setMix(mix)
-				changed(this)
-			},
-			0.01
-		)
-		return panel
 	}
-	async destroyGui() {
-		this.guiEvents?.abort()
-	}
-	async destroy() {
-		this.connected = false
+	override async destroy() {
 		this.revision++
 		this.pendingPreset?.abort()
-		await this.destroyGui()
-		for (const node of [this.audioInput, this.convolver, this.dry, this.wet, this.output]) {
-			node.disconnect()
-		}
+		await super.destroy()
 	}
 }

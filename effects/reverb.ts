@@ -2,7 +2,7 @@
  * Create a reverb impulse response buffer
  */
 export const createReverbImpulseResponse = (
-	audioContext: AudioContext,
+	audioContext: BaseAudioContext,
 	duration: number,
 	decay: number
 ): AudioBuffer => {

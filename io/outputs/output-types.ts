@@ -41,6 +41,10 @@ export const BUTTERCHURN = "butterchurn" as const
 export const WEBCLAP_PREFIX = "webclap:" as const
 export const webclapOutputId = (pluginId: string): `webclap:${string}` =>
 	`${WEBCLAP_PREFIX}${pluginId}`
+export const EFFECT_PREFIX = "effect:" as const
+/** Impulse Response keeps its original ID so saved workspaces still restore it. */
+export const effectOutputId = (effectId: string): typeof IMPULSE_RESPONSE | `effect:${string}` =>
+	effectId === IMPULSE_RESPONSE ? IMPULSE_RESPONSE : `${EFFECT_PREFIX}${effectId}`
 
 export type OutputId =
 	| typeof IMPULSE_RESPONSE
@@ -56,6 +60,7 @@ export type OutputId =
 	| typeof PERFORMANCE
 	| typeof RECORDER
 	| `webclap:${string}`
+	| `effect:${string}`
 	| typeof CONSOLE
 	| typeof DESCRIBE
 	| typeof NOTATION

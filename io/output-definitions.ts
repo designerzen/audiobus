@@ -14,6 +14,9 @@ import * as OUTPUT_TYPES from "./outputs/output-types.ts"
 import { CLAP_PATCHES } from "../instruments/clap/clap-catalog"
 import { WAM2_INSTRUMENTS, wam2OutputId } from "../wam/registry"
 import { OUTPUT_PREVIEWS } from "./output-previews"
+import { EFFECT_REGISTRY } from "../effects/effect-registry"
+import { IMPULSE_RESPONSE } from "../effects/effect-definitions"
+import type { EffectDefinition } from "../effects/effect-interface"
 
 export interface OutputDefinition extends DeviceClassification {
 	id: string
@@ -26,17 +29,24 @@ export interface OutputDefinition extends DeviceClassification {
 	attribution?: DeviceAttribution
 }
 
+const effectDefinition = (effect: EffectDefinition): OutputDefinition => ({
+	id: OUTPUT_TYPES.effectOutputId(effect.id),
+	name: effect.name,
+	description: effect.description,
+	type: "audio",
+	subtype: "effect",
+	category: "Effects",
+	icon: "/icons/device-spectrum.svg"
+})
+
 export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
-	[OUTPUT_TYPES.IMPULSE_RESPONSE]: {
-		id: OUTPUT_TYPES.IMPULSE_RESPONSE,
-		name: "Impulse Response",
-		description:
-			"Chain convolution filters for reverbs, spaces and speaker cabinets using your own impulse responses",
-		type: "audio",
-		subtype: "effect",
-		category: "Audio",
-		icon: "/icons/output-default.svg"
-	},
+	[OUTPUT_TYPES.IMPULSE_RESPONSE]: effectDefinition(IMPULSE_RESPONSE),
+	...Object.fromEntries(
+		EFFECT_REGISTRY.map((effect) => [
+			OUTPUT_TYPES.effectOutputId(effect.id),
+			effectDefinition(effect)
+		])
+	),
 	[OUTPUT_TYPES.CHROMATIC_SAMPLER]: {
 		id: OUTPUT_TYPES.CHROMATIC_SAMPLER,
 		name: "ChromaticSampler",
