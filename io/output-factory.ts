@@ -1,4 +1,4 @@
-import { OUTPUT_DEFINITIONS } from "./output-definitions.ts"
+import { OUTPUT_DEFINITIONS, type OutputDefinition } from "./output-definitions.ts"
 import { getAudioDestination } from "./audio-destination"
 import type { DeviceClassification, DeviceAttribution } from "./device-classification.ts"
 import { defineDevice } from "./device-definition"
@@ -63,8 +63,6 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./outputs/output-console.ts")
 		case OUTPUT_TYPES.DESCRIBE:
 			return await import("./outputs/output-describe.ts")
-		case OUTPUT_TYPES.PINK_TROMBONE:
-			return await import("./outputs/output-pink-trombone.ts")
 		case OUTPUT_TYPES.NOTATION:
 			return await import("./outputs/output-notation.ts")
 		case OUTPUT_TYPES.SPECTRUM_ANALYSER:
@@ -335,15 +333,6 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		create: (options) => createOutput(OUTPUT_TYPES.CONSOLE, options)
 	},
 	{
-		id: OUTPUT_TYPES.PINK_TROMBONE,
-		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.PINK_TROMBONE].type,
-		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.PINK_TROMBONE].subtype,
-		name: "Pink Trombone",
-		description: "Vocal synthesis engine with speech-like sounds",
-		isAvailable: () => true,
-		create: (options) => createOutput(OUTPUT_TYPES.PINK_TROMBONE, options)
-	},
-	{
 		id: OUTPUT_TYPES.NOTATION,
 		type: OUTPUT_DEFINITIONS[OUTPUT_TYPES.NOTATION].type,
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.NOTATION].subtype,
@@ -506,6 +495,60 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		create: (options) => createOutput(OUTPUT_TYPES.BUTTERCHURN, options)
 	}
 ]
+
+/** An output supplied by another package, added with registerOutput(). */
+export interface OutputRegistration {
+	definition: OutputDefinition
+	isAvailable?: () => boolean
+	create: (options: {
+		audioContext?: AudioContext
+		destination?: AudioNode
+		mixer?: GainNode
+		[option: string]: any
+	}) => IAudioOutput | Promise<IAudioOutput>
+}
+
+const registeredOutputs = new Set<string>()
+
+/**
+ * Add an output from another package, so audiobus does not depend on it.
+ * Registering an id again replaces the earlier registration.
+ */
+export function registerOutput({
+	definition,
+	isAvailable = () => true,
+	create
+}: OutputRegistration) {
+	OUTPUT_DEFINITIONS[definition.id] = { ...definition }
+	const factory: OutputFactory = {
+		id: definition.id,
+		type: definition.type,
+		subtype: definition.subtype,
+		name: definition.name,
+		description: definition.description,
+		category: definition.category,
+		attribution: definition.attribution,
+		isAvailable,
+		create: (options = {}) =>
+			create({
+				...options,
+				destination:
+					options.destination ??
+					(options.audioContext ? getAudioDestination(options.audioContext) : undefined)
+			})
+	}
+	const index = OUTPUT_FACTORIES.findIndex((f) => f.id === definition.id)
+	if (index === -1) {
+		OUTPUT_FACTORIES.push(factory)
+	} else {
+		OUTPUT_FACTORIES[index] = factory
+	}
+	registeredOutputs.add(definition.id)
+}
+
+export function isRegisteredOutput(id: string): boolean {
+	return registeredOutputs.has(id)
+}
 
 /**
  * Get all available output factories

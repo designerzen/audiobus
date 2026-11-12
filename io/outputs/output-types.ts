@@ -17,7 +17,6 @@ export const OSC = "osc" as const
 export const PERFORMANCE = "performance" as const
 export const RECORDER = "recorder" as const
 export const DESCRIBE = "describe" as const
-export const PINK_TROMBONE = "pink-trombone" as const
 export const NOTATION = "notation" as const
 export const SPECTRUM_ANALYSER = "spectrum-analyser" as const
 export const SPEECH_SYNTHESIS = "speech-synthesis" as const
@@ -59,7 +58,6 @@ export type OutputId =
 	| `webclap:${string}`
 	| typeof CONSOLE
 	| typeof DESCRIBE
-	| typeof PINK_TROMBONE
 	| typeof NOTATION
 	| typeof SPECTRUM_ANALYSER
 	| typeof SPEECH_SYNTHESIS

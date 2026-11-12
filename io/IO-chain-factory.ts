@@ -226,7 +226,7 @@ export class IOChainFactory {
 
 		// Dynamically import factories
 		const { createInputById } = await import("./input-factory")
-		const { createOutputById } = await import("./output-factory")
+		const { createOutputById, isRegisteredOutput } = await import("./output-factory")
 
 		// Create inputs from preset
 		const inputs: IAudioInput[] = []
@@ -260,7 +260,6 @@ export class IOChainFactory {
 					})
 				} else if (
 					[
-						OUTPUT_TYPES.PINK_TROMBONE,
 						OUTPUT_TYPES.WAM,
 						OUTPUT_TYPES.WAM2,
 						OUTPUT_TYPES.MOOG,
@@ -270,7 +269,8 @@ export class IOChainFactory {
 						OUTPUT_TYPES.DRUM_KIT,
 						OUTPUT_TYPES.SYNTH_303
 					].includes(outputId as any) ||
-					outputId.startsWith("wam2:")
+					outputId.startsWith("wam2:") ||
+					isRegisteredOutput(outputId)
 				) {
 					output = await createOutputById(outputId, {
 						audioContext: options.audioContext,

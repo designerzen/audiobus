@@ -247,16 +247,6 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		category: "Debug"
 	},
 
-	[OUTPUT_TYPES.PINK_TROMBONE]: {
-		id: OUTPUT_TYPES.PINK_TROMBONE,
-		type: "engine",
-		subtype: "instrument",
-		name: "Pink Trombone",
-		description: "Vocal synthesis engine with speech-like sounds",
-		icon: "/icons/output-pink-trombone.svg",
-		category: "Synthesis"
-	},
-
 	[OUTPUT_TYPES.NOTATION]: {
 		id: OUTPUT_TYPES.NOTATION,
 		type: "visual",

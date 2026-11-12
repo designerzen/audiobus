@@ -50,7 +50,6 @@ export const OUTPUT_PREVIEWS: Record<string, string> = {
 	"output:wam2:com.webaudiomodules.wam-examples.faust-flute":
 		"/previews/outputs/output--wam2--com.webaudiomodules.wam-examples.faust-flute.jpg",
 	"output:moog": "/previews/outputs/output--moog.jpg",
-	"output:pink-trombone": "/previews/outputs/output--pink-trombone.jpg",
 	"output:webclap:org.surge-synth-team.surge-xt":
 		"/previews/outputs/output--webclap--org.surge-synth-team.surge-xt.jpg",
 	"instrument:clap": "/previews/outputs/instrument--clap.jpg",

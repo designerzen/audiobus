@@ -1,5 +1,4 @@
 import { withEnvelopeBindings } from "control-surface/envelope-bindings"
-import { createDomGui } from "control-surface/dom"
 import { bindingKey, validateValue, directDescriptor } from "control-surface/model"
 import type {
 	ComponentUi,
@@ -81,6 +80,22 @@ export function subscribeControlSchema(component: object, listener: () => void):
 }
 
 const listeners = new WeakMap<object, Set<(id?: string) => void>>()
+/** Draws generated controls; supplied by the host so the engine does not depend on a widget toolkit. */
+export type ControlRenderer = (bindings: ControlBinding[]) => {
+	element: HTMLElement
+	destroy(): void
+}
+let controlRenderer: ControlRenderer | undefined
+export function setControlRenderer(renderer: ControlRenderer | undefined): void {
+	controlRenderer = renderer
+}
+export function renderControls(bindings: ControlBinding[]): ReturnType<ControlRenderer> {
+	if (!controlRenderer) {
+		throw new Error("No control renderer registered; call setControlRenderer() first")
+	}
+	return controlRenderer(bindings)
+}
+
 export function notifyControls(component: object, id?: string): void {
 	for (const listener of listeners.get(component) ?? []) {
 		listener(id)
@@ -370,10 +385,10 @@ export function installComponentUi<T extends object>(target: T): T & ComponentUi
 		}
 	}
 	if (!originalGui) {
-		let gui: ReturnType<typeof createDomGui> | undefined
+		let gui: ReturnType<ControlRenderer> | undefined
 		component.createGui = async () => {
 			if (!gui) {
-				gui = createDomGui(await componentBindings(component, "generated"))
+				gui = renderControls(await componentBindings(component, "generated"))
 			}
 			return gui.element
 		}

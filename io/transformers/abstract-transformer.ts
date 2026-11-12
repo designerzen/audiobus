@@ -5,9 +5,10 @@ import {
 	fieldsDescriptor,
 	componentBindings,
 	notifyControls,
-	subscribeControls
+	renderControls,
+	subscribeControls,
+	type ControlRenderer
 } from "../component-ui"
-import { createDomGui } from "control-surface/dom"
 import type { ControlChoice, ControlValue } from "control-surface/types"
 
 export interface TransformerConfig {
@@ -50,7 +51,7 @@ export abstract class Transformer<Config = TransformerConfig> implements ITransf
 	get fields(): FieldConfig[] {
 		return []
 	}
-	private generatedGui?: ReturnType<typeof createDomGui>
+	private generatedGui?: ReturnType<ControlRenderer>
 	private switches = new Set<string>()
 	getUiDescriptor() {
 		const descriptor = fieldsDescriptor(this.fields)
@@ -88,7 +89,7 @@ export abstract class Transformer<Config = TransformerConfig> implements ITransf
 		if (!this.generatedGui) {
 			const bindings = await componentBindings(this, this.midiControlId)
 			// The graph title bar owns the enable switch; retain its binding for control surfaces.
-			this.generatedGui = createDomGui(
+			this.generatedGui = renderControls(
 				bindings.filter((binding) => binding.descriptor.id !== "enabled")
 			)
 			this.generatedGui.element.classList.add("transformer-controls")

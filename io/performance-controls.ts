@@ -4,10 +4,10 @@ import {
 	createGuitarTabControl,
 	createPianoRollControl,
 	createRelativeKeysControl,
-	musicOptions,
-	createStrumControl,
-	strumOptions
-} from "control-surface"
+	createStrumControl
+} from "control-surface/widgets"
+import { musicOptions } from "control-surface/music"
+import { strumOptions } from "control-surface/strum"
 import { bindingKey, validateValue } from "control-surface/model"
 import type { ControlBinding, ControlValue } from "control-surface/types"
 
