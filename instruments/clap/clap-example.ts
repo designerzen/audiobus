@@ -5,13 +5,13 @@
  * in your harmoneasy application.
  */
 
-import OutputCLAP from "./output-clap.ts"
+import CLAPInstrument from "./clap-instrument.ts"
 import { initializeCLAPRegistry, clapRegistry } from "./clap-registry.ts"
 
 /**
  * Setup and initialize CLAP
  */
-export async function setupCLAPExample(audioContext: AudioContext): Promise<OutputCLAP> {
+export async function setupCLAPExample(audioContext: AudioContext): Promise<CLAPInstrument> {
 	// 1. Initialize the registry (loads from /clap-registry.json)
 	console.log("Initializing CLAP registry...")
 	await initializeCLAPRegistry()
@@ -20,9 +20,9 @@ export async function setupCLAPExample(audioContext: AudioContext): Promise<Outp
 	const patches = clapRegistry.getPatches()
 	console.log("Available CLAP patches:", patches)
 
-	// 3. Create CLAP output
+	// 3. Create CLAP instrument, routed to the speakers
 	console.log("Creating CLAP output...")
-	const clapOutput = new OutputCLAP(audioContext, patches)
+	const clapOutput = new CLAPInstrument(audioContext, null, { routeAudio: true })
 
 	// 4. Connect to audio context
 	console.log("Connecting CLAP output...")
@@ -44,7 +44,7 @@ export async function setupCLAPExample(audioContext: AudioContext): Promise<Outp
 /**
  * Example: Play a simple melody
  */
-export function playMelody(clapOutput: OutputCLAP): void {
+export function playMelody(clapOutput: CLAPInstrument): void {
 	const notes = [60, 62, 64, 65, 67] // C, D, E, F, G
 	const noteDuration = 500 // ms
 
@@ -67,7 +67,7 @@ export function playMelody(clapOutput: OutputCLAP): void {
 /**
  * Example: Create and display GUI
  */
-export async function displayCLAPGUI(clapOutput: OutputCLAP, containerId: string): Promise<void> {
+export async function displayCLAPGUI(clapOutput: CLAPInstrument, containerId: string): Promise<void> {
 	const container = document.getElementById(containerId)
 	if (!container) {
 		console.error("Container not found:", containerId)
@@ -94,7 +94,7 @@ export async function displayCLAPGUI(clapOutput: OutputCLAP, containerId: string
 /**
  * Example: Search and load specific patch
  */
-export async function loadPatchByName(clapOutput: OutputCLAP, patchName: string): Promise<boolean> {
+export async function loadPatchByName(clapOutput: CLAPInstrument, patchName: string): Promise<boolean> {
 	const patches = clapRegistry.searchPatches(patchName)
 
 	if (patches.length === 0) {
@@ -139,7 +139,7 @@ export function listPatchesByCategory(): void {
  * Example: Continuous pattern playback
  */
 export function playPattern(
-	clapOutput: OutputCLAP,
+	clapOutput: CLAPInstrument,
 	pattern: number[],
 	tempo: number = 120
 ): () => void {
@@ -220,4 +220,4 @@ export async function setupCLAPWithUI(audioContext: AudioContext): Promise<void>
 }
 
 // Export for use in other modules
-export { OutputCLAP, initializeCLAPRegistry, clapRegistry }
+export { CLAPInstrument, initializeCLAPRegistry, clapRegistry }

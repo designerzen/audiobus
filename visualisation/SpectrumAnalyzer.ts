@@ -4,7 +4,6 @@
  */
 import type { IVisualiser as _IVisualiser } from "./visualisers/IVisualiser.ts"
 import { Visualiser } from "./visualisers/Visualiser.ts"
-import { TimeNow } from "../timing/TimeNow.ts"
 
 export class SpectrumAnalyzer {
 	private audioContext: AudioContext
@@ -168,7 +167,7 @@ export class SpectrumAnalyzer {
 				this.visualContext.fillRect(0, 0, vis.width, vis.height)
 
 				while (vis) {
-					vis.update(this.frequencyData, TimeNow(), this.analyser.frequencyBinCount)
+					vis.update(this.frequencyData, performance.now(), this.analyser.frequencyBinCount)
 					vis = vis.next
 				}
 			}

@@ -8,7 +8,7 @@ import { INPUT_EVENT } from "../../events/event-constants.ts"
  */
 
 import InputMicrophoneFormant from "./input-microphone-formant.ts"
-import InputManager from "./input-manager.ts"
+import InputManager from "../input-manager.ts"
 import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 
 /**
