@@ -10,8 +10,7 @@ export const ENGINE_TRIM_DB = {
 	moog: 4,
 	tb303: 1.5,
 	sion: 5.5,
-	yoshimi: -5.5,
-	"opendaw-vaporisateur": 12
+	yoshimi: -5.5
 } as const
 
 export function engineGain(engine: keyof typeof ENGINE_TRIM_DB): number {

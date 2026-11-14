@@ -8,7 +8,6 @@ import {
 	INSTRUMENT_TYPE_TONE_SAMPLER,
 	INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT,
 	INSTRUMENT_TYPE_CLAP,
-	INSTRUMENT_TYPE_OPENDAW_VAPORISATEUR,
 	INSTRUMENT_CATEGORY_WAM2,
 	EXTERNAL_DATA_KEY_SCSYNTH,
 	INSTRUMENTS,
@@ -25,7 +24,6 @@ export {
 	INSTRUMENT_TYPE_TONE_SAMPLER,
 	INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT,
 	INSTRUMENT_TYPE_CLAP,
-	INSTRUMENT_TYPE_OPENDAW_VAPORISATEUR,
 	INSTRUMENT_TYPE_WAM2,
 	INSTRUMENT_CATEGORY_WAM2,
 	INSTRUMENT_CATEGORY_OSCILLATOR,
@@ -36,6 +34,7 @@ export {
 	INSTRUMENT_CATEGORY_SUPERCOLLIDER,
 	EXTERNAL_DATA_KEY_SCSYNTH,
 	EXTERNAL_DATA_KEY_SAMPLE_URLS,
+	registerInstrument,
 	type InstrumentMetadata
 } from "./instrument-types.ts"
 
@@ -96,10 +95,14 @@ export class InstrumentFactory {
 			}
 		}
 
-		// Lazy load the module
-		const module = await metadata.loader()
-		const InstrumentClass = module.default
 		options = { ...metadata.defaultOptions, ...options }
+		if (metadata.create) {
+			return metadata.create(audioContext, options)
+		}
+
+		// Lazy load the module
+		const module = await metadata.loader!()
+		const InstrumentClass = module.default
 
 		if (metadata.category === INSTRUMENT_CATEGORY_WAM2) {
 			const instrument = new InstrumentClass(audioContext, options)
@@ -134,11 +137,6 @@ export class InstrumentFactory {
 				)
 				// Auto-connect CLAP to initialize and load default patch
 				await (instance as any).connect()
-				break
-
-			case INSTRUMENT_TYPE_OPENDAW_VAPORISATEUR:
-				instance = new InstrumentClass(audioContext, options)
-				await instance.connect!()
 				break
 
 			case INSTRUMENT_TYPE_SYNTH_OSCILLATOR:

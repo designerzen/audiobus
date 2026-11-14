@@ -2,6 +2,7 @@ import {
 	INSTRUMENT_CLASSIFICATION,
 	type DeviceClassification
 } from "../io/device-classification.ts"
+import type { IAudioOutput } from "../io/outputs/output-interface.ts"
 import wam2Registry, { WAM2_INSTRUMENTS, wam2OutputId } from "../wam/registry"
 /**
  * Instrument Type Constants
@@ -15,7 +16,6 @@ export const INSTRUMENT_TYPE_TONE_SAMPLER = "tone-sampler"
 export const INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT = "scsynth-instrument"
 export const INSTRUMENT_TYPE_CLAP = "clap"
 export const INSTRUMENT_TYPE_FAUST = "faust"
-export const INSTRUMENT_TYPE_OPENDAW_VAPORISATEUR = "opendaw-vaporisateur"
 export const INSTRUMENT_TYPE_WAM2 = "wam2"
 
 /**
@@ -52,7 +52,13 @@ export interface InstrumentMetadata extends DeviceClassification<"engine"> {
 		| "supercollider"
 		| "faust"
 		| "wam2"
-	loader: () => Promise<any>
+	/** Loads a module whose default export is the instrument class. */
+	loader?: () => Promise<any>
+	/** Builds the instrument directly; used by instruments registered from other packages. */
+	create?: (
+		audioContext: BaseAudioContext | AudioContext,
+		options: Record<string, any>
+	) => IAudioOutput | Promise<IAudioOutput>
 	defaultOptions?: Record<string, any>
 	requiresExternalData?: string[] // e.g., ["scsynth", "sampleUrls"]
 }
@@ -161,17 +167,6 @@ export const INSTRUMENTS: Map<string, InstrumentMetadata> = new Map([
 			category: INSTRUMENT_CATEGORY_FAUST,
 			loader: () => import("./faust/faust-instrument.ts")
 		}
-	],
-	[
-		INSTRUMENT_TYPE_OPENDAW_VAPORISATEUR,
-		{
-			id: INSTRUMENT_TYPE_OPENDAW_VAPORISATEUR,
-			...INSTRUMENT_CLASSIFICATION,
-			name: "openDAW Vaporisateur",
-			description: "Vaporisateur instrument using openDAW framework",
-			category: INSTRUMENT_CATEGORY_SYNTHESIS,
-			loader: () => import("./openDAW/opendaw-vaporisateur.ts")
-		}
 	]
 ])
 
@@ -196,4 +191,17 @@ for (const plugin of WAM2_INSTRUMENTS) {
 		defaultOptions: { pluginUrl: wam2Registry.getPluginUrl(plugin), name: plugin.name },
 		loader: () => import("./wam/wam-instrument")
 	})
+}
+
+/**
+ * Add an instrument from another package, so audiobus does not depend on it.
+ * Registering an id again replaces the earlier registration.
+ */
+export function registerInstrument(
+	metadata: Omit<InstrumentMetadata, keyof typeof INSTRUMENT_CLASSIFICATION>
+) {
+	if (!metadata.create && !metadata.loader) {
+		throw new Error(`Instrument ${metadata.id} needs create() or loader()`)
+	}
+	INSTRUMENTS.set(metadata.id, { ...INSTRUMENT_CLASSIFICATION, ...metadata })
 }

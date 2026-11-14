@@ -23,6 +23,7 @@ export {
 	EXTERNAL_DATA_KEY_SCSYNTH,
 	EXTERNAL_DATA_KEY_SAMPLE_URLS,
 	INSTRUMENTS,
+	registerInstrument,
 	// Types
 	type InstrumentMetadata
 } from "./instrument-types.ts"
