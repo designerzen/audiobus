@@ -1,3 +1,4 @@
+import { loadNativeMidiAddon } from "../native-midi-addon.ts"
 import { MidiOutputRouting } from "./midi-output-routing.ts"
 import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 /**
@@ -171,14 +172,6 @@ export default class OutputMIDI2 implements IAudioOutput {
 			}
 		)
 
-		// Try to load native MIDI2 binding
-		try {
-			// eslint-disable-next-line global-require, @typescript-eslint/no-var-requires
-			this.midi2Native = require("../../../build/Release/midi2-native.node")
-		} catch {
-			console.warn("[OutputMIDI2] Native module not available, falling back to MIDI 1 API")
-			// Fallback to WebMIDI or other available API
-		}
 	}
 
 	/**
@@ -309,7 +302,7 @@ export default class OutputMIDI2 implements IAudioOutput {
 		}
 
 		if (!this.midi2Native) {
-			this.midi2Native = await import("../../../build/Release/midi2-native.node" as any)
+			this.midi2Native = await loadNativeMidiAddon()
 		}
 		if (this.midi2Native) {
 			try {

@@ -65,7 +65,10 @@
 		"ui",
 		"hardware",
 		"utils",
-		"visualisation"
+		"visualisation",
+		"wam",
+		"formats",
+		"types"
 	],
 	"dependencies": {
 		"@magenta/music": "^1.23.1",

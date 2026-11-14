@@ -1,3 +1,4 @@
+import { loadNativeMidiAddon } from "../native-midi-addon.ts"
 import {
 	EVENT_CONFIGURATION_CHANGED,
 	EVENT_NOTEON,
@@ -42,8 +43,7 @@ async function loadNativeMIDI(): Promise<any> {
 	}
 
 	try {
-		// Use import() for ES modules compatibility
-		const mod = await import("../../../build/Release/midi2-native.node" as any)
+		const mod = await loadNativeMidiAddon()
 		nativeMIDI = mod
 		return nativeMIDI
 	} catch (e) {
