@@ -1,14 +1,10 @@
 /**
  * Importers
- * Import from various audio file and project formats
+ * Import project, MIDI, MusicXML and tracker files, and dropped media
  */
 
-export { MIDIImporter, importMIDI } from "./midi-importer.ts"
-
-export { MusicXMLImporter, importMusicXML } from "./musicxml-importer.ts"
-
-export { AudioFileImporter, importAudioFile } from "./audio-file-importer.ts"
-
-export { ProjectImporter, importProject } from "./project-importer.ts"
-
-export { Importer, ImporterFactory } from "./importer.ts"
+export * from "./dropped-media.ts"
+export { importDawProjectFile } from "./import-dawproject.ts"
+export { importMIDIFile } from "./import-midi-file.ts"
+export { importMusicXMLFile } from "./import-musicxml-import.ts"
+export { importTrackerFile } from "./import-tracker-file.ts"

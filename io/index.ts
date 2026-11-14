@@ -9,26 +9,29 @@ export { createInputById, getAvailableInputFactories } from "./input-factory.ts"
 export { createOutputById, getAvailableOutputFactories } from "./output-factory.ts"
 
 // Input Manager
-export { InputManager } from "./input-manager.ts"
+export { default as InputManager } from "./input-manager.ts"
 
 // Output Manager
-export { OutputManager } from "./output-manager.ts"
+export { default as OutputManager } from "./output-manager.ts"
 
 // IO Chain coordination
-export { IOChain } from "./IO-chain.ts"
+export { default as IOChain } from "./IO-chain.ts"
 
 // Transformer functionality
+export { tranformerFactory, TRANSFORMER_TYPE, TRANSFORMERS } from "./transformer-factory.ts"
+
+export { default as TransformerManager } from "./transformer-manager.ts"
+
+export { default as TransformerManagerWorker } from "./transformer-manager-worker.ts"
+
 export {
-	createTransformerById,
-	getAvailableTransformers,
-	getTransformerDefinitions
-} from "./transformer-factory.ts"
-
-export { TransformerManager } from "./transformer-manager.ts"
-
-export { TransformerManagerWorker } from "./transformer-manager-worker.ts"
-
-export { transformerDefinitions, getTransformerPresets } from "./transformer-presets.ts"
+	DEFAULT_PRESET_LIBRARY,
+	PRESETS,
+	PRESET_CATEGORIES,
+	createPresetTransformers,
+	type PresetStep,
+	type TransformerPreset
+} from "./transformer-presets.ts"
 
 // Definitions and metadata
 export * from "./definitions-index.ts"

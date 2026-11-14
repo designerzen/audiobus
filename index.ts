@@ -4,25 +4,19 @@
  */
 
 // Core audio commands
-export { IAudioCommand, AudioCommand, AudioCommandInterface } from "./commands/audio-command-interface.ts"
-
-export { AudioCommand as AudioCommandClass } from "./commands/audio-command.ts"
-
-export { AudioCommandFactory } from "./commands/audio-command-factory.ts"
-
-export { AudioCommandEncoder } from "./commands/audio-command-encoder.ts"
-
-export { AudioCommandDecoder } from "./commands/audio-command-decoder.ts"
+export type { IAudioCommand } from "./commands/audio-command-interface.ts"
+export { default as AudioCommand } from "./commands/audio-command.ts"
+export { createAudioCommand, cloneAudioCommand } from "./commands/audio-command-factory.ts"
+export { encodeAudioCommand } from "./commands/audio-command-encoder.ts"
+export { decodeAudioCommand } from "./commands/audio-command-decoder.ts"
 
 // Audio events and recording
-export { IAudioEvent, AudioEvent } from "./models/audio-event.ts"
-
-export { AudioEventRecorder } from "./events/audio-event-recorder.ts"
+export { default as AudioEvent } from "./models/audio-event.ts"
+export { default as AudioEventRecorder } from "./events/audio-event-recorder.ts"
 
 // Note and track models
-export { NoteModel } from "./models/note-model.ts"
-
-export { AudioTrack } from "./models/audio-track.js"
+export { default as NoteModel, QUANTITY_NOTES, isSharp, isFlat } from "./models/note-model.ts"
+export { default as AudioTrack } from "./models/audio-track.ts"
 
 // IO Chain - Input, Transformation, Output
 export * from "./io/index.ts"

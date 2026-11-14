@@ -18,7 +18,7 @@ import {
 } from "./sampler/sampler-state.js"
 import { setupSamplerEditor } from "./sampler/sampler-editor.js"
 import processorURL from "./sampler/layered-sampler.worklet.js?worker&url"
-import "./sampler/sampler-editor.scss"
+import "./sampler/sampler-editor.css"
 
 interface SavedLayer extends Omit<SamplerLayer, "channels" | "sampleRate"> {
 	sample?: string
