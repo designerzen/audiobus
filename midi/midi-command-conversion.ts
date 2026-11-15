@@ -86,6 +86,14 @@ export function commandToMidi(command: IAudioCommand): number[] | undefined {
 	const channel = Math.max(1, Math.min(16, command.channel || 1)) - 1
 	const note = byte(command.number)
 	switch (command.type) {
+		case MIDI_CLOCK:
+			return [0xf8]
+		case MIDI_START:
+			return [0xfa]
+		case MIDI_CONTINUE:
+			return [0xfb]
+		case MIDI_STOP:
+			return [0xfc]
 		// Rebuild note bytes so transformers can change pitch and velocity.
 		case NOTE_ON:
 			return [0x90 | channel, note, byte(command.velocity ?? 127)]

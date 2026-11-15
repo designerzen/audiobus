@@ -40,6 +40,15 @@ const effectDefinition = (effect: EffectDefinition): OutputDefinition => ({
 })
 
 export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
+	[OUTPUT_TYPES.PROTOCOL]: {
+		id: OUTPUT_TYPES.PROTOCOL,
+		name: "audioBus Protocol",
+		description: "Send MIDI and application commands to a paired music application",
+		type: "midi",
+		subtype: "device",
+		category: "Device",
+		icon: "/icons/device-midi.svg"
+	},
 	[OUTPUT_TYPES.IMPULSE_RESPONSE]: effectDefinition(IMPULSE_RESPONSE),
 	...Object.fromEntries(
 		EFFECT_REGISTRY.map((effect) => [

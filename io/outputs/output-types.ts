@@ -14,6 +14,7 @@ export const ROMPLER = "rompler" as const
 export const HARMONY_SAMPLER = "harmony-sampler" as const
 export const EVENT_RECORDER = "event-recorder" as const
 export const OSC = "osc" as const
+export const PROTOCOL = "protocol" as const
 export const PERFORMANCE = "performance" as const
 export const RECORDER = "recorder" as const
 export const DESCRIBE = "describe" as const
@@ -61,6 +62,7 @@ export type OutputId =
 	| typeof HARMONY_SAMPLER
 	| typeof EVENT_RECORDER
 	| typeof OSC
+	| typeof PROTOCOL
 	| typeof PERFORMANCE
 	| typeof RECORDER
 	| `webclap:${string}`

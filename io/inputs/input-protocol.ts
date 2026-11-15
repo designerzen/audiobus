@@ -53,6 +53,8 @@ export default class InputProtocol extends AbstractInput {
 			identity: { name: this.options.applicationName ?? "audioBus", version: "1" },
 			registry:
 				(this.options.registry as CommandRegistry | undefined) ?? getProtocolRegistry(),
+			getPatch: this.options.getPatch,
+			setPatch: this.options.setPatch,
 			onMidi: (bytes) => {
 				if (this.peer !== peer) {
 					return
@@ -98,6 +100,9 @@ export default class InputProtocol extends AbstractInput {
 				return
 			}
 			this.setAsConnected()
+			if (this.options.getPatch || this.options.setPatch) {
+				peer.announceReady()
+			}
 			if (this.status) {
 				this.status.textContent = "Connected"
 			}
@@ -170,7 +175,24 @@ export default class InputProtocol extends AbstractInput {
 				this.status!.textContent = error instanceof Error ? error.message : String(error)
 			}
 		})
-		this.gui.append(label, open, this.status)
+		const opener = document.createElement("button")
+		opener.type = "button"
+		opener.textContent = "Pair with opening application"
+		opener.disabled = !window.opener
+		opener.addEventListener(EVENT_CLICK, () => {
+			try {
+				const address = new URL(url.value)
+				if (!window.opener) {
+					throw new Error("This window has no opening application")
+				}
+				this.attach(window.opener, address.origin)
+				this.status!.textContent =
+					"Paired with opening application. Press Connect in both applications."
+			} catch (error) {
+				this.status!.textContent = error instanceof Error ? error.message : String(error)
+			}
+		})
+		this.gui.append(label, open, opener, this.status)
 		return this.gui
 	}
 	async destroyGui(): Promise<void> {
