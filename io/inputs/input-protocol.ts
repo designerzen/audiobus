@@ -56,8 +56,16 @@ export default class InputProtocol extends AbstractInput {
 			getPatch: this.options.getPatch,
 			setPatch: this.options.setPatch,
 			ump: true,
-			onMidi: (bytes) => { if (this.peer === peer) this.receivePacket({ format: "midi", data: Array.from(bytes) }) },
-			onUmp: (words) => { if (this.peer === peer) this.receivePacket({ format: "ump", data: words }) }
+			onMidi: (bytes) => {
+				if (this.peer === peer) {
+					this.receivePacket({ format: "midi", data: Array.from(bytes) })
+				}
+			},
+			onUmp: (words) => {
+				if (this.peer === peer) {
+					this.receivePacket({ format: "ump", data: words })
+				}
+			}
 		})
 		this.peer = peer
 		try {
@@ -80,20 +88,34 @@ export default class InputProtocol extends AbstractInput {
 		}
 	}
 	private dispatchPacket(packet: ProtocolPacket): void {
-		const command = packet.format === "ump" ? umpToCommand(packet.data, this.now, this.uuid) : midiToCommand(packet.data, this.now, this.uuid)
-		if (command) this.dispatch(command)
+		const command =
+			packet.format === "ump"
+				? umpToCommand(packet.data, this.now, this.uuid)
+				: midiToCommand(packet.data, this.now, this.uuid)
+		if (command) {
+			this.dispatch(command)
+		}
 	}
 	private receivePacket(packet: ProtocolPacket): void {
 		const type = packet.data[0] >>> 28
-		if (!this.options.allowSysex && (packet.format === "midi" ? packet.data[0] === 0xf0 : type === 3 || type === 5)) return
-		for (const release of this.midiState.accept(packet)) this.dispatchPacket(release)
+		if (
+			!this.options.allowSysex &&
+			(packet.format === "midi" ? packet.data[0] === 0xf0 : type === 3 || type === 5)
+		) {
+			return
+		}
+		for (const release of this.midiState.accept(packet)) {
+			this.dispatchPacket(release)
+		}
 		this.dispatchPacket(packet)
 	}
 	async disconnect(): Promise<void> {
 		this.generation++
 		this.peer?.close()
 		this.peer = undefined
-		for (const release of this.midiState.release()) this.dispatchPacket(release)
+		for (const release of this.midiState.release()) {
+			this.dispatchPacket(release)
+		}
 		this.setAsDisconnected()
 		if (this.status) {
 			this.status.textContent = "Disconnected — pair an application window using attach()."

@@ -31,10 +31,14 @@ export function createProtocolOutputControls(output: OutputProtocol) {
 	const fallback = document.createElement("input")
 	fallback.type = "checkbox"
 	fallback.checked = output.options.allowMidi1Fallback === true
-	fallback.addEventListener(EVENT_CHANGE, () => {
-		output.options.allowMidi1Fallback = fallback.checked
-		changed(output)
-	}, options)
+	fallback.addEventListener(
+		EVENT_CHANGE,
+		() => {
+			output.options.allowMidi1Fallback = fallback.checked
+			changed(output)
+		},
+		options
+	)
 	const status = document.createElement("p")
 	status.setAttribute("role", "status")
 	const report = (error: unknown) => {
