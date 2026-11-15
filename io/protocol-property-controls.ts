@@ -90,7 +90,7 @@ export function createProtocolPropertyControls(output: OutputProtocol) {
 				}
 			}
 		}
-		editor.required = true
+		editor.required = schema.type !== "string"
 		editor.disabled = property.readOnly || !property.available
 		host.append(editor)
 		void load()
