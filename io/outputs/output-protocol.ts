@@ -245,7 +245,9 @@ export default class OutputProtocol extends EventTarget implements IAudioOutput 
 	allNotesOff(): void {
 		const releases = this.midiState.release()
 		if (this.connected && this.peer) {
-			for (const release of releases) this.sendPacket(release)
+			for (const release of releases) {
+				this.sendPacket(release)
+			}
 		}
 	}
 	async disconnect(): Promise<void> {

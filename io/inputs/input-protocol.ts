@@ -26,6 +26,9 @@ export default class InputProtocol extends AbstractInput {
 	hasMidiInput(): boolean {
 		return true
 	}
+	hasSysexInput(): boolean {
+		return this.options.allowSysex === true
+	}
 	get connection(): Peer | undefined {
 		return this.peer
 	}
