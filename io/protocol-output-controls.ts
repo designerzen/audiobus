@@ -2,9 +2,11 @@ import type OutputProtocol from "./outputs/output-protocol"
 import { type CommandDescriptor, type Params, validate } from "audiobus-protocol"
 import { devicePanel, changed } from "./device-controls"
 import { EVENT_CLICK, EVENT_CHANGE, EVENT_SUBMIT } from "../events/event-constants"
+import { createProtocolPropertyControls } from "./protocol-property-controls"
 
 export function createProtocolOutputControls(output: OutputProtocol) {
 	const element = devicePanel()
+	const properties = createProtocolPropertyControls(output)
 	const lifetime = new AbortController()
 	const options = { signal: lifetime.signal }
 	const field = (title: string, control: HTMLElement) => {
@@ -130,6 +132,7 @@ export function createProtocolOutputControls(output: OutputProtocol) {
 		}
 	}
 	const update = () => {
+		properties.update()
 		revision++
 		const control = output.isConnected && output.options.mode === "audiobus"
 		refreshButton.disabled = !control
@@ -148,6 +151,7 @@ export function createProtocolOutputControls(output: OutputProtocol) {
 			return
 		}
 		const request = ++revision
+		void properties.refresh()
 		try {
 			const result = await output.discover()
 			if (request !== revision || lifetime.signal.aborted) {
@@ -243,7 +247,8 @@ export function createProtocolOutputControls(output: OutputProtocol) {
 		status,
 		refreshButton,
 		field("Destination command", commands),
-		form
+		form,
+		properties.element
 	)
 	update()
 	if (output.isConnected) {
@@ -253,9 +258,11 @@ export function createProtocolOutputControls(output: OutputProtocol) {
 		element,
 		update,
 		refresh,
+		propertyChanged: properties.changed,
 		destroy: () => {
 			revision++
 			lifetime.abort()
+			properties.destroy()
 			element.remove()
 		}
 	}

@@ -8,7 +8,10 @@ import {
 	type CommandDescriptor,
 	type CommandRegistry,
 	type PropertyDescriptor,
-	type CapabilityBundle
+	type CapabilityBundle,
+	TOPIC_COMMANDS_CHANGED,
+	TOPIC_PROPERTIES_CHANGED,
+	TOPIC_PROPERTIES_LIST_CHANGED
 } from "audiobus-protocol"
 import { getProtocolRegistry } from "../protocol-registry"
 import { commandToMidi } from "../../midi/midi-command-conversion"
@@ -97,8 +100,14 @@ export default class OutputProtocol extends EventTarget implements IAudioOutput 
 				this.dispatchEvent(
 					new CustomEvent(EVENT_PROTOCOL_EVENT, { detail: { topic, data } })
 				)
-				if (topic === "commands.changed") {
+				if (topic === TOPIC_COMMANDS_CHANGED) {
 					void this.gui?.refresh()
+				}
+				if (topic === TOPIC_PROPERTIES_LIST_CHANGED) {
+					void this.gui?.refresh()
+				}
+				if (topic === TOPIC_PROPERTIES_CHANGED) {
+					this.gui?.propertyChanged(data)
 				}
 			}
 		})
@@ -113,7 +122,11 @@ export default class OutputProtocol extends EventTarget implements IAudioOutput 
 				}
 				this.setConnected(true)
 				if (this.options.mode === "audiobus") {
-					await peer.subscribe("commands.changed")
+					await peer.subscribe(TOPIC_COMMANDS_CHANGED)
+					if (peer.supports("properties")) {
+						await peer.subscribe(TOPIC_PROPERTIES_CHANGED)
+						await peer.subscribe(TOPIC_PROPERTIES_LIST_CHANGED)
+					}
 				}
 				await this.gui?.refresh()
 			} catch (error) {
@@ -212,8 +225,13 @@ export default class OutputProtocol extends EventTarget implements IAudioOutput 
 			} else {
 				// Lossy conversion is opt-in and never merges nonzero UMP groups.
 				const group = (words[0] >>> 24) & 15
+				const kind = (words[0] >>> 20) & 15
+				const extended =
+					type === 4 &&
+					(((kind === 8 || kind === 9) && (words[0] & 255) !== 0) ||
+						(kind === 12 && (words[0] & 0xffff) !== 0))
 				const bytes =
-					(type === 1 || type === 2 || type === 4) && group === 0
+					(type === 1 || type === 2 || type === 4) && group === 0 && !extended
 						? umpToMidiBytes(words)
 						: undefined
 				if (!this.options.allowMidi1Fallback || !bytes) {

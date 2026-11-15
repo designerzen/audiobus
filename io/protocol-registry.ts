@@ -5,7 +5,12 @@ export {
 	EMPTY_SCHEMA,
 	ProtocolError,
 	Peer,
-	windowTransport
+	windowTransport,
+	TOPIC_COMMANDS_CHANGED,
+	TOPIC_PROPERTIES_CHANGED,
+	TOPIC_PROPERTIES_LIST_CHANGED,
+	TOPIC_BUNDLES_CHANGED,
+	TOPIC_TRANSPORT_CHANGED
 } from "audiobus-protocol"
 export type {
 	CommandDescriptor,
