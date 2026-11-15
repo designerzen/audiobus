@@ -450,9 +450,14 @@ export default class IOChain extends EventTarget {
 		)
 		this.outputManager.allNotesOff()
 		// OutputManager owns the actual transformed pitches; generators own pedal/bend state.
-		void this.triggerAudioCommandsOnDevice(
-			cleanup.filter((cmd) => cmd.type !== NOTE_ON && cmd.type !== NOTE_OFF)
-		)
+		this.triggerCleanupCommands(cleanup)
+	}
+
+	private triggerCleanupCommands(cleanup: IAudioCommand[]): void {
+		const commands = cleanup.filter((cmd) => cmd.type !== NOTE_ON && cmd.type !== NOTE_OFF)
+		if (commands.length) {
+			void this.triggerAudioCommandsOnDevice(commands)
+		}
 	}
 
 	/**
@@ -1056,11 +1061,7 @@ export default class IOChain extends EventTarget {
 		const cleanup = ((transformerEvent.detail?.removed ?? []) as ITransformer[]).flatMap(
 			(transformer) => transformer.stop?.(this.timer.now) ?? []
 		)
-		if (cleanup.length) {
-			void this.triggerAudioCommandsOnDevice(
-				cleanup.filter((cmd) => cmd.type !== NOTE_ON && cmd.type !== NOTE_OFF)
-			)
-		}
+		this.triggerCleanupCommands(cleanup)
 		this.clearNoteCommands()
 		this.dispatchEvent(
 			new CustomEvent(transformerEvent.type, { detail: transformerEvent.detail })
