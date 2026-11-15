@@ -1,0 +1,505 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "korg-volca-kick",
+	"name": "Korg volca kick",
+	"manufacturer": "Korg",
+	"manufacturerUrl": "https://www.korg.com/",
+	"productUrl": "https://www.korg.com/us/products/dj/volca_kick/",
+	"description": "Analog resonator-based kick and bass generator.",
+	"ids": ["korg-volca-kick"],
+	"portNames": ["volca kick", "Korg volca kick"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Korg volca kick owner manual",
+			"url": "https://cdn.korg.com/us/support/download/files/8a661f5232cc2c13780c706191ff8356.pdf"
+		},
+		{
+			"title": "Korg volca kick MIDI implementation chart",
+			"url": "https://cdn.korg.com/us/support/download/files/6ccaa99d5343b89209b19c07f47e3b0f.pdf"
+		}
+	],
+	"abilities": ["DIN MIDI IN only", "MIDI note reception", "Documented CC reception"],
+	"hardwareControls": [
+		"Master: Volume, Tempo, Memory, Play, Record, Function, Touch FX",
+		"Resonator: Pitch, Bend, Time",
+		"Pulse: Colour, Level",
+		"Amp: Attack, Decay",
+		"Drive Tone: Drive, Tone, Accent"
+	],
+	"notice": "Most controls are MIDI receive mappings. The unmodified hardware has no MIDI output and cannot send panel movements or notes to Harmoneasy. Enable MIDI RX ShortMessage for note and CC reception.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "resonator-pitch-knob",
+			"label": "Resonator: Pitch",
+			"widget": "slider",
+			"cc": 46
+		},
+		{
+			"id": "resonator-bend-knob",
+			"label": "Resonator: Bend",
+			"widget": "slider",
+			"cc": 47
+		},
+		{
+			"id": "resonator-time-knob",
+			"label": "Resonator: Time",
+			"widget": "slider",
+			"cc": 48
+		},
+		{
+			"id": "pulse-colour-knob",
+			"label": "Pulse: Colour",
+			"widget": "slider",
+			"cc": 40
+		},
+		{
+			"id": "pulse-level-knob",
+			"label": "Pulse: Level",
+			"widget": "slider",
+			"cc": 41
+		},
+		{
+			"id": "amp-attack-knob",
+			"label": "Amp: Attack",
+			"widget": "slider",
+			"cc": 42
+		},
+		{
+			"id": "amp-decay-knob",
+			"label": "Amp: Decay",
+			"widget": "slider",
+			"cc": 43
+		},
+		{
+			"id": "drive-tone-drive-knob",
+			"label": "Drive Tone: Drive",
+			"widget": "slider",
+			"cc": 44
+		},
+		{
+			"id": "drive-tone-tone-knob",
+			"label": "Drive Tone: Tone",
+			"widget": "slider",
+			"cc": 45
+		},
+		{
+			"id": "drive-tone-accent-knob",
+			"label": "Drive Tone: Accent",
+			"widget": "slider",
+			"cc": 49
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Korg volca kick overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 1200,
+		"height": 650,
+		"elements": [
+			{
+				"id": "resonator-pitch-knob",
+				"label": "Pitch",
+				"kind": "knob",
+				"position": {
+					"x": 28.833333333333332,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "resonator-pitch-knob"
+			},
+			{
+				"id": "resonator-bend-knob",
+				"label": "Bend",
+				"kind": "knob",
+				"position": {
+					"x": 28.833333333333332,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "resonator-bend-knob"
+			},
+			{
+				"id": "resonator-time-knob",
+				"label": "Time",
+				"kind": "knob",
+				"position": {
+					"x": 28.833333333333332,
+					"y": 48.769230769230774,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "resonator-time-knob"
+			},
+			{
+				"id": "pulse-colour-knob",
+				"label": "Colour",
+				"kind": "knob",
+				"position": {
+					"x": 41.16666666666667,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "pulse-colour-knob"
+			},
+			{
+				"id": "pulse-level-knob",
+				"label": "Level",
+				"kind": "knob",
+				"position": {
+					"x": 41.16666666666667,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "pulse-level-knob"
+			},
+			{
+				"id": "amp-attack-knob",
+				"label": "Attack",
+				"kind": "knob",
+				"position": {
+					"x": 53.5,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "amp-attack-knob"
+			},
+			{
+				"id": "amp-decay-knob",
+				"label": "Decay",
+				"kind": "knob",
+				"position": {
+					"x": 53.5,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "amp-decay-knob"
+			},
+			{
+				"id": "drive-tone-drive-knob",
+				"label": "Drive",
+				"kind": "knob",
+				"position": {
+					"x": 65.83333333333333,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "drive-tone-drive-knob"
+			},
+			{
+				"id": "drive-tone-tone-knob",
+				"label": "Tone",
+				"kind": "knob",
+				"position": {
+					"x": 65.83333333333333,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "drive-tone-tone-knob"
+			},
+			{
+				"id": "drive-tone-accent-knob",
+				"label": "Accent",
+				"kind": "knob",
+				"position": {
+					"x": 65.83333333333333,
+					"y": 48.769230769230774,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "drive-tone-accent-knob"
+			},
+			{
+				"id": "key-1",
+				"label": "Key 1",
+				"kind": "key",
+				"position": {
+					"x": 2.083333333333333,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 48
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-2",
+				"label": "Key 2",
+				"kind": "key",
+				"position": {
+					"x": 8.072916666666668,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 49
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-3",
+				"label": "Key 3",
+				"kind": "key",
+				"position": {
+					"x": 14.0625,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 50
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-4",
+				"label": "Key 4",
+				"kind": "key",
+				"position": {
+					"x": 20.052083333333336,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 51
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-5",
+				"label": "Key 5",
+				"kind": "key",
+				"position": {
+					"x": 26.041666666666668,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 52
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-6",
+				"label": "Key 6",
+				"kind": "key",
+				"position": {
+					"x": 32.03125,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 53
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-7",
+				"label": "Key 7",
+				"kind": "key",
+				"position": {
+					"x": 38.02083333333333,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 54
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-8",
+				"label": "Key 8",
+				"kind": "key",
+				"position": {
+					"x": 44.01041666666667,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 55
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-9",
+				"label": "Key 9",
+				"kind": "key",
+				"position": {
+					"x": 50.0,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 56
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-10",
+				"label": "Key 10",
+				"kind": "key",
+				"position": {
+					"x": 55.989583333333336,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 57
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-11",
+				"label": "Key 11",
+				"kind": "key",
+				"position": {
+					"x": 61.979166666666664,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 58
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-12",
+				"label": "Key 12",
+				"kind": "key",
+				"position": {
+					"x": 67.96875,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 59
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-13",
+				"label": "Key 13",
+				"kind": "key",
+				"position": {
+					"x": 73.95833333333334,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-14",
+				"label": "Key 14",
+				"kind": "key",
+				"position": {
+					"x": 79.94791666666666,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 61
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-15",
+				"label": "Key 15",
+				"kind": "key",
+				"position": {
+					"x": 85.9375,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 62
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-16",
+				"label": "Key 16",
+				"kind": "key",
+				"position": {
+					"x": 91.92708333333334,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 63
+				},
+				"learnable": true
+			}
+		]
+	}
+}

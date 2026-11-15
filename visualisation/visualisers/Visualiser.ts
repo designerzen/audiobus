@@ -1,158 +1,166 @@
-/**
- * Base class for all visualisers
- * To view a visualiser, simply add the canvas element to the stage
- */
 import type { IVisualiser } from "./IVisualiser.ts"
+import { RenderSurface, type VisualisationMode } from "../renderers/RenderSurface.ts"
 
+/** A layer in an analyser-owned rendering chain. Rendering never advances the chain. */
 export class Visualiser implements IVisualiser {
-	public context!: CanvasRenderingContext2D
 	public canvas!: HTMLCanvasElement
-	public bitmapData!: ImageData
-
-	public name: string = "Visualiser"
-	public width!: number
-	public height!: number
-
-	public centreX!: number
-	public centreY!: number
-
-	// Linked List
 	public next?: Visualiser
 	public previous?: Visualiser
-
-	public master: boolean = false
-
-	constructor(title: string) {
-		this.name = title
+	public master = false
+	public red = 55
+	public green = 55
+	public blue = 55
+	public opacity = 255
+	public thickness = 2
+	public readonly dataDomain: "frequency" | "time" = "frequency"
+	protected surface?: RenderSurface
+	private ownsSurface = false
+	get width(): number {
+		return this.canvas?.width ?? 0
 	}
-
-	public toString(): string {
-		let vis: Visualiser = this
-		let counter: number = 1
-		let output: string = "Visualisers\n"
-
-		while (vis.previous) {
-			vis = vis.previous
-			output += `${counter++}. name: ${vis.name}\n`
-		}
-
-		vis = this
-		output += `${counter++}. name: **${vis.name}**\n`
-
-		while (vis.next) {
-			vis = vis.next
-			output += `${counter++}. name: ${vis.name}\n`
-		}
-
-		return output
+	get height(): number {
+		return this.canvas?.height ?? 0
 	}
-
-	public unlink(): Visualiser {
-		if (this.previous && this.next) {
+	get centreX(): number {
+		return this.width / 2
+	}
+	get centreY(): number {
+		return this.height / 2
+	}
+	get ready(): Promise<void> {
+		return this.surface?.ready ?? Promise.resolve()
+	}
+	get backend() {
+		return this.surface?.backend ?? "pending"
+	}
+	constructor(public name = "Visualiser") {}
+	toString(): string {
+		return this.name
+	}
+	unlink(): Visualiser {
+		if (this.previous) {
 			this.previous.next = this.next
-			this.next.previous = this.previous
-		} else if (!this.previous && this.next) {
-			this.next.previous = undefined
-		} else if (this.previous && !this.next) {
-			this.previous.next = undefined
 		}
-		return this
-	}
-
-	public createCanvas(width: number = 256, height: number = 256): void {
-		this.canvas = document.createElement("canvas")
-		this.canvas.width = width
-		this.canvas.height = height
-
-		document.body.appendChild(this.canvas)
-
-		this.setCanvas(this.canvas)
-	}
-
-	public setCanvas(canvas: HTMLCanvasElement): void {
-		this.canvas = canvas
-		const ctx = this.canvas.getContext("2d")
-		if (!ctx) {
-			throw new Error("Could not get 2D context")
-		}
-		this.context = ctx
-		this.width = this.canvas.width
-		this.height = this.canvas.height
-		this.centreX = this.width / 2
-		this.centreY = this.height / 2
-		this.bitmapData = this.context.getImageData(0, 0, this.width, this.height)
-	}
-
-	public setAsMaster(): Visualiser {
-		let vis: Visualiser = this
-		let head: Visualiser = this
-		let tail: Visualiser = this
-
-		while (vis.previous) {
-			vis = vis.previous
-			vis.master = false
-			vis.setCanvas(this.canvas)
-			head = vis
-		}
-
-		vis = this
-
-		while (vis.next) {
-			vis = vis.next
-			vis.master = false
-			vis.setCanvas(this.canvas)
-			tail = vis
-		}
-
-		this.master = true
-		console.error(head, tail)
-		return this
-	}
-
-	public appendSlave(slave: Visualiser): Visualiser {
-		let vis: Visualiser = this
-		while (vis.next) {
-			vis = vis.next
-		}
-		vis.next = slave
-		slave.previous = vis
-		slave.setCanvas(this.canvas)
-		console.error(vis)
-		return this
-	}
-
-	public prependSlave(slave: Visualiser): Visualiser {
-		let vis: Visualiser = this
-		while (vis.previous) {
-			vis = vis.previous
-		}
-		vis.previous = slave
-		slave.next = vis
-		slave.setCanvas(this.canvas)
-		console.error("prependSlave", vis.previous)
-		return this
-	}
-
-	public drawPixel(x: number, y: number, r: number, g: number, b: number, alpha: number): void {
-		x = x >> 0
-		y = y >> 0
-		const i: number = (x + y * this.width) * 4
-		this.bitmapData.data[i + 0] = r
-		this.bitmapData.data[i + 1] = g
-		this.bitmapData.data[i + 2] = b
-		this.bitmapData.data[i + 3] = alpha
-	}
-
-	public clearScreen(): void {
-		this.context.save()
-		this.context.setTransform(1, 0, 0, 1, 0, 0)
-		this.context.clearRect(0, 0, this.width, this.height)
-		this.context.restore()
-	}
-
-	public update(spectrum: Uint8Array, time: number, bufferLength: number): void {
 		if (this.next) {
-			this.next.update(spectrum, time, bufferLength)
+			this.next.previous = this.previous
 		}
+		this.next = this.previous = undefined
+		return this
+	}
+	createCanvas(width = 256, height = 256): void {
+		const canvas = document.createElement("canvas")
+		canvas.width = width
+		canvas.height = height
+		canvas.setAttribute("role", "img")
+		canvas.setAttribute("aria-label", this.name)
+		document.body.appendChild(canvas)
+		this.setCanvas(canvas)
+	}
+	setCanvas(canvas: HTMLCanvasElement, surface?: RenderSurface): void {
+		if (this.canvas === canvas && (!surface || this.surface === surface)) {
+			return
+		}
+		if (this.ownsSurface) {
+			this.surface?.dispose()
+		}
+		this.canvas = canvas
+		this.surface = surface ?? new RenderSurface(canvas)
+		this.ownsSurface = !surface
+	}
+	setAsMaster(): Visualiser {
+		this.master = true
+		let head: Visualiser = this
+		while (head.previous) {
+			head = head.previous
+		}
+		for (let vis: Visualiser | undefined = head; vis; vis = vis.next) {
+			if (vis !== this) {
+				vis.master = false
+			}
+			vis.setCanvas(this.canvas, this.surface)
+		}
+		return this
+	}
+	appendSlave(slave: Visualiser): Visualiser {
+		this.assertSeparate(slave)
+		slave.unlink()
+		let tail: Visualiser = this
+		while (tail.next) {
+			tail = tail.next
+		}
+		tail.next = slave
+		slave.previous = tail
+		if (this.canvas) {
+			slave.setCanvas(this.canvas, this.surface)
+		}
+		return this
+	}
+	prependSlave(slave: Visualiser): Visualiser {
+		this.assertSeparate(slave)
+		slave.unlink()
+		let head: Visualiser = this
+		while (head.previous) {
+			head = head.previous
+		}
+		head.previous = slave
+		slave.next = head
+		if (this.canvas) {
+			slave.setCanvas(this.canvas, this.surface)
+		}
+		return this
+	}
+	private assertSeparate(slave: Visualiser): void {
+		let head: Visualiser = this
+		while (head.previous) {
+			head = head.previous
+		}
+		for (let vis: Visualiser | undefined = head; vis; vis = vis.next) {
+			if (vis === slave) {
+				throw new Error("Visualiser already belongs to this chain")
+			}
+		}
+	}
+	protected render(
+		mode: VisualisationMode,
+		data: Uint8Array<ArrayBuffer>,
+		time: number,
+		amplitude = 150,
+		decay = 0.0002,
+		ratios = [3, 2, 3],
+		phases = [0, 0, 0]
+	): void {
+		if (!this.surface) {
+			return
+		}
+		if (this.ownsSurface) {
+			this.surface.beginFrame()
+		}
+		this.surface.add({
+			mode,
+			data,
+			time,
+			colour: [
+				this.red / 255,
+				this.green / 255,
+				this.blue / 255,
+				Math.max(0, Math.min(1, this.opacity / 255))
+			],
+			thickness: this.thickness,
+			amplitude,
+			decay,
+			ratios,
+			phases
+		})
+		if (this.ownsSurface) {
+			this.surface.endFrame()
+		}
+	}
+	update(_spectrum: Uint8Array<ArrayBuffer>, _time: number, _bufferLength: number): void {}
+	dispose(): void {
+		this.unlink()
+		if (this.ownsSurface) {
+			this.surface?.dispose()
+		}
+		this.surface = undefined
 	}
 }

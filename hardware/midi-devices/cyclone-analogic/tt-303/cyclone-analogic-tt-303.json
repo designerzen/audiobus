@@ -1,0 +1,275 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "cyclone-analogic-tt-303",
+	"name": "Cyclone Analogic TT-303",
+	"manufacturer": "Cyclone Analogic",
+	"manufacturerUrl": "https://www.cyclone-analogic.fr/",
+	"ids": ["cyclone-analogic-tt-303"],
+	"portNames": ["TT-303", "TT303", "Bass Bot TT-303", "Cyclone Analogic TT-303"],
+	"description": "Bass Bot analog bass synthesizer and MIDI note sequencer.",
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Cyclone Analogic TT-303 manual and MIDI reference",
+			"url": "https://www.cyclone-analogic.fr/img/cms/The-Bass-Bot-English-2.0.pdf"
+		}
+	],
+	"abilities": ["Sequencer note output", "Accent velocity", "MIDI clock output"],
+	"hardwareControls": ["Note buttons", "Pattern sequencer", "Analog sound controls"],
+	"notice": "Uses the TT-303 V1/InstaDJ 2.0 note implementation. Connect MIDI OUT through an interface; V1 requires its DIN-8 MIDI splitter for output. Set the MIDI output channel on the hardware (V1 supports 1-10). An interface port usually has its own name, so select this profile manually for DIN connections. Accent is encoded in note velocity. Sound knobs do not transmit MIDI CC; slide is not a pitch-bend control. Virtual keys start at note 48.",
+	"controls": [],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Cyclone Analogic TT-303 overhead hardware diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 1000,
+		"height": 620,
+		"elements": [
+			{
+				"id": "key-0",
+				"label": "Note 48",
+				"kind": "key",
+				"position": {
+					"x": 22.5,
+					"y": 83.87096774193549,
+					"width": 8.85125,
+					"height": 6.774193548387098
+				},
+				"message": {
+					"type": "note",
+					"number": 48
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-2",
+				"label": "Note 50",
+				"kind": "key",
+				"position": {
+					"x": 31.624999999999996,
+					"y": 83.87096774193549,
+					"width": 8.85125,
+					"height": 6.774193548387098
+				},
+				"message": {
+					"type": "note",
+					"number": 50
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-4",
+				"label": "Note 52",
+				"kind": "key",
+				"position": {
+					"x": 40.75,
+					"y": 83.87096774193549,
+					"width": 8.85125,
+					"height": 6.774193548387098
+				},
+				"message": {
+					"type": "note",
+					"number": 52
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-5",
+				"label": "Note 53",
+				"kind": "key",
+				"position": {
+					"x": 49.875,
+					"y": 83.87096774193549,
+					"width": 8.85125,
+					"height": 6.774193548387098
+				},
+				"message": {
+					"type": "note",
+					"number": 53
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-7",
+				"label": "Note 55",
+				"kind": "key",
+				"position": {
+					"x": 59.0,
+					"y": 83.87096774193549,
+					"width": 8.85125,
+					"height": 6.774193548387098
+				},
+				"message": {
+					"type": "note",
+					"number": 55
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-9",
+				"label": "Note 57",
+				"kind": "key",
+				"position": {
+					"x": 68.125,
+					"y": 83.87096774193549,
+					"width": 8.85125,
+					"height": 6.774193548387098
+				},
+				"message": {
+					"type": "note",
+					"number": 57
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-11",
+				"label": "Note 59",
+				"kind": "key",
+				"position": {
+					"x": 77.25,
+					"y": 83.87096774193549,
+					"width": 8.85125,
+					"height": 6.774193548387098
+				},
+				"message": {
+					"type": "note",
+					"number": 59
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-12",
+				"label": "Note 60",
+				"kind": "key",
+				"position": {
+					"x": 86.375,
+					"y": 83.87096774193549,
+					"width": 8.85125,
+					"height": 6.774193548387098
+				},
+				"message": {
+					"type": "note",
+					"number": 60
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-1",
+				"label": "Note 49",
+				"kind": "key",
+				"position": {
+					"x": 28.8875,
+					"y": 71.7741935483871,
+					"width": 5.475,
+					"height": 6.774193548387098
+				},
+				"message": {
+					"type": "note",
+					"number": 49
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "key-3",
+				"label": "Note 51",
+				"kind": "key",
+				"position": {
+					"x": 38.012499999999996,
+					"y": 71.7741935483871,
+					"width": 5.475,
+					"height": 6.774193548387098
+				},
+				"message": {
+					"type": "note",
+					"number": 51
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "key-6",
+				"label": "Note 54",
+				"kind": "key",
+				"position": {
+					"x": 56.2625,
+					"y": 71.7741935483871,
+					"width": 5.475,
+					"height": 6.774193548387098
+				},
+				"message": {
+					"type": "note",
+					"number": 54
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "key-8",
+				"label": "Note 56",
+				"kind": "key",
+				"position": {
+					"x": 65.3875,
+					"y": 71.7741935483871,
+					"width": 5.475,
+					"height": 6.774193548387098
+				},
+				"message": {
+					"type": "note",
+					"number": 56
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "key-10",
+				"label": "Note 58",
+				"kind": "key",
+				"position": {
+					"x": 74.5125,
+					"y": 71.7741935483871,
+					"width": 5.475,
+					"height": 6.774193548387098
+				},
+				"message": {
+					"type": "note",
+					"number": 58
+				},
+				"learnable": true,
+				"dark": true
+			}
+		]
+	}
+}

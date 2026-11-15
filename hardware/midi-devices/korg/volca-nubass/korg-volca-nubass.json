@@ -1,0 +1,523 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "korg-volca-nubass",
+	"name": "Korg volca nubass",
+	"manufacturer": "Korg",
+	"manufacturerUrl": "https://www.korg.com/",
+	"productUrl": "https://www.korg.com/us/products/dj/volca_nubass/",
+	"description": "Nutube oscillator bass synthesizer and sequencer.",
+	"ids": ["korg-volca-nubass"],
+	"portNames": ["volca nubass", "Korg volca nubass"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Korg volca nubass owner manual",
+			"url": "https://cdn.korg.com/us/support/download/files/97f9ba442039508d2ef345163ac60954.pdf"
+		},
+		{
+			"title": "Korg volca nubass MIDI implementation chart",
+			"url": "https://cdn.korg.com/us/support/download/files/002bae1cd7751c5f3ac6e5c51f08b7e0.pdf"
+		}
+	],
+	"abilities": ["DIN MIDI IN only", "MIDI note reception", "Documented CC reception"],
+	"hardwareControls": [
+		"Master: Volume, Tempo, Memory, Play, Record, Function",
+		"VTO: Pitch, Saturation, Level",
+		"VCF: Cutoff, Peak, Attack, Decay, EG intensity",
+		"LFO: Rate, Intensity",
+		"Drive: Drive, Tone, Accent"
+	],
+	"notice": "Most controls are MIDI receive mappings. The unmodified hardware has no MIDI output and cannot send panel movements or notes to Harmoneasy. Enable MIDI RX ShortMessage for note and CC reception. Drive and Tone have no assignments in the published MIDI chart.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "vto-pitch-knob",
+			"label": "VTO: Pitch",
+			"widget": "slider",
+			"cc": 40
+		},
+		{
+			"id": "vto-saturation-knob",
+			"label": "VTO: Saturation",
+			"widget": "slider",
+			"cc": 41
+		},
+		{
+			"id": "vto-level-knob",
+			"label": "VTO: Level",
+			"widget": "slider",
+			"cc": 42
+		},
+		{
+			"id": "vcf-cutoff-knob",
+			"label": "VCF: Cutoff",
+			"widget": "slider",
+			"cc": 43
+		},
+		{
+			"id": "vcf-peak-knob",
+			"label": "VCF: Peak",
+			"widget": "slider",
+			"cc": 44
+		},
+		{
+			"id": "vcf-attack-knob",
+			"label": "VCF: Attack",
+			"widget": "slider",
+			"cc": 45
+		},
+		{
+			"id": "vcf-decay-knob",
+			"label": "VCF: Decay",
+			"widget": "slider",
+			"cc": 46
+		},
+		{
+			"id": "vcf-eg-intensity-knob",
+			"label": "VCF: EG intensity",
+			"widget": "slider",
+			"cc": 47
+		},
+		{
+			"id": "lfo-rate-knob",
+			"label": "LFO: Rate",
+			"widget": "slider",
+			"cc": 49
+		},
+		{
+			"id": "lfo-intensity-knob",
+			"label": "LFO: Intensity",
+			"widget": "slider",
+			"cc": 50
+		},
+		{
+			"id": "drive-accent-knob",
+			"label": "Drive: Accent",
+			"widget": "slider",
+			"cc": 48
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Korg volca nubass overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 1200,
+		"height": 650,
+		"elements": [
+			{
+				"id": "vto-pitch-knob",
+				"label": "Pitch",
+				"kind": "knob",
+				"position": {
+					"x": 20.916666666666668,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "vto-pitch-knob"
+			},
+			{
+				"id": "vto-saturation-knob",
+				"label": "Saturation",
+				"kind": "knob",
+				"position": {
+					"x": 20.916666666666668,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "vto-saturation-knob"
+			},
+			{
+				"id": "vto-level-knob",
+				"label": "Level",
+				"kind": "knob",
+				"position": {
+					"x": 20.916666666666668,
+					"y": 48.769230769230774,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "vto-level-knob"
+			},
+			{
+				"id": "vcf-cutoff-knob",
+				"label": "Cutoff",
+				"kind": "knob",
+				"position": {
+					"x": 33.25,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "vcf-cutoff-knob"
+			},
+			{
+				"id": "vcf-peak-knob",
+				"label": "Peak",
+				"kind": "knob",
+				"position": {
+					"x": 41.16666666666667,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "vcf-peak-knob"
+			},
+			{
+				"id": "vcf-attack-knob",
+				"label": "Attack",
+				"kind": "knob",
+				"position": {
+					"x": 33.25,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "vcf-attack-knob"
+			},
+			{
+				"id": "vcf-decay-knob",
+				"label": "Decay",
+				"kind": "knob",
+				"position": {
+					"x": 41.16666666666667,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "vcf-decay-knob"
+			},
+			{
+				"id": "vcf-eg-intensity-knob",
+				"label": "EG intensity",
+				"kind": "knob",
+				"position": {
+					"x": 33.25,
+					"y": 48.769230769230774,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "vcf-eg-intensity-knob"
+			},
+			{
+				"id": "lfo-rate-knob",
+				"label": "Rate",
+				"kind": "knob",
+				"position": {
+					"x": 51.083333333333336,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "lfo-rate-knob"
+			},
+			{
+				"id": "lfo-intensity-knob",
+				"label": "Intensity",
+				"kind": "knob",
+				"position": {
+					"x": 51.083333333333336,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "lfo-intensity-knob"
+			},
+			{
+				"id": "drive-accent-knob",
+				"label": "Accent",
+				"kind": "knob",
+				"position": {
+					"x": 63.416666666666664,
+					"y": 48.769230769230774,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "drive-accent-knob"
+			},
+			{
+				"id": "key-1",
+				"label": "Key 1",
+				"kind": "key",
+				"position": {
+					"x": 2.083333333333333,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 48
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-2",
+				"label": "Key 2",
+				"kind": "key",
+				"position": {
+					"x": 8.072916666666668,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 49
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-3",
+				"label": "Key 3",
+				"kind": "key",
+				"position": {
+					"x": 14.0625,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 50
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-4",
+				"label": "Key 4",
+				"kind": "key",
+				"position": {
+					"x": 20.052083333333336,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 51
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-5",
+				"label": "Key 5",
+				"kind": "key",
+				"position": {
+					"x": 26.041666666666668,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 52
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-6",
+				"label": "Key 6",
+				"kind": "key",
+				"position": {
+					"x": 32.03125,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 53
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-7",
+				"label": "Key 7",
+				"kind": "key",
+				"position": {
+					"x": 38.02083333333333,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 54
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-8",
+				"label": "Key 8",
+				"kind": "key",
+				"position": {
+					"x": 44.01041666666667,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 55
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-9",
+				"label": "Key 9",
+				"kind": "key",
+				"position": {
+					"x": 50.0,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 56
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-10",
+				"label": "Key 10",
+				"kind": "key",
+				"position": {
+					"x": 55.989583333333336,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 57
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-11",
+				"label": "Key 11",
+				"kind": "key",
+				"position": {
+					"x": 61.979166666666664,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 58
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-12",
+				"label": "Key 12",
+				"kind": "key",
+				"position": {
+					"x": 67.96875,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 59
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-13",
+				"label": "Key 13",
+				"kind": "key",
+				"position": {
+					"x": 73.95833333333334,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-14",
+				"label": "Key 14",
+				"kind": "key",
+				"position": {
+					"x": 79.94791666666666,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 61
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-15",
+				"label": "Key 15",
+				"kind": "key",
+				"position": {
+					"x": 85.9375,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 62
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-16",
+				"label": "Key 16",
+				"kind": "key",
+				"position": {
+					"x": 91.92708333333334,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 63
+				},
+				"learnable": true
+			}
+		]
+	}
+}

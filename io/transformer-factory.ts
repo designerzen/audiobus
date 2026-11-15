@@ -77,6 +77,12 @@ import {
 	TransformerVelocityShaper
 } from "./transformers/transformer-velocity-shaper.ts"
 import { ID_STRUMMER, TransformerStrummer } from "./transformers/transformer-strummer.ts"
+import { ID_HARP, TransformerHarp } from "./transformers/transformer-harp.ts"
+import { ID_SLOP, TransformerSlop } from "./transformers/transformer-slop.ts"
+import {
+	ID_CHORD_PATTERN,
+	TransformerChordPattern
+} from "./transformers/transformer-chord-pattern.ts"
 import {
 	ID_PROBABILITY_GATE,
 	TransformerProbabilityGate
@@ -174,6 +180,12 @@ export const tranformerFactory = (type: string, config: any = {}) => {
 			return new TransformerVelocityShaper(config)
 		case ID_STRUMMER:
 			return new TransformerStrummer(config)
+		case ID_HARP:
+			return new TransformerHarp(config)
+		case ID_SLOP:
+			return new TransformerSlop(config)
+		case ID_CHORD_PATTERN:
+			return new TransformerChordPattern(config)
 		case ID_PROBABILITY_GATE:
 			return new TransformerProbabilityGate(config)
 		case ID_NOTE_MAPPER:
@@ -278,6 +290,9 @@ export const TRANSFORMER_TYPE = {
 	ID_BROWSER_AI,
 	ID_VELOCITY_SHAPER,
 	ID_STRUMMER,
+	ID_HARP,
+	ID_SLOP,
+	ID_CHORD_PATTERN,
 	ID_PROBABILITY_GATE,
 	ID_NOTE_MAPPER,
 	ID_LATCH,

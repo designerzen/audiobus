@@ -1,0 +1,700 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "korg-volca-fm2",
+	"name": "Korg volca fm2",
+	"manufacturer": "Korg",
+	"manufacturerUrl": "https://www.korg.com/",
+	"productUrl": "https://www.korg.com/us/products/dj/volca_fm2/",
+	"description": "Second-generation six-voice FM synthesizer.",
+	"ids": ["korg-volca-fm2"],
+	"portNames": ["volca fm2", "volca fm 2", "Korg volca fm2"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Korg volca fm2 owner manual",
+			"url": "https://cdn.korg.com/us/support/download/files/fd37180c39c87b20df510643347ee119.pdf"
+		},
+		{
+			"title": "Korg volca fm2 MIDI implementation chart",
+			"url": "https://cdn.korg.com/us/support/download/files/38bf877e063858210403554ec502efac.pdf"
+		}
+	],
+	"abilities": ["TRS MIDI IN/OUT", "MIDI note reception", "Documented CC reception"],
+	"hardwareControls": [
+		"Master: Volume, Tempo, Program, Memory, Play, Record, Function, Edit, Chorus",
+		"Performance: Transpose, Velocity",
+		"Modulator: Attack, Decay",
+		"Carrier: Attack, Decay",
+		"LFO: Rate, Pitch depth",
+		"Algorithm Arp: Algorithm, Type, Division"
+	],
+	"notice": "Match the hardware MIDI channel and receive settings. Six-voice model with TRS MIDI IN and OUT and note velocity support. Use the correct MIDI adapter. Chorus depth CC93 and reverb depth CC91 are documented additional MIDI parameters; the physical Chorus button is not assigned a guessed CC toggle here.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "performance-transpose-fader",
+			"label": "Performance: Transpose",
+			"widget": "slider",
+			"cc": 40
+		},
+		{
+			"id": "performance-velocity-fader",
+			"label": "Performance: Velocity",
+			"widget": "slider",
+			"cc": 41
+		},
+		{
+			"id": "modulator-attack-knob",
+			"label": "Modulator: Attack",
+			"widget": "slider",
+			"cc": 42
+		},
+		{
+			"id": "modulator-decay-knob",
+			"label": "Modulator: Decay",
+			"widget": "slider",
+			"cc": 43
+		},
+		{
+			"id": "carrier-attack-knob",
+			"label": "Carrier: Attack",
+			"widget": "slider",
+			"cc": 44
+		},
+		{
+			"id": "carrier-decay-knob",
+			"label": "Carrier: Decay",
+			"widget": "slider",
+			"cc": 45
+		},
+		{
+			"id": "lfo-rate-knob",
+			"label": "LFO: Rate",
+			"widget": "slider",
+			"cc": 46
+		},
+		{
+			"id": "lfo-pitch-depth-knob",
+			"label": "LFO: Pitch depth",
+			"widget": "slider",
+			"cc": 47
+		},
+		{
+			"id": "algorithm-arp-algorithm-knob",
+			"label": "Algorithm Arp: Algorithm",
+			"widget": "slider",
+			"cc": 48
+		},
+		{
+			"id": "algorithm-arp-type-knob",
+			"label": "Algorithm Arp: Type",
+			"widget": "slider",
+			"cc": 49
+		},
+		{
+			"id": "algorithm-arp-division-knob",
+			"label": "Algorithm Arp: Division",
+			"widget": "slider",
+			"cc": 50
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Korg volca fm2 overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 1200,
+		"height": 650,
+		"elements": [
+			{
+				"id": "performance-transpose-fader",
+				"label": "Transpose",
+				"kind": "fader",
+				"position": {
+					"x": 28.833333333333332,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "performance-transpose-fader"
+			},
+			{
+				"id": "performance-velocity-fader",
+				"label": "Velocity",
+				"kind": "fader",
+				"position": {
+					"x": 28.833333333333332,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "performance-velocity-fader"
+			},
+			{
+				"id": "modulator-attack-knob",
+				"label": "Attack",
+				"kind": "knob",
+				"position": {
+					"x": 41.16666666666667,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "modulator-attack-knob"
+			},
+			{
+				"id": "modulator-decay-knob",
+				"label": "Decay",
+				"kind": "knob",
+				"position": {
+					"x": 41.16666666666667,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "modulator-decay-knob"
+			},
+			{
+				"id": "carrier-attack-knob",
+				"label": "Attack",
+				"kind": "knob",
+				"position": {
+					"x": 53.5,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "carrier-attack-knob"
+			},
+			{
+				"id": "carrier-decay-knob",
+				"label": "Decay",
+				"kind": "knob",
+				"position": {
+					"x": 53.5,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "carrier-decay-knob"
+			},
+			{
+				"id": "lfo-rate-knob",
+				"label": "Rate",
+				"kind": "knob",
+				"position": {
+					"x": 65.83333333333333,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "lfo-rate-knob"
+			},
+			{
+				"id": "lfo-pitch-depth-knob",
+				"label": "Pitch depth",
+				"kind": "knob",
+				"position": {
+					"x": 65.83333333333333,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "lfo-pitch-depth-knob"
+			},
+			{
+				"id": "algorithm-arp-algorithm-knob",
+				"label": "Algorithm",
+				"kind": "knob",
+				"position": {
+					"x": 78.16666666666666,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "algorithm-arp-algorithm-knob"
+			},
+			{
+				"id": "algorithm-arp-type-knob",
+				"label": "Type",
+				"kind": "knob",
+				"position": {
+					"x": 78.16666666666666,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "algorithm-arp-type-knob"
+			},
+			{
+				"id": "algorithm-arp-division-knob",
+				"label": "Division",
+				"kind": "knob",
+				"position": {
+					"x": 78.16666666666666,
+					"y": 48.769230769230774,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "algorithm-arp-division-knob"
+			},
+			{
+				"id": "key-1",
+				"label": "Key 1",
+				"kind": "key",
+				"position": {
+					"x": 2.083333333333333,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 48
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-2",
+				"label": "Key 2",
+				"kind": "key",
+				"position": {
+					"x": 5.632716049382716,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 49
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-3",
+				"label": "Key 3",
+				"kind": "key",
+				"position": {
+					"x": 9.1820987654321,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 50
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-4",
+				"label": "Key 4",
+				"kind": "key",
+				"position": {
+					"x": 12.73148148148148,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 51
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-5",
+				"label": "Key 5",
+				"kind": "key",
+				"position": {
+					"x": 16.280864197530864,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 52
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-6",
+				"label": "Key 6",
+				"kind": "key",
+				"position": {
+					"x": 19.83024691358025,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 53
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-7",
+				"label": "Key 7",
+				"kind": "key",
+				"position": {
+					"x": 23.379629629629626,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 54
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-8",
+				"label": "Key 8",
+				"kind": "key",
+				"position": {
+					"x": 26.929012345679016,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 55
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-9",
+				"label": "Key 9",
+				"kind": "key",
+				"position": {
+					"x": 30.478395061728396,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 56
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-10",
+				"label": "Key 10",
+				"kind": "key",
+				"position": {
+					"x": 34.02777777777778,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 57
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-11",
+				"label": "Key 11",
+				"kind": "key",
+				"position": {
+					"x": 37.577160493827165,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 58
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-12",
+				"label": "Key 12",
+				"kind": "key",
+				"position": {
+					"x": 41.126543209876544,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 59
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-13",
+				"label": "Key 13",
+				"kind": "key",
+				"position": {
+					"x": 44.675925925925924,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-14",
+				"label": "Key 14",
+				"kind": "key",
+				"position": {
+					"x": 48.2253086419753,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 61
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-15",
+				"label": "Key 15",
+				"kind": "key",
+				"position": {
+					"x": 51.7746913580247,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 62
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-16",
+				"label": "Key 16",
+				"kind": "key",
+				"position": {
+					"x": 55.32407407407408,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 63
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-17",
+				"label": "Key 17",
+				"kind": "key",
+				"position": {
+					"x": 58.873456790123456,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 64
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-18",
+				"label": "Key 18",
+				"kind": "key",
+				"position": {
+					"x": 62.42283950617284,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 65
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-19",
+				"label": "Key 19",
+				"kind": "key",
+				"position": {
+					"x": 65.97222222222223,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 66
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-20",
+				"label": "Key 20",
+				"kind": "key",
+				"position": {
+					"x": 69.52160493827161,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 67
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-21",
+				"label": "Key 21",
+				"kind": "key",
+				"position": {
+					"x": 73.070987654321,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 68
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-22",
+				"label": "Key 22",
+				"kind": "key",
+				"position": {
+					"x": 76.62037037037037,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 69
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-23",
+				"label": "Key 23",
+				"kind": "key",
+				"position": {
+					"x": 80.16975308641976,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 70
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-24",
+				"label": "Key 24",
+				"kind": "key",
+				"position": {
+					"x": 83.71913580246914,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 71
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-25",
+				"label": "Key 25",
+				"kind": "key",
+				"position": {
+					"x": 87.2685185185185,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 72
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-26",
+				"label": "Key 26",
+				"kind": "key",
+				"position": {
+					"x": 90.8179012345679,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 73
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-27",
+				"label": "Key 27",
+				"kind": "key",
+				"position": {
+					"x": 94.36728395061729,
+					"y": 82.76923076923077,
+					"width": 3.132716049382716,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 74
+				},
+				"learnable": true
+			}
+		]
+	}
+}

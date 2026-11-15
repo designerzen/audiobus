@@ -1,0 +1,1034 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "novation-circuit",
+	"name": "Novation Circuit",
+	"manufacturer": "Novation",
+	"manufacturerUrl": "https://novationmusic.com/",
+	"ids": ["novation-circuit"],
+	"portNames": ["Circuit", "Circuit MIDI", "Novation Circuit"],
+	"description": "Original Circuit groovebox with two synth tracks, four drum tracks and eight macro encoders.",
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Novation Circuit manual and MIDI reference",
+			"url": "https://downloads.novationmusic.com/novation/circuit/circuit"
+		}
+	],
+	"abilities": [
+		"Polyphonic synth notes",
+		"Drum notes",
+		"Synth macro CCs",
+		"Sequencer MIDI output"
+	],
+	"hardwareControls": [
+		"32 velocity-sensitive pads",
+		"Eight macro encoders",
+		"Two synth tracks",
+		"Four drum tracks"
+	],
+	"notice": "Original Circuit, rather than Circuit Tracks or Rhythm. Enable MIDI note and CC transmission in the setup view. Synth macros use factory channels 1 and 2; drums use channel 10. The two macro rows represent the same eight encoders on the two synth tracks. Pad notes are virtual chromatic defaults; use MIDI learn to match the selected scale and octave. If hardware channels have changed, edit the surface mappings.",
+	"controls": [
+		{
+			"id": "synth-1-macro-1",
+			"label": "Synth 1 macro 1",
+			"message": {
+				"type": "cc",
+				"number": 80,
+				"channel": 1
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "synth-1-macro-2",
+			"label": "Synth 1 macro 2",
+			"message": {
+				"type": "cc",
+				"number": 81,
+				"channel": 1
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "synth-1-macro-3",
+			"label": "Synth 1 macro 3",
+			"message": {
+				"type": "cc",
+				"number": 82,
+				"channel": 1
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "synth-1-macro-4",
+			"label": "Synth 1 macro 4",
+			"message": {
+				"type": "cc",
+				"number": 83,
+				"channel": 1
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "synth-1-macro-5",
+			"label": "Synth 1 macro 5",
+			"message": {
+				"type": "cc",
+				"number": 84,
+				"channel": 1
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "synth-1-macro-6",
+			"label": "Synth 1 macro 6",
+			"message": {
+				"type": "cc",
+				"number": 85,
+				"channel": 1
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "synth-1-macro-7",
+			"label": "Synth 1 macro 7",
+			"message": {
+				"type": "cc",
+				"number": 86,
+				"channel": 1
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "synth-1-macro-8",
+			"label": "Synth 1 macro 8",
+			"message": {
+				"type": "cc",
+				"number": 87,
+				"channel": 1
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "synth-2-macro-1",
+			"label": "Synth 2 macro 1",
+			"message": {
+				"type": "cc",
+				"number": 80,
+				"channel": 2
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "synth-2-macro-2",
+			"label": "Synth 2 macro 2",
+			"message": {
+				"type": "cc",
+				"number": 81,
+				"channel": 2
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "synth-2-macro-3",
+			"label": "Synth 2 macro 3",
+			"message": {
+				"type": "cc",
+				"number": 82,
+				"channel": 2
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "synth-2-macro-4",
+			"label": "Synth 2 macro 4",
+			"message": {
+				"type": "cc",
+				"number": 83,
+				"channel": 2
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "synth-2-macro-5",
+			"label": "Synth 2 macro 5",
+			"message": {
+				"type": "cc",
+				"number": 84,
+				"channel": 2
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "synth-2-macro-6",
+			"label": "Synth 2 macro 6",
+			"message": {
+				"type": "cc",
+				"number": 85,
+				"channel": 2
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "synth-2-macro-7",
+			"label": "Synth 2 macro 7",
+			"message": {
+				"type": "cc",
+				"number": 86,
+				"channel": 2
+			},
+			"widget": "slider"
+		},
+		{
+			"id": "synth-2-macro-8",
+			"label": "Synth 2 macro 8",
+			"message": {
+				"type": "cc",
+				"number": 87,
+				"channel": 2
+			},
+			"widget": "slider"
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Novation Circuit overhead hardware diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "section",
+				"label": "MIDI controls",
+				"children": [
+					{
+						"type": "controls"
+					}
+				]
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 1000,
+		"height": 760,
+		"elements": [
+			{
+				"id": "synth-1-macro-1",
+				"label": "Synth 1 macro 1",
+				"kind": "knob",
+				"position": {
+					"x": 15.1,
+					"y": 7.368421052631578,
+					"width": 2.4,
+					"height": 6.315789473684211
+				},
+				"control": "synth-1-macro-1"
+			},
+			{
+				"id": "synth-1-macro-2",
+				"label": "Synth 1 macro 2",
+				"kind": "knob",
+				"position": {
+					"x": 24.099999999999998,
+					"y": 15.921052631578947,
+					"width": 2.4,
+					"height": 6.315789473684211
+				},
+				"control": "synth-1-macro-2"
+			},
+			{
+				"id": "synth-1-macro-3",
+				"label": "Synth 1 macro 3",
+				"kind": "knob",
+				"position": {
+					"x": 33.1,
+					"y": 7.368421052631578,
+					"width": 2.4,
+					"height": 6.315789473684211
+				},
+				"control": "synth-1-macro-3"
+			},
+			{
+				"id": "synth-1-macro-4",
+				"label": "Synth 1 macro 4",
+				"kind": "knob",
+				"position": {
+					"x": 42.1,
+					"y": 15.921052631578947,
+					"width": 2.4,
+					"height": 6.315789473684211
+				},
+				"control": "synth-1-macro-4"
+			},
+			{
+				"id": "synth-1-macro-5",
+				"label": "Synth 1 macro 5",
+				"kind": "knob",
+				"position": {
+					"x": 51.1,
+					"y": 7.368421052631578,
+					"width": 2.4,
+					"height": 6.315789473684211
+				},
+				"control": "synth-1-macro-5"
+			},
+			{
+				"id": "synth-1-macro-6",
+				"label": "Synth 1 macro 6",
+				"kind": "knob",
+				"position": {
+					"x": 60.099999999999994,
+					"y": 15.921052631578947,
+					"width": 2.4,
+					"height": 6.315789473684211
+				},
+				"control": "synth-1-macro-6"
+			},
+			{
+				"id": "synth-1-macro-7",
+				"label": "Synth 1 macro 7",
+				"kind": "knob",
+				"position": {
+					"x": 69.1,
+					"y": 7.368421052631578,
+					"width": 2.4,
+					"height": 6.315789473684211
+				},
+				"control": "synth-1-macro-7"
+			},
+			{
+				"id": "synth-1-macro-8",
+				"label": "Synth 1 macro 8",
+				"kind": "knob",
+				"position": {
+					"x": 78.10000000000001,
+					"y": 15.921052631578947,
+					"width": 2.4,
+					"height": 6.315789473684211
+				},
+				"control": "synth-1-macro-8"
+			},
+			{
+				"id": "synth-2-macro-1",
+				"label": "Synth 2 macro 1",
+				"kind": "knob",
+				"position": {
+					"x": 17.5,
+					"y": 7.368421052631578,
+					"width": 2.4,
+					"height": 6.315789473684211
+				},
+				"control": "synth-2-macro-1"
+			},
+			{
+				"id": "synth-2-macro-2",
+				"label": "Synth 2 macro 2",
+				"kind": "knob",
+				"position": {
+					"x": 26.5,
+					"y": 15.921052631578947,
+					"width": 2.4,
+					"height": 6.315789473684211
+				},
+				"control": "synth-2-macro-2"
+			},
+			{
+				"id": "synth-2-macro-3",
+				"label": "Synth 2 macro 3",
+				"kind": "knob",
+				"position": {
+					"x": 35.5,
+					"y": 7.368421052631578,
+					"width": 2.4,
+					"height": 6.315789473684211
+				},
+				"control": "synth-2-macro-3"
+			},
+			{
+				"id": "synth-2-macro-4",
+				"label": "Synth 2 macro 4",
+				"kind": "knob",
+				"position": {
+					"x": 44.5,
+					"y": 15.921052631578947,
+					"width": 2.4,
+					"height": 6.315789473684211
+				},
+				"control": "synth-2-macro-4"
+			},
+			{
+				"id": "synth-2-macro-5",
+				"label": "Synth 2 macro 5",
+				"kind": "knob",
+				"position": {
+					"x": 53.5,
+					"y": 7.368421052631578,
+					"width": 2.4,
+					"height": 6.315789473684211
+				},
+				"control": "synth-2-macro-5"
+			},
+			{
+				"id": "synth-2-macro-6",
+				"label": "Synth 2 macro 6",
+				"kind": "knob",
+				"position": {
+					"x": 62.5,
+					"y": 15.921052631578947,
+					"width": 2.4,
+					"height": 6.315789473684211
+				},
+				"control": "synth-2-macro-6"
+			},
+			{
+				"id": "synth-2-macro-7",
+				"label": "Synth 2 macro 7",
+				"kind": "knob",
+				"position": {
+					"x": 71.5,
+					"y": 7.368421052631578,
+					"width": 2.4,
+					"height": 6.315789473684211
+				},
+				"control": "synth-2-macro-7"
+			},
+			{
+				"id": "synth-2-macro-8",
+				"label": "Synth 2 macro 8",
+				"kind": "knob",
+				"position": {
+					"x": 80.5,
+					"y": 15.921052631578947,
+					"width": 2.4,
+					"height": 6.315789473684211
+				},
+				"control": "synth-2-macro-8"
+			},
+			{
+				"id": "key-0",
+				"label": "Note 48",
+				"kind": "pad",
+				"position": {
+					"x": 14.000000000000002,
+					"y": 43.42105263157895,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 48,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-1",
+				"label": "Note 49",
+				"kind": "pad",
+				"position": {
+					"x": 23.0,
+					"y": 43.42105263157895,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 49,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-2",
+				"label": "Note 50",
+				"kind": "pad",
+				"position": {
+					"x": 32.0,
+					"y": 43.42105263157895,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 50,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-3",
+				"label": "Note 51",
+				"kind": "pad",
+				"position": {
+					"x": 41.0,
+					"y": 43.42105263157895,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 51,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-4",
+				"label": "Note 52",
+				"kind": "pad",
+				"position": {
+					"x": 50.0,
+					"y": 43.42105263157895,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 52,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-5",
+				"label": "Note 53",
+				"kind": "pad",
+				"position": {
+					"x": 59.0,
+					"y": 43.42105263157895,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 53,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-6",
+				"label": "Note 54",
+				"kind": "pad",
+				"position": {
+					"x": 68.0,
+					"y": 43.42105263157895,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 54,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-7",
+				"label": "Note 55",
+				"kind": "pad",
+				"position": {
+					"x": 77.0,
+					"y": 43.42105263157895,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 55,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-8",
+				"label": "Note 56",
+				"kind": "pad",
+				"position": {
+					"x": 14.000000000000002,
+					"y": 55.78947368421052,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 56,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-9",
+				"label": "Note 57",
+				"kind": "pad",
+				"position": {
+					"x": 23.0,
+					"y": 55.78947368421052,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 57,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-10",
+				"label": "Note 58",
+				"kind": "pad",
+				"position": {
+					"x": 32.0,
+					"y": 55.78947368421052,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 58,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-11",
+				"label": "Note 59",
+				"kind": "pad",
+				"position": {
+					"x": 41.0,
+					"y": 55.78947368421052,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 59,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-12",
+				"label": "Note 60",
+				"kind": "pad",
+				"position": {
+					"x": 50.0,
+					"y": 55.78947368421052,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-13",
+				"label": "Note 61",
+				"kind": "pad",
+				"position": {
+					"x": 59.0,
+					"y": 55.78947368421052,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 61,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-14",
+				"label": "Note 62",
+				"kind": "pad",
+				"position": {
+					"x": 68.0,
+					"y": 55.78947368421052,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 62,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-15",
+				"label": "Note 63",
+				"kind": "pad",
+				"position": {
+					"x": 77.0,
+					"y": 55.78947368421052,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 63,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-16",
+				"label": "Note 64",
+				"kind": "pad",
+				"position": {
+					"x": 14.000000000000002,
+					"y": 68.15789473684211,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 64,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-17",
+				"label": "Note 65",
+				"kind": "pad",
+				"position": {
+					"x": 23.0,
+					"y": 68.15789473684211,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 65,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-18",
+				"label": "Note 66",
+				"kind": "pad",
+				"position": {
+					"x": 32.0,
+					"y": 68.15789473684211,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 66,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-19",
+				"label": "Note 67",
+				"kind": "pad",
+				"position": {
+					"x": 41.0,
+					"y": 68.15789473684211,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 67,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-20",
+				"label": "Note 68",
+				"kind": "pad",
+				"position": {
+					"x": 50.0,
+					"y": 68.15789473684211,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 68,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-21",
+				"label": "Note 69",
+				"kind": "pad",
+				"position": {
+					"x": 59.0,
+					"y": 68.15789473684211,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 69,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-22",
+				"label": "Note 70",
+				"kind": "pad",
+				"position": {
+					"x": 68.0,
+					"y": 68.15789473684211,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 70,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-23",
+				"label": "Note 71",
+				"kind": "pad",
+				"position": {
+					"x": 77.0,
+					"y": 68.15789473684211,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 71,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-24",
+				"label": "Note 72",
+				"kind": "pad",
+				"position": {
+					"x": 14.000000000000002,
+					"y": 80.52631578947368,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 72,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-25",
+				"label": "Note 73",
+				"kind": "pad",
+				"position": {
+					"x": 23.0,
+					"y": 80.52631578947368,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 73,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-26",
+				"label": "Note 74",
+				"kind": "pad",
+				"position": {
+					"x": 32.0,
+					"y": 80.52631578947368,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 74,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-27",
+				"label": "Note 75",
+				"kind": "pad",
+				"position": {
+					"x": 41.0,
+					"y": 80.52631578947368,
+					"width": 8.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 75,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-28",
+				"label": "Note 76",
+				"kind": "pad",
+				"position": {
+					"x": 50.0,
+					"y": 80.52631578947368,
+					"width": 4.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 76,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-29",
+				"label": "Note 77",
+				"kind": "pad",
+				"position": {
+					"x": 59.0,
+					"y": 80.52631578947368,
+					"width": 4.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 77,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-30",
+				"label": "Note 78",
+				"kind": "pad",
+				"position": {
+					"x": 68.0,
+					"y": 80.52631578947368,
+					"width": 4.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 78,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-31",
+				"label": "Note 79",
+				"kind": "pad",
+				"position": {
+					"x": 77.0,
+					"y": 80.52631578947368,
+					"width": 4.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 79,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "drum-1",
+				"label": "Drum 1",
+				"kind": "pad",
+				"position": {
+					"x": 54.0,
+					"y": 80.52631578947368,
+					"width": 4.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 10
+				}
+			},
+			{
+				"id": "drum-2",
+				"label": "Drum 2",
+				"kind": "pad",
+				"position": {
+					"x": 63.0,
+					"y": 80.52631578947368,
+					"width": 4.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 62,
+					"channel": 10
+				}
+			},
+			{
+				"id": "drum-3",
+				"label": "Drum 3",
+				"kind": "pad",
+				"position": {
+					"x": 72.0,
+					"y": 80.52631578947368,
+					"width": 4.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 64,
+					"channel": 10
+				}
+			},
+			{
+				"id": "drum-4",
+				"label": "Drum 4",
+				"kind": "pad",
+				"position": {
+					"x": 81.0,
+					"y": 80.52631578947368,
+					"width": 4.0,
+					"height": 10.526315789473683
+				},
+				"message": {
+					"type": "note",
+					"number": 65,
+					"channel": 10
+				}
+			}
+		]
+	}
+}

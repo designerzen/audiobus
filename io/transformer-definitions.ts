@@ -292,6 +292,33 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		type: "transformer",
 		subtype: "timing"
 	},
+	[TRANSFORMER_TYPE.ID_HARP]: {
+		id: TRANSFORMER_TYPE.ID_HARP,
+		name: "Harp",
+		description: "Sweep live chords across several octaves like a hand run over harp strings.",
+		icon: "/icons/transformer-harp.svg",
+		category: "Timing",
+		type: "transformer",
+		subtype: "timing"
+	},
+	[TRANSFORMER_TYPE.ID_SLOP]: {
+		id: TRANSFORMER_TYPE.ID_SLOP,
+		name: "Slop",
+		description: "Loosen each key press with its own small, random delay.",
+		icon: "/icons/transformer-slop.svg",
+		category: "Timing",
+		type: "transformer",
+		subtype: "timing"
+	},
+	[TRANSFORMER_TYPE.ID_CHORD_PATTERN]: {
+		id: TRANSFORMER_TYPE.ID_CHORD_PATTERN,
+		name: "Chord Pattern",
+		description: "Replay the held chord in a choice of fixed rhythms.",
+		icon: "/icons/transformer-chord-pattern.svg",
+		category: "Pattern",
+		type: "transformer",
+		subtype: "pattern"
+	},
 	[TRANSFORMER_TYPE.ID_PROBABILITY_GATE]: {
 		id: TRANSFORMER_TYPE.ID_PROBABILITY_GATE,
 		name: "Probability Gate",
@@ -423,7 +450,7 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 	[TRANSFORMER_TYPE.ID_ARPEGGIATOR]: {
 		id: TRANSFORMER_TYPE.ID_ARPEGGIATOR,
 		name: "Arpeggiator",
-		description: "Breaks chords into flowing sequences of individual notes",
+		description: "Breaks chords into flowing sequences of individual notes, played once or repeated while held",
 		icon: "/icons/transformer-arpeggiator.svg",
 		category: "Pattern",
 		type: "transformer",

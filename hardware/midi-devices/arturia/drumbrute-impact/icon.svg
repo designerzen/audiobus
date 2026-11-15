@@ -1,0 +1,657 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" role="group" aria-labelledby="arturia-drumbrute-impact-icon--title" aria-describedby="arturia-drumbrute-impact-icon--description" data-device="arturia-drumbrute-impact" style="background: #fff; color: #334155;" data-diagram-style="wireframe">
+  <title id="arturia-drumbrute-impact-icon--title">Arturia DrumBrute Impact overhead hardware diagram</title>
+  <desc id="arturia-drumbrute-impact-icon--description">Wireframe top-down schematic; positions are approximate. Each physical control has a stable device-prefixed ID and data-part name. Buttons in this standalone drawing are disabled until a host adds input handlers. Transparent regions marked data-surface-control correspond to the profile MIDI hit areas; multiple regions can share one context-dependent physical control.</desc>
+  <style>text { font-family: Arial, sans-serif; } .section-label { font-size: 11px; letter-spacing: 1px; } [data-part]:focus-visible { outline: 3px solid currentColor; }</style>
+  <g id="arturia-drumbrute-impact-icon--chassis" aria-hidden="true">
+    <rect x="3" y="3" width="1194" height="674" rx="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="22" y="28" fill="currentColor" font-size="19" stroke="none">Arturia DrumBrute Impact</text>
+    <text x="132" y="310" class="section-label" fill="currentColor" stroke="none">KICK</text>
+    <text x="259" y="310" class="section-label" fill="currentColor" stroke="none">SNARE-1</text>
+    <text x="386" y="310" class="section-label" fill="currentColor" stroke="none">SNARE-2</text>
+    <text x="513" y="310" class="section-label" fill="currentColor" stroke="none">TOM</text>
+    <text x="640" y="310" class="section-label" fill="currentColor" stroke="none">CYMBAL-COWBELL</text>
+    <text x="767" y="310" class="section-label" fill="currentColor" stroke="none">CLOSED-HAT</text>
+    <text x="894" y="310" class="section-label" fill="currentColor" stroke="none">OPEN-HAT</text>
+    <text x="1021" y="310" class="section-label" fill="currentColor" stroke="none">FM-DRUM</text>
+  </g>
+  <g id="arturia-drumbrute-impact-icon--controls" role="group" aria-label="Top panel controls">
+    <g id="arturia-drumbrute-impact-icon--tempo-display" data-part="tempo-display" data-kind="display" role="group" aria-roledescription="display" aria-label="Tempo display">
+      <title>Tempo display</title>
+      <g aria-hidden="true">
+        <rect x="25" y="50" width="100" height="45" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75" y="76.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Tempo display</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--record" data-part="record" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Record">
+      <title>Record</title>
+      <g aria-hidden="true">
+        <rect x="145" y="55" width="65" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="177.5" y="76.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Record</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--stop" data-part="stop" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Stop">
+      <title>Stop</title>
+      <g aria-hidden="true">
+        <rect x="220" y="55" width="65" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="252.5" y="76.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Stop</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--play-pause" data-part="play-pause" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Play / Pause">
+      <title>Play / Pause</title>
+      <g aria-hidden="true">
+        <rect x="295" y="55" width="65" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="327.5" y="76.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Play / Pause</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--sync" data-part="sync" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Sync">
+      <title>Sync</title>
+      <g aria-hidden="true">
+        <rect x="380" y="60" width="65" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="412.5" y="79" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Sync</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--erase" data-part="erase" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Erase">
+      <title>Erase</title>
+      <g aria-hidden="true">
+        <rect x="480" y="50" width="72" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="516" y="69" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Erase</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--copy" data-part="copy" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Copy">
+      <title>Copy</title>
+      <g aria-hidden="true">
+        <rect x="560" y="50" width="72" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="596" y="69" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Copy</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--save" data-part="save" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Save">
+      <title>Save</title>
+      <g aria-hidden="true">
+        <rect x="640" y="50" width="72" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="676" y="69" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Save</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--last-step" data-part="last-step" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Last Step">
+      <title>Last Step</title>
+      <g aria-hidden="true">
+        <rect x="480" y="98" width="72" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="516" y="117" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Last Step</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--previous" data-part="previous" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Previous">
+      <title>Previous</title>
+      <g aria-hidden="true">
+        <rect x="560" y="98" width="72" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="596" y="117" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Previous</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--next" data-part="next" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Next">
+      <title>Next</title>
+      <g aria-hidden="true">
+        <rect x="640" y="98" width="72" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="676" y="117" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Next</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--distortion" data-part="distortion" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Distortion">
+      <title>Distortion</title>
+      <g aria-hidden="true">
+        <circle cx="870" cy="70" r="23" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 870 52 v 12.88" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="870" y="107" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Distortion</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--distortion-on" data-part="distortion-on" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="On">
+      <title>On</title>
+      <g aria-hidden="true">
+        <rect x="920" y="57" width="45" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="942.5" y="76" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">On</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--master-level" data-part="master-level" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Level">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="1020" cy="70" r="23" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1020 52 v 12.88" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1020" y="107" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Level</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--rate" data-part="rate" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Rate / Fine">
+      <title>Rate / Fine</title>
+      <g aria-hidden="true">
+        <circle cx="65" cy="158" r="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 65 139 v 13.440000000000001" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="65" y="196" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Rate / Fine</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--tap" data-part="tap" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Tap tempo">
+      <title>Tap tempo</title>
+      <g aria-hidden="true">
+        <rect x="25" y="207" width="80" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="65" y="226" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Tap tempo</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--song" data-part="song" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Song">
+      <title>Song</title>
+      <g aria-hidden="true">
+        <rect x="145" y="142" width="62" height="32" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="176" y="162" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Song</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--bank" data-part="bank" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Bank">
+      <title>Bank</title>
+      <g aria-hidden="true">
+        <rect x="215" y="142" width="62" height="32" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="246" y="162" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Bank</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--pattern" data-part="pattern" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Pattern">
+      <title>Pattern</title>
+      <g aria-hidden="true">
+        <rect x="285" y="142" width="62" height="32" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="316" y="162" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pattern</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--step" data-part="step" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Step">
+      <title>Step</title>
+      <g aria-hidden="true">
+        <rect x="355" y="142" width="62" height="32" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="386" y="162" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Step</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--accent" data-part="accent" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Accent">
+      <title>Accent</title>
+      <g aria-hidden="true">
+        <rect x="425" y="142" width="62" height="32" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="456" y="162" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Accent</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--swing" data-part="swing" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Swing">
+      <title>Swing</title>
+      <g aria-hidden="true">
+        <circle cx="570" cy="158" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 570 141 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="570" y="194" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Swing</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--swing-current-track" data-part="swing-current-track" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Current track">
+      <title>Current track</title>
+      <g aria-hidden="true">
+        <rect x="610" y="145" width="90" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="655" y="163" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Current track</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--random" data-part="random" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Random">
+      <title>Random</title>
+      <g aria-hidden="true">
+        <circle cx="755" cy="158" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 755 141 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="755" y="194" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Random</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--random-current-track" data-part="random-current-track" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Current track">
+      <title>Current track</title>
+      <g aria-hidden="true">
+        <rect x="795" y="145" width="90" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="840" y="163" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Current track</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--roller-looper" data-part="roller-looper" data-kind="touch" role="group" aria-roledescription="touch strip" aria-label="Roller / Looper">
+      <title>Roller / Looper</title>
+      <g aria-hidden="true">
+        <rect x="915" y="167" width="250" height="55" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1040" y="198.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Roller / Looper</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--step-1" data-part="step-1" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="1">
+      <title>1</title>
+      <g aria-hidden="true">
+        <rect x="145" y="232" width="54" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="172" y="253.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">1</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--step-2" data-part="step-2" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="2">
+      <title>2</title>
+      <g aria-hidden="true">
+        <rect x="209" y="232" width="54" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="236" y="253.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">2</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--step-3" data-part="step-3" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="3">
+      <title>3</title>
+      <g aria-hidden="true">
+        <rect x="273" y="232" width="54" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="300" y="253.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">3</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--step-4" data-part="step-4" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="4">
+      <title>4</title>
+      <g aria-hidden="true">
+        <rect x="337" y="232" width="54" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="364" y="253.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">4</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--step-5" data-part="step-5" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="5">
+      <title>5</title>
+      <g aria-hidden="true">
+        <rect x="401" y="232" width="54" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="428" y="253.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">5</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--step-6" data-part="step-6" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="6">
+      <title>6</title>
+      <g aria-hidden="true">
+        <rect x="465" y="232" width="54" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="492" y="253.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">6</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--step-7" data-part="step-7" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="7">
+      <title>7</title>
+      <g aria-hidden="true">
+        <rect x="529" y="232" width="54" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="556" y="253.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">7</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--step-8" data-part="step-8" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="8">
+      <title>8</title>
+      <g aria-hidden="true">
+        <rect x="593" y="232" width="54" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="620" y="253.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">8</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--step-9" data-part="step-9" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="9">
+      <title>9</title>
+      <g aria-hidden="true">
+        <rect x="657" y="232" width="54" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="684" y="253.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">9</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--step-10" data-part="step-10" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="10">
+      <title>10</title>
+      <g aria-hidden="true">
+        <rect x="721" y="232" width="54" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="748" y="253.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">10</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--step-11" data-part="step-11" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="11">
+      <title>11</title>
+      <g aria-hidden="true">
+        <rect x="785" y="232" width="54" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="812" y="253.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">11</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--step-12" data-part="step-12" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="12">
+      <title>12</title>
+      <g aria-hidden="true">
+        <rect x="849" y="232" width="54" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="876" y="253.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">12</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--step-13" data-part="step-13" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="13">
+      <title>13</title>
+      <g aria-hidden="true">
+        <rect x="913" y="232" width="54" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="940" y="253.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">13</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--step-14" data-part="step-14" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="14">
+      <title>14</title>
+      <g aria-hidden="true">
+        <rect x="977" y="232" width="54" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1004" y="253.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">14</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--step-15" data-part="step-15" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="15">
+      <title>15</title>
+      <g aria-hidden="true">
+        <rect x="1041" y="232" width="54" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1068" y="253.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">15</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--step-16" data-part="step-16" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="16">
+      <title>16</title>
+      <g aria-hidden="true">
+        <rect x="1105" y="232" width="54" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1132" y="253.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">16</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--kick-decay" data-part="kick-decay" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Decay">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <circle cx="165" cy="350" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 165 337 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="165" y="382" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Decay</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--kick-pitch" data-part="kick-pitch" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Pitch">
+      <title>Pitch</title>
+      <g aria-hidden="true">
+        <circle cx="165" cy="418" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 165 405 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="165" y="450" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Pitch</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--kick-level" data-part="kick-level" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Level">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="165" cy="486" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 165 473 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="165" y="518" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Level</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--kick-pad" data-part="kick-pad" data-kind="pad" data-surface-controls="drum-0 color-0" role="button" aria-disabled="true" tabindex="-1" aria-label="kick">
+      <title>kick</title>
+      <g aria-hidden="true">
+        <rect x="125" y="576" width="88" height="65" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="169" y="612.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">kick</text>
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--drum-0" data-surface-control="drum-0" aria-hidden="true">
+        <rect x="125" y="576" width="44" height="65" fill="none" pointer-events="all" data-hit-area="drum-0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--color-0" data-surface-control="color-0" aria-hidden="true">
+        <rect x="169" y="576" width="44" height="65" fill="none" pointer-events="all" data-hit-area="color-0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--snare-1-decay" data-part="snare-1-decay" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Decay">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <circle cx="292" cy="350" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 292 337 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="292" y="382" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Decay</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--snare-1-tone-snap" data-part="snare-1-tone-snap" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Tone / Snap">
+      <title>Tone / Snap</title>
+      <g aria-hidden="true">
+        <circle cx="292" cy="418" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 292 405 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="292" y="450" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Tone / Snap</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--snare-1-level" data-part="snare-1-level" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Level">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="292" cy="486" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 292 473 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="292" y="518" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Level</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--snare-1-pad" data-part="snare-1-pad" data-kind="pad" data-surface-controls="drum-1 color-1" role="button" aria-disabled="true" tabindex="-1" aria-label="snare 1">
+      <title>snare 1</title>
+      <g aria-hidden="true">
+        <rect x="252" y="576" width="88" height="65" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="296" y="612.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">snare 1</text>
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--drum-1" data-surface-control="drum-1" aria-hidden="true">
+        <rect x="252" y="576" width="44" height="65" fill="none" pointer-events="all" data-hit-area="drum-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--color-1" data-surface-control="color-1" aria-hidden="true">
+        <rect x="296" y="576" width="44" height="65" fill="none" pointer-events="all" data-hit-area="color-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--snare-2-decay" data-part="snare-2-decay" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Decay">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <circle cx="419" cy="350" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 419 337 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="419" y="382" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Decay</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--snare-2-tone" data-part="snare-2-tone" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Tone">
+      <title>Tone</title>
+      <g aria-hidden="true">
+        <circle cx="419" cy="418" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 419 405 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="419" y="450" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Tone</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--snare-2-level" data-part="snare-2-level" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Level">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="419" cy="486" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 419 473 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="419" y="518" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Level</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--snare-2-pad" data-part="snare-2-pad" data-kind="pad" data-surface-controls="drum-2 color-2" role="button" aria-disabled="true" tabindex="-1" aria-label="snare 2">
+      <title>snare 2</title>
+      <g aria-hidden="true">
+        <rect x="379" y="576" width="88" height="65" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="423" y="612.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">snare 2</text>
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--drum-2" data-surface-control="drum-2" aria-hidden="true">
+        <rect x="379" y="576" width="44" height="65" fill="none" pointer-events="all" data-hit-area="drum-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--color-2" data-surface-control="color-2" aria-hidden="true">
+        <rect x="423" y="576" width="44" height="65" fill="none" pointer-events="all" data-hit-area="color-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--tom-pitch" data-part="tom-pitch" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Pitch">
+      <title>Pitch</title>
+      <g aria-hidden="true">
+        <circle cx="546" cy="350" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 546 337 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="546" y="382" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Pitch</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--tom-level" data-part="tom-level" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Level">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="546" cy="418" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 546 405 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="546" y="450" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Level</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--tom-pad" data-part="tom-pad" data-kind="pad" data-surface-controls="drum-3 color-3 drum-4 color-4" role="button" aria-disabled="true" tabindex="-1" aria-label="tom">
+      <title>tom</title>
+      <g aria-hidden="true">
+        <rect x="506" y="576" width="88" height="65" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="550" y="612.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">tom</text>
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--drum-3" data-surface-control="drum-3" aria-hidden="true">
+        <rect x="506" y="576" width="22" height="65" fill="none" pointer-events="all" data-hit-area="drum-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--color-3" data-surface-control="color-3" aria-hidden="true">
+        <rect x="528" y="576" width="22" height="65" fill="none" pointer-events="all" data-hit-area="color-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--drum-4" data-surface-control="drum-4" aria-hidden="true">
+        <rect x="550" y="576" width="22" height="65" fill="none" pointer-events="all" data-hit-area="drum-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--color-4" data-surface-control="color-4" aria-hidden="true">
+        <rect x="572" y="576" width="22" height="65" fill="none" pointer-events="all" data-hit-area="color-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--tom-type" data-part="tom-type" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Select">
+      <title>Select</title>
+      <g aria-hidden="true">
+        <rect x="519" y="535" width="60" height="25" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="549" y="551.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Select</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--cymbal-cowbell-decay" data-part="cymbal-cowbell-decay" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Decay">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <circle cx="673" cy="350" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 673 337 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="673" y="382" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Decay</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--cymbal-cowbell-tone" data-part="cymbal-cowbell-tone" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Tone">
+      <title>Tone</title>
+      <g aria-hidden="true">
+        <circle cx="673" cy="418" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 673 405 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="673" y="450" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Tone</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--cymbal-cowbell-level" data-part="cymbal-cowbell-level" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Level">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="673" cy="486" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 673 473 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="673" y="518" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Level</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--cymbal-cowbell-pad" data-part="cymbal-cowbell-pad" data-kind="pad" data-surface-controls="drum-5 color-5 drum-6" role="button" aria-disabled="true" tabindex="-1" aria-label="cymbal cowbell">
+      <title>cymbal cowbell</title>
+      <g aria-hidden="true">
+        <rect x="633" y="576" width="88" height="65" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="677" y="612.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">cymbal cowbell</text>
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--drum-5" data-surface-control="drum-5" aria-hidden="true">
+        <rect x="633" y="576" width="29.333333333333332" height="65" fill="none" pointer-events="all" data-hit-area="drum-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--color-5" data-surface-control="color-5" aria-hidden="true">
+        <rect x="662.3333333333334" y="576" width="29.333333333333332" height="65" fill="none" pointer-events="all" data-hit-area="color-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--drum-6" data-surface-control="drum-6" aria-hidden="true">
+        <rect x="691.6666666666666" y="576" width="29.333333333333332" height="65" fill="none" pointer-events="all" data-hit-area="drum-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--cymbal-cowbell-type" data-part="cymbal-cowbell-type" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Select">
+      <title>Select</title>
+      <g aria-hidden="true">
+        <rect x="646" y="535" width="60" height="25" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="676" y="551.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Select</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--closed-hat-decay" data-part="closed-hat-decay" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Decay">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <circle cx="800" cy="350" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 800 337 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="800" y="382" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Decay</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--closed-hat-level" data-part="closed-hat-level" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Level">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="800" cy="418" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 800 405 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="800" y="450" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Level</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--closed-hat-pad" data-part="closed-hat-pad" data-kind="pad" data-surface-controls="drum-7 color-7" role="button" aria-disabled="true" tabindex="-1" aria-label="closed hat">
+      <title>closed hat</title>
+      <g aria-hidden="true">
+        <rect x="760" y="576" width="88" height="65" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="804" y="612.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">closed hat</text>
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--drum-7" data-surface-control="drum-7" aria-hidden="true">
+        <rect x="760" y="576" width="44" height="65" fill="none" pointer-events="all" data-hit-area="drum-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--color-7" data-surface-control="color-7" aria-hidden="true">
+        <rect x="804" y="576" width="44" height="65" fill="none" pointer-events="all" data-hit-area="color-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--open-hat-decay" data-part="open-hat-decay" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Decay">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <circle cx="927" cy="350" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 927 337 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="927" y="382" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Decay</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--open-hat-level" data-part="open-hat-level" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Level">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="927" cy="418" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 927 405 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="927" y="450" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Level</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--open-hat-pad" data-part="open-hat-pad" data-kind="pad" data-surface-controls="drum-8 color-8" role="button" aria-disabled="true" tabindex="-1" aria-label="open hat">
+      <title>open hat</title>
+      <g aria-hidden="true">
+        <rect x="887" y="576" width="88" height="65" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="931" y="612.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">open hat</text>
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--drum-8" data-surface-control="drum-8" aria-hidden="true">
+        <rect x="887" y="576" width="44" height="65" fill="none" pointer-events="all" data-hit-area="drum-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--color-8" data-surface-control="color-8" aria-hidden="true">
+        <rect x="931" y="576" width="44" height="65" fill="none" pointer-events="all" data-hit-area="color-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--fm-drum-decay" data-part="fm-drum-decay" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Decay">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <circle cx="1054" cy="350" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1054 337 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1054" y="382" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Decay</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--fm-drum-carrier" data-part="fm-drum-carrier" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Carrier">
+      <title>Carrier</title>
+      <g aria-hidden="true">
+        <circle cx="1054" cy="418" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1054 405 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1054" y="450" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Carrier</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--fm-drum-mod-pitch" data-part="fm-drum-mod-pitch" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Mod pitch">
+      <title>Mod pitch</title>
+      <g aria-hidden="true">
+        <circle cx="1054" cy="486" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1054 473 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1054" y="518" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Mod pitch</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--fm-drum-fm-amount" data-part="fm-drum-fm-amount" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="FM amount">
+      <title>FM amount</title>
+      <g aria-hidden="true">
+        <circle cx="1102" cy="350" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1102 337 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1102" y="382" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">FM amount</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--fm-drum-level" data-part="fm-drum-level" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Level">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="1102" cy="418" r="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1102 405 v 10.080000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1102" y="450" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Level</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--fm-drum-pad" data-part="fm-drum-pad" data-kind="pad" data-surface-controls="drum-9 color-9" role="button" aria-disabled="true" tabindex="-1" aria-label="fm drum">
+      <title>fm drum</title>
+      <g aria-hidden="true">
+        <rect x="1014" y="576" width="88" height="65" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1058" y="612.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">fm drum</text>
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--drum-9" data-surface-control="drum-9" aria-hidden="true">
+        <rect x="1014" y="576" width="44" height="65" fill="none" pointer-events="all" data-hit-area="drum-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+      <g id="arturia-drumbrute-impact-icon--surface--color-9" data-surface-control="color-9" aria-hidden="true">
+        <rect x="1058" y="576" width="44" height="65" fill="none" pointer-events="all" data-hit-area="color-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--color" data-part="color" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Color">
+      <title>Color</title>
+      <g aria-hidden="true">
+        <rect x="20" y="590" width="85" height="40" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="62.5" y="614" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Color</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--shift" data-part="shift" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Shift">
+      <title>Shift</title>
+      <g aria-hidden="true">
+        <rect x="20" y="535" width="85" height="32" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="62.5" y="555" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Shift</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--mute" data-part="mute" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Mute">
+      <title>Mute</title>
+      <g aria-hidden="true">
+        <rect x="20" y="415" width="85" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="62.5" y="434" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Mute</text>
+      </g>
+    </g>
+    <g id="arturia-drumbrute-impact-icon--solo" data-part="solo" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Solo">
+      <title>Solo</title>
+      <g aria-hidden="true">
+        <rect x="20" y="460" width="85" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="62.5" y="479" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Solo</text>
+      </g>
+    </g>
+  </g>
+</svg>

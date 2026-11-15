@@ -1,0 +1,391 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "korg-volca-drum",
+	"name": "Korg volca drum",
+	"manufacturer": "Korg",
+	"manufacturerUrl": "https://www.korg.com/",
+	"productUrl": "https://www.korg.com/us/products/dj/volca_drum/",
+	"description": "Six-part dual-layer digital percussion synthesizer.",
+	"ids": ["korg-volca-drum"],
+	"portNames": ["volca drum", "Korg volca drum"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Korg volca drum owner manual",
+			"url": "https://cdn.korg.com/us/support/download/files/c65c033ee08932b5bd69303ebf7f31b0.pdf"
+		},
+		{
+			"title": "Korg volca drum MIDI implementation chart",
+			"url": "https://cdn.korg.com/us/support/download/files/68ae4f439b41bcb2cdc8350874a84cec.pdf"
+		},
+		{
+			"title": "Factory split-channel MIDI chart",
+			"url": "https://cdn.korg.com/us/support/download/files/aa0a404eb2b0fa59873677d825cc272e.pdf"
+		}
+	],
+	"abilities": ["DIN MIDI IN only", "MIDI note reception", "Documented CC reception"],
+	"hardwareControls": [
+		"Master: Volume, Tempo, Select, Memory, Play, Record, Function, Edit Step, Layer",
+		"Sound: Select layers, Level layers, Pitch layers",
+		"Modulation: Amount layers, Rate layers",
+		"Envelope: Attack layers, Release layers",
+		"Waveguide: Model, Decay, Body, Tune, Send"
+	],
+	"notice": "Most controls are MIDI receive mappings. The unmodified hardware has no MIDI output and cannot send panel movements or notes to Harmoneasy. Factory split-channel mode: channels 1-6 select parts 1-6 and any note triggers that part. CC controls address both sound layers on the selected part channel. The optional single-channel mode has a different CC map; it does not make note numbers select the drum parts.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "sound-select-layers-knob",
+			"label": "Sound: Select layers",
+			"widget": "slider",
+			"cc": 16
+		},
+		{
+			"id": "sound-level-layers-knob",
+			"label": "Sound: Level layers",
+			"widget": "slider",
+			"cc": 19
+		},
+		{
+			"id": "sound-pitch-layers-knob",
+			"label": "Sound: Pitch layers",
+			"widget": "slider",
+			"cc": 28
+		},
+		{
+			"id": "modulation-amount-layers-knob",
+			"label": "Modulation: Amount layers",
+			"widget": "slider",
+			"cc": 31
+		},
+		{
+			"id": "modulation-rate-layers-knob",
+			"label": "Modulation: Rate layers",
+			"widget": "slider",
+			"cc": 48
+		},
+		{
+			"id": "envelope-attack-layers-knob",
+			"label": "Envelope: Attack layers",
+			"widget": "slider",
+			"cc": 22
+		},
+		{
+			"id": "envelope-release-layers-knob",
+			"label": "Envelope: Release layers",
+			"widget": "slider",
+			"cc": 25
+		},
+		{
+			"id": "waveguide-model-knob",
+			"label": "Waveguide: Model",
+			"widget": "slider",
+			"cc": 116
+		},
+		{
+			"id": "waveguide-decay-knob",
+			"label": "Waveguide: Decay",
+			"widget": "slider",
+			"cc": 117
+		},
+		{
+			"id": "waveguide-body-knob",
+			"label": "Waveguide: Body",
+			"widget": "slider",
+			"cc": 118
+		},
+		{
+			"id": "waveguide-tune-knob",
+			"label": "Waveguide: Tune",
+			"widget": "slider",
+			"cc": 119
+		},
+		{
+			"id": "waveguide-send-knob",
+			"label": "Waveguide: Send",
+			"widget": "slider",
+			"cc": 103
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Korg volca drum overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 1200,
+		"height": 650,
+		"elements": [
+			{
+				"id": "sound-select-layers-knob",
+				"label": "Select layers",
+				"kind": "knob",
+				"position": {
+					"x": 28.833333333333332,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "sound-select-layers-knob"
+			},
+			{
+				"id": "sound-level-layers-knob",
+				"label": "Level layers",
+				"kind": "knob",
+				"position": {
+					"x": 28.833333333333332,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "sound-level-layers-knob"
+			},
+			{
+				"id": "sound-pitch-layers-knob",
+				"label": "Pitch layers",
+				"kind": "knob",
+				"position": {
+					"x": 28.833333333333332,
+					"y": 48.769230769230774,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "sound-pitch-layers-knob"
+			},
+			{
+				"id": "modulation-amount-layers-knob",
+				"label": "Amount layers",
+				"kind": "knob",
+				"position": {
+					"x": 41.16666666666667,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "modulation-amount-layers-knob"
+			},
+			{
+				"id": "modulation-rate-layers-knob",
+				"label": "Rate layers",
+				"kind": "knob",
+				"position": {
+					"x": 41.16666666666667,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "modulation-rate-layers-knob"
+			},
+			{
+				"id": "envelope-attack-layers-knob",
+				"label": "Attack layers",
+				"kind": "knob",
+				"position": {
+					"x": 53.5,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "envelope-attack-layers-knob"
+			},
+			{
+				"id": "envelope-release-layers-knob",
+				"label": "Release layers",
+				"kind": "knob",
+				"position": {
+					"x": 53.5,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "envelope-release-layers-knob"
+			},
+			{
+				"id": "waveguide-model-knob",
+				"label": "Model",
+				"kind": "knob",
+				"position": {
+					"x": 65.83333333333333,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "waveguide-model-knob"
+			},
+			{
+				"id": "waveguide-decay-knob",
+				"label": "Decay",
+				"kind": "knob",
+				"position": {
+					"x": 73.75,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "waveguide-decay-knob"
+			},
+			{
+				"id": "waveguide-body-knob",
+				"label": "Body",
+				"kind": "knob",
+				"position": {
+					"x": 65.83333333333333,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "waveguide-body-knob"
+			},
+			{
+				"id": "waveguide-tune-knob",
+				"label": "Tune",
+				"kind": "knob",
+				"position": {
+					"x": 73.75,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "waveguide-tune-knob"
+			},
+			{
+				"id": "waveguide-send-knob",
+				"label": "Send",
+				"kind": "knob",
+				"position": {
+					"x": 65.83333333333333,
+					"y": 48.769230769230774,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "waveguide-send-knob"
+			},
+			{
+				"id": "key-1",
+				"label": "Part 1",
+				"kind": "key",
+				"position": {
+					"x": 2.083333333333333,
+					"y": 82.76923076923077,
+					"width": 15.555555555555555,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-2",
+				"label": "Part 2",
+				"kind": "key",
+				"position": {
+					"x": 18.055555555555554,
+					"y": 82.76923076923077,
+					"width": 15.555555555555555,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 2
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-3",
+				"label": "Part 3",
+				"kind": "key",
+				"position": {
+					"x": 34.02777777777777,
+					"y": 82.76923076923077,
+					"width": 15.555555555555555,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 3
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-4",
+				"label": "Part 4",
+				"kind": "key",
+				"position": {
+					"x": 50.0,
+					"y": 82.76923076923077,
+					"width": 15.555555555555555,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 4
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-5",
+				"label": "Part 5",
+				"kind": "key",
+				"position": {
+					"x": 65.97222222222221,
+					"y": 82.76923076923077,
+					"width": 15.555555555555555,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 5
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-6",
+				"label": "Part 6",
+				"kind": "key",
+				"position": {
+					"x": 81.94444444444444,
+					"y": 82.76923076923077,
+					"width": 15.555555555555555,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 6
+				},
+				"learnable": true
+			}
+		]
+	}
+}

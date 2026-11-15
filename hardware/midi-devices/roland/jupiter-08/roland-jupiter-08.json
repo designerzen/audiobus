@@ -1,0 +1,1057 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "roland-jupiter-08",
+	"name": "Roland JUPITER-08",
+	"manufacturer": "Roland",
+	"manufacturerUrl": "https://www.roland.com/",
+	"productUrl": "https://www.roland.com/global/products/jupiter-08/",
+	"description": "Modern JUPITER-8-inspired Boutique with expanded polyphony and keyboard dock.",
+	"ids": ["roland-jupiter-08"],
+	"portNames": ["JUPITER-08", "JUPITER-08 MIDI 1", "Roland JUPITER-08"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Roland JUPITER-08 owner manual",
+			"url": "https://static.roland.com/assets/media/pdf/JUPITER-08_reference_eng01_W.pdf"
+		}
+	],
+	"abilities": ["USB MIDI", "DIN MIDI IN/OUT", "MIDI notes", "Documented controller mappings"],
+	"hardwareControls": [
+		"LFO: Rate, Delay, Waveform",
+		"VCO Mod: LFO, Env, Frequency select, Pulse width, PWM source",
+		"VCO 1: Cross mod, Range, Waveform",
+		"VCO 2: Low range, Range, Sync, Fine tune, Waveform",
+		"Mixer: Source mix",
+		"HPF: Cutoff",
+		"VCF: Cutoff, Resonance, Slope, Env, Env select, LFO, Key follow",
+		"VCA: Level, LFO mod",
+		"Envelope: ENV select, Attack, Decay, Sustain, Release, Key follow, ENV1 polarity",
+		"Performance: Volume, Note, Arpeggio, Sequencer, Start, Menu, Value, Hold, Dual, Split, Lower, Upper, Bank 1 4, Bank 5 8, Manual, Chorus, Delay, Reverb",
+		"Patches: Patch 1, Patch 2, Patch 3, Patch 4, Patch 5, Patch 6"
+	],
+	"notice": "Use USB MIDI or a DIN MIDI interface. Match the MIDI channel and enable the required MIDI transmit/receive settings. JUPITER-08 is a distinct 2026 model, not JP-08. Use the part channel; cutoff is CC3. Shared envelope controls use ENV1 mappings. The included K-25m dock is shown with virtual note defaults.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "lfo-rate-fader",
+			"label": "LFO: Rate",
+			"widget": "slider",
+			"cc": 29
+		},
+		{
+			"id": "lfo-delay-fader",
+			"label": "LFO: Delay",
+			"widget": "slider",
+			"cc": 27
+		},
+		{
+			"id": "lfo-waveform-knob",
+			"label": "LFO: Waveform",
+			"widget": "slider",
+			"cc": 35
+		},
+		{
+			"id": "vco-mod-lfo-fader",
+			"label": "VCO Mod: LFO",
+			"widget": "slider",
+			"cc": 26
+		},
+		{
+			"id": "vco-mod-env-fader",
+			"label": "VCO Mod: Env",
+			"widget": "slider",
+			"cc": 25
+		},
+		{
+			"id": "vco-mod-frequency-select-switch",
+			"label": "VCO Mod: Frequency select",
+			"widget": "slider",
+			"cc": 60
+		},
+		{
+			"id": "vco-mod-pulse-width-fader",
+			"label": "VCO Mod: Pulse width",
+			"widget": "slider",
+			"cc": 18
+		},
+		{
+			"id": "vco-mod-pwm-source-switch",
+			"label": "VCO Mod: PWM source",
+			"widget": "slider",
+			"cc": 19
+		},
+		{
+			"id": "vco-1-cross-mod-fader",
+			"label": "VCO 1: Cross mod",
+			"widget": "slider",
+			"cc": 59
+		},
+		{
+			"id": "vco-1-range-knob",
+			"label": "VCO 1: Range",
+			"widget": "slider",
+			"cc": 20
+		},
+		{
+			"id": "vco-1-waveform-knob",
+			"label": "VCO 1: Waveform",
+			"widget": "slider",
+			"cc": 46
+		},
+		{
+			"id": "vco-2-low-range-switch",
+			"label": "VCO 2: Low range",
+			"widget": "slider",
+			"cc": 63
+		},
+		{
+			"id": "vco-2-range-knob",
+			"label": "VCO 2: Range",
+			"widget": "slider",
+			"cc": 62
+		},
+		{
+			"id": "vco-2-sync-switch",
+			"label": "VCO 2: Sync",
+			"widget": "slider",
+			"cc": 87
+		},
+		{
+			"id": "vco-2-fine-tune-knob",
+			"label": "VCO 2: Fine tune",
+			"widget": "slider",
+			"cc": 56
+		},
+		{
+			"id": "vco-2-waveform-knob",
+			"label": "VCO 2: Waveform",
+			"widget": "slider",
+			"cc": 61
+		},
+		{
+			"id": "hpf-cutoff-fader",
+			"label": "HPF: Cutoff",
+			"widget": "slider",
+			"cc": 79
+		},
+		{
+			"id": "vcf-cutoff-fader",
+			"label": "VCF: Cutoff",
+			"widget": "slider",
+			"cc": 3
+		},
+		{
+			"id": "vcf-resonance-fader",
+			"label": "VCF: Resonance",
+			"widget": "slider",
+			"cc": 9
+		},
+		{
+			"id": "vcf-slope-switch",
+			"label": "VCF: Slope",
+			"widget": "slider",
+			"cc": 13
+		},
+		{
+			"id": "vcf-env-fader",
+			"label": "VCF: Env",
+			"widget": "slider",
+			"cc": 81
+		},
+		{
+			"id": "vcf-env-select-switch",
+			"label": "VCF: Env select",
+			"widget": "slider",
+			"cc": 84
+		},
+		{
+			"id": "vcf-lfo-fader",
+			"label": "VCF: LFO",
+			"widget": "slider",
+			"cc": 28
+		},
+		{
+			"id": "vcf-key-follow-fader",
+			"label": "VCF: Key follow",
+			"widget": "slider",
+			"cc": 82
+		},
+		{
+			"id": "vca-level-fader",
+			"label": "VCA: Level",
+			"widget": "slider",
+			"cc": 110
+		},
+		{
+			"id": "vca-lfo-mod-switch",
+			"label": "VCA: LFO mod",
+			"widget": "slider",
+			"cc": 109
+		},
+		{
+			"id": "envelope-attack-fader",
+			"label": "Envelope: Attack",
+			"widget": "slider",
+			"cc": 83
+		},
+		{
+			"id": "envelope-decay-fader",
+			"label": "Envelope: Decay",
+			"widget": "slider",
+			"cc": 80
+		},
+		{
+			"id": "envelope-sustain-fader",
+			"label": "Envelope: Sustain",
+			"widget": "slider",
+			"cc": 85
+		},
+		{
+			"id": "envelope-release-fader",
+			"label": "Envelope: Release",
+			"widget": "slider",
+			"cc": 86
+		},
+		{
+			"id": "envelope-key-follow-switch",
+			"label": "Envelope: Key follow",
+			"widget": "slider",
+			"cc": 104
+		},
+		{
+			"id": "envelope-env1-polarity-switch",
+			"label": "Envelope: ENV1 polarity",
+			"widget": "slider",
+			"cc": 106
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Roland JUPITER-08 overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 2644,
+		"height": 650,
+		"elements": [
+			{
+				"id": "lfo-rate-fader",
+				"label": "Rate",
+				"kind": "fader",
+				"position": {
+					"x": 1.399394856278366,
+					"y": 22.30769230769231,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "lfo-rate-fader"
+			},
+			{
+				"id": "lfo-delay-fader",
+				"label": "Delay",
+				"kind": "fader",
+				"position": {
+					"x": 1.399394856278366,
+					"y": 35.53846153846154,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "lfo-delay-fader"
+			},
+			{
+				"id": "lfo-waveform-knob",
+				"label": "Waveform",
+				"kind": "knob",
+				"position": {
+					"x": 1.399394856278366,
+					"y": 48.769230769230774,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "lfo-waveform-knob"
+			},
+			{
+				"id": "vco-mod-lfo-fader",
+				"label": "LFO",
+				"kind": "fader",
+				"position": {
+					"x": 6.9969742813918305,
+					"y": 22.30769230769231,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vco-mod-lfo-fader"
+			},
+			{
+				"id": "vco-mod-env-fader",
+				"label": "Env",
+				"kind": "fader",
+				"position": {
+					"x": 10.59001512859304,
+					"y": 22.30769230769231,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vco-mod-env-fader"
+			},
+			{
+				"id": "vco-mod-frequency-select-switch",
+				"label": "Frequency select",
+				"kind": "fader",
+				"position": {
+					"x": 6.9969742813918305,
+					"y": 35.53846153846154,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vco-mod-frequency-select-switch"
+			},
+			{
+				"id": "vco-mod-pulse-width-fader",
+				"label": "Pulse width",
+				"kind": "fader",
+				"position": {
+					"x": 10.59001512859304,
+					"y": 35.53846153846154,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vco-mod-pulse-width-fader"
+			},
+			{
+				"id": "vco-mod-pwm-source-switch",
+				"label": "PWM source",
+				"kind": "fader",
+				"position": {
+					"x": 6.9969742813918305,
+					"y": 48.769230769230774,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vco-mod-pwm-source-switch"
+			},
+			{
+				"id": "vco-1-cross-mod-fader",
+				"label": "Cross mod",
+				"kind": "fader",
+				"position": {
+					"x": 15.090771558245084,
+					"y": 22.30769230769231,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vco-1-cross-mod-fader"
+			},
+			{
+				"id": "vco-1-range-knob",
+				"label": "Range",
+				"kind": "knob",
+				"position": {
+					"x": 15.090771558245084,
+					"y": 35.53846153846154,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vco-1-range-knob"
+			},
+			{
+				"id": "vco-1-waveform-knob",
+				"label": "Waveform",
+				"kind": "knob",
+				"position": {
+					"x": 15.090771558245084,
+					"y": 48.769230769230774,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vco-1-waveform-knob"
+			},
+			{
+				"id": "vco-2-low-range-switch",
+				"label": "Low range",
+				"kind": "fader",
+				"position": {
+					"x": 20.688350983358546,
+					"y": 22.30769230769231,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vco-2-low-range-switch"
+			},
+			{
+				"id": "vco-2-range-knob",
+				"label": "Range",
+				"kind": "knob",
+				"position": {
+					"x": 24.28139183055976,
+					"y": 22.30769230769231,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vco-2-range-knob"
+			},
+			{
+				"id": "vco-2-sync-switch",
+				"label": "Sync",
+				"kind": "fader",
+				"position": {
+					"x": 20.688350983358546,
+					"y": 35.53846153846154,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vco-2-sync-switch"
+			},
+			{
+				"id": "vco-2-fine-tune-knob",
+				"label": "Fine tune",
+				"kind": "knob",
+				"position": {
+					"x": 24.28139183055976,
+					"y": 35.53846153846154,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vco-2-fine-tune-knob"
+			},
+			{
+				"id": "vco-2-waveform-knob",
+				"label": "Waveform",
+				"kind": "knob",
+				"position": {
+					"x": 20.688350983358546,
+					"y": 48.769230769230774,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vco-2-waveform-knob"
+			},
+			{
+				"id": "hpf-cutoff-fader",
+				"label": "Cutoff",
+				"kind": "fader",
+				"position": {
+					"x": 34.379727685325264,
+					"y": 22.30769230769231,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "hpf-cutoff-fader"
+			},
+			{
+				"id": "vcf-cutoff-fader",
+				"label": "Cutoff",
+				"kind": "fader",
+				"position": {
+					"x": 39.97730711043873,
+					"y": 22.30769230769231,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vcf-cutoff-fader"
+			},
+			{
+				"id": "vcf-resonance-fader",
+				"label": "Resonance",
+				"kind": "fader",
+				"position": {
+					"x": 43.57034795763994,
+					"y": 22.30769230769231,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vcf-resonance-fader"
+			},
+			{
+				"id": "vcf-slope-switch",
+				"label": "Slope",
+				"kind": "fader",
+				"position": {
+					"x": 47.16338880484115,
+					"y": 22.30769230769231,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vcf-slope-switch"
+			},
+			{
+				"id": "vcf-env-fader",
+				"label": "Env",
+				"kind": "fader",
+				"position": {
+					"x": 39.97730711043873,
+					"y": 35.53846153846154,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vcf-env-fader"
+			},
+			{
+				"id": "vcf-env-select-switch",
+				"label": "Env select",
+				"kind": "fader",
+				"position": {
+					"x": 43.57034795763994,
+					"y": 35.53846153846154,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vcf-env-select-switch"
+			},
+			{
+				"id": "vcf-lfo-fader",
+				"label": "LFO",
+				"kind": "fader",
+				"position": {
+					"x": 47.16338880484115,
+					"y": 35.53846153846154,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vcf-lfo-fader"
+			},
+			{
+				"id": "vcf-key-follow-fader",
+				"label": "Key follow",
+				"kind": "fader",
+				"position": {
+					"x": 39.97730711043873,
+					"y": 48.769230769230774,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vcf-key-follow-fader"
+			},
+			{
+				"id": "vca-level-fader",
+				"label": "Level",
+				"kind": "fader",
+				"position": {
+					"x": 51.6641452344932,
+					"y": 22.30769230769231,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vca-level-fader"
+			},
+			{
+				"id": "vca-lfo-mod-switch",
+				"label": "LFO mod",
+				"kind": "fader",
+				"position": {
+					"x": 51.6641452344932,
+					"y": 35.53846153846154,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "vca-lfo-mod-switch"
+			},
+			{
+				"id": "envelope-attack-fader",
+				"label": "Attack",
+				"kind": "fader",
+				"position": {
+					"x": 60.854765506807865,
+					"y": 22.30769230769231,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "envelope-attack-fader"
+			},
+			{
+				"id": "envelope-decay-fader",
+				"label": "Decay",
+				"kind": "fader",
+				"position": {
+					"x": 64.44780635400907,
+					"y": 22.30769230769231,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "envelope-decay-fader"
+			},
+			{
+				"id": "envelope-sustain-fader",
+				"label": "Sustain",
+				"kind": "fader",
+				"position": {
+					"x": 57.261724659606664,
+					"y": 35.53846153846154,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "envelope-sustain-fader"
+			},
+			{
+				"id": "envelope-release-fader",
+				"label": "Release",
+				"kind": "fader",
+				"position": {
+					"x": 60.854765506807865,
+					"y": 35.53846153846154,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "envelope-release-fader"
+			},
+			{
+				"id": "envelope-key-follow-switch",
+				"label": "Key follow",
+				"kind": "fader",
+				"position": {
+					"x": 64.44780635400907,
+					"y": 35.53846153846154,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "envelope-key-follow-switch"
+			},
+			{
+				"id": "envelope-env1-polarity-switch",
+				"label": "ENV1 polarity",
+				"kind": "fader",
+				"position": {
+					"x": 57.261724659606664,
+					"y": 48.769230769230774,
+					"width": 2.8744326777609683,
+					"height": 7.6923076923076925
+				},
+				"control": "envelope-env1-polarity-switch"
+			},
+			{
+				"id": "keyboard-1",
+				"label": "Keyboard note 48",
+				"kind": "key",
+				"position": {
+					"x": 0.9455370650529501,
+					"y": 76.92307692307693,
+					"width": 6.2789712556732225,
+					"height": 18.461538461538463
+				},
+				"message": {
+					"type": "note",
+					"number": 48
+				},
+				"learnable": true
+			},
+			{
+				"id": "keyboard-2",
+				"label": "Keyboard note 49",
+				"kind": "key",
+				"position": {
+					"x": 5.523953605648009,
+					"y": 76.92307692307693,
+					"width": 3.924357034795764,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 49
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "keyboard-3",
+				"label": "Keyboard note 50",
+				"kind": "key",
+				"position": {
+					"x": 7.4861321230458895,
+					"y": 76.92307692307693,
+					"width": 6.2789712556732225,
+					"height": 18.461538461538463
+				},
+				"message": {
+					"type": "note",
+					"number": 50
+				},
+				"learnable": true
+			},
+			{
+				"id": "keyboard-4",
+				"label": "Keyboard note 51",
+				"kind": "key",
+				"position": {
+					"x": 12.064548663640949,
+					"y": 76.92307692307693,
+					"width": 3.924357034795764,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 51
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "keyboard-5",
+				"label": "Keyboard note 52",
+				"kind": "key",
+				"position": {
+					"x": 14.026727181038831,
+					"y": 76.92307692307693,
+					"width": 6.2789712556732225,
+					"height": 18.461538461538463
+				},
+				"message": {
+					"type": "note",
+					"number": 52
+				},
+				"learnable": true
+			},
+			{
+				"id": "keyboard-6",
+				"label": "Keyboard note 53",
+				"kind": "key",
+				"position": {
+					"x": 20.567322239031768,
+					"y": 76.92307692307693,
+					"width": 6.2789712556732225,
+					"height": 18.461538461538463
+				},
+				"message": {
+					"type": "note",
+					"number": 53
+				},
+				"learnable": true
+			},
+			{
+				"id": "keyboard-7",
+				"label": "Keyboard note 54",
+				"kind": "key",
+				"position": {
+					"x": 25.145738779626832,
+					"y": 76.92307692307693,
+					"width": 3.924357034795764,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 54
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "keyboard-8",
+				"label": "Keyboard note 55",
+				"kind": "key",
+				"position": {
+					"x": 27.10791729702471,
+					"y": 76.92307692307693,
+					"width": 6.2789712556732225,
+					"height": 18.461538461538463
+				},
+				"message": {
+					"type": "note",
+					"number": 55
+				},
+				"learnable": true
+			},
+			{
+				"id": "keyboard-9",
+				"label": "Keyboard note 56",
+				"kind": "key",
+				"position": {
+					"x": 31.686333837619774,
+					"y": 76.92307692307693,
+					"width": 3.924357034795764,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 56
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "keyboard-10",
+				"label": "Keyboard note 57",
+				"kind": "key",
+				"position": {
+					"x": 33.64851235501765,
+					"y": 76.92307692307693,
+					"width": 6.2789712556732225,
+					"height": 18.461538461538463
+				},
+				"message": {
+					"type": "note",
+					"number": 57
+				},
+				"learnable": true
+			},
+			{
+				"id": "keyboard-11",
+				"label": "Keyboard note 58",
+				"kind": "key",
+				"position": {
+					"x": 38.22692889561271,
+					"y": 76.92307692307693,
+					"width": 3.924357034795764,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 58
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "keyboard-12",
+				"label": "Keyboard note 59",
+				"kind": "key",
+				"position": {
+					"x": 40.18910741301059,
+					"y": 76.92307692307693,
+					"width": 6.2789712556732225,
+					"height": 18.461538461538463
+				},
+				"message": {
+					"type": "note",
+					"number": 59
+				},
+				"learnable": true
+			},
+			{
+				"id": "keyboard-13",
+				"label": "Keyboard note 60",
+				"kind": "key",
+				"position": {
+					"x": 46.729702471003534,
+					"y": 76.92307692307693,
+					"width": 6.2789712556732225,
+					"height": 18.461538461538463
+				},
+				"message": {
+					"type": "note",
+					"number": 60
+				},
+				"learnable": true
+			},
+			{
+				"id": "keyboard-14",
+				"label": "Keyboard note 61",
+				"kind": "key",
+				"position": {
+					"x": 51.3081190115986,
+					"y": 76.92307692307693,
+					"width": 3.924357034795764,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 61
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "keyboard-15",
+				"label": "Keyboard note 62",
+				"kind": "key",
+				"position": {
+					"x": 53.270297528996466,
+					"y": 76.92307692307693,
+					"width": 6.2789712556732225,
+					"height": 18.461538461538463
+				},
+				"message": {
+					"type": "note",
+					"number": 62
+				},
+				"learnable": true
+			},
+			{
+				"id": "keyboard-16",
+				"label": "Keyboard note 63",
+				"kind": "key",
+				"position": {
+					"x": 57.84871406959152,
+					"y": 76.92307692307693,
+					"width": 3.924357034795764,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 63
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "keyboard-17",
+				"label": "Keyboard note 64",
+				"kind": "key",
+				"position": {
+					"x": 59.81089258698942,
+					"y": 76.92307692307693,
+					"width": 6.2789712556732225,
+					"height": 18.461538461538463
+				},
+				"message": {
+					"type": "note",
+					"number": 64
+				},
+				"learnable": true
+			},
+			{
+				"id": "keyboard-18",
+				"label": "Keyboard note 65",
+				"kind": "key",
+				"position": {
+					"x": 66.35148764498236,
+					"y": 76.92307692307693,
+					"width": 6.2789712556732225,
+					"height": 18.461538461538463
+				},
+				"message": {
+					"type": "note",
+					"number": 65
+				},
+				"learnable": true
+			},
+			{
+				"id": "keyboard-19",
+				"label": "Keyboard note 66",
+				"kind": "key",
+				"position": {
+					"x": 70.92990418557741,
+					"y": 76.92307692307693,
+					"width": 3.924357034795764,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 66
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "keyboard-20",
+				"label": "Keyboard note 67",
+				"kind": "key",
+				"position": {
+					"x": 72.89208270297529,
+					"y": 76.92307692307693,
+					"width": 6.2789712556732225,
+					"height": 18.461538461538463
+				},
+				"message": {
+					"type": "note",
+					"number": 67
+				},
+				"learnable": true
+			},
+			{
+				"id": "keyboard-21",
+				"label": "Keyboard note 68",
+				"kind": "key",
+				"position": {
+					"x": 77.47049924357033,
+					"y": 76.92307692307693,
+					"width": 3.924357034795764,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 68
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "keyboard-22",
+				"label": "Keyboard note 69",
+				"kind": "key",
+				"position": {
+					"x": 79.43267776096822,
+					"y": 76.92307692307693,
+					"width": 6.2789712556732225,
+					"height": 18.461538461538463
+				},
+				"message": {
+					"type": "note",
+					"number": 69
+				},
+				"learnable": true
+			},
+			{
+				"id": "keyboard-23",
+				"label": "Keyboard note 70",
+				"kind": "key",
+				"position": {
+					"x": 84.01109430156328,
+					"y": 76.92307692307693,
+					"width": 3.924357034795764,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 70
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "keyboard-24",
+				"label": "Keyboard note 71",
+				"kind": "key",
+				"position": {
+					"x": 85.97327281896116,
+					"y": 76.92307692307693,
+					"width": 6.2789712556732225,
+					"height": 18.461538461538463
+				},
+				"message": {
+					"type": "note",
+					"number": 71
+				},
+				"learnable": true
+			},
+			{
+				"id": "keyboard-25",
+				"label": "Keyboard note 72",
+				"kind": "key",
+				"position": {
+					"x": 92.51386787695411,
+					"y": 76.92307692307693,
+					"width": 6.2789712556732225,
+					"height": 18.461538461538463
+				},
+				"message": {
+					"type": "note",
+					"number": 72
+				},
+				"learnable": true
+			}
+		]
+	}
+}

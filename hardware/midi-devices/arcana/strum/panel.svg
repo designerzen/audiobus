@@ -1,0 +1,194 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 650" role="group" aria-labelledby="arcana-strum-panel--title" aria-describedby="arcana-strum-panel--description" data-device="arcana-strum" style="background: #fff; color: #334155;" data-diagram-style="wireframe">
+  <title id="arcana-strum-panel--title">Arcana Strum overhead hardware diagram</title>
+  <desc id="arcana-strum-panel--description">Wireframe top-down schematic; positions are approximate. Each physical control has a stable device-prefixed ID and data-part name. Buttons in this standalone drawing are disabled until a host adds input handlers. Transparent regions marked data-surface-control correspond to the profile MIDI hit areas; multiple regions can share one context-dependent physical control.</desc>
+  <style>text { font-family: Arial, sans-serif; } .section-label { font-size: 11px; letter-spacing: 1px; } [data-part]:focus-visible { outline: 3px solid currentColor; }</style>
+  <g id="arcana-strum-panel--chassis" aria-hidden="true">
+    <rect x="3" y="3" width="1094" height="644" rx="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="22" y="28" fill="currentColor" font-size="19" stroke="none">Arcana Strum</text>
+    <ellipse cx="170" cy="200" rx="145" ry="135" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="940" cy="200" r="135" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 940 105 V 295 M 845 200 H 1035" fill="none" stroke="currentColor" stroke-dasharray="5 5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <rect x="810" y="133" width="14" height="5" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <rect x="810" y="157" width="14" height="5" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <rect x="810" y="181" width="14" height="5" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <rect x="810" y="205" width="14" height="5" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <rect x="810" y="229" width="14" height="5" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <rect x="810" y="253" width="14" height="5" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="30" y="395" class="section-label" fill="currentColor" stroke="none">UNDERSIDE CONTROLS (SHOWN SEPARATELY)</text>
+    <rect x="25" y="415" width="1050" height="210" rx="10" fill="none" stroke="currentColor" stroke-dasharray="6 6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+  <g id="arcana-strum-panel--controls" role="group" aria-label="Top panel and underside controls">
+    <g id="arcana-strum-panel--playing-key-1" data-part="playing-key-1" data-kind="key" data-surface-controls="strum-key-1" role="button" aria-disabled="true" tabindex="-1" aria-label="Playing key 1">
+      <title>Playing key 1</title>
+      <g aria-hidden="true">
+        <rect x="60" y="132" width="35" height="128" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="77.5" y="200.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">1</text>
+      </g>
+      <g id="arcana-strum-panel--surface--strum-key-1" data-surface-control="strum-key-1" aria-hidden="true">
+        <rect x="60.0" y="132" width="35.0" height="128" fill="none" data-hit-area="strum-key-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" pointer-events="all" />
+      </g>
+    </g>
+    <g id="arcana-strum-panel--playing-key-2" data-part="playing-key-2" data-kind="key" data-surface-controls="strum-key-2" role="button" aria-disabled="true" tabindex="-1" aria-label="Playing key 2">
+      <title>Playing key 2</title>
+      <g aria-hidden="true">
+        <rect x="104" y="132" width="35" height="128" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="121.5" y="200.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">2</text>
+      </g>
+      <g id="arcana-strum-panel--surface--strum-key-2" data-surface-control="strum-key-2" aria-hidden="true">
+        <rect x="104.0" y="132" width="35.0" height="128" fill="none" data-hit-area="strum-key-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" pointer-events="all" />
+      </g>
+    </g>
+    <g id="arcana-strum-panel--playing-key-3" data-part="playing-key-3" data-kind="key" data-surface-controls="strum-key-3" role="button" aria-disabled="true" tabindex="-1" aria-label="Playing key 3">
+      <title>Playing key 3</title>
+      <g aria-hidden="true">
+        <rect x="148" y="132" width="35" height="128" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="165.5" y="200.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">3</text>
+      </g>
+      <g id="arcana-strum-panel--surface--strum-key-3" data-surface-control="strum-key-3" aria-hidden="true">
+        <rect x="148.0" y="132" width="35.0" height="128" fill="none" data-hit-area="strum-key-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" pointer-events="all" />
+      </g>
+    </g>
+    <g id="arcana-strum-panel--playing-key-4" data-part="playing-key-4" data-kind="key" data-surface-controls="strum-key-4" role="button" aria-disabled="true" tabindex="-1" aria-label="Playing key 4">
+      <title>Playing key 4</title>
+      <g aria-hidden="true">
+        <rect x="192" y="132" width="35" height="128" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="209.5" y="200.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">4</text>
+      </g>
+      <g id="arcana-strum-panel--surface--strum-key-4" data-surface-control="strum-key-4" aria-hidden="true">
+        <rect x="192.0" y="132" width="35.0" height="128" fill="none" data-hit-area="strum-key-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" pointer-events="all" />
+      </g>
+    </g>
+    <g id="arcana-strum-panel--playing-key-5" data-part="playing-key-5" data-kind="key" data-surface-controls="strum-key-5" role="button" aria-disabled="true" tabindex="-1" aria-label="Playing key 5">
+      <title>Playing key 5</title>
+      <g aria-hidden="true">
+        <rect x="236" y="132" width="35" height="128" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="253.5" y="200.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">5</text>
+      </g>
+      <g id="arcana-strum-panel--surface--strum-key-5" data-surface-control="strum-key-5" aria-hidden="true">
+        <rect x="236.0" y="132" width="35.0" height="128" fill="none" data-hit-area="strum-key-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" pointer-events="all" />
+      </g>
+    </g>
+    <g id="arcana-strum-panel--melody" data-part="melody" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Melody">
+      <title>Melody</title>
+      <g aria-hidden="true">
+        <rect x="365" y="120" width="90" height="48" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="410.0" y="148.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Melody</text>
+      </g>
+    </g>
+    <g id="arcana-strum-panel--mode-i" data-part="mode-i" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Mode I">
+      <title>Mode I</title>
+      <g aria-hidden="true">
+        <rect x="465" y="120" width="90" height="48" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="510.0" y="148.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Mode I</text>
+      </g>
+    </g>
+    <g id="arcana-strum-panel--mode-ii" data-part="mode-ii" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Mode II">
+      <title>Mode II</title>
+      <g aria-hidden="true">
+        <rect x="565" y="120" width="90" height="48" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="610.0" y="148.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Mode II</text>
+      </g>
+    </g>
+    <g id="arcana-strum-panel--power-reset" data-part="power-reset" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Power / Reset">
+      <title>Power / Reset</title>
+      <g aria-hidden="true">
+        <rect x="665" y="120" width="90" height="48" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="710.0" y="148.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Power / Reset</text>
+      </g>
+    </g>
+    <g id="arcana-strum-panel--duration" data-part="duration" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Duration">
+      <title>Duration</title>
+      <g aria-hidden="true">
+        <rect x="365" y="205" width="90" height="48" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="410.0" y="233.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Duration</text>
+      </g>
+    </g>
+    <g id="arcana-strum-panel--transpose-down" data-part="transpose-down" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Transpose down">
+      <title>Transpose down</title>
+      <g aria-hidden="true">
+        <rect x="465" y="205" width="90" height="48" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="510.0" y="233.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Transpose down</text>
+      </g>
+    </g>
+    <g id="arcana-strum-panel--transpose-up" data-part="transpose-up" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Transpose up">
+      <title>Transpose up</title>
+      <g aria-hidden="true">
+        <rect x="565" y="205" width="90" height="48" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="610.0" y="233.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Transpose up</text>
+      </g>
+    </g>
+    <g id="arcana-strum-panel--septachords" data-part="septachords" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="SeptaChords">
+      <title>SeptaChords</title>
+      <g aria-hidden="true">
+        <rect x="665" y="205" width="90" height="48" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="710.0" y="233.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">SeptaChords</text>
+      </g>
+    </g>
+    <g id="arcana-strum-panel--strum-stick" data-part="strum-stick" data-kind="knob" role="group" aria-roledescription="strum joystick" aria-label="Strum stick">
+      <title>Strum stick</title>
+      <g aria-hidden="true">
+        <circle cx="940.0" cy="200.0" r="50.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 940.0 155 v 28.000000000000004" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="940.0" y="264" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Strum stick</text>
+      </g>
+    </g>
+    <g id="arcana-strum-panel--keyboard-lock" data-part="keyboard-lock" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Keyboard angle lock">
+      <title>Keyboard angle lock</title>
+      <g aria-hidden="true">
+        <circle cx="135.0" cy="500.0" r="32.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 135.0 473 v 17.92" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="135.0" y="546" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Keyboard angle lock</text>
+      </g>
+    </g>
+    <g id="arcana-strum-panel--dynamics-on-off" data-part="dynamics-on-off" data-kind="switch" role="group" aria-roledescription="selector switch" aria-label="Dynamics on / off">
+      <title>Dynamics on / off</title>
+      <g aria-hidden="true">
+        <rect x="280" y="475" width="135" height="42" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="347.5" y="500.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Dynamics on / off</text>
+      </g>
+    </g>
+    <g id="arcana-strum-panel--skill-1-2" data-part="skill-1-2" data-kind="switch" role="group" aria-roledescription="selector switch" aria-label="Skill 1 / 2">
+      <title>Skill 1 / 2</title>
+      <g aria-hidden="true">
+        <rect x="435" y="475" width="135" height="42" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="502.5" y="500.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Skill 1 / 2</text>
+      </g>
+    </g>
+    <g id="arcana-strum-panel--three-five-keys" data-part="three-five-keys" data-kind="switch" role="group" aria-roledescription="selector switch" aria-label="Three / Five keys">
+      <title>Three / Five keys</title>
+      <g aria-hidden="true">
+        <rect x="590" y="475" width="135" height="42" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="657.5" y="500.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Three / Five keys</text>
+      </g>
+    </g>
+    <g id="arcana-strum-panel--left-right-hand" data-part="left-right-hand" data-kind="switch" role="group" aria-roledescription="selector switch" aria-label="Left / Right hand">
+      <title>Left / Right hand</title>
+      <g aria-hidden="true">
+        <rect x="745" y="475" width="135" height="42" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="812.5" y="500.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Left / Right hand</text>
+      </g>
+    </g>
+    <g id="arcana-strum-panel--strum-resistance" data-part="strum-resistance" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Strum resistance">
+      <title>Strum resistance</title>
+      <g aria-hidden="true">
+        <circle cx="970.0" cy="500.0" r="32.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 970.0 473 v 17.92" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="970.0" y="546" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Strum resistance</text>
+      </g>
+    </g>
+    <g id="arcana-strum-panel--usb-port" data-part="usb-port" data-kind="socket" role="group" aria-roledescription="connector" aria-label="USB / Power (rear)">
+      <title>USB / Power (rear)</title>
+      <g aria-hidden="true">
+        <rect x="400" y="50" width="155" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="477.5" y="68.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">USB / Power (rear)</text>
+      </g>
+    </g>
+    <g id="arcana-strum-panel--external-device-port" data-part="external-device-port" data-kind="socket" role="group" aria-roledescription="connector" aria-label="External E-Box (rear)">
+      <title>External E-Box (rear)</title>
+      <g aria-hidden="true">
+        <rect x="580" y="50" width="155" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="657.5" y="68.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">External E-Box (rear)</text>
+      </g>
+    </g>
+  </g>
+</svg>

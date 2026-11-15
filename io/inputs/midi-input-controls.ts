@@ -3,9 +3,9 @@ import {
 	matchMidiDeviceProfile,
 	MIDI_DEVICE_PROFILES,
 	onMidiDeviceProfilesChanged
-} from "../../midi/hardware/device-profiles"
-import { createMidiDevicePreview } from "../../midi/hardware/device-preview"
-import type { MidiDeviceProfile } from "../../midi/hardware/device-profile-schema"
+} from "../../hardware/midi-devices/device-profiles"
+import { createMidiDevicePreview } from "../../hardware/midi-devices/device-preview"
+import type { MidiDeviceProfile } from "../../hardware/midi-devices/device-profile-schema"
 
 export interface MidiInputDeviceOption {
 	id: string

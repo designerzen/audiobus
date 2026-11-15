@@ -1,0 +1,385 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "roland-tr-06",
+	"name": "Roland TR-06",
+	"manufacturer": "Roland",
+	"manufacturerUrl": "https://www.roland.com/",
+	"productUrl": "https://www.roland.com/global/products/tr-06/",
+	"description": "Boutique Expanded TR-606-style Drumatix rhythm composer.",
+	"ids": ["roland-tr-06"],
+	"portNames": ["TR-06", "TR-06 MIDI 1", "Roland TR-06"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Roland TR-06 owner manual",
+			"url": "https://static.roland.com/assets/media/pdf/TR-06_eng02_W.pdf"
+		},
+		{
+			"title": "Roland TR-06 MIDI implementation chart",
+			"url": "https://static.roland.com/assets/media/pdf/TR-06_MIDI_Imple_Chart_eng01_W.pdf"
+		}
+	],
+	"abilities": ["USB MIDI", "DIN MIDI IN/OUT", "MIDI notes", "Documented controller mappings"],
+	"hardwareControls": [
+		"Master: Volume, Value, Instrument, Mode, Run Stop, Pattern clear, Menu Substep, Step loop, Function, Tempo, Pattern group, Tap Reset, Scale",
+		"Effects: Drive, Time, Depth",
+		"Levels: Accent, Bass drum, Snare, Tom, Cymbal, Hi hat",
+		"Remaining Steps: Step 8, Step 9, Step 10, Step 11, Step 12, Step 13, Step 14, Step 15, Step 16"
+	],
+	"notice": "Use USB MIDI or a DIN MIDI interface. Match the MIDI channel and enable the required MIDI transmit/receive settings. Factory drum channel is 10. Note regions use the transmitted factory drum map. Shared level regions address their alternative voices; other front-panel buttons retain local sequencer functions.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "effects-drive-knob",
+			"label": "Effects: Drive",
+			"widget": "slider",
+			"cc": 17
+		},
+		{
+			"id": "effects-time-knob",
+			"label": "Effects: Time",
+			"widget": "slider",
+			"cc": 18
+		},
+		{
+			"id": "effects-depth-knob",
+			"label": "Effects: Depth",
+			"widget": "slider",
+			"cc": 19
+		},
+		{
+			"id": "levels-accent-knob",
+			"label": "Levels: Accent",
+			"widget": "slider",
+			"cc": 71
+		},
+		{
+			"id": "levels-bass-drum-knob",
+			"label": "Levels: Bass drum",
+			"widget": "slider",
+			"cc": 24
+		},
+		{
+			"id": "levels-snare-knob",
+			"label": "Levels: Snare",
+			"widget": "slider",
+			"cc": 29
+		},
+		{
+			"id": "levels-tom-knob-1",
+			"label": "Levels: Tom (part 1)",
+			"widget": "slider",
+			"cc": 51
+		},
+		{
+			"id": "levels-tom-knob-2",
+			"label": "Levels: Tom (part 2)",
+			"widget": "slider",
+			"cc": 54
+		},
+		{
+			"id": "levels-cymbal-knob",
+			"label": "Levels: Cymbal",
+			"widget": "slider",
+			"cc": 85
+		},
+		{
+			"id": "levels-hi-hat-knob-1",
+			"label": "Levels: Hi hat (part 1)",
+			"widget": "slider",
+			"cc": 63
+		},
+		{
+			"id": "levels-hi-hat-knob-2",
+			"label": "Levels: Hi hat (part 2)",
+			"widget": "slider",
+			"cc": 82
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Roland TR-06 overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 1220,
+		"height": 650,
+		"elements": [
+			{
+				"id": "effects-drive-knob",
+				"label": "Drive",
+				"kind": "knob",
+				"position": {
+					"x": 43.9344262295082,
+					"y": 22.30769230769231,
+					"width": 6.229508196721312,
+					"height": 7.6923076923076925
+				},
+				"control": "effects-drive-knob"
+			},
+			{
+				"id": "effects-time-knob",
+				"label": "Time",
+				"kind": "knob",
+				"position": {
+					"x": 43.9344262295082,
+					"y": 35.53846153846154,
+					"width": 6.229508196721312,
+					"height": 7.6923076923076925
+				},
+				"control": "effects-time-knob"
+			},
+			{
+				"id": "effects-depth-knob",
+				"label": "Depth",
+				"kind": "knob",
+				"position": {
+					"x": 43.9344262295082,
+					"y": 48.769230769230774,
+					"width": 6.229508196721312,
+					"height": 7.6923076923076925
+				},
+				"control": "effects-depth-knob"
+			},
+			{
+				"id": "levels-accent-knob",
+				"label": "Accent",
+				"kind": "knob",
+				"position": {
+					"x": 56.0655737704918,
+					"y": 22.30769230769231,
+					"width": 6.229508196721312,
+					"height": 7.6923076923076925
+				},
+				"control": "levels-accent-knob"
+			},
+			{
+				"id": "levels-bass-drum-knob",
+				"label": "Bass drum",
+				"kind": "knob",
+				"position": {
+					"x": 63.852459016393446,
+					"y": 22.30769230769231,
+					"width": 6.229508196721312,
+					"height": 7.6923076923076925
+				},
+				"control": "levels-bass-drum-knob"
+			},
+			{
+				"id": "levels-snare-knob",
+				"label": "Snare",
+				"kind": "knob",
+				"position": {
+					"x": 56.0655737704918,
+					"y": 35.53846153846154,
+					"width": 6.229508196721312,
+					"height": 7.6923076923076925
+				},
+				"control": "levels-snare-knob"
+			},
+			{
+				"id": "levels-tom-knob-1",
+				"label": "Tom (part 1)",
+				"kind": "knob",
+				"position": {
+					"x": 63.852459016393446,
+					"y": 35.53846153846154,
+					"width": 3.114754098360656,
+					"height": 7.6923076923076925
+				},
+				"control": "levels-tom-knob-1"
+			},
+			{
+				"id": "levels-tom-knob-2",
+				"label": "Tom (part 2)",
+				"kind": "knob",
+				"position": {
+					"x": 66.9672131147541,
+					"y": 35.53846153846154,
+					"width": 3.114754098360656,
+					"height": 7.6923076923076925
+				},
+				"control": "levels-tom-knob-2"
+			},
+			{
+				"id": "levels-cymbal-knob",
+				"label": "Cymbal",
+				"kind": "knob",
+				"position": {
+					"x": 56.0655737704918,
+					"y": 48.769230769230774,
+					"width": 6.229508196721312,
+					"height": 7.6923076923076925
+				},
+				"control": "levels-cymbal-knob"
+			},
+			{
+				"id": "levels-hi-hat-knob-1",
+				"label": "Hi hat (part 1)",
+				"kind": "knob",
+				"position": {
+					"x": 63.852459016393446,
+					"y": 48.769230769230774,
+					"width": 3.114754098360656,
+					"height": 7.6923076923076925
+				},
+				"control": "levels-hi-hat-knob-1"
+			},
+			{
+				"id": "levels-hi-hat-knob-2",
+				"label": "Hi hat (part 2)",
+				"kind": "knob",
+				"position": {
+					"x": 66.9672131147541,
+					"y": 48.769230769230774,
+					"width": 3.114754098360656,
+					"height": 7.6923076923076925
+				},
+				"control": "levels-hi-hat-knob-2"
+			},
+			{
+				"id": "key-1",
+				"label": "Kick",
+				"kind": "key",
+				"position": {
+					"x": 2.0491803278688523,
+					"y": 82.76923076923077,
+					"width": 13.290398126463701,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 36,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-2",
+				"label": "Snare",
+				"kind": "key",
+				"position": {
+					"x": 15.749414519906324,
+					"y": 82.76923076923077,
+					"width": 13.290398126463701,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 38,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-3",
+				"label": "Low tom",
+				"kind": "key",
+				"position": {
+					"x": 29.449648711943794,
+					"y": 82.76923076923077,
+					"width": 13.290398126463701,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 47,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-4",
+				"label": "High tom",
+				"kind": "key",
+				"position": {
+					"x": 43.149882903981265,
+					"y": 82.76923076923077,
+					"width": 13.290398126463701,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 50,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-5",
+				"label": "Cymbal",
+				"kind": "key",
+				"position": {
+					"x": 56.850117096018735,
+					"y": 82.76923076923077,
+					"width": 13.290398126463701,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 49,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-6",
+				"label": "Open hat",
+				"kind": "key",
+				"position": {
+					"x": 70.5503512880562,
+					"y": 82.76923076923077,
+					"width": 13.290398126463701,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 46,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-7",
+				"label": "Closed hat",
+				"kind": "key",
+				"position": {
+					"x": 84.25058548009368,
+					"y": 82.76923076923077,
+					"width": 13.290398126463701,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 42,
+					"channel": 10
+				},
+				"learnable": true
+			}
+		]
+	}
+}

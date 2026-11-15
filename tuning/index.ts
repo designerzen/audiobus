@@ -12,3 +12,6 @@ export {
 } from "./chords/describe-chord.ts"
 export type { ChordDescription } from "./chords/describe-chord.ts"
 export * from "./chord-suggestions.ts"
+export * from "./emotional-intervals.ts"
+export * from "./keys.ts"
+export * from "./emotion-chords.ts"

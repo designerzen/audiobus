@@ -13,7 +13,10 @@ import { AI_MODELS, type AIInputId } from "./inputs/ai-model-catalogue"
 
 import { UI_INPUT_COMPONENTS } from "../ui/input-components.ts"
 import * as INPUT_TYPES from "./inputs/input-types.ts"
-import { MIDI_DEVICE_PROFILES, onMidiDeviceProfilesChanged } from "../midi/hardware/device-profiles"
+import {
+	MIDI_DEVICE_PROFILES,
+	onMidiDeviceProfilesChanged
+} from "../hardware/midi-devices/device-profiles"
 
 export interface InputDefinition extends DeviceClassification {
 	attribution?: DeviceAttribution
@@ -25,6 +28,15 @@ export interface InputDefinition extends DeviceClassification {
 }
 
 export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
+	[INPUT_TYPES.PROTOCOL]: {
+		id: INPUT_TYPES.PROTOCOL,
+		name: "audioBus Protocol",
+		description: "Receive MIDI and application commands from an explicitly paired music application",
+		type: "midi",
+		subtype: "device",
+		category: "Device",
+		icon: "/icons/device-midi.svg"
+	},
 	[INPUT_TYPES.CHANNEL_TRIGGER]: {
 		id: INPUT_TYPES.CHANNEL_TRIGGER,
 		name: "Song Channel Trigger",

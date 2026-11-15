@@ -1,0 +1,1 @@
+export default function registerFMProcessor(config: { name: string }): void

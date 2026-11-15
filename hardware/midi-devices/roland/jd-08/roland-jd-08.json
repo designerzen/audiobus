@@ -1,0 +1,500 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "roland-jd-08",
+	"name": "Roland JD-08",
+	"manufacturer": "Roland",
+	"manufacturerUrl": "https://www.roland.com/",
+	"productUrl": "https://www.roland.com/global/products/jd-08/",
+	"description": "Two-part JD-800-inspired Boutique digital synthesizer.",
+	"ids": ["roland-jd-08"],
+	"portNames": ["JD-08", "JD-08 MIDI 1", "Roland JD-08"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Roland JD-08 owner manual",
+			"url": "https://static.roland.com/assets/media/pdf/JD-08_reference_eng01_W.pdf"
+		}
+	],
+	"abilities": ["USB MIDI", "DIN MIDI IN/OUT", "MIDI notes", "Documented controller mappings"],
+	"hardwareControls": [
+		"Palette: Tone A, Tone B, Tone C, Tone D",
+		"LFO: Select, Rate, Delay, Fade, Waveform, Offset, Key trigger",
+		"WG: Pitch coarse, Pitch fine, Pitch random, Key follow, Waveform, LFO 1, LFO 2",
+		"Envelope: Time key follow, T1, T2, T3, T4, L1, L2, L3, L4, Sustain, Select",
+		"TVF: Mode, Cutoff, Resonance, Env, Key follow, LFO select, LFO",
+		"TVA: Level, Bias direction, Bias point, Bias level, LFO select, LFO",
+		"Performance: Volume, Tone A, Tone B, Tone C, Tone D, Layer Active, Arpeggio, Note, Common, Effects, Start, Exit, Value, Manual",
+		"Memory: Bank 1, Bank 2, Bank 3, Bank 4, Bank 5, Bank 6, Bank 7, Bank 8, Number 1, Number 2, Number 3, Number 4, Number 5, Number 6, Number 7, Number 8"
+	],
+	"notice": "Use USB MIDI or a DIN MIDI interface. Match the MIDI channel and enable the required MIDI transmit/receive settings. Uses the part-channel MIDI chart, not the separate system-channel chart. Cutoff is CC3 and resonance is CC9. Palette CC68-71 are transmit-only; they do not remotely set palette levels. Envelope regions use the documented FILTER envelope bank; select/remap other envelope banks explicitly. Waveform encoder relative messages are not represented as an absolute CC slider.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "palette-tone-a-fader",
+			"label": "Palette: Tone A",
+			"widget": "slider",
+			"cc": 68
+		},
+		{
+			"id": "palette-tone-b-fader",
+			"label": "Palette: Tone B",
+			"widget": "slider",
+			"cc": 69
+		},
+		{
+			"id": "palette-tone-c-fader",
+			"label": "Palette: Tone C",
+			"widget": "slider",
+			"cc": 70
+		},
+		{
+			"id": "palette-tone-d-fader",
+			"label": "Palette: Tone D",
+			"widget": "slider",
+			"cc": 71
+		},
+		{
+			"id": "lfo-rate-fader",
+			"label": "LFO: Rate",
+			"widget": "slider",
+			"cc": 14
+		},
+		{
+			"id": "lfo-delay-fader",
+			"label": "LFO: Delay",
+			"widget": "slider",
+			"cc": 15
+		},
+		{
+			"id": "lfo-fade-fader",
+			"label": "LFO: Fade",
+			"widget": "slider",
+			"cc": 16
+		},
+		{
+			"id": "wg-pitch-coarse-knob",
+			"label": "WG: Pitch coarse",
+			"widget": "slider",
+			"cc": 79
+		},
+		{
+			"id": "wg-pitch-fine-knob",
+			"label": "WG: Pitch fine",
+			"widget": "slider",
+			"cc": 80
+		},
+		{
+			"id": "wg-pitch-random-fader",
+			"label": "WG: Pitch random",
+			"widget": "slider",
+			"cc": 81
+		},
+		{
+			"id": "wg-key-follow-fader",
+			"label": "WG: Key follow",
+			"widget": "slider",
+			"cc": 82
+		},
+		{
+			"id": "wg-lfo-1-fader",
+			"label": "WG: LFO 1",
+			"widget": "slider",
+			"cc": 83
+		},
+		{
+			"id": "wg-lfo-2-fader",
+			"label": "WG: LFO 2",
+			"widget": "slider",
+			"cc": 85
+		},
+		{
+			"id": "envelope-time-key-follow-fader",
+			"label": "Envelope: Time key follow",
+			"widget": "slider",
+			"cc": 46
+		},
+		{
+			"id": "envelope-t1-fader",
+			"label": "Envelope: T1",
+			"widget": "slider",
+			"cc": 47
+		},
+		{
+			"id": "envelope-t2-fader",
+			"label": "Envelope: T2",
+			"widget": "slider",
+			"cc": 50
+		},
+		{
+			"id": "envelope-t3-fader",
+			"label": "Envelope: T3",
+			"widget": "slider",
+			"cc": 52
+		},
+		{
+			"id": "envelope-t4-fader",
+			"label": "Envelope: T4",
+			"widget": "slider",
+			"cc": 54
+		},
+		{
+			"id": "envelope-l1-fader",
+			"label": "Envelope: L1",
+			"widget": "slider",
+			"cc": 48
+		},
+		{
+			"id": "envelope-l2-fader",
+			"label": "Envelope: L2",
+			"widget": "slider",
+			"cc": 51
+		},
+		{
+			"id": "envelope-l4-fader",
+			"label": "Envelope: L4",
+			"widget": "slider",
+			"cc": 56
+		},
+		{
+			"id": "envelope-sustain-fader",
+			"label": "Envelope: Sustain",
+			"widget": "slider",
+			"cc": 53
+		},
+		{
+			"id": "tvf-cutoff-fader",
+			"label": "TVF: Cutoff",
+			"widget": "slider",
+			"cc": 3
+		},
+		{
+			"id": "tvf-resonance-fader",
+			"label": "TVF: Resonance",
+			"widget": "slider",
+			"cc": 9
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Roland JD-08 overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 2902,
+		"height": 540,
+		"elements": [
+			{
+				"id": "palette-tone-a-fader",
+				"label": "Tone A",
+				"kind": "fader",
+				"position": {
+					"x": 1.2749827705031014,
+					"y": 26.851851851851855,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "palette-tone-a-fader"
+			},
+			{
+				"id": "palette-tone-b-fader",
+				"label": "Tone B",
+				"kind": "fader",
+				"position": {
+					"x": 4.548587181254307,
+					"y": 26.851851851851855,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "palette-tone-b-fader"
+			},
+			{
+				"id": "palette-tone-c-fader",
+				"label": "Tone C",
+				"kind": "fader",
+				"position": {
+					"x": 1.2749827705031014,
+					"y": 42.77777777777778,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "palette-tone-c-fader"
+			},
+			{
+				"id": "palette-tone-d-fader",
+				"label": "Tone D",
+				"kind": "fader",
+				"position": {
+					"x": 4.548587181254307,
+					"y": 42.77777777777778,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "palette-tone-d-fader"
+			},
+			{
+				"id": "lfo-rate-fader",
+				"label": "Rate",
+				"kind": "fader",
+				"position": {
+					"x": 11.922811853893867,
+					"y": 26.851851851851855,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "lfo-rate-fader"
+			},
+			{
+				"id": "lfo-delay-fader",
+				"label": "Delay",
+				"kind": "fader",
+				"position": {
+					"x": 15.196416264645071,
+					"y": 26.851851851851855,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "lfo-delay-fader"
+			},
+			{
+				"id": "lfo-fade-fader",
+				"label": "Fade",
+				"kind": "fader",
+				"position": {
+					"x": 8.64920744314266,
+					"y": 42.77777777777778,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "lfo-fade-fader"
+			},
+			{
+				"id": "wg-pitch-coarse-knob",
+				"label": "Pitch coarse",
+				"kind": "knob",
+				"position": {
+					"x": 19.297036526533425,
+					"y": 26.851851851851855,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "wg-pitch-coarse-knob"
+			},
+			{
+				"id": "wg-pitch-fine-knob",
+				"label": "Pitch fine",
+				"kind": "knob",
+				"position": {
+					"x": 22.57064093728463,
+					"y": 26.851851851851855,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "wg-pitch-fine-knob"
+			},
+			{
+				"id": "wg-pitch-random-fader",
+				"label": "Pitch random",
+				"kind": "fader",
+				"position": {
+					"x": 25.844245348035837,
+					"y": 26.851851851851855,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "wg-pitch-random-fader"
+			},
+			{
+				"id": "wg-key-follow-fader",
+				"label": "Key follow",
+				"kind": "fader",
+				"position": {
+					"x": 19.297036526533425,
+					"y": 42.77777777777778,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "wg-key-follow-fader"
+			},
+			{
+				"id": "wg-lfo-1-fader",
+				"label": "LFO 1",
+				"kind": "fader",
+				"position": {
+					"x": 25.844245348035837,
+					"y": 42.77777777777778,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "wg-lfo-1-fader"
+			},
+			{
+				"id": "wg-lfo-2-fader",
+				"label": "LFO 2",
+				"kind": "fader",
+				"position": {
+					"x": 19.297036526533425,
+					"y": 58.7037037037037,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "wg-lfo-2-fader"
+			},
+			{
+				"id": "envelope-time-key-follow-fader",
+				"label": "Time key follow",
+				"kind": "fader",
+				"position": {
+					"x": 29.944865609924193,
+					"y": 26.851851851851855,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-time-key-follow-fader"
+			},
+			{
+				"id": "envelope-t1-fader",
+				"label": "T1",
+				"kind": "fader",
+				"position": {
+					"x": 33.2184700206754,
+					"y": 26.851851851851855,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-t1-fader"
+			},
+			{
+				"id": "envelope-t2-fader",
+				"label": "T2",
+				"kind": "fader",
+				"position": {
+					"x": 36.4920744314266,
+					"y": 26.851851851851855,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-t2-fader"
+			},
+			{
+				"id": "envelope-t3-fader",
+				"label": "T3",
+				"kind": "fader",
+				"position": {
+					"x": 39.765678842177806,
+					"y": 26.851851851851855,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-t3-fader"
+			},
+			{
+				"id": "envelope-t4-fader",
+				"label": "T4",
+				"kind": "fader",
+				"position": {
+					"x": 29.944865609924193,
+					"y": 42.77777777777778,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-t4-fader"
+			},
+			{
+				"id": "envelope-l1-fader",
+				"label": "L1",
+				"kind": "fader",
+				"position": {
+					"x": 33.2184700206754,
+					"y": 42.77777777777778,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-l1-fader"
+			},
+			{
+				"id": "envelope-l2-fader",
+				"label": "L2",
+				"kind": "fader",
+				"position": {
+					"x": 36.4920744314266,
+					"y": 42.77777777777778,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-l2-fader"
+			},
+			{
+				"id": "envelope-l4-fader",
+				"label": "L4",
+				"kind": "fader",
+				"position": {
+					"x": 29.944865609924193,
+					"y": 58.7037037037037,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-l4-fader"
+			},
+			{
+				"id": "envelope-sustain-fader",
+				"label": "Sustain",
+				"kind": "fader",
+				"position": {
+					"x": 33.2184700206754,
+					"y": 58.7037037037037,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-sustain-fader"
+			},
+			{
+				"id": "tvf-cutoff-fader",
+				"label": "Cutoff",
+				"kind": "fader",
+				"position": {
+					"x": 47.13990351481737,
+					"y": 26.851851851851855,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "tvf-cutoff-fader"
+			},
+			{
+				"id": "tvf-resonance-fader",
+				"label": "Resonance",
+				"kind": "fader",
+				"position": {
+					"x": 50.41350792556857,
+					"y": 26.851851851851855,
+					"width": 2.6188835286009646,
+					"height": 9.25925925925926
+				},
+				"control": "tvf-resonance-fader"
+			}
+		]
+	}
+}

@@ -11,11 +11,11 @@ import {
 	claimMidiProfilePort,
 	matchMidiDeviceProfile,
 	type MidiProfileTransport
-} from "../../midi/hardware/device-profiles"
+} from "../../hardware/midi-devices/device-profiles"
 import { getNativeMidiBridge } from "../../midi/native-midi-bridge"
 import { midiToCommand } from "../../midi/midi-command-conversion"
-import { createProfiledMidiGui } from "../../midi/hardware/profiled-midi-gui"
-import { profileMessageBytes } from "../../midi/hardware/device-profile-schema"
+import { createProfiledMidiGui } from "../../hardware/midi-devices/profiled-midi-gui"
+import { profileMessageBytes } from "../../hardware/midi-devices/device-profile-schema"
 import { sharedWebMidi } from "../../midi/shared-webmidi"
 
 export default class InputProfiledMidiDevice extends AbstractInput {

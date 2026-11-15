@@ -1,0 +1,437 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "korg-volca-sample",
+	"name": "Korg volca sample",
+	"manufacturer": "Korg",
+	"manufacturerUrl": "https://www.korg.com/",
+	"productUrl": "https://www.korg.com/us/products/dj/volca_sample/",
+	"description": "Original ten-part sample playback sequencer.",
+	"ids": ["korg-volca-sample"],
+	"portNames": ["volca sample", "Korg volca sample"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Korg volca sample owner manual",
+			"url": "https://cdn.korg.com/us/support/download/files/639d9c1eba904a8ca4cc17f8ed3e56ae.pdf"
+		},
+		{
+			"title": "Korg volca sample MIDI implementation chart",
+			"url": "https://cdn.korg.com/us/support/download/files/9bdc4997e44b7e96e771f612e06a90e5.pdf"
+		}
+	],
+	"abilities": ["DIN MIDI IN only", "MIDI note reception", "Documented CC reception"],
+	"hardwareControls": [
+		"Master: Volume, Tempo, Memory, Play, Record, Function, Step, Part left, Part right",
+		"Sample: Start point, Length, Hi cut",
+		"Pitch: Speed, EG intensity, Attack, Decay",
+		"Amp: Level, Pan, Attack, Decay",
+		"Isolator: Bass, Treble"
+	],
+	"notice": "Most controls are MIDI receive mappings. The unmodified hardware has no MIDI output and cannot send panel movements or notes to Harmoneasy. Factory mapping uses MIDI channels 1-10 for parts 1-10; note pitch does not select the part. Choose the target part channel for the CC controls. The OK GO cosmetic edition shares this implementation. Bass and Treble isolator knobs are analog-only.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "sample-start-point-knob",
+			"label": "Sample: Start point",
+			"widget": "slider",
+			"cc": 40
+		},
+		{
+			"id": "sample-length-knob",
+			"label": "Sample: Length",
+			"widget": "slider",
+			"cc": 41
+		},
+		{
+			"id": "sample-hi-cut-knob",
+			"label": "Sample: Hi cut",
+			"widget": "slider",
+			"cc": 42
+		},
+		{
+			"id": "pitch-speed-knob",
+			"label": "Pitch: Speed",
+			"widget": "slider",
+			"cc": 43
+		},
+		{
+			"id": "pitch-eg-intensity-knob",
+			"label": "Pitch: EG intensity",
+			"widget": "slider",
+			"cc": 44
+		},
+		{
+			"id": "pitch-attack-knob",
+			"label": "Pitch: Attack",
+			"widget": "slider",
+			"cc": 45
+		},
+		{
+			"id": "pitch-decay-knob",
+			"label": "Pitch: Decay",
+			"widget": "slider",
+			"cc": 46
+		},
+		{
+			"id": "amp-level-knob",
+			"label": "Amp: Level",
+			"widget": "slider",
+			"cc": 7
+		},
+		{
+			"id": "amp-pan-knob",
+			"label": "Amp: Pan",
+			"widget": "slider",
+			"cc": 10
+		},
+		{
+			"id": "amp-attack-knob",
+			"label": "Amp: Attack",
+			"widget": "slider",
+			"cc": 47
+		},
+		{
+			"id": "amp-decay-knob",
+			"label": "Amp: Decay",
+			"widget": "slider",
+			"cc": 48
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Korg volca sample overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 1200,
+		"height": 650,
+		"elements": [
+			{
+				"id": "sample-start-point-knob",
+				"label": "Start point",
+				"kind": "knob",
+				"position": {
+					"x": 28.833333333333332,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "sample-start-point-knob"
+			},
+			{
+				"id": "sample-length-knob",
+				"label": "Length",
+				"kind": "knob",
+				"position": {
+					"x": 28.833333333333332,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "sample-length-knob"
+			},
+			{
+				"id": "sample-hi-cut-knob",
+				"label": "Hi cut",
+				"kind": "knob",
+				"position": {
+					"x": 28.833333333333332,
+					"y": 48.769230769230774,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "sample-hi-cut-knob"
+			},
+			{
+				"id": "pitch-speed-knob",
+				"label": "Speed",
+				"kind": "knob",
+				"position": {
+					"x": 41.16666666666667,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "pitch-speed-knob"
+			},
+			{
+				"id": "pitch-eg-intensity-knob",
+				"label": "EG intensity",
+				"kind": "knob",
+				"position": {
+					"x": 49.083333333333336,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "pitch-eg-intensity-knob"
+			},
+			{
+				"id": "pitch-attack-knob",
+				"label": "Attack",
+				"kind": "knob",
+				"position": {
+					"x": 41.16666666666667,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "pitch-attack-knob"
+			},
+			{
+				"id": "pitch-decay-knob",
+				"label": "Decay",
+				"kind": "knob",
+				"position": {
+					"x": 49.083333333333336,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "pitch-decay-knob"
+			},
+			{
+				"id": "amp-level-knob",
+				"label": "Level",
+				"kind": "knob",
+				"position": {
+					"x": 59.0,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "amp-level-knob"
+			},
+			{
+				"id": "amp-pan-knob",
+				"label": "Pan",
+				"kind": "knob",
+				"position": {
+					"x": 66.91666666666667,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "amp-pan-knob"
+			},
+			{
+				"id": "amp-attack-knob",
+				"label": "Attack",
+				"kind": "knob",
+				"position": {
+					"x": 59.0,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "amp-attack-knob"
+			},
+			{
+				"id": "amp-decay-knob",
+				"label": "Decay",
+				"kind": "knob",
+				"position": {
+					"x": 66.91666666666667,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "amp-decay-knob"
+			},
+			{
+				"id": "key-1",
+				"label": "Part 1",
+				"kind": "key",
+				"position": {
+					"x": 2.083333333333333,
+					"y": 82.76923076923077,
+					"width": 9.166666666666666,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 1
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-2",
+				"label": "Part 2",
+				"kind": "key",
+				"position": {
+					"x": 11.666666666666666,
+					"y": 82.76923076923077,
+					"width": 9.166666666666666,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 2
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-3",
+				"label": "Part 3",
+				"kind": "key",
+				"position": {
+					"x": 21.25,
+					"y": 82.76923076923077,
+					"width": 9.166666666666666,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 3
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-4",
+				"label": "Part 4",
+				"kind": "key",
+				"position": {
+					"x": 30.833333333333336,
+					"y": 82.76923076923077,
+					"width": 9.166666666666666,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 4
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-5",
+				"label": "Part 5",
+				"kind": "key",
+				"position": {
+					"x": 40.416666666666664,
+					"y": 82.76923076923077,
+					"width": 9.166666666666666,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 5
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-6",
+				"label": "Part 6",
+				"kind": "key",
+				"position": {
+					"x": 50.0,
+					"y": 82.76923076923077,
+					"width": 9.166666666666666,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 6
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-7",
+				"label": "Part 7",
+				"kind": "key",
+				"position": {
+					"x": 59.583333333333336,
+					"y": 82.76923076923077,
+					"width": 9.166666666666666,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 7
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-8",
+				"label": "Part 8",
+				"kind": "key",
+				"position": {
+					"x": 69.16666666666667,
+					"y": 82.76923076923077,
+					"width": 9.166666666666666,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 8
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-9",
+				"label": "Part 9",
+				"kind": "key",
+				"position": {
+					"x": 78.75,
+					"y": 82.76923076923077,
+					"width": 9.166666666666666,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 9
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-10",
+				"label": "Part 10",
+				"kind": "key",
+				"position": {
+					"x": 88.33333333333333,
+					"y": 82.76923076923077,
+					"width": 9.166666666666666,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60,
+					"channel": 10
+				},
+				"learnable": true
+			}
+		]
+	}
+}

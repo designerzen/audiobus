@@ -4,6 +4,10 @@
  * Sad emojis → minor/dark chords
  * Excited emojis → augmented/extended chords
  * Calm emojis → sus2/sus4 chords
+ *
+ * The "expressive" voicing swaps the simple table for the PhotoSYNTH emotional chord
+ * profiles (extended, clustered and suspended colours, denser for stronger expressions)
+ * for every emoji PhotoSYNTH defines.
  */
 import { Transformer, type TransformerConfig } from "./abstract-transformer.ts"
 import { cloneAudioCommand } from "../../commands/audio-command-factory.ts"
@@ -28,18 +32,32 @@ import {
 	PERFECT_FIFTH
 } from "../../tuning/intervals.js"
 
+import {
+	EMOJI_EXPRESSIONS,
+	EMOJI_INTERVAL_CHOICES,
+	getMusicalDetailsFromEmoji,
+	getPrimaryIntervalsForEmoji
+} from "../../tuning/emotion-chords.ts"
+
 import type { Timer } from "netronome"
 import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 import type { FieldConfig, ITransformer } from "./interface-transformer.ts"
 
 export const ID_EMOJI = "Moodifier"
 
+export const EMOJI_VOICING_SIMPLE = "simple"
+export const EMOJI_VOICING_EXPRESSIVE = "expressive"
+export type EmojiVoicing = typeof EMOJI_VOICING_SIMPLE | typeof EMOJI_VOICING_EXPRESSIVE
+
 interface Config extends TransformerConfig {
 	emoji: string
+	/** "simple" keeps the original chord table; "expressive" uses the PhotoSYNTH mapping where it defines the emoji */
+	voicing: EmojiVoicing
 }
 
 const DEFAULT_OPTIONS: Config = {
 	emoji: "😊",
+	voicing: EMOJI_VOICING_SIMPLE,
 	enabled: true,
 	available: false
 }
@@ -116,6 +134,17 @@ const EMOJI_EMOTIONS = {
 
 const EMOJIS = Object.keys(EMOJI_EMOTIONS)
 
+// Expressions PhotoSYNTH maps that the simple table lacks. They are selectable, and in
+// simple mode they sound as their primary PhotoSYNTH intervals.
+const EXTRA_EMOJI_NAMES = new Map<string, string>()
+for (const [key, emoji] of Object.entries(EMOJI_EXPRESSIONS)) {
+	if (!(emoji in EMOJI_EMOTIONS) && !EXTRA_EMOJI_NAMES.has(emoji)) {
+		const words = key.replace("EMOJI_", "").toLowerCase().replace(/_/g, " ")
+		EXTRA_EMOJI_NAMES.set(emoji, words.charAt(0).toUpperCase() + words.slice(1))
+	}
+}
+const EXTRA_EMOJI_VELOCITY = 0.8
+
 export class TransformerEmoji extends Transformer<Config> implements ITransformer {
 	type = ID_EMOJI
 	category = TRANSFORMER_CATEGORY_TUNING
@@ -144,14 +173,30 @@ export class TransformerEmoji extends Transformer<Config> implements ITransforme
 				name: "emoji",
 				type: "select",
 				enabled: true,
-				values: EMOJIS.map((emoji) => {
-					const data = EMOJI_EMOTIONS[emoji as keyof typeof EMOJI_EMOTIONS]
-					return {
-						name: emoji + " " + data.name,
+				values: [
+					...EMOJIS.map((emoji) => {
+						const data = EMOJI_EMOTIONS[emoji as keyof typeof EMOJI_EMOTIONS]
+						return {
+							name: emoji + " " + data.name,
+							value: emoji
+						}
+					}),
+					...[...EXTRA_EMOJI_NAMES].map(([emoji, name]) => ({
+						name: emoji + " " + name,
 						value: emoji
-					}
-				}),
+					}))
+				],
 				default: DEFAULT_OPTIONS.emoji
+			},
+			{
+				name: "voicing",
+				type: "select",
+				enabled: true,
+				values: [
+					{ name: "Simple", value: EMOJI_VOICING_SIMPLE },
+					{ name: "Expressive", value: EMOJI_VOICING_EXPRESSIVE }
+				],
+				default: DEFAULT_OPTIONS.voicing
 			}
 		]
 	}
@@ -165,7 +210,27 @@ export class TransformerEmoji extends Transformer<Config> implements ITransforme
 	 * Falls back to happy if emoji not found
 	 */
 	private getEmotionData(emoji: string) {
-		return EMOJI_EMOTIONS[emoji as keyof typeof EMOJI_EMOTIONS] || EMOJI_EMOTIONS["😊"]
+		const legacy = EMOJI_EMOTIONS[emoji as keyof typeof EMOJI_EMOTIONS]
+		if (legacy) {
+			return legacy
+		}
+		if (EXTRA_EMOJI_NAMES.has(emoji)) {
+			return {
+				name: EXTRA_EMOJI_NAMES.get(emoji),
+				intervals: getPrimaryIntervalsForEmoji(emoji),
+				velocity: EXTRA_EMOJI_VELOCITY
+			}
+		}
+		return EMOJI_EMOTIONS["😊"]
+	}
+
+	/** Absolute chord notes from the PhotoSYNTH mapping, or null when it does not define the emoji. */
+	private getExpressiveChord(emoji: string, baseNote: number): number[] | null {
+		if (!EMOJI_INTERVAL_CHOICES.has(emoji)) {
+			return null
+		}
+		const chord = getMusicalDetailsFromEmoji(baseNote, emoji)
+		return chord?.length ? chord.map((note) => note.noteNumber) : null
 	}
 
 	/**
@@ -175,10 +240,17 @@ export class TransformerEmoji extends Transformer<Config> implements ITransforme
 		const emotion = this.getEmotionData(this.config.emoji)
 		const baseNote = command.number
 
+		const expressive =
+			this.config.voicing === EMOJI_VOICING_EXPRESSIVE
+				? this.getExpressiveChord(this.config.emoji, baseNote)
+				: null
+		const noteNumbers =
+			expressive ?? emotion.intervals.map((interval: number) => baseNote + interval)
+
 		// Create chord notes based on emotion intervals
-		const chordNotes: IAudioCommand[] = emotion.intervals.map((interval: number) => {
+		const chordNotes: IAudioCommand[] = noteNumbers.map((noteNumber: number) => {
 			const newCommand: IAudioCommand = cloneAudioCommand(command)
-			newCommand.number = baseNote + interval
+			newCommand.number = noteNumber
 			// Scale velocity based on emotion intensity
 			newCommand.velocity = (command.velocity ?? 1) * emotion.velocity
 			return newCommand

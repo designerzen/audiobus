@@ -1,12 +1,12 @@
-export default class Colour {
+export class Colour {
 	public red: number
 	public green: number
 	public blue: number
 
 	constructor(r: number, g: number, b: number) {
-		this.red = r >> 0
-		this.green = g >> 0
-		this.blue = b >> 0
+		this.red = Math.max(0, Math.min(255, Math.round(r)))
+		this.green = Math.max(0, Math.min(255, Math.round(g)))
+		this.blue = Math.max(0, Math.min(255, Math.round(b)))
 	}
 
 	public toRGB(): string {
@@ -14,7 +14,17 @@ export default class Colour {
 	}
 
 	public toRGBA(alpha: number): string {
-		return "rgba(" + this.red + "," + this.green + "," + this.blue + "," + alpha + ")"
+		return (
+			"rgba(" +
+			this.red +
+			"," +
+			this.green +
+			"," +
+			this.blue +
+			"," +
+			Math.max(0, Math.min(1, alpha)) +
+			")"
+		)
 	}
 
 	public toString(): string {
@@ -24,3 +34,4 @@ export default class Colour {
 		)
 	}
 }
+export default Colour

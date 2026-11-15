@@ -1,0 +1,525 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1218 650" role="group" aria-labelledby="korg-volca-beats-panel--title" aria-describedby="korg-volca-beats-panel--description" data-device="korg-volca-beats" data-diagram-style="wireframe" style="background: #fff; color: #334155;">
+  <title id="korg-volca-beats-panel--title">Korg volca beats overhead wireframe diagram</title>
+  <desc id="korg-volca-beats-panel--description">Schematic top view grouped by panel section. Every physical control has a stable ID and accessible label. Standalone buttons are disabled until a host supplies interaction. MIDI regions match the JSON surface; note and shared parameter regions use the setup described in the profile.</desc>
+  <style>text { font-family: Arial, sans-serif; fill: currentColor; stroke: none; } [data-part]:focus-visible { outline: 3px solid currentColor; }</style>
+  <g id="korg-volca-beats-panel--chassis" aria-hidden="true">
+    <rect x="3" y="3" width="1212" height="644" rx="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="25" y="30" font-size="22">Korg volca beats</text>
+    <rect x="25" y="105" width="202" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="35" y="128" font-size="12">Master</text>
+    <rect x="239" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="249" y="128" font-size="12">Kick</text>
+    <rect x="387" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="397" y="128" font-size="12">Snare</text>
+    <rect x="535" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="545" y="128" font-size="12">Tom</text>
+    <rect x="683" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="693" y="128" font-size="12">Hi Hat</text>
+    <rect x="831" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="841" y="128" font-size="12">Stutter</text>
+    <rect x="979" y="105" width="202" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="989" y="128" font-size="12">Part</text>
+  </g>
+  <g id="korg-volca-beats-panel--controls" role="group" aria-label="Physical hardware controls">
+    <g id="korg-volca-beats-panel--master-volume-knob" data-part="master-volume-knob" data-kind="knob" role="group" aria-label="Volume" aria-roledescription="rotary control">
+      <title>Volume</title>
+      <g aria-hidden="true">
+        <circle cx="75.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 75.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="209" text-anchor="middle" font-size="10">Volume</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--master-tempo-knob" data-part="master-tempo-knob" data-kind="knob" role="group" aria-label="Tempo" aria-roledescription="rotary control">
+      <title>Tempo</title>
+      <g aria-hidden="true">
+        <circle cx="170.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 170.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="170.0" y="209" text-anchor="middle" font-size="10">Tempo</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--master-memory-button" data-part="master-memory-button" data-kind="button" role="button" aria-label="Memory" aria-disabled="true" tabindex="-1">
+      <title>Memory</title>
+      <g aria-hidden="true">
+        <rect x="37" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="260.0" text-anchor="middle" font-size="10">Memory</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--master-play-button" data-part="master-play-button" data-kind="button" role="button" aria-label="Play" aria-disabled="true" tabindex="-1">
+      <title>Play</title>
+      <g aria-hidden="true">
+        <rect x="132" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="170.0" y="260.0" text-anchor="middle" font-size="10">Play</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--master-record-button" data-part="master-record-button" data-kind="button" role="button" aria-label="Record" aria-disabled="true" tabindex="-1">
+      <title>Record</title>
+      <g aria-hidden="true">
+        <rect x="37" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="346.0" text-anchor="middle" font-size="10">Record</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--master-function-button" data-part="master-function-button" data-kind="button" role="button" aria-label="Function" aria-disabled="true" tabindex="-1">
+      <title>Function</title>
+      <g aria-hidden="true">
+        <rect x="132" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="170.0" y="346.0" text-anchor="middle" font-size="10">Function</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--kick-pitch-knob" data-part="kick-pitch-knob" data-kind="knob" role="group" aria-label="Pitch" aria-roledescription="rotary control">
+      <title>Pitch</title>
+      <g aria-hidden="true">
+        <circle cx="289.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 289.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="289.0" y="209" text-anchor="middle" font-size="10">Pitch</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--kick-click-knob" data-part="kick-click-knob" data-kind="knob" role="group" aria-label="Click" aria-roledescription="rotary control">
+      <title>Click</title>
+      <g aria-hidden="true">
+        <circle cx="289.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 289.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="289.0" y="295" text-anchor="middle" font-size="10">Click</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--kick-decay-knob" data-part="kick-decay-knob" data-kind="knob" role="group" aria-label="Decay" aria-roledescription="rotary control">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <circle cx="289.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 289.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="289.0" y="381" text-anchor="middle" font-size="10">Decay</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--snare-pitch-knob" data-part="snare-pitch-knob" data-kind="knob" role="group" aria-label="Pitch" aria-roledescription="rotary control">
+      <title>Pitch</title>
+      <g aria-hidden="true">
+        <circle cx="437.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 437.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="437.0" y="209" text-anchor="middle" font-size="10">Pitch</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--snare-snappy-knob" data-part="snare-snappy-knob" data-kind="knob" role="group" aria-label="Snappy" aria-roledescription="rotary control">
+      <title>Snappy</title>
+      <g aria-hidden="true">
+        <circle cx="437.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 437.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="437.0" y="295" text-anchor="middle" font-size="10">Snappy</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--snare-decay-knob" data-part="snare-decay-knob" data-kind="knob" role="group" aria-label="Decay" aria-roledescription="rotary control">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <circle cx="437.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 437.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="437.0" y="381" text-anchor="middle" font-size="10">Decay</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--tom-lo-pitch-knob" data-part="tom-lo-pitch-knob" data-kind="knob" role="group" aria-label="Lo pitch" aria-roledescription="rotary control">
+      <title>Lo pitch</title>
+      <g aria-hidden="true">
+        <circle cx="585.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 585.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="585.0" y="209" text-anchor="middle" font-size="10">Lo pitch</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--tom-hi-pitch-knob" data-part="tom-hi-pitch-knob" data-kind="knob" role="group" aria-label="Hi pitch" aria-roledescription="rotary control">
+      <title>Hi pitch</title>
+      <g aria-hidden="true">
+        <circle cx="585.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 585.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="585.0" y="295" text-anchor="middle" font-size="10">Hi pitch</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--tom-decay-knob" data-part="tom-decay-knob" data-kind="knob" role="group" aria-label="Decay" aria-roledescription="rotary control" data-surface-controls="tom-decay-knob">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <circle cx="585.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 585.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="585.0" y="381" text-anchor="middle" font-size="10">Decay</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--tom-decay-knob" data-surface-control="tom-decay-knob" aria-hidden="true">
+        <rect x="547.0" y="317" width="76.0" height="50" data-hit-area="tom-decay-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--hi-hat-grain-knob" data-part="hi-hat-grain-knob" data-kind="knob" role="group" aria-label="Grain" aria-roledescription="rotary control" data-surface-controls="hi-hat-grain-knob">
+      <title>Grain</title>
+      <g aria-hidden="true">
+        <circle cx="733.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 733.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="733.0" y="209" text-anchor="middle" font-size="10">Grain</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--hi-hat-grain-knob" data-surface-control="hi-hat-grain-knob" aria-hidden="true">
+        <rect x="695.0" y="145" width="76.0" height="50" data-hit-area="hi-hat-grain-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--hi-hat-closed-decay-knob" data-part="hi-hat-closed-decay-knob" data-kind="knob" role="group" aria-label="Closed decay" aria-roledescription="rotary control" data-surface-controls="hi-hat-closed-decay-knob">
+      <title>Closed decay</title>
+      <g aria-hidden="true">
+        <circle cx="733.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 733.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="733.0" y="295" text-anchor="middle" font-size="10">Closed decay</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--hi-hat-closed-decay-knob" data-surface-control="hi-hat-closed-decay-knob" aria-hidden="true">
+        <rect x="695.0" y="231" width="76.0" height="50" data-hit-area="hi-hat-closed-decay-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--hi-hat-open-decay-knob" data-part="hi-hat-open-decay-knob" data-kind="knob" role="group" aria-label="Open decay" aria-roledescription="rotary control" data-surface-controls="hi-hat-open-decay-knob">
+      <title>Open decay</title>
+      <g aria-hidden="true">
+        <circle cx="733.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 733.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="733.0" y="381" text-anchor="middle" font-size="10">Open decay</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--hi-hat-open-decay-knob" data-surface-control="hi-hat-open-decay-knob" aria-hidden="true">
+        <rect x="695.0" y="317" width="76.0" height="50" data-hit-area="hi-hat-open-decay-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--stutter-time-knob" data-part="stutter-time-knob" data-kind="knob" role="group" aria-label="Time" aria-roledescription="rotary control" data-surface-controls="stutter-time-knob">
+      <title>Time</title>
+      <g aria-hidden="true">
+        <circle cx="881.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 881.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="881.0" y="209" text-anchor="middle" font-size="10">Time</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--stutter-time-knob" data-surface-control="stutter-time-knob" aria-hidden="true">
+        <rect x="843.0" y="145" width="76.0" height="50" data-hit-area="stutter-time-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--stutter-depth-knob" data-part="stutter-depth-knob" data-kind="knob" role="group" aria-label="Depth" aria-roledescription="rotary control" data-surface-controls="stutter-depth-knob">
+      <title>Depth</title>
+      <g aria-hidden="true">
+        <circle cx="881.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 881.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="881.0" y="295" text-anchor="middle" font-size="10">Depth</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--stutter-depth-knob" data-surface-control="stutter-depth-knob" aria-hidden="true">
+        <rect x="843.0" y="231" width="76.0" height="50" data-hit-area="stutter-depth-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--part-level-knob" data-part="part-level-knob" data-kind="knob" role="group" aria-label="Level" aria-roledescription="rotary control" data-surface-controls="part-level-knob-1 part-level-knob-2 part-level-knob-3 part-level-knob-4 part-level-knob-5 part-level-knob-6 part-level-knob-7 part-level-knob-8 part-level-knob-9 part-level-knob-10">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="1029.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1029.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1029.0" y="209" text-anchor="middle" font-size="10">Level</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--part-level-knob-1" data-surface-control="part-level-knob-1" aria-hidden="true">
+        <rect x="991.0" y="145" width="7.6" height="50" data-hit-area="part-level-knob-1" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <g id="korg-volca-beats-panel--surface--part-level-knob-2" data-surface-control="part-level-knob-2" aria-hidden="true">
+        <rect x="998.6" y="145" width="7.6" height="50" data-hit-area="part-level-knob-2" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <g id="korg-volca-beats-panel--surface--part-level-knob-3" data-surface-control="part-level-knob-3" aria-hidden="true">
+        <rect x="1006.2" y="145" width="7.6" height="50" data-hit-area="part-level-knob-3" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <g id="korg-volca-beats-panel--surface--part-level-knob-4" data-surface-control="part-level-knob-4" aria-hidden="true">
+        <rect x="1013.8" y="145" width="7.6" height="50" data-hit-area="part-level-knob-4" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <g id="korg-volca-beats-panel--surface--part-level-knob-5" data-surface-control="part-level-knob-5" aria-hidden="true">
+        <rect x="1021.4" y="145" width="7.6" height="50" data-hit-area="part-level-knob-5" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <g id="korg-volca-beats-panel--surface--part-level-knob-6" data-surface-control="part-level-knob-6" aria-hidden="true">
+        <rect x="1029.0" y="145" width="7.6" height="50" data-hit-area="part-level-knob-6" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <g id="korg-volca-beats-panel--surface--part-level-knob-7" data-surface-control="part-level-knob-7" aria-hidden="true">
+        <rect x="1036.6" y="145" width="7.6" height="50" data-hit-area="part-level-knob-7" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <g id="korg-volca-beats-panel--surface--part-level-knob-8" data-surface-control="part-level-knob-8" aria-hidden="true">
+        <rect x="1044.2" y="145" width="7.6" height="50" data-hit-area="part-level-knob-8" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <g id="korg-volca-beats-panel--surface--part-level-knob-9" data-surface-control="part-level-knob-9" aria-hidden="true">
+        <rect x="1051.8" y="145" width="7.6" height="50" data-hit-area="part-level-knob-9" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <g id="korg-volca-beats-panel--surface--part-level-knob-10" data-surface-control="part-level-knob-10" aria-hidden="true">
+        <rect x="1059.4" y="145" width="7.6" height="50" data-hit-area="part-level-knob-10" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--part-pcm-speed-knob" data-part="part-pcm-speed-knob" data-kind="knob" role="group" aria-label="PCM speed" aria-roledescription="rotary control" data-surface-controls="part-pcm-speed-knob-1 part-pcm-speed-knob-2 part-pcm-speed-knob-3 part-pcm-speed-knob-4">
+      <title>PCM speed</title>
+      <g aria-hidden="true">
+        <circle cx="1124.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1124.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1124.0" y="209" text-anchor="middle" font-size="10">PCM speed</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--part-pcm-speed-knob-1" data-surface-control="part-pcm-speed-knob-1" aria-hidden="true">
+        <rect x="1086.0" y="145" width="19.0" height="50" data-hit-area="part-pcm-speed-knob-1" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <g id="korg-volca-beats-panel--surface--part-pcm-speed-knob-2" data-surface-control="part-pcm-speed-knob-2" aria-hidden="true">
+        <rect x="1105.0" y="145" width="19.0" height="50" data-hit-area="part-pcm-speed-knob-2" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <g id="korg-volca-beats-panel--surface--part-pcm-speed-knob-3" data-surface-control="part-pcm-speed-knob-3" aria-hidden="true">
+        <rect x="1124.0" y="145" width="19.0" height="50" data-hit-area="part-pcm-speed-knob-3" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <g id="korg-volca-beats-panel--surface--part-pcm-speed-knob-4" data-surface-control="part-pcm-speed-knob-4" aria-hidden="true">
+        <rect x="1143.0" y="145" width="19.0" height="50" data-hit-area="part-pcm-speed-knob-4" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--part-part-left-button" data-part="part-part-left-button" data-kind="button" role="button" aria-label="Part left" aria-disabled="true" tabindex="-1">
+      <title>Part left</title>
+      <g aria-hidden="true">
+        <rect x="991" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1029.0" y="260.0" text-anchor="middle" font-size="10">Part left</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--part-part-right-button" data-part="part-part-right-button" data-kind="button" role="button" aria-label="Part right" aria-disabled="true" tabindex="-1">
+      <title>Part right</title>
+      <g aria-hidden="true">
+        <rect x="1086" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1124.0" y="260.0" text-anchor="middle" font-size="10">Part right</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--power" data-part="power" data-kind="button" role="button" aria-label="Power" aria-disabled="true" tabindex="-1">
+      <title>Power</title>
+      <g aria-hidden="true">
+        <rect x="1128" y="45" width="65" height="25" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1160.5" y="61.5" text-anchor="middle" font-size="10">Power</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--dc-9v" data-part="dc-9v" data-kind="socket" role="group" aria-label="DC 9V" aria-roledescription="connector">
+      <title>DC 9V</title>
+      <g aria-hidden="true">
+        <rect x="25" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="69.0" y="62.5" text-anchor="middle" font-size="10">DC 9V</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--midi-in" data-part="midi-in" data-kind="socket" role="group" aria-label="MIDI IN" aria-roledescription="connector">
+      <title>MIDI IN</title>
+      <g aria-hidden="true">
+        <rect x="125" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="169.0" y="62.5" text-anchor="middle" font-size="10">MIDI IN</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--sync-in" data-part="sync-in" data-kind="socket" role="group" aria-label="SYNC IN" aria-roledescription="connector">
+      <title>SYNC IN</title>
+      <g aria-hidden="true">
+        <rect x="225" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="269.0" y="62.5" text-anchor="middle" font-size="10">SYNC IN</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--sync-out" data-part="sync-out" data-kind="socket" role="group" aria-label="SYNC OUT" aria-roledescription="connector">
+      <title>SYNC OUT</title>
+      <g aria-hidden="true">
+        <rect x="325" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="369.0" y="62.5" text-anchor="middle" font-size="10">SYNC OUT</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--headphones" data-part="headphones" data-kind="socket" role="group" aria-label="Headphones" aria-roledescription="connector">
+      <title>Headphones</title>
+      <g aria-hidden="true">
+        <rect x="425" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="469.0" y="62.5" text-anchor="middle" font-size="10">Headphones</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--step-1" data-part="step-1" data-kind="button" role="button" aria-label="Step 1" aria-disabled="true" tabindex="-1">
+      <title>Step 1</title>
+      <g aria-hidden="true">
+        <rect x="25.0" y="425" width="68.0" height="34" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="59.0" y="446.0" text-anchor="middle" font-size="10">Step 1</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--step-2" data-part="step-2" data-kind="button" role="button" aria-label="Step 2" aria-disabled="true" tabindex="-1">
+      <title>Step 2</title>
+      <g aria-hidden="true">
+        <rect x="98.0" y="425" width="68.0" height="34" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="132.0" y="446.0" text-anchor="middle" font-size="10">Step 2</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--step-3" data-part="step-3" data-kind="button" role="button" aria-label="Step 3" aria-disabled="true" tabindex="-1">
+      <title>Step 3</title>
+      <g aria-hidden="true">
+        <rect x="171.0" y="425" width="68.0" height="34" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="205.0" y="446.0" text-anchor="middle" font-size="10">Step 3</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--step-4" data-part="step-4" data-kind="button" role="button" aria-label="Step 4" aria-disabled="true" tabindex="-1">
+      <title>Step 4</title>
+      <g aria-hidden="true">
+        <rect x="244.0" y="425" width="68.0" height="34" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="278.0" y="446.0" text-anchor="middle" font-size="10">Step 4</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--step-5" data-part="step-5" data-kind="button" role="button" aria-label="Step 5" aria-disabled="true" tabindex="-1">
+      <title>Step 5</title>
+      <g aria-hidden="true">
+        <rect x="317.0" y="425" width="68.0" height="34" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="351.0" y="446.0" text-anchor="middle" font-size="10">Step 5</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--step-6" data-part="step-6" data-kind="button" role="button" aria-label="Step 6" aria-disabled="true" tabindex="-1">
+      <title>Step 6</title>
+      <g aria-hidden="true">
+        <rect x="390.0" y="425" width="68.0" height="34" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="424.0" y="446.0" text-anchor="middle" font-size="10">Step 6</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--step-7" data-part="step-7" data-kind="button" role="button" aria-label="Step 7" aria-disabled="true" tabindex="-1">
+      <title>Step 7</title>
+      <g aria-hidden="true">
+        <rect x="463.0" y="425" width="68.0" height="34" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="497.0" y="446.0" text-anchor="middle" font-size="10">Step 7</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--step-8" data-part="step-8" data-kind="button" role="button" aria-label="Step 8" aria-disabled="true" tabindex="-1">
+      <title>Step 8</title>
+      <g aria-hidden="true">
+        <rect x="536.0" y="425" width="68.0" height="34" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="570.0" y="446.0" text-anchor="middle" font-size="10">Step 8</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--step-9" data-part="step-9" data-kind="button" role="button" aria-label="Step 9" aria-disabled="true" tabindex="-1">
+      <title>Step 9</title>
+      <g aria-hidden="true">
+        <rect x="609.0" y="425" width="68.0" height="34" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="643.0" y="446.0" text-anchor="middle" font-size="10">Step 9</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--step-10" data-part="step-10" data-kind="button" role="button" aria-label="Step 10" aria-disabled="true" tabindex="-1">
+      <title>Step 10</title>
+      <g aria-hidden="true">
+        <rect x="682.0" y="425" width="68.0" height="34" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="716.0" y="446.0" text-anchor="middle" font-size="10">Step 10</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--step-11" data-part="step-11" data-kind="button" role="button" aria-label="Step 11" aria-disabled="true" tabindex="-1">
+      <title>Step 11</title>
+      <g aria-hidden="true">
+        <rect x="755.0" y="425" width="68.0" height="34" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="789.0" y="446.0" text-anchor="middle" font-size="10">Step 11</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--step-12" data-part="step-12" data-kind="button" role="button" aria-label="Step 12" aria-disabled="true" tabindex="-1">
+      <title>Step 12</title>
+      <g aria-hidden="true">
+        <rect x="828.0" y="425" width="68.0" height="34" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="862.0" y="446.0" text-anchor="middle" font-size="10">Step 12</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--step-13" data-part="step-13" data-kind="button" role="button" aria-label="Step 13" aria-disabled="true" tabindex="-1">
+      <title>Step 13</title>
+      <g aria-hidden="true">
+        <rect x="901.0" y="425" width="68.0" height="34" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="935.0" y="446.0" text-anchor="middle" font-size="10">Step 13</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--step-14" data-part="step-14" data-kind="button" role="button" aria-label="Step 14" aria-disabled="true" tabindex="-1">
+      <title>Step 14</title>
+      <g aria-hidden="true">
+        <rect x="974.0" y="425" width="68.0" height="34" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1008.0" y="446.0" text-anchor="middle" font-size="10">Step 14</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--step-15" data-part="step-15" data-kind="button" role="button" aria-label="Step 15" aria-disabled="true" tabindex="-1">
+      <title>Step 15</title>
+      <g aria-hidden="true">
+        <rect x="1047.0" y="425" width="68.0" height="34" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1081.0" y="446.0" text-anchor="middle" font-size="10">Step 15</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--step-16" data-part="step-16" data-kind="button" role="button" aria-label="Step 16" aria-disabled="true" tabindex="-1">
+      <title>Step 16</title>
+      <g aria-hidden="true">
+        <rect x="1120.0" y="425" width="68.0" height="34" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1154.0" y="446.0" text-anchor="middle" font-size="10">Step 16</text>
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--key-1" data-part="key-1" data-kind="key" role="button" aria-label="Kick" aria-disabled="true" tabindex="-1" data-surface-controls="key-1">
+      <title>Kick</title>
+      <g aria-hidden="true">
+        <rect x="25.0" y="538" width="111.8" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="80.9" y="579.5" text-anchor="middle" font-size="10">Kick</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--key-1" data-surface-control="key-1" aria-hidden="true">
+        <rect x="25.0" y="538" width="111.8" height="75" data-hit-area="key-1" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--key-2" data-part="key-2" data-kind="key" role="button" aria-label="Snare" aria-disabled="true" tabindex="-1" data-surface-controls="key-2">
+      <title>Snare</title>
+      <g aria-hidden="true">
+        <rect x="141.8" y="538" width="111.8" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="197.70000000000002" y="579.5" text-anchor="middle" font-size="10">Snare</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--key-2" data-surface-control="key-2" aria-hidden="true">
+        <rect x="141.8" y="538" width="111.8" height="75" data-hit-area="key-2" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--key-3" data-part="key-3" data-kind="key" role="button" aria-label="Low tom" aria-disabled="true" tabindex="-1" data-surface-controls="key-3">
+      <title>Low tom</title>
+      <g aria-hidden="true">
+        <rect x="258.6" y="538" width="111.8" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="314.5" y="579.5" text-anchor="middle" font-size="10">Low tom</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--key-3" data-surface-control="key-3" aria-hidden="true">
+        <rect x="258.6" y="538" width="111.8" height="75" data-hit-area="key-3" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--key-4" data-part="key-4" data-kind="key" role="button" aria-label="High tom" aria-disabled="true" tabindex="-1" data-surface-controls="key-4">
+      <title>High tom</title>
+      <g aria-hidden="true">
+        <rect x="375.4" y="538" width="111.8" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="431.29999999999995" y="579.5" text-anchor="middle" font-size="10">High tom</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--key-4" data-surface-control="key-4" aria-hidden="true">
+        <rect x="375.4" y="538" width="111.8" height="75" data-hit-area="key-4" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--key-5" data-part="key-5" data-kind="key" role="button" aria-label="Closed hat" aria-disabled="true" tabindex="-1" data-surface-controls="key-5">
+      <title>Closed hat</title>
+      <g aria-hidden="true">
+        <rect x="492.2" y="538" width="111.8" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="548.1" y="579.5" text-anchor="middle" font-size="10">Closed hat</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--key-5" data-surface-control="key-5" aria-hidden="true">
+        <rect x="492.2" y="538" width="111.8" height="75" data-hit-area="key-5" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--key-6" data-part="key-6" data-kind="key" role="button" aria-label="Open hat" aria-disabled="true" tabindex="-1" data-surface-controls="key-6">
+      <title>Open hat</title>
+      <g aria-hidden="true">
+        <rect x="609.0" y="538" width="111.8" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="664.9" y="579.5" text-anchor="middle" font-size="10">Open hat</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--key-6" data-surface-control="key-6" aria-hidden="true">
+        <rect x="609.0" y="538" width="111.8" height="75" data-hit-area="key-6" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--key-7" data-part="key-7" data-kind="key" role="button" aria-label="Clap" aria-disabled="true" tabindex="-1" data-surface-controls="key-7">
+      <title>Clap</title>
+      <g aria-hidden="true">
+        <rect x="725.8" y="538" width="111.8" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="781.6999999999999" y="579.5" text-anchor="middle" font-size="10">Clap</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--key-7" data-surface-control="key-7" aria-hidden="true">
+        <rect x="725.8" y="538" width="111.8" height="75" data-hit-area="key-7" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--key-8" data-part="key-8" data-kind="key" role="button" aria-label="Claves" aria-disabled="true" tabindex="-1" data-surface-controls="key-8">
+      <title>Claves</title>
+      <g aria-hidden="true">
+        <rect x="842.6" y="538" width="111.8" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="898.5" y="579.5" text-anchor="middle" font-size="10">Claves</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--key-8" data-surface-control="key-8" aria-hidden="true">
+        <rect x="842.6" y="538" width="111.8" height="75" data-hit-area="key-8" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--key-9" data-part="key-9" data-kind="key" role="button" aria-label="Agogo" aria-disabled="true" tabindex="-1" data-surface-controls="key-9">
+      <title>Agogo</title>
+      <g aria-hidden="true">
+        <rect x="959.4" y="538" width="111.8" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1015.3" y="579.5" text-anchor="middle" font-size="10">Agogo</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--key-9" data-surface-control="key-9" aria-hidden="true">
+        <rect x="959.4" y="538" width="111.8" height="75" data-hit-area="key-9" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="korg-volca-beats-panel--key-10" data-part="key-10" data-kind="key" role="button" aria-label="Crash" aria-disabled="true" tabindex="-1" data-surface-controls="key-10">
+      <title>Crash</title>
+      <g aria-hidden="true">
+        <rect x="1076.2" y="538" width="111.8" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1132.1000000000001" y="579.5" text-anchor="middle" font-size="10">Crash</text>
+      </g>
+      <g id="korg-volca-beats-panel--surface--key-10" data-surface-control="key-10" aria-hidden="true">
+        <rect x="1076.2" y="538" width="111.8" height="75" data-hit-area="key-10" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+  </g>
+</svg>

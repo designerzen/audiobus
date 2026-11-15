@@ -24,7 +24,7 @@ export interface CLAPNode extends AudioWorkletNode {
 }
 
 export const webclapUrl = (path: string): string =>
-	`${import.meta.env.BASE_URL ?? "/"}webclap/${path}`
+	`${import.meta.env?.BASE_URL ?? "/"}webclap/${path}`
 
 export async function createCLAPNode(
 	context: AudioContext,

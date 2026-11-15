@@ -41,7 +41,7 @@ export class ExampleVisualiser {
 		type: string = SpectrumAnalyzer.TYPE_FREQUENCY,
 		fftSize: number = 1024
 	) {
-		this.analyser = new SpectrumAnalyzer(audioContext, type)
+		this.analyser = new SpectrumAnalyzer(audioContext, type, fftSize)
 
 		this.visualiserCanvas = this.analyser.createCanvas(
 			window.innerWidth,
@@ -50,7 +50,7 @@ export class ExampleVisualiser {
 		)
 		this.rainbow = Rainbows.colour()
 
-		this.analyser.connect(audioContext.destination, source)
+		this.analyser.observe(source)
 		this.analyser.setFidelity(fftSize)
 
 		// Add visualisers
@@ -84,7 +84,7 @@ export class ExampleVisualiser {
 	public update(_spectrum: Uint8Array): void {
 		switch (this.activeVisualiser) {
 			case this.harmongraph:
-				const index: number = Math.round(this.count * 0.0005) % 255
+				const index: number = Math.round(this.count * 0.0005) % this.rainbow.length
 				const colour: Colour = this.rainbow[index]
 
 				this.harmongraph.red = colour.red
@@ -103,13 +103,17 @@ export class ExampleVisualiser {
 		}
 	}
 
+	public stop(): void {
+		this.analyser.stop()
+	}
+
+	public dispose(): void {
+		this.analyser.dispose()
+	}
+
 	public next(): void {
 		this.counter = (this.counter + 1) % this.visualisers.length
 		this.activeVisualiser = this.visualisers[this.counter]
 		this.analyser.solo(this.activeVisualiser)
-		console.log(
-			`${this.counter}/${this.visualisers.length}. activeVisualiser`,
-			this.activeVisualiser
-		)
 	}
 }

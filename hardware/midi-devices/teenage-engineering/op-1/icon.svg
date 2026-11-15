@@ -1,0 +1,522 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 460" role="group" aria-labelledby="teenage-engineering-op-1-icon--title" aria-describedby="teenage-engineering-op-1-icon--description" data-device="teenage-engineering-op-1" style="background: #fff; color: #334155;" data-diagram-style="wireframe">
+  <title id="teenage-engineering-op-1-icon--title">Teenage Engineering OP-1 overhead hardware diagram</title>
+  <desc id="teenage-engineering-op-1-icon--description">Wireframe top-down schematic; positions are approximate. Each physical control has a stable device-prefixed ID and data-part name. Buttons in this standalone drawing are disabled until a host adds input handlers. Transparent regions marked data-surface-control correspond to the profile MIDI hit areas; multiple regions can share one context-dependent physical control.</desc>
+  <style>text { font-family: Arial, sans-serif; } .section-label { font-size: 11px; letter-spacing: 1px; } [data-part]:focus-visible { outline: 3px solid currentColor; }</style>
+  <g id="teenage-engineering-op-1-icon--chassis" aria-hidden="true">
+    <rect x="3" y="3" width="1194" height="454" rx="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="22" y="28" fill="currentColor" font-size="19" stroke="none">Teenage Engineering OP-1</text>
+    <rect x="24" y="50" width="105" height="90" rx="4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="35" y="105" class="section-label" fill="currentColor" stroke="none">SPEAKER</text>
+  </g>
+  <g id="teenage-engineering-op-1-icon--controls" role="group" aria-label="Top panel controls">
+    <g id="teenage-engineering-op-1-icon--volume" data-part="volume" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Volume">
+      <title>Volume</title>
+      <g aria-hidden="true">
+        <circle cx="180.0" cy="65.0" r="20.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 180.0 50 v 11.200000000000001" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="180.0" y="99" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Volume</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--help" data-part="help" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Help">
+      <title>Help</title>
+      <g aria-hidden="true">
+        <rect x="145" y="115" width="45" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="167.5" y="134.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Help</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--tempo" data-part="tempo" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Tempo">
+      <title>Tempo</title>
+      <g aria-hidden="true">
+        <rect x="205" y="115" width="55" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="232.5" y="134.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Tempo</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--display" data-part="display" data-kind="display" role="group" aria-roledescription="display" aria-label="OLED display">
+      <title>OLED display</title>
+      <g aria-hidden="true">
+        <rect x="295" y="48" width="235" height="100" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="412.5" y="102.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">OLED display</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--encoder-1" data-part="encoder-1" data-kind="knob" data-surface-controls="encoder-1" role="group" aria-roledescription="rotary control" aria-label="Blue">
+      <title>Blue</title>
+      <g aria-hidden="true">
+        <circle cx="610.0" cy="95.0" r="31.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 610.0 69 v 17.360000000000003" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="610.0" y="140" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Blue</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--encoder-1" data-surface-control="encoder-1" aria-hidden="true">
+        <rect x="579.0" y="64" width="62.0" height="62" fill="none" pointer-events="all" data-hit-area="encoder-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--encoder-2" data-part="encoder-2" data-kind="knob" data-surface-controls="encoder-2" role="group" aria-roledescription="rotary control" aria-label="Green">
+      <title>Green</title>
+      <g aria-hidden="true">
+        <circle cx="755.0" cy="95.0" r="31.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 755.0 69 v 17.360000000000003" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="755.0" y="140" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Green</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--encoder-2" data-surface-control="encoder-2" aria-hidden="true">
+        <rect x="724.0" y="64" width="62.0" height="62" fill="none" pointer-events="all" data-hit-area="encoder-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--encoder-3" data-part="encoder-3" data-kind="knob" data-surface-controls="encoder-3" role="group" aria-roledescription="rotary control" aria-label="White">
+      <title>White</title>
+      <g aria-hidden="true">
+        <circle cx="900.0" cy="95.0" r="31.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 900.0 69 v 17.360000000000003" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="900.0" y="140" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">White</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--encoder-3" data-surface-control="encoder-3" aria-hidden="true">
+        <rect x="869.0" y="64" width="62.0" height="62" fill="none" pointer-events="all" data-hit-area="encoder-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--encoder-4" data-part="encoder-4" data-kind="knob" data-surface-controls="encoder-4" role="group" aria-roledescription="rotary control" aria-label="Orange">
+      <title>Orange</title>
+      <g aria-hidden="true">
+        <circle cx="1045.0" cy="95.0" r="31.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1045.0 69 v 17.360000000000003" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1045.0" y="140" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Orange</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--encoder-4" data-surface-control="encoder-4" aria-hidden="true">
+        <rect x="1014.0" y="64" width="62.0" height="62" fill="none" pointer-events="all" data-hit-area="encoder-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--mic-input" data-part="mic-input" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Mic / Input">
+      <title>Mic / Input</title>
+      <g aria-hidden="true">
+        <rect x="1110" y="50" width="62" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1141.0" y="71.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Mic / Input</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--album-com" data-part="album-com" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Album / COM">
+      <title>Album / COM</title>
+      <g aria-hidden="true">
+        <rect x="1110" y="115" width="62" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1141.0" y="136.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Album / COM</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--sequencer" data-part="sequencer" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Sequencer">
+      <title>Sequencer</title>
+      <g aria-hidden="true">
+        <rect x="1110" y="180" width="62" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1141.0" y="201.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Sequencer</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--synth" data-part="synth" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Synth">
+      <title>Synth</title>
+      <g aria-hidden="true">
+        <rect x="25" y="175" width="53" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="51.5" y="196.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Synth</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--drum" data-part="drum" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Drum">
+      <title>Drum</title>
+      <g aria-hidden="true">
+        <rect x="86" y="175" width="53" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="112.5" y="196.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Drum</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--tape" data-part="tape" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Tape">
+      <title>Tape</title>
+      <g aria-hidden="true">
+        <rect x="147" y="175" width="53" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="173.5" y="196.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Tape</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--mixer" data-part="mixer" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Mixer">
+      <title>Mixer</title>
+      <g aria-hidden="true">
+        <rect x="208" y="175" width="53" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="234.5" y="196.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Mixer</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--lift" data-part="lift" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Lift">
+      <title>Lift</title>
+      <g aria-hidden="true">
+        <rect x="25" y="240" width="53" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="51.5" y="261.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Lift</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--drop" data-part="drop" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Drop">
+      <title>Drop</title>
+      <g aria-hidden="true">
+        <rect x="86" y="240" width="53" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="112.5" y="261.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Drop</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--split" data-part="split" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Split">
+      <title>Split</title>
+      <g aria-hidden="true">
+        <rect x="147" y="240" width="53" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="173.5" y="261.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Split</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--record" data-part="record" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Record">
+      <title>Record</title>
+      <g aria-hidden="true">
+        <rect x="25" y="305" width="53" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="51.5" y="326.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Record</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--play" data-part="play" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Play">
+      <title>Play</title>
+      <g aria-hidden="true">
+        <rect x="86" y="305" width="53" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="112.5" y="326.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Play</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--stop" data-part="stop" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Stop">
+      <title>Stop</title>
+      <g aria-hidden="true">
+        <rect x="147" y="305" width="53" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="173.5" y="326.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Stop</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--rewind" data-part="rewind" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Rewind / Oct down">
+      <title>Rewind / Oct down</title>
+      <g aria-hidden="true">
+        <rect x="25" y="385" width="70" height="36" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="60.0" y="407.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Rewind</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--forward" data-part="forward" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Forward / Oct up">
+      <title>Forward / Oct up</title>
+      <g aria-hidden="true">
+        <rect x="108" y="385" width="70" height="36" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="143.0" y="407.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Forward</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--shift" data-part="shift" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Shift">
+      <title>Shift</title>
+      <g aria-hidden="true">
+        <rect x="210" y="385" width="62" height="36" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="241.0" y="407.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Shift</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--t1" data-part="t1" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="T1">
+      <title>T1</title>
+      <g aria-hidden="true">
+        <rect x="295" y="166" width="53" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="321.5" y="187.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">T1</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--t2" data-part="t2" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="T2">
+      <title>T2</title>
+      <g aria-hidden="true">
+        <rect x="355" y="166" width="53" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="381.5" y="187.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">T2</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--t3" data-part="t3" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="T3">
+      <title>T3</title>
+      <g aria-hidden="true">
+        <rect x="415" y="166" width="53" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="441.5" y="187.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">T3</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--t4" data-part="t4" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="T4">
+      <title>T4</title>
+      <g aria-hidden="true">
+        <rect x="475" y="166" width="53" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="501.5" y="187.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">T4</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--sound-1" data-part="sound-1" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Sound 1">
+      <title>Sound 1</title>
+      <g aria-hidden="true">
+        <rect x="575" y="180" width="58" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="604.0" y="201.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Sound 1</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--sound-2" data-part="sound-2" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Sound 2">
+      <title>Sound 2</title>
+      <g aria-hidden="true">
+        <rect x="640" y="180" width="58" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="669.0" y="201.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Sound 2</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--sound-3" data-part="sound-3" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Sound 3">
+      <title>Sound 3</title>
+      <g aria-hidden="true">
+        <rect x="705" y="180" width="58" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="734.0" y="201.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Sound 3</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--sound-4" data-part="sound-4" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Sound 4">
+      <title>Sound 4</title>
+      <g aria-hidden="true">
+        <rect x="770" y="180" width="58" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="799.0" y="201.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Sound 4</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--sound-5" data-part="sound-5" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Sound 5">
+      <title>Sound 5</title>
+      <g aria-hidden="true">
+        <rect x="835" y="180" width="58" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="864.0" y="201.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Sound 5</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--sound-6" data-part="sound-6" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Sound 6">
+      <title>Sound 6</title>
+      <g aria-hidden="true">
+        <rect x="900" y="180" width="58" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="929.0" y="201.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Sound 6</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--sound-7" data-part="sound-7" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Sound 7">
+      <title>Sound 7</title>
+      <g aria-hidden="true">
+        <rect x="965" y="180" width="58" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="994.0" y="201.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Sound 7</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--sound-8" data-part="sound-8" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Sound 8">
+      <title>Sound 8</title>
+      <g aria-hidden="true">
+        <rect x="1030" y="180" width="58" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1059.0" y="201.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Sound 8</text>
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-0" data-part="key-0" data-kind="key" data-surface-controls="key-0" role="button" aria-disabled="true" tabindex="-1" aria-label="C 3">
+      <title>C 3</title>
+      <g aria-hidden="true">
+        <rect x="295.0" y="265" width="60.625" height="155" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="325.3125" y="346.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">C</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-0" data-surface-control="key-0" aria-hidden="true">
+        <rect x="295.0" y="265" width="60.625" height="155" fill="none" pointer-events="all" data-hit-area="key-0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-2" data-part="key-2" data-kind="key" data-surface-controls="key-2" role="button" aria-disabled="true" tabindex="-1" aria-label="D 3">
+      <title>D 3</title>
+      <g aria-hidden="true">
+        <rect x="357.5" y="265" width="60.625" height="155" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="387.8125" y="346.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">D</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-2" data-surface-control="key-2" aria-hidden="true">
+        <rect x="357.5" y="265" width="60.625" height="155" fill="none" pointer-events="all" data-hit-area="key-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-4" data-part="key-4" data-kind="key" data-surface-controls="key-4" role="button" aria-disabled="true" tabindex="-1" aria-label="E 3">
+      <title>E 3</title>
+      <g aria-hidden="true">
+        <rect x="420.0" y="265" width="60.625" height="155" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="450.3125" y="346.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">E</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-4" data-surface-control="key-4" aria-hidden="true">
+        <rect x="420.0" y="265" width="60.625" height="155" fill="none" pointer-events="all" data-hit-area="key-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-5" data-part="key-5" data-kind="key" data-surface-controls="key-5" role="button" aria-disabled="true" tabindex="-1" aria-label="F 3">
+      <title>F 3</title>
+      <g aria-hidden="true">
+        <rect x="482.5" y="265" width="60.625" height="155" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="512.8125" y="346.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">F</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-5" data-surface-control="key-5" aria-hidden="true">
+        <rect x="482.5" y="265" width="60.625" height="155" fill="none" pointer-events="all" data-hit-area="key-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-7" data-part="key-7" data-kind="key" data-surface-controls="key-7" role="button" aria-disabled="true" tabindex="-1" aria-label="G 3">
+      <title>G 3</title>
+      <g aria-hidden="true">
+        <rect x="545.0" y="265" width="60.625" height="155" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="575.3125" y="346.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">G</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-7" data-surface-control="key-7" aria-hidden="true">
+        <rect x="545.0" y="265" width="60.625" height="155" fill="none" pointer-events="all" data-hit-area="key-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-9" data-part="key-9" data-kind="key" data-surface-controls="key-9" role="button" aria-disabled="true" tabindex="-1" aria-label="A 3">
+      <title>A 3</title>
+      <g aria-hidden="true">
+        <rect x="607.5" y="265" width="60.625" height="155" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="637.8125" y="346.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">A</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-9" data-surface-control="key-9" aria-hidden="true">
+        <rect x="607.5" y="265" width="60.625" height="155" fill="none" pointer-events="all" data-hit-area="key-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-11" data-part="key-11" data-kind="key" data-surface-controls="key-11" role="button" aria-disabled="true" tabindex="-1" aria-label="B 3">
+      <title>B 3</title>
+      <g aria-hidden="true">
+        <rect x="670.0" y="265" width="60.625" height="155" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="700.3125" y="346.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">B</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-11" data-surface-control="key-11" aria-hidden="true">
+        <rect x="670.0" y="265" width="60.625" height="155" fill="none" pointer-events="all" data-hit-area="key-11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-12" data-part="key-12" data-kind="key" data-surface-controls="key-12" role="button" aria-disabled="true" tabindex="-1" aria-label="C 4">
+      <title>C 4</title>
+      <g aria-hidden="true">
+        <rect x="732.5" y="265" width="60.625" height="155" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="762.8125" y="346.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">C</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-12" data-surface-control="key-12" aria-hidden="true">
+        <rect x="732.5" y="265" width="60.625" height="155" fill="none" pointer-events="all" data-hit-area="key-12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-14" data-part="key-14" data-kind="key" data-surface-controls="key-14" role="button" aria-disabled="true" tabindex="-1" aria-label="D 4">
+      <title>D 4</title>
+      <g aria-hidden="true">
+        <rect x="795.0" y="265" width="60.625" height="155" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="825.3125" y="346.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">D</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-14" data-surface-control="key-14" aria-hidden="true">
+        <rect x="795.0" y="265" width="60.625" height="155" fill="none" pointer-events="all" data-hit-area="key-14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-16" data-part="key-16" data-kind="key" data-surface-controls="key-16" role="button" aria-disabled="true" tabindex="-1" aria-label="E 4">
+      <title>E 4</title>
+      <g aria-hidden="true">
+        <rect x="857.5" y="265" width="60.625" height="155" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="887.8125" y="346.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">E</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-16" data-surface-control="key-16" aria-hidden="true">
+        <rect x="857.5" y="265" width="60.625" height="155" fill="none" pointer-events="all" data-hit-area="key-16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-17" data-part="key-17" data-kind="key" data-surface-controls="key-17" role="button" aria-disabled="true" tabindex="-1" aria-label="F 4">
+      <title>F 4</title>
+      <g aria-hidden="true">
+        <rect x="920.0" y="265" width="60.625" height="155" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="950.3125" y="346.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">F</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-17" data-surface-control="key-17" aria-hidden="true">
+        <rect x="920.0" y="265" width="60.625" height="155" fill="none" pointer-events="all" data-hit-area="key-17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-19" data-part="key-19" data-kind="key" data-surface-controls="key-19" role="button" aria-disabled="true" tabindex="-1" aria-label="G 4">
+      <title>G 4</title>
+      <g aria-hidden="true">
+        <rect x="982.5" y="265" width="60.625" height="155" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1012.8125" y="346.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">G</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-19" data-surface-control="key-19" aria-hidden="true">
+        <rect x="982.5" y="265" width="60.625" height="155" fill="none" pointer-events="all" data-hit-area="key-19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-21" data-part="key-21" data-kind="key" data-surface-controls="key-21" role="button" aria-disabled="true" tabindex="-1" aria-label="A 4">
+      <title>A 4</title>
+      <g aria-hidden="true">
+        <rect x="1045.0" y="265" width="60.625" height="155" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1075.3125" y="346.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">A</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-21" data-surface-control="key-21" aria-hidden="true">
+        <rect x="1045.0" y="265" width="60.625" height="155" fill="none" pointer-events="all" data-hit-area="key-21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-23" data-part="key-23" data-kind="key" data-surface-controls="key-23" role="button" aria-disabled="true" tabindex="-1" aria-label="B 4">
+      <title>B 4</title>
+      <g aria-hidden="true">
+        <rect x="1107.5" y="265" width="60.625" height="155" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1137.8125" y="346.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">B</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-23" data-surface-control="key-23" aria-hidden="true">
+        <rect x="1107.5" y="265" width="60.625" height="155" fill="none" pointer-events="all" data-hit-area="key-23" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-1" data-part="key-1" data-kind="key" data-surface-controls="key-1" role="button" aria-disabled="true" tabindex="-1" aria-label="C sharp 3">
+      <title>C sharp 3</title>
+      <g aria-hidden="true">
+        <rect x="338.75" y="265" width="37.5" height="94.55" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="357.5" y="316.275" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">C#</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-1" data-surface-control="key-1" aria-hidden="true">
+        <rect x="338.75" y="265" width="37.5" height="94.55" fill="none" pointer-events="all" data-hit-area="key-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-3" data-part="key-3" data-kind="key" data-surface-controls="key-3" role="button" aria-disabled="true" tabindex="-1" aria-label="D sharp 3">
+      <title>D sharp 3</title>
+      <g aria-hidden="true">
+        <rect x="401.25" y="265" width="37.5" height="94.55" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="420.0" y="316.275" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">D#</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-3" data-surface-control="key-3" aria-hidden="true">
+        <rect x="401.25" y="265" width="37.5" height="94.55" fill="none" pointer-events="all" data-hit-area="key-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-6" data-part="key-6" data-kind="key" data-surface-controls="key-6" role="button" aria-disabled="true" tabindex="-1" aria-label="F sharp 3">
+      <title>F sharp 3</title>
+      <g aria-hidden="true">
+        <rect x="526.25" y="265" width="37.5" height="94.55" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="545.0" y="316.275" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">F#</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-6" data-surface-control="key-6" aria-hidden="true">
+        <rect x="526.25" y="265" width="37.5" height="94.55" fill="none" pointer-events="all" data-hit-area="key-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-8" data-part="key-8" data-kind="key" data-surface-controls="key-8" role="button" aria-disabled="true" tabindex="-1" aria-label="G sharp 3">
+      <title>G sharp 3</title>
+      <g aria-hidden="true">
+        <rect x="588.75" y="265" width="37.5" height="94.55" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="607.5" y="316.275" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">G#</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-8" data-surface-control="key-8" aria-hidden="true">
+        <rect x="588.75" y="265" width="37.5" height="94.55" fill="none" pointer-events="all" data-hit-area="key-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-10" data-part="key-10" data-kind="key" data-surface-controls="key-10" role="button" aria-disabled="true" tabindex="-1" aria-label="A sharp 3">
+      <title>A sharp 3</title>
+      <g aria-hidden="true">
+        <rect x="651.25" y="265" width="37.5" height="94.55" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="670.0" y="316.275" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">A#</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-10" data-surface-control="key-10" aria-hidden="true">
+        <rect x="651.25" y="265" width="37.5" height="94.55" fill="none" pointer-events="all" data-hit-area="key-10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-13" data-part="key-13" data-kind="key" data-surface-controls="key-13" role="button" aria-disabled="true" tabindex="-1" aria-label="C sharp 4">
+      <title>C sharp 4</title>
+      <g aria-hidden="true">
+        <rect x="776.25" y="265" width="37.5" height="94.55" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="795.0" y="316.275" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">C#</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-13" data-surface-control="key-13" aria-hidden="true">
+        <rect x="776.25" y="265" width="37.5" height="94.55" fill="none" pointer-events="all" data-hit-area="key-13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-15" data-part="key-15" data-kind="key" data-surface-controls="key-15" role="button" aria-disabled="true" tabindex="-1" aria-label="D sharp 4">
+      <title>D sharp 4</title>
+      <g aria-hidden="true">
+        <rect x="838.75" y="265" width="37.5" height="94.55" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="857.5" y="316.275" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">D#</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-15" data-surface-control="key-15" aria-hidden="true">
+        <rect x="838.75" y="265" width="37.5" height="94.55" fill="none" pointer-events="all" data-hit-area="key-15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-18" data-part="key-18" data-kind="key" data-surface-controls="key-18" role="button" aria-disabled="true" tabindex="-1" aria-label="F sharp 4">
+      <title>F sharp 4</title>
+      <g aria-hidden="true">
+        <rect x="963.75" y="265" width="37.5" height="94.55" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="982.5" y="316.275" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">F#</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-18" data-surface-control="key-18" aria-hidden="true">
+        <rect x="963.75" y="265" width="37.5" height="94.55" fill="none" pointer-events="all" data-hit-area="key-18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-20" data-part="key-20" data-kind="key" data-surface-controls="key-20" role="button" aria-disabled="true" tabindex="-1" aria-label="G sharp 4">
+      <title>G sharp 4</title>
+      <g aria-hidden="true">
+        <rect x="1026.25" y="265" width="37.5" height="94.55" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1045.0" y="316.275" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">G#</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-20" data-surface-control="key-20" aria-hidden="true">
+        <rect x="1026.25" y="265" width="37.5" height="94.55" fill="none" pointer-events="all" data-hit-area="key-20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="teenage-engineering-op-1-icon--key-22" data-part="key-22" data-kind="key" data-surface-controls="key-22" role="button" aria-disabled="true" tabindex="-1" aria-label="A sharp 4">
+      <title>A sharp 4</title>
+      <g aria-hidden="true">
+        <rect x="1088.75" y="265" width="37.5" height="94.55" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1107.5" y="316.275" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">A#</text>
+      </g>
+      <g id="teenage-engineering-op-1-icon--surface--key-22" data-surface-control="key-22" aria-hidden="true">
+        <rect x="1088.75" y="265" width="37.5" height="94.55" fill="none" pointer-events="all" data-hit-area="key-22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+  </g>
+</svg>

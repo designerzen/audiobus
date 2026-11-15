@@ -15,14 +15,16 @@ import { bounded, changed, devicePanel, numberControl } from "../../device-contr
 import { musicalCommand } from "../../event-clip"
 import {
 	ROMPLER_HOST,
-	ROMPLER_PACKS,
 	ROMPLER_FAMILIES,
+	isSustained,
 	presetTitle,
 	sampleGrid,
 	sampleUrl
 } from "./rompler-catalogue"
 import { RomplerLoader, type RomplerProgress } from "./rompler-loader"
-import processorURL from "./rompler.worklet.js?worker&url"
+
+// A plain URL rather than a bundler-specific import, so Vite and Parcel both emit the worklet as its own file.
+const processorURL = new URL("./rompler.worklet.js", import.meta.url).href
 
 const registrations = new WeakMap<BaseAudioContext, Promise<void>>()
 const SPACINGS = [1, 2, 3, 6]
@@ -41,7 +43,6 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 	readonly configurationAffectsNoteRouting = false
 	readonly output: GainNode
 	readonly options: {
-		pack: string
 		preset: number
 		baseUrl: string
 		spacing: number
@@ -73,9 +74,6 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 		}
 		this.context = options.audioContext
 		this.options = {
-			pack: ROMPLER_PACKS.some((pack) => pack.id === options.pack)
-				? options.pack
-				: ROMPLER_PACKS[0].id,
 			preset: Math.round(bounded(options.preset, 0, 0, 127)),
 			baseUrl:
 				typeof options.baseUrl === "string" && options.baseUrl.endsWith("/")
@@ -92,13 +90,14 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 		this.output.connect(options.mixer ?? getAudioDestination(this.context))
 		this.loader = new RomplerLoader(
 			this.context,
-			({ note, channels }) => {
+			(sample) => {
+				const { channels } = sample
 				if (this.stale) {
 					this.stale = false
 					this.node?.port.postMessage({ type: "clear" })
 				}
 				this.node?.port.postMessage(
-					{ type: "sample", note, channels },
+					{ type: "sample", ...sample },
 					channels.map((channel) => channel.buffer)
 				)
 			},
@@ -163,9 +162,13 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 		if (!this.node) {
 			return
 		}
-		const { baseUrl, pack, preset, spacing } = this.options
+		const { baseUrl, preset, spacing } = this.options
 		this.stale = true
-		this.loader.load(sampleGrid(spacing), (note) => sampleUrl(baseUrl, pack, preset, note))
+		this.loader.load(
+			sampleGrid(spacing),
+			(note) => sampleUrl(baseUrl, preset, note),
+			isSustained(preset)
+		)
 	}
 	private nearest(note: number): number {
 		let key = this.grid[0]
@@ -366,13 +369,6 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 					select.append(group)
 				}),
 			(value) => this.setPreset(Number(value))
-		)
-		this.select(
-			gui,
-			"Soundfont",
-			this.options.pack,
-			(select) => ROMPLER_PACKS.forEach((pack) => option(select, pack.id, pack.title)),
-			(pack) => this.configure({ pack })
 		)
 		this.select(
 			gui,

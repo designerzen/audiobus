@@ -6,7 +6,7 @@ import { NOTE_ON } from "../../commands/commands"
 import { EVENT_CHANGE, EVENT_CLICK, EVENT_LOAD, EVENT_ERROR } from "../../events/event-constants"
 import { EnsembleSession, type EnsembleMode, type EnsembleSettings } from "../ensemble-session"
 import { loadMidi, midiSong, type MidiSong } from "../midi-song"
-import { notifyControls } from "../component-ui"
+import { notifyControls, notifyControlSchema } from "../component-ui"
 import type { ControlValue } from "control-surface/types"
 
 export const ID_ENSEMBLE = "Ensemble"
@@ -57,6 +57,8 @@ export class TransformerEnsemble extends Transformer<Config> {
 	private unsubscribe?: () => void
 	private learning?: number
 	private destroyed = false
+	private library: { name: string; url: string }[] = []
+	private libraryLoading?: Promise<void>
 	get name() {
 		return "Ensemble"
 	}
@@ -81,7 +83,16 @@ export class TransformerEnsemble extends Transformer<Config> {
 	}
 	get fields(): FieldConfig[] {
 		return [
-			{ name: "uploadSong", label: "Upload MIDI song", type: "button" },
+			{ name: "uploadSong", label: "Choose any MIDI file", type: "button" },
+			{
+				name: "songLibrary",
+				label: "Or choose a library song",
+				type: "select",
+				values: [
+					{ name: "Choose a song…", value: "" },
+					...(this.library ?? []).map((song) => ({ name: song.name, value: song.url }))
+				]
+			},
 			{ name: "midiFileUrl", label: "MIDI song URL", type: "text" },
 			{
 				name: "autoInputs",
@@ -188,7 +199,32 @@ export class TransformerEnsemble extends Transformer<Config> {
 	private settings(): EnsembleSettings {
 		return { ...this.config, players: this.config.players }
 	}
+	loadSongLibrary(): Promise<void> {
+		this.libraryLoading ??= fetch(`${import.meta.env?.BASE_URL ?? "/"}midi/index.json`)
+			.then(async (response) => {
+				if (!response.ok) {
+					return
+				}
+				const songs: { name: string; file: string }[] = await response.json()
+				if (this.destroyed || !Array.isArray(songs)) {
+					return
+				}
+				this.library = songs
+					.filter(
+						(song) => typeof song.name === "string" && typeof song.file === "string"
+					)
+					.map((song) => ({ name: song.name, url: `midi/${song.file}` }))
+				notifyControlSchema(this)
+			})
+			.catch(() => {})
+		return this.libraryLoading
+	}
 	override getControlValue(id: string): ControlValue | undefined {
+		if (id === "songLibrary") {
+			return this.library.some((song) => song.url === this.config.midiFileUrl)
+				? this.config.midiFileUrl
+				: ""
+		}
 		if (id === "midiFileUrl" && this.config.midiFileUrl.startsWith("data:")) {
 			return ""
 		}
@@ -198,6 +234,14 @@ export class TransformerEnsemble extends Transformer<Config> {
 		return super.getControlValue(id)
 	}
 	override setControlValue(id: string, value: ControlValue): void {
+		if (id === "songLibrary") {
+			const song = this.library.find((song) => song.url === value)
+			if (song) {
+				super.setConfig("midiFileName", song.name)
+				this.setConfig("midiFileUrl", song.url)
+			}
+			return
+		}
 		if (id === "midiFileUrl") {
 			super.setConfig("midiFileName", "")
 		}
@@ -469,6 +513,7 @@ export class TransformerEnsemble extends Transformer<Config> {
 		if (this.root) {
 			return this.root
 		}
+		await this.loadSongLibrary()
 		const root = document.createElement("div")
 		root.className = "transformer-controls ensemble-controls"
 		root.style.display = "grid"
@@ -476,19 +521,6 @@ export class TransformerEnsemble extends Transformer<Config> {
 		const guidance = document.createElement("p")
 		guidance.textContent =
 			"Use one Ensemble for all players. Inputs join on their first press; use Learn to assign them manually. Each player can own several song channels, and players can share channels. Enable assistance to keep the whole song playing, or disable it for press-controlled parts."
-		const library = document.createElement("select")
-		library.setAttribute("aria-label", "Ensemble song library")
-		const placeholder = document.createElement("option")
-		placeholder.value = ""
-		placeholder.textContent = "Choose a library song…"
-		library.append(placeholder)
-		library.addEventListener(EVENT_CHANGE, () => {
-			if (!library.value) {
-				return
-			}
-			super.setConfig("midiFileName", library.selectedOptions[0].textContent ?? "")
-			this.setConfig("midiFileUrl", library.value)
-		})
 		this.status = document.createElement("p")
 		this.status.setAttribute("role", "status")
 		this.playersRoot = document.createElement("div")
@@ -500,15 +532,7 @@ export class TransformerEnsemble extends Transformer<Config> {
 		restart.type = "button"
 		restart.textContent = "Restart song"
 		restart.addEventListener(EVENT_CLICK, () => this.reset())
-		root.append(
-			guidance,
-			library,
-			this.status,
-			await super.createGui(),
-			this.playersRoot,
-			add,
-			restart
-		)
+		root.append(guidance, this.status, await super.createGui(), this.playersRoot, add, restart)
 		this.root = root
 		this.unsubscribe = this.subscribeControls(() => {
 			this.renderPlayers()
@@ -516,23 +540,6 @@ export class TransformerEnsemble extends Transformer<Config> {
 		})
 		this.renderPlayers()
 		this.updateStatus()
-		void fetch(`${import.meta.env.BASE_URL}midi/index.json`)
-			.then(async (response) => {
-				if (!response.ok) {
-					return
-				}
-				const songs: { name: string; file: string }[] = await response.json()
-				if (this.root !== root) {
-					return
-				}
-				for (const song of songs) {
-					const option = document.createElement("option")
-					option.value = `midi/${song.file}`
-					option.textContent = song.name
-					library.append(option)
-				}
-			})
-			.catch(() => {})
 		return root
 	}
 	override destroyGui(): void {

@@ -1,0 +1,103 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "roland-d-05",
+	"name": "Roland D-05",
+	"manufacturer": "Roland",
+	"manufacturerUrl": "https://www.roland.com/",
+	"productUrl": "https://www.roland.com/global/products/d-05/",
+	"description": "Boutique D-50 Linear Arithmetic synthesizer.",
+	"ids": ["roland-d-05"],
+	"portNames": ["D-05", "D-05 MIDI 1", "Roland D-05"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Roland D-05 owner manual",
+			"url": "https://static.roland.com/assets/media/pdf/D-05_eng04_W.pdf"
+		}
+	],
+	"abilities": ["USB MIDI", "DIN MIDI IN/OUT", "MIDI notes", "Documented controller mappings"],
+	"hardwareControls": [
+		"Performance: Volume, Ribbon C1, Ribbon C2, Partial balance joystick",
+		"Edit: Function, Preset User, Partial Balance Edit, Left, F1, F2, Right, Chase, Portamento, Edit, Exit, Sequencer, Write, Increment, Decrement",
+		"Numeric: Digit 0, Digit 1, Digit 2, Digit 3, Digit 4, Digit 5, Digit 6, Digit 7, Digit 8, Digit 9, Shift, Enter",
+		"Memory: Bank 1, Bank 2, Bank 3, Bank 4, Bank 5, Bank 6, Bank 7, Bank 8, Patch 1, Patch 2, Patch 3, Patch 4, Patch 5, Patch 6, Patch 7, Patch 8"
+	],
+	"notice": "Use USB MIDI or a DIN MIDI interface. Match the MIDI channel and enable the required MIDI transmit/receive settings. D-05 patch editing and joystick behavior are not represented as invented CC controls. C1 is pitch bend and C2 is modulation, as specified in the owner manual.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "performance-ribbon-c1-touch",
+			"label": "Performance: Ribbon C1",
+			"widget": "slider",
+			"message": {
+				"type": "pitchBend"
+			},
+			"default": 8192
+		},
+		{
+			"id": "performance-ribbon-c2-touch",
+			"label": "Performance: Ribbon C2",
+			"widget": "slider",
+			"cc": 1
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Roland D-05 overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 1761,
+		"height": 540,
+		"elements": [
+			{
+				"id": "performance-ribbon-c1-touch",
+				"label": "Ribbon C1",
+				"kind": "fader",
+				"position": {
+					"x": 7.495741056218058,
+					"y": 26.851851851851855,
+					"width": 4.315729699034639,
+					"height": 9.25925925925926
+				},
+				"control": "performance-ribbon-c1-touch"
+			},
+			{
+				"id": "performance-ribbon-c2-touch",
+				"label": "Ribbon C2",
+				"kind": "fader",
+				"position": {
+					"x": 2.1010789324247585,
+					"y": 42.77777777777778,
+					"width": 4.315729699034639,
+					"height": 9.25925925925926
+				},
+				"control": "performance-ribbon-c2-touch"
+			}
+		]
+	}
+}

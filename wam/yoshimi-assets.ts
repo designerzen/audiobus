@@ -1,14 +1,25 @@
 // Vite emits every referenced legacy asset in web and Electron builds.
-const assets = import.meta.glob(
-	[
-		"./yoshimi/worklet/*.{js,wasm}",
-		"./yoshimi/libs/wam-processor.js",
-		"./yoshimi/banks/**/*.{xiz,json}"
-	],
-	{ eager: true, query: "?url", import: "default" }
-) as Record<string, string>
+let assets: Record<string, string> | undefined
+try {
+	assets = import.meta.glob(
+		[
+			"./yoshimi/worklet/*.{js,wasm}",
+			"./yoshimi/libs/wam-processor.js",
+			"./yoshimi/banks/**/*.{xiz,json}"
+		],
+		{ eager: true, query: "?url", import: "default" }
+	) as Record<string, string>
+} catch {
+	// Other bundlers have no glob imports, so the host serves the yoshimi folder itself.
+}
+let assetBase = `${import.meta.env?.BASE_URL ?? "/"}yoshimi/`
+
+/** Where the yoshimi folder is served from when the bundler has not emitted its files. */
+export function setYoshimiAssetBase(url: string) {
+	assetBase = url.endsWith("/") ? url : `${url}/`
+}
 export function yoshimiAsset(path: string): string {
-	const url = assets[`./yoshimi/${path}`]
+	const url = assets ? assets[`./yoshimi/${path}`] : assetBase + path
 	if (!url) {
 		throw new Error(`Unknown Yoshimi asset: ${path}`)
 	}

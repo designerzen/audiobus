@@ -17,6 +17,9 @@ export { default as OutputManager } from "./output-manager.ts"
 // IO Chain coordination
 export { default as IOChain } from "./IO-chain.ts"
 
+// Chord performance over any output
+export { ChordPerformer } from "./chord-performer.ts"
+
 // Transformer functionality
 export { tranformerFactory, TRANSFORMER_TYPE, TRANSFORMERS } from "./transformer-factory.ts"
 

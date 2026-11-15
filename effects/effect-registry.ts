@@ -17,6 +17,7 @@ const lazy = (definition: EffectDefinition, load: () => Promise<EffectModule>): 
 /** Every effect, in the order offered to users; modules load only when an effect is created. */
 export const EFFECT_REGISTRY: readonly EffectEntry[] = [
 	lazy(EFFECTS.REVERB, () => import("./effect-reverb")),
+	lazy(EFFECTS.SNARE_REVERB, () => import("./effect-snare-reverb")),
 	{
 		...EFFECTS.IMPULSE_RESPONSE,
 		create: async (context, options) =>
@@ -27,20 +28,25 @@ export const EFFECT_REGISTRY: readonly EffectEntry[] = [
 	},
 	lazy(EFFECTS.DELAY, () => import("./effect-delay")),
 	lazy(EFFECTS.PING_PONG_DELAY, () => import("./effect-ping-pong-delay")),
+	lazy(EFFECTS.DUB_DELAY, () => import("./effect-dub-delay")),
 	lazy(EFFECTS.CHORUS, () => import("./effect-chorus")),
 	lazy(EFFECTS.FLANGER, () => import("./effect-flanger")),
 	lazy(EFFECTS.PHASER, () => import("./effect-phaser")),
 	lazy(EFFECTS.VIBRATO, () => import("./effect-vibrato")),
 	lazy(EFFECTS.TREMOLO, () => import("./effect-tremolo")),
 	lazy(EFFECTS.AUTO_PAN, () => import("./effect-auto-pan")),
+	lazy(EFFECTS.EXPRESSION, () => import("./effect-expression")),
 	lazy(EFFECTS.FILTER, () => import("./effect-filter")),
 	lazy(EFFECTS.AUTO_FILTER, () => import("./effect-auto-filter")),
 	lazy(EFFECTS.EQ, () => import("./effect-eq")),
 	lazy(EFFECTS.COMPRESSOR, () => import("./effect-compressor")),
 	lazy(EFFECTS.LIMITER, () => import("./effect-limiter")),
 	lazy(EFFECTS.DISTORTION, () => import("./effect-distortion")),
+	lazy(EFFECTS.SATURATOR, () => import("./effect-saturator")),
 	lazy(EFFECTS.BITCRUSHER, () => import("./effect-bitcrusher")),
 	lazy(EFFECTS.RING_MODULATOR, () => import("./effect-ring-modulator")),
 	lazy(EFFECTS.STEREO_WIDTH, () => import("./effect-stereo-width")),
-	lazy(EFFECTS.UTILITY, () => import("./effect-utility"))
+	lazy(EFFECTS.UTILITY, () => import("./effect-utility")),
+	lazy(EFFECTS.CHANNEL_STRIP, () => import("./effect-channel-strip")),
+	lazy(EFFECTS.DRUM_BUS, () => import("./effect-drum-bus"))
 ]

@@ -21,3 +21,5 @@ export { Plasma } from "./visualisers/Plasma.ts"
 // Colour utilities
 export { Colour } from "./colour/Colour.ts"
 export { Rainbows } from "./colour/Rainbows.ts"
+export { RenderSurface } from "./renderers/RenderSurface.ts"
+export type { RenderLayer, VisualisationMode } from "./renderers/RenderSurface.ts"

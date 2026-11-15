@@ -1,0 +1,472 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "roland-ju-06",
+	"name": "Roland JU-06",
+	"manufacturer": "Roland",
+	"manufacturerUrl": "https://www.roland.com/",
+	"productUrl": "https://www.roland.com/global/products/ju-06/",
+	"description": "Four-voice JUNO-106-inspired Boutique synthesizer.",
+	"ids": ["roland-ju-06"],
+	"portNames": ["JU-06", "JU-06 MIDI 1", "Roland JU-06"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Roland JU-06 owner manual",
+			"url": "https://static.roland.com/assets/media/pdf/JU-06_e02_W.pdf"
+		},
+		{
+			"title": "Roland JU-06 MIDI implementation chart",
+			"url": "https://static.roland.com/assets/media/pdf/JU-06_MIDI_Imple_eng03_W.pdf"
+		}
+	],
+	"abilities": ["USB MIDI", "DIN MIDI IN/OUT", "MIDI notes", "Documented controller mappings"],
+	"hardwareControls": [
+		"Performance: Volume, Ribbon C1, Ribbon C2, Manual",
+		"LFO: Rate, Delay",
+		"DCO: 16 foot, 8 foot, 4 foot, LFO, PWM, PWM source, Square, Saw, Sub, Noise",
+		"HPF: Cutoff",
+		"VCF: Cutoff, Resonance, Polarity, Envelope, LFO, Key follow",
+		"VCA: Envelope Gate, Level",
+		"Envelope: Attack, Decay, Sustain, Release",
+		"Chorus: Chorus I, Chorus II",
+		"Memory: Bank 1, Bank 2, Bank 3, Bank 4, Bank 5, Bank 6, Bank 7, Bank 8, Patch 1, Patch 2, Patch 3, Patch 4, Patch 5, Patch 6, Patch 7, Patch 8"
+	],
+	"notice": "Use USB MIDI or a DIN MIDI interface. Match the MIDI channel and enable the required MIDI transmit/receive settings. Panel CC mappings use normal instrument mode on compatible firmware, not the alternate control-surface mode.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "performance-ribbon-c1-touch",
+			"label": "Performance: Ribbon C1",
+			"widget": "slider",
+			"message": {
+				"type": "pitchBend"
+			},
+			"default": 8192
+		},
+		{
+			"id": "performance-ribbon-c2-touch",
+			"label": "Performance: Ribbon C2",
+			"widget": "slider",
+			"cc": 1
+		},
+		{
+			"id": "lfo-rate-fader",
+			"label": "LFO: Rate",
+			"widget": "slider",
+			"cc": 3
+		},
+		{
+			"id": "lfo-delay-fader",
+			"label": "LFO: Delay",
+			"widget": "slider",
+			"cc": 9
+		},
+		{
+			"id": "dco-lfo-fader",
+			"label": "DCO: LFO",
+			"widget": "slider",
+			"cc": 13
+		},
+		{
+			"id": "dco-pwm-fader",
+			"label": "DCO: PWM",
+			"widget": "slider",
+			"cc": 14
+		},
+		{
+			"id": "dco-pwm-source-switch",
+			"label": "DCO: PWM source",
+			"widget": "slider",
+			"cc": 15
+		},
+		{
+			"id": "dco-sub-fader",
+			"label": "DCO: Sub",
+			"widget": "slider",
+			"cc": 18
+		},
+		{
+			"id": "dco-noise-fader",
+			"label": "DCO: Noise",
+			"widget": "slider",
+			"cc": 19
+		},
+		{
+			"id": "hpf-cutoff-fader",
+			"label": "HPF: Cutoff",
+			"widget": "slider",
+			"cc": 20
+		},
+		{
+			"id": "vcf-cutoff-fader",
+			"label": "VCF: Cutoff",
+			"widget": "slider",
+			"cc": 74
+		},
+		{
+			"id": "vcf-resonance-fader",
+			"label": "VCF: Resonance",
+			"widget": "slider",
+			"cc": 71
+		},
+		{
+			"id": "vcf-polarity-switch",
+			"label": "VCF: Polarity",
+			"widget": "slider",
+			"cc": 21
+		},
+		{
+			"id": "vcf-envelope-fader",
+			"label": "VCF: Envelope",
+			"widget": "slider",
+			"cc": 22
+		},
+		{
+			"id": "vcf-lfo-fader",
+			"label": "VCF: LFO",
+			"widget": "slider",
+			"cc": 23
+		},
+		{
+			"id": "vcf-key-follow-fader",
+			"label": "VCF: Key follow",
+			"widget": "slider",
+			"cc": 24
+		},
+		{
+			"id": "vca-envelope-gate-switch",
+			"label": "VCA: Envelope Gate",
+			"widget": "slider",
+			"cc": 25
+		},
+		{
+			"id": "vca-level-fader",
+			"label": "VCA: Level",
+			"widget": "slider",
+			"cc": 26
+		},
+		{
+			"id": "envelope-attack-fader",
+			"label": "Envelope: Attack",
+			"widget": "slider",
+			"cc": 73
+		},
+		{
+			"id": "envelope-decay-fader",
+			"label": "Envelope: Decay",
+			"widget": "slider",
+			"cc": 75
+		},
+		{
+			"id": "envelope-sustain-fader",
+			"label": "Envelope: Sustain",
+			"widget": "slider",
+			"cc": 27
+		},
+		{
+			"id": "envelope-release-fader",
+			"label": "Envelope: Release",
+			"widget": "slider",
+			"cc": 72
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Roland JU-06 overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 2282,
+		"height": 540,
+		"elements": [
+			{
+				"id": "performance-ribbon-c1-touch",
+				"label": "Ribbon C1",
+				"kind": "fader",
+				"position": {
+					"x": 5.784399649430324,
+					"y": 26.851851851851855,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "performance-ribbon-c1-touch"
+			},
+			{
+				"id": "performance-ribbon-c2-touch",
+				"label": "Ribbon C2",
+				"kind": "fader",
+				"position": {
+					"x": 1.6213847502191059,
+					"y": 42.77777777777778,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "performance-ribbon-c2-touch"
+			},
+			{
+				"id": "lfo-rate-fader",
+				"label": "Rate",
+				"kind": "fader",
+				"position": {
+					"x": 10.999123575810692,
+					"y": 26.851851851851855,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "lfo-rate-fader"
+			},
+			{
+				"id": "lfo-delay-fader",
+				"label": "Delay",
+				"kind": "fader",
+				"position": {
+					"x": 10.999123575810692,
+					"y": 42.77777777777778,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "lfo-delay-fader"
+			},
+			{
+				"id": "dco-lfo-fader",
+				"label": "LFO",
+				"kind": "fader",
+				"position": {
+					"x": 29.97370727432077,
+					"y": 26.851851851851855,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "dco-lfo-fader"
+			},
+			{
+				"id": "dco-pwm-fader",
+				"label": "PWM",
+				"kind": "fader",
+				"position": {
+					"x": 17.484662576687114,
+					"y": 42.77777777777778,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "dco-pwm-fader"
+			},
+			{
+				"id": "dco-pwm-source-switch",
+				"label": "PWM source",
+				"kind": "fader",
+				"position": {
+					"x": 21.647677475898337,
+					"y": 42.77777777777778,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "dco-pwm-source-switch"
+			},
+			{
+				"id": "dco-sub-fader",
+				"label": "Sub",
+				"kind": "fader",
+				"position": {
+					"x": 17.484662576687114,
+					"y": 58.7037037037037,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "dco-sub-fader"
+			},
+			{
+				"id": "dco-noise-fader",
+				"label": "Noise",
+				"kind": "fader",
+				"position": {
+					"x": 21.647677475898337,
+					"y": 58.7037037037037,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "dco-noise-fader"
+			},
+			{
+				"id": "hpf-cutoff-fader",
+				"label": "Cutoff",
+				"kind": "fader",
+				"position": {
+					"x": 35.18843120070114,
+					"y": 26.851851851851855,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "hpf-cutoff-fader"
+			},
+			{
+				"id": "vcf-cutoff-fader",
+				"label": "Cutoff",
+				"kind": "fader",
+				"position": {
+					"x": 41.67397020157757,
+					"y": 26.851851851851855,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "vcf-cutoff-fader"
+			},
+			{
+				"id": "vcf-resonance-fader",
+				"label": "Resonance",
+				"kind": "fader",
+				"position": {
+					"x": 45.83698510078878,
+					"y": 26.851851851851855,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "vcf-resonance-fader"
+			},
+			{
+				"id": "vcf-polarity-switch",
+				"label": "Polarity",
+				"kind": "fader",
+				"position": {
+					"x": 41.67397020157757,
+					"y": 42.77777777777778,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "vcf-polarity-switch"
+			},
+			{
+				"id": "vcf-envelope-fader",
+				"label": "Envelope",
+				"kind": "fader",
+				"position": {
+					"x": 45.83698510078878,
+					"y": 42.77777777777778,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "vcf-envelope-fader"
+			},
+			{
+				"id": "vcf-lfo-fader",
+				"label": "LFO",
+				"kind": "fader",
+				"position": {
+					"x": 41.67397020157757,
+					"y": 58.7037037037037,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "vcf-lfo-fader"
+			},
+			{
+				"id": "vcf-key-follow-fader",
+				"label": "Key follow",
+				"kind": "fader",
+				"position": {
+					"x": 45.83698510078878,
+					"y": 58.7037037037037,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "vcf-key-follow-fader"
+			},
+			{
+				"id": "vca-envelope-gate-switch",
+				"label": "Envelope Gate",
+				"kind": "fader",
+				"position": {
+					"x": 51.051709027169146,
+					"y": 26.851851851851855,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "vca-envelope-gate-switch"
+			},
+			{
+				"id": "vca-level-fader",
+				"label": "Level",
+				"kind": "fader",
+				"position": {
+					"x": 51.051709027169146,
+					"y": 42.77777777777778,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "vca-level-fader"
+			},
+			{
+				"id": "envelope-attack-fader",
+				"label": "Attack",
+				"kind": "fader",
+				"position": {
+					"x": 57.537248028045575,
+					"y": 26.851851851851855,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-attack-fader"
+			},
+			{
+				"id": "envelope-decay-fader",
+				"label": "Decay",
+				"kind": "fader",
+				"position": {
+					"x": 61.70026292725679,
+					"y": 26.851851851851855,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-decay-fader"
+			},
+			{
+				"id": "envelope-sustain-fader",
+				"label": "Sustain",
+				"kind": "fader",
+				"position": {
+					"x": 57.537248028045575,
+					"y": 42.77777777777778,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-sustain-fader"
+			},
+			{
+				"id": "envelope-release-fader",
+				"label": "Release",
+				"kind": "fader",
+				"position": {
+					"x": 61.70026292725679,
+					"y": 42.77777777777778,
+					"width": 3.3304119193689745,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-release-fader"
+			}
+		]
+	}
+}

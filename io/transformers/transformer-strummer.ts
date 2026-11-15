@@ -4,6 +4,7 @@ import {
 	type Settings,
 	type Voice
 } from "./performance-transformer.ts"
+import { spreadOctaves } from "./chord-loop-transformer.ts"
 
 export const ID_STRUMMER = "Strummer"
 export class TransformerStrummer extends PerformanceTransformer {
@@ -22,7 +23,7 @@ export class TransformerStrummer extends PerformanceTransformer {
 	}
 	constructor(config: Settings = {}) {
 		super(
-			{ direction: "alternate", spread: 80, collect: 25, falloff: 10 },
+			{ direction: "alternate", spread: 80, collect: 25, falloff: 10, octaves: 1, slop: 0 },
 			[
 				{
 					name: "direction",
@@ -49,6 +50,22 @@ export class TransformerStrummer extends PerformanceTransformer {
 					values: [0, 10, 20, 30, 50],
 					min: 0,
 					max: 90
+				},
+				{
+					name: "octaves",
+					label: "Octaves",
+					values: [1, 2, 3],
+					min: 1,
+					max: 3,
+					help: "Repeat the chord in higher octaves within the same stroke."
+				},
+				{
+					name: "slop",
+					label: "Slop (ms)",
+					values: [0, 10, 20, 30, 50, 80],
+					min: 0,
+					max: 250,
+					help: "Make each note late by a different random amount, up to this long, on every stroke."
 				}
 			],
 			config
@@ -71,9 +88,10 @@ export class TransformerStrummer extends PerformanceTransformer {
 		return []
 	}
 	private strum(key: string) {
-		const chord = (this.chords.get(key) ?? [])
-			.filter((voice) => !voice.released)
-			.sort((a, b) => a.input.number - b.input.number)
+		const chord = spreadOctaves(
+			(this.chords.get(key) ?? []).filter((voice) => !voice.released),
+			Number(this.options.octaves)
+		)
 		this.chords.delete(key)
 		const stroke = this.strokes.get(key) ?? 0
 		if (
@@ -83,17 +101,18 @@ export class TransformerStrummer extends PerformanceTransformer {
 			chord.reverse()
 		}
 		this.strokes.set(key, stroke + 1)
-		for (const [index, voice] of chord.entries()) {
+		for (const [index, { voice, pitch }] of chord.entries()) {
 			this.schedule(
 				this.now +
-					(index * Number(this.options.spread)) / 1000 / Math.max(1, chord.length - 1),
+					(index * Number(this.options.spread)) / 1000 / Math.max(1, chord.length - 1) +
+					(Number(this.options.slop) && Math.random() * Number(this.options.slop)) / 1000,
 				() =>
 					voice.released
 						? []
 						: [
 								this.start(
 									voice,
-									voice.input.number,
+									pitch,
 									this.now,
 									voice.input.velocity *
 										(1 -

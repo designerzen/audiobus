@@ -1,0 +1,487 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "korg-volca-bass",
+	"name": "Korg volca bass",
+	"manufacturer": "Korg",
+	"manufacturerUrl": "https://www.korg.com/",
+	"productUrl": "https://www.korg.com/us/products/dj/volca_bass/",
+	"description": "Three-oscillator analog bass sequencer.",
+	"ids": ["korg-volca-bass"],
+	"portNames": ["volca bass", "Korg volca bass"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Korg volca bass owner manual",
+			"url": "https://cdn.korg.com/us/support/download/files/2f40ef4723d56c66090c59ef38ea2a1b.pdf"
+		},
+		{
+			"title": "Korg volca bass MIDI implementation chart",
+			"url": "https://cdn.korg.com/us/support/download/files/5b722ac465bb10f1907528e571968f4e.pdf"
+		}
+	],
+	"abilities": ["DIN MIDI IN only", "MIDI note reception", "Documented CC reception"],
+	"hardwareControls": [
+		"Master: Volume, Tempo, Memory, Play, Record, Function",
+		"VCO: Octave, Pitch 1, Pitch 2, Pitch 3, VCO 1, VCO 2, VCO 3",
+		"Filter: Cutoff, Peak, EG intensity",
+		"LFO: Rate, Intensity",
+		"Envelope: Attack, Decay Release"
+	],
+	"notice": "Most controls are MIDI receive mappings. The unmodified hardware has no MIDI output and cannot send panel movements or notes to Harmoneasy. Cutoff and Peak are analog-only controls: they have no MIDI CC. Slide time CC5, expression CC11 and gate time CC49 are MIDI-only parameters and are not represented as physical knobs.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "vco-octave-knob",
+			"label": "VCO: Octave",
+			"widget": "slider",
+			"cc": 40
+		},
+		{
+			"id": "vco-pitch-1-knob",
+			"label": "VCO: Pitch 1",
+			"widget": "slider",
+			"cc": 43
+		},
+		{
+			"id": "vco-pitch-2-knob",
+			"label": "VCO: Pitch 2",
+			"widget": "slider",
+			"cc": 44
+		},
+		{
+			"id": "vco-pitch-3-knob",
+			"label": "VCO: Pitch 3",
+			"widget": "slider",
+			"cc": 45
+		},
+		{
+			"id": "filter-eg-intensity-knob",
+			"label": "Filter: EG intensity",
+			"widget": "slider",
+			"cc": 48
+		},
+		{
+			"id": "lfo-rate-knob",
+			"label": "LFO: Rate",
+			"widget": "slider",
+			"cc": 41
+		},
+		{
+			"id": "lfo-intensity-knob",
+			"label": "LFO: Intensity",
+			"widget": "slider",
+			"cc": 42
+		},
+		{
+			"id": "envelope-attack-knob",
+			"label": "Envelope: Attack",
+			"widget": "slider",
+			"cc": 46
+		},
+		{
+			"id": "envelope-decay-release-knob",
+			"label": "Envelope: Decay Release",
+			"widget": "slider",
+			"cc": 47
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Korg volca bass overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 1200,
+		"height": 650,
+		"elements": [
+			{
+				"id": "vco-octave-knob",
+				"label": "Octave",
+				"kind": "knob",
+				"position": {
+					"x": 20.916666666666668,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "vco-octave-knob"
+			},
+			{
+				"id": "vco-pitch-1-knob",
+				"label": "Pitch 1",
+				"kind": "knob",
+				"position": {
+					"x": 28.833333333333332,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "vco-pitch-1-knob"
+			},
+			{
+				"id": "vco-pitch-2-knob",
+				"label": "Pitch 2",
+				"kind": "knob",
+				"position": {
+					"x": 36.75,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "vco-pitch-2-knob"
+			},
+			{
+				"id": "vco-pitch-3-knob",
+				"label": "Pitch 3",
+				"kind": "knob",
+				"position": {
+					"x": 20.916666666666668,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "vco-pitch-3-knob"
+			},
+			{
+				"id": "filter-eg-intensity-knob",
+				"label": "EG intensity",
+				"kind": "knob",
+				"position": {
+					"x": 46.666666666666664,
+					"y": 48.769230769230774,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "filter-eg-intensity-knob"
+			},
+			{
+				"id": "lfo-rate-knob",
+				"label": "Rate",
+				"kind": "knob",
+				"position": {
+					"x": 59.0,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "lfo-rate-knob"
+			},
+			{
+				"id": "lfo-intensity-knob",
+				"label": "Intensity",
+				"kind": "knob",
+				"position": {
+					"x": 59.0,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "lfo-intensity-knob"
+			},
+			{
+				"id": "envelope-attack-knob",
+				"label": "Attack",
+				"kind": "knob",
+				"position": {
+					"x": 71.33333333333334,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "envelope-attack-knob"
+			},
+			{
+				"id": "envelope-decay-release-knob",
+				"label": "Decay Release",
+				"kind": "knob",
+				"position": {
+					"x": 71.33333333333334,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "envelope-decay-release-knob"
+			},
+			{
+				"id": "key-1",
+				"label": "Key 1",
+				"kind": "key",
+				"position": {
+					"x": 2.083333333333333,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 48
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-2",
+				"label": "Key 2",
+				"kind": "key",
+				"position": {
+					"x": 8.072916666666668,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 49
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-3",
+				"label": "Key 3",
+				"kind": "key",
+				"position": {
+					"x": 14.0625,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 50
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-4",
+				"label": "Key 4",
+				"kind": "key",
+				"position": {
+					"x": 20.052083333333336,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 51
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-5",
+				"label": "Key 5",
+				"kind": "key",
+				"position": {
+					"x": 26.041666666666668,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 52
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-6",
+				"label": "Key 6",
+				"kind": "key",
+				"position": {
+					"x": 32.03125,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 53
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-7",
+				"label": "Key 7",
+				"kind": "key",
+				"position": {
+					"x": 38.02083333333333,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 54
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-8",
+				"label": "Key 8",
+				"kind": "key",
+				"position": {
+					"x": 44.01041666666667,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 55
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-9",
+				"label": "Key 9",
+				"kind": "key",
+				"position": {
+					"x": 50.0,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 56
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-10",
+				"label": "Key 10",
+				"kind": "key",
+				"position": {
+					"x": 55.989583333333336,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 57
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-11",
+				"label": "Key 11",
+				"kind": "key",
+				"position": {
+					"x": 61.979166666666664,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 58
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-12",
+				"label": "Key 12",
+				"kind": "key",
+				"position": {
+					"x": 67.96875,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 59
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-13",
+				"label": "Key 13",
+				"kind": "key",
+				"position": {
+					"x": 73.95833333333334,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-14",
+				"label": "Key 14",
+				"kind": "key",
+				"position": {
+					"x": 79.94791666666666,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 61
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-15",
+				"label": "Key 15",
+				"kind": "key",
+				"position": {
+					"x": 85.9375,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 62
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-16",
+				"label": "Key 16",
+				"kind": "key",
+				"position": {
+					"x": 91.92708333333334,
+					"y": 82.76923076923077,
+					"width": 5.572916666666667,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 63
+				},
+				"learnable": true
+			}
+		]
+	}
+}

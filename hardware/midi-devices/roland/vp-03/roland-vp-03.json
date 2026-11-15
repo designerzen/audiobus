@@ -1,0 +1,399 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "roland-vp-03",
+	"name": "Roland VP-03",
+	"manufacturer": "Roland",
+	"manufacturerUrl": "https://www.roland.com/",
+	"productUrl": "https://www.roland.com/global/products/vp-03/",
+	"description": "Boutique vocoder, human-voice and string synthesizer.",
+	"ids": ["roland-vp-03"],
+	"portNames": ["VP-03", "VP-03 MIDI 1", "Roland VP-03"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Roland VP-03 owner manual",
+			"url": "https://static.roland.com/assets/media/pdf/VP-03_e03_W.pdf"
+		},
+		{
+			"title": "Roland VP-03 MIDI implementation chart",
+			"url": "https://static.roland.com/assets/media/pdf/VP-03_MIDI_Imple_e01_W.pdf"
+		}
+	],
+	"abilities": ["USB MIDI", "DIN MIDI IN/OUT", "MIDI notes", "Documented controller mappings"],
+	"hardwareControls": [
+		"Performance: Volume, Tune, Ribbon C1, Ribbon C2, Mic power, C1 mode",
+		"Pitch Shift: Time, Pitch set, Auto Off Manual",
+		"Balance: Direct mic, Human voice, Strings",
+		"Vibrato: Rate, Delay, Depth",
+		"Vocoder: On Off, Ensemble, Level, Tone",
+		"Human Voice: Male 8 foot, Female 4 foot, Ensemble, Attack",
+		"Strings: On Off, Attack, Tone, Release",
+		"Memory: Memory, Play Stop, Step 1, Step 2, Step 3, Step 4, Step 5, Step 6, Step 7, Step 8, Step 9, Step 10, Step 11, Step 12, Step 13, Step 14, Step 15, Step 16"
+	],
+	"notice": "Use USB MIDI or a DIN MIDI interface. Match the MIDI channel and enable the required MIDI transmit/receive settings. Vocoder audio needs a microphone/audio path separately from MIDI note control.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "performance-tune-knob",
+			"label": "Performance: Tune",
+			"widget": "slider",
+			"cc": 79
+		},
+		{
+			"id": "performance-ribbon-c1-touch",
+			"label": "Performance: Ribbon C1",
+			"widget": "slider",
+			"message": {
+				"type": "pitchBend"
+			},
+			"default": 8192
+		},
+		{
+			"id": "performance-ribbon-c2-touch",
+			"label": "Performance: Ribbon C2",
+			"widget": "slider",
+			"cc": 1
+		},
+		{
+			"id": "pitch-shift-time-knob",
+			"label": "Pitch Shift: Time",
+			"widget": "slider",
+			"cc": 12
+		},
+		{
+			"id": "pitch-shift-pitch-set-knob",
+			"label": "Pitch Shift: Pitch set",
+			"widget": "slider",
+			"cc": 13
+		},
+		{
+			"id": "pitch-shift-auto-off-manual-switch",
+			"label": "Pitch Shift: Auto Off Manual",
+			"widget": "slider",
+			"cc": 15
+		},
+		{
+			"id": "balance-direct-mic-fader",
+			"label": "Balance: Direct mic",
+			"widget": "slider",
+			"cc": 16
+		},
+		{
+			"id": "balance-human-voice-fader",
+			"label": "Balance: Human voice",
+			"widget": "slider",
+			"cc": 17
+		},
+		{
+			"id": "balance-strings-fader",
+			"label": "Balance: Strings",
+			"widget": "slider",
+			"cc": 18
+		},
+		{
+			"id": "vibrato-rate-fader",
+			"label": "Vibrato: Rate",
+			"widget": "slider",
+			"cc": 76
+		},
+		{
+			"id": "vibrato-delay-fader",
+			"label": "Vibrato: Delay",
+			"widget": "slider",
+			"cc": 78
+		},
+		{
+			"id": "vibrato-depth-fader",
+			"label": "Vibrato: Depth",
+			"widget": "slider",
+			"cc": 77
+		},
+		{
+			"id": "vocoder-level-fader",
+			"label": "Vocoder: Level",
+			"widget": "slider",
+			"cc": 70
+		},
+		{
+			"id": "vocoder-tone-fader",
+			"label": "Vocoder: Tone",
+			"widget": "slider",
+			"cc": 71
+		},
+		{
+			"id": "human-voice-attack-fader",
+			"label": "Human Voice: Attack",
+			"widget": "slider",
+			"cc": 75
+		},
+		{
+			"id": "strings-attack-fader",
+			"label": "Strings: Attack",
+			"widget": "slider",
+			"cc": 73
+		},
+		{
+			"id": "strings-tone-fader",
+			"label": "Strings: Tone",
+			"widget": "slider",
+			"cc": 74
+		},
+		{
+			"id": "strings-release-fader",
+			"label": "Strings: Release",
+			"widget": "slider",
+			"cc": 72
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Roland VP-03 overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 1944,
+		"height": 540,
+		"elements": [
+			{
+				"id": "performance-tune-knob",
+				"label": "Tune",
+				"kind": "knob",
+				"position": {
+					"x": 6.790123456790123,
+					"y": 26.851851851851855,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "performance-tune-knob"
+			},
+			{
+				"id": "performance-ribbon-c1-touch",
+				"label": "Ribbon C1",
+				"kind": "fader",
+				"position": {
+					"x": 1.9032921810699588,
+					"y": 42.77777777777778,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "performance-ribbon-c1-touch"
+			},
+			{
+				"id": "performance-ribbon-c2-touch",
+				"label": "Ribbon C2",
+				"kind": "fader",
+				"position": {
+					"x": 6.790123456790123,
+					"y": 42.77777777777778,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "performance-ribbon-c2-touch"
+			},
+			{
+				"id": "pitch-shift-time-knob",
+				"label": "Time",
+				"kind": "knob",
+				"position": {
+					"x": 12.911522633744857,
+					"y": 26.851851851851855,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "pitch-shift-time-knob"
+			},
+			{
+				"id": "pitch-shift-pitch-set-knob",
+				"label": "Pitch set",
+				"kind": "knob",
+				"position": {
+					"x": 12.911522633744857,
+					"y": 42.77777777777778,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "pitch-shift-pitch-set-knob"
+			},
+			{
+				"id": "pitch-shift-auto-off-manual-switch",
+				"label": "Auto Off Manual",
+				"kind": "fader",
+				"position": {
+					"x": 12.911522633744857,
+					"y": 58.7037037037037,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "pitch-shift-auto-off-manual-switch"
+			},
+			{
+				"id": "balance-direct-mic-fader",
+				"label": "Direct mic",
+				"kind": "fader",
+				"position": {
+					"x": 20.52469135802469,
+					"y": 26.851851851851855,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "balance-direct-mic-fader"
+			},
+			{
+				"id": "balance-human-voice-fader",
+				"label": "Human voice",
+				"kind": "fader",
+				"position": {
+					"x": 20.52469135802469,
+					"y": 42.77777777777778,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "balance-human-voice-fader"
+			},
+			{
+				"id": "balance-strings-fader",
+				"label": "Strings",
+				"kind": "fader",
+				"position": {
+					"x": 20.52469135802469,
+					"y": 58.7037037037037,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "balance-strings-fader"
+			},
+			{
+				"id": "vibrato-rate-fader",
+				"label": "Rate",
+				"kind": "fader",
+				"position": {
+					"x": 28.137860082304528,
+					"y": 26.851851851851855,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "vibrato-rate-fader"
+			},
+			{
+				"id": "vibrato-delay-fader",
+				"label": "Delay",
+				"kind": "fader",
+				"position": {
+					"x": 28.137860082304528,
+					"y": 42.77777777777778,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "vibrato-delay-fader"
+			},
+			{
+				"id": "vibrato-depth-fader",
+				"label": "Depth",
+				"kind": "fader",
+				"position": {
+					"x": 28.137860082304528,
+					"y": 58.7037037037037,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "vibrato-depth-fader"
+			},
+			{
+				"id": "vocoder-level-fader",
+				"label": "Level",
+				"kind": "fader",
+				"position": {
+					"x": 35.75102880658436,
+					"y": 42.77777777777778,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "vocoder-level-fader"
+			},
+			{
+				"id": "vocoder-tone-fader",
+				"label": "Tone",
+				"kind": "fader",
+				"position": {
+					"x": 40.63786008230453,
+					"y": 42.77777777777778,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "vocoder-tone-fader"
+			},
+			{
+				"id": "human-voice-attack-fader",
+				"label": "Attack",
+				"kind": "fader",
+				"position": {
+					"x": 51.64609053497943,
+					"y": 42.77777777777778,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "human-voice-attack-fader"
+			},
+			{
+				"id": "strings-attack-fader",
+				"label": "Attack",
+				"kind": "fader",
+				"position": {
+					"x": 62.65432098765432,
+					"y": 26.851851851851855,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "strings-attack-fader"
+			},
+			{
+				"id": "strings-tone-fader",
+				"label": "Tone",
+				"kind": "fader",
+				"position": {
+					"x": 57.76748971193416,
+					"y": 42.77777777777778,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "strings-tone-fader"
+			},
+			{
+				"id": "strings-release-fader",
+				"label": "Release",
+				"kind": "fader",
+				"position": {
+					"x": 62.65432098765432,
+					"y": 42.77777777777778,
+					"width": 3.909465020576132,
+					"height": 9.25925925925926
+				},
+				"control": "strings-release-fader"
+			}
+		]
+	}
+}

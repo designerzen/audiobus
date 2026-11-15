@@ -25,6 +25,8 @@ export interface IAudioCommand {
 	pitchBend: number
 
 	time: number
+	// AudioContext time in seconds of the source event (e.g. a DVS pilot zero crossing)
+	audioTime?: number
 	timeCode: number
 
 	text: string

@@ -1,0 +1,400 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1761 540" role="group" aria-labelledby="roland-d-05-icon--title" aria-describedby="roland-d-05-icon--description" data-device="roland-d-05" data-diagram-style="wireframe" style="background: #fff; color: #334155;">
+  <title id="roland-d-05-icon--title">Roland D-05 overhead wireframe diagram</title>
+  <desc id="roland-d-05-icon--description">Schematic top view grouped by panel section. Every physical control has a stable ID and accessible label. Standalone buttons are disabled until a host supplies interaction. MIDI regions match the JSON surface; note and shared parameter regions use the setup described in the profile.</desc>
+  <style>text { font-family: Arial, sans-serif; fill: currentColor; stroke: none; } [data-part]:focus-visible { outline: 3px solid currentColor; }</style>
+  <g id="roland-d-05-icon--chassis" aria-hidden="true">
+    <rect x="3" y="3" width="1755" height="534" rx="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="25" y="30" font-size="22">Roland D-05</text>
+    <rect x="25" y="105" width="202" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="35" y="128" font-size="12">Performance</text>
+    <rect x="239" y="105" width="487" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="249" y="128" font-size="12">Edit</text>
+    <rect x="738" y="105" width="392" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="748" y="128" font-size="12">Numeric</text>
+    <rect x="1142" y="105" width="582" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1152" y="128" font-size="12">Memory</text>
+  </g>
+  <g id="roland-d-05-icon--controls" role="group" aria-label="Physical hardware controls">
+    <g id="roland-d-05-icon--performance-volume-knob" data-part="performance-volume-knob" data-kind="knob" role="group" aria-label="Volume" aria-roledescription="rotary control">
+      <title>Volume</title>
+      <g aria-hidden="true">
+        <circle cx="75.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 75.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="209" text-anchor="middle" font-size="10">Volume</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--performance-ribbon-c1-touch" data-part="performance-ribbon-c1-touch" data-kind="touch" role="group" aria-label="Ribbon C1" aria-roledescription="touch strip" data-surface-controls="performance-ribbon-c1-touch">
+      <title>Ribbon C1</title>
+      <g aria-hidden="true">
+        <rect x="132" y="145" width="76" height="50" rx="4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 137 170.0 H 203" stroke-dasharray="3 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="170.0" y="174.0" text-anchor="middle" font-size="10">Ribbon C1</text>
+      </g>
+      <g id="roland-d-05-icon--surface--performance-ribbon-c1-touch" data-surface-control="performance-ribbon-c1-touch" aria-hidden="true">
+        <rect x="132.0" y="145" width="76.0" height="50" data-hit-area="performance-ribbon-c1-touch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-d-05-icon--performance-ribbon-c2-touch" data-part="performance-ribbon-c2-touch" data-kind="touch" role="group" aria-label="Ribbon C2" aria-roledescription="touch strip" data-surface-controls="performance-ribbon-c2-touch">
+      <title>Ribbon C2</title>
+      <g aria-hidden="true">
+        <rect x="37" y="231" width="76" height="50" rx="4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 42 256.0 H 108" stroke-dasharray="3 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="260.0" text-anchor="middle" font-size="10">Ribbon C2</text>
+      </g>
+      <g id="roland-d-05-icon--surface--performance-ribbon-c2-touch" data-surface-control="performance-ribbon-c2-touch" aria-hidden="true">
+        <rect x="37.0" y="231" width="76.0" height="50" data-hit-area="performance-ribbon-c2-touch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-d-05-icon--performance-partial-balance-joystick-joystick" data-part="performance-partial-balance-joystick-joystick" data-kind="joystick" role="group" aria-label="Partial balance joystick" aria-roledescription="joystick">
+      <title>Partial balance joystick</title>
+      <g aria-hidden="true">
+        <circle cx="170.0" cy="256.0" r="25.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 170.0 231 v 50 M 132 256.0 h 76" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="170.0" y="260.0" text-anchor="middle" font-size="8">Partial balance joystick</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--edit-function-button" data-part="edit-function-button" data-kind="button" role="button" aria-label="Function" aria-disabled="true" tabindex="-1">
+      <title>Function</title>
+      <g aria-hidden="true">
+        <rect x="251" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="289.0" y="174.0" text-anchor="middle" font-size="10">Function</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--edit-preset-user-button" data-part="edit-preset-user-button" data-kind="button" role="button" aria-label="Preset User" aria-disabled="true" tabindex="-1">
+      <title>Preset User</title>
+      <g aria-hidden="true">
+        <rect x="346" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="384.0" y="174.0" text-anchor="middle" font-size="10">Preset User</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--edit-partial-balance-edit-button" data-part="edit-partial-balance-edit-button" data-kind="button" role="button" aria-label="Partial Balance Edit" aria-disabled="true" tabindex="-1">
+      <title>Partial Balance Edit</title>
+      <g aria-hidden="true">
+        <rect x="441" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="479.0" y="174.0" text-anchor="middle" font-size="8">Partial Balance Edit</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--edit-left-button" data-part="edit-left-button" data-kind="button" role="button" aria-label="Left" aria-disabled="true" tabindex="-1">
+      <title>Left</title>
+      <g aria-hidden="true">
+        <rect x="536" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="574.0" y="174.0" text-anchor="middle" font-size="10">Left</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--edit-f1-button" data-part="edit-f1-button" data-kind="button" role="button" aria-label="F1" aria-disabled="true" tabindex="-1">
+      <title>F1</title>
+      <g aria-hidden="true">
+        <rect x="631" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="669.0" y="174.0" text-anchor="middle" font-size="10">F1</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--edit-f2-button" data-part="edit-f2-button" data-kind="button" role="button" aria-label="F2" aria-disabled="true" tabindex="-1">
+      <title>F2</title>
+      <g aria-hidden="true">
+        <rect x="251" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="289.0" y="260.0" text-anchor="middle" font-size="10">F2</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--edit-right-button" data-part="edit-right-button" data-kind="button" role="button" aria-label="Right" aria-disabled="true" tabindex="-1">
+      <title>Right</title>
+      <g aria-hidden="true">
+        <rect x="346" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="384.0" y="260.0" text-anchor="middle" font-size="10">Right</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--edit-chase-button" data-part="edit-chase-button" data-kind="button" role="button" aria-label="Chase" aria-disabled="true" tabindex="-1">
+      <title>Chase</title>
+      <g aria-hidden="true">
+        <rect x="441" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="479.0" y="260.0" text-anchor="middle" font-size="10">Chase</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--edit-portamento-button" data-part="edit-portamento-button" data-kind="button" role="button" aria-label="Portamento" aria-disabled="true" tabindex="-1">
+      <title>Portamento</title>
+      <g aria-hidden="true">
+        <rect x="536" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="574.0" y="260.0" text-anchor="middle" font-size="10">Portamento</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--edit-edit-button" data-part="edit-edit-button" data-kind="button" role="button" aria-label="Edit" aria-disabled="true" tabindex="-1">
+      <title>Edit</title>
+      <g aria-hidden="true">
+        <rect x="631" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="669.0" y="260.0" text-anchor="middle" font-size="10">Edit</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--edit-exit-button" data-part="edit-exit-button" data-kind="button" role="button" aria-label="Exit" aria-disabled="true" tabindex="-1">
+      <title>Exit</title>
+      <g aria-hidden="true">
+        <rect x="251" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="289.0" y="346.0" text-anchor="middle" font-size="10">Exit</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--edit-sequencer-button" data-part="edit-sequencer-button" data-kind="button" role="button" aria-label="Sequencer" aria-disabled="true" tabindex="-1">
+      <title>Sequencer</title>
+      <g aria-hidden="true">
+        <rect x="346" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="384.0" y="346.0" text-anchor="middle" font-size="10">Sequencer</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--edit-write-button" data-part="edit-write-button" data-kind="button" role="button" aria-label="Write" aria-disabled="true" tabindex="-1">
+      <title>Write</title>
+      <g aria-hidden="true">
+        <rect x="441" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="479.0" y="346.0" text-anchor="middle" font-size="10">Write</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--edit-increment-button" data-part="edit-increment-button" data-kind="button" role="button" aria-label="Increment" aria-disabled="true" tabindex="-1">
+      <title>Increment</title>
+      <g aria-hidden="true">
+        <rect x="536" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="574.0" y="346.0" text-anchor="middle" font-size="10">Increment</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--edit-decrement-button" data-part="edit-decrement-button" data-kind="button" role="button" aria-label="Decrement" aria-disabled="true" tabindex="-1">
+      <title>Decrement</title>
+      <g aria-hidden="true">
+        <rect x="631" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="669.0" y="346.0" text-anchor="middle" font-size="10">Decrement</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--numeric-digit-0-button" data-part="numeric-digit-0-button" data-kind="button" role="button" aria-label="Digit 0" aria-disabled="true" tabindex="-1">
+      <title>Digit 0</title>
+      <g aria-hidden="true">
+        <rect x="750" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="788.0" y="174.0" text-anchor="middle" font-size="10">Digit 0</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--numeric-digit-1-button" data-part="numeric-digit-1-button" data-kind="button" role="button" aria-label="Digit 1" aria-disabled="true" tabindex="-1">
+      <title>Digit 1</title>
+      <g aria-hidden="true">
+        <rect x="845" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="883.0" y="174.0" text-anchor="middle" font-size="10">Digit 1</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--numeric-digit-2-button" data-part="numeric-digit-2-button" data-kind="button" role="button" aria-label="Digit 2" aria-disabled="true" tabindex="-1">
+      <title>Digit 2</title>
+      <g aria-hidden="true">
+        <rect x="940" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="978.0" y="174.0" text-anchor="middle" font-size="10">Digit 2</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--numeric-digit-3-button" data-part="numeric-digit-3-button" data-kind="button" role="button" aria-label="Digit 3" aria-disabled="true" tabindex="-1">
+      <title>Digit 3</title>
+      <g aria-hidden="true">
+        <rect x="1035" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1073.0" y="174.0" text-anchor="middle" font-size="10">Digit 3</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--numeric-digit-4-button" data-part="numeric-digit-4-button" data-kind="button" role="button" aria-label="Digit 4" aria-disabled="true" tabindex="-1">
+      <title>Digit 4</title>
+      <g aria-hidden="true">
+        <rect x="750" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="788.0" y="260.0" text-anchor="middle" font-size="10">Digit 4</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--numeric-digit-5-button" data-part="numeric-digit-5-button" data-kind="button" role="button" aria-label="Digit 5" aria-disabled="true" tabindex="-1">
+      <title>Digit 5</title>
+      <g aria-hidden="true">
+        <rect x="845" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="883.0" y="260.0" text-anchor="middle" font-size="10">Digit 5</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--numeric-digit-6-button" data-part="numeric-digit-6-button" data-kind="button" role="button" aria-label="Digit 6" aria-disabled="true" tabindex="-1">
+      <title>Digit 6</title>
+      <g aria-hidden="true">
+        <rect x="940" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="978.0" y="260.0" text-anchor="middle" font-size="10">Digit 6</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--numeric-digit-7-button" data-part="numeric-digit-7-button" data-kind="button" role="button" aria-label="Digit 7" aria-disabled="true" tabindex="-1">
+      <title>Digit 7</title>
+      <g aria-hidden="true">
+        <rect x="1035" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1073.0" y="260.0" text-anchor="middle" font-size="10">Digit 7</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--numeric-digit-8-button" data-part="numeric-digit-8-button" data-kind="button" role="button" aria-label="Digit 8" aria-disabled="true" tabindex="-1">
+      <title>Digit 8</title>
+      <g aria-hidden="true">
+        <rect x="750" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="788.0" y="346.0" text-anchor="middle" font-size="10">Digit 8</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--numeric-digit-9-button" data-part="numeric-digit-9-button" data-kind="button" role="button" aria-label="Digit 9" aria-disabled="true" tabindex="-1">
+      <title>Digit 9</title>
+      <g aria-hidden="true">
+        <rect x="845" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="883.0" y="346.0" text-anchor="middle" font-size="10">Digit 9</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--numeric-shift-button" data-part="numeric-shift-button" data-kind="button" role="button" aria-label="Shift" aria-disabled="true" tabindex="-1">
+      <title>Shift</title>
+      <g aria-hidden="true">
+        <rect x="940" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="978.0" y="346.0" text-anchor="middle" font-size="10">Shift</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--numeric-enter-button" data-part="numeric-enter-button" data-kind="button" role="button" aria-label="Enter" aria-disabled="true" tabindex="-1">
+      <title>Enter</title>
+      <g aria-hidden="true">
+        <rect x="1035" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1073.0" y="346.0" text-anchor="middle" font-size="10">Enter</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--memory-bank-1-button" data-part="memory-bank-1-button" data-kind="button" role="button" aria-label="Bank 1" aria-disabled="true" tabindex="-1">
+      <title>Bank 1</title>
+      <g aria-hidden="true">
+        <rect x="1154" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1192.0" y="174.0" text-anchor="middle" font-size="10">Bank 1</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--memory-bank-2-button" data-part="memory-bank-2-button" data-kind="button" role="button" aria-label="Bank 2" aria-disabled="true" tabindex="-1">
+      <title>Bank 2</title>
+      <g aria-hidden="true">
+        <rect x="1249" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1287.0" y="174.0" text-anchor="middle" font-size="10">Bank 2</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--memory-bank-3-button" data-part="memory-bank-3-button" data-kind="button" role="button" aria-label="Bank 3" aria-disabled="true" tabindex="-1">
+      <title>Bank 3</title>
+      <g aria-hidden="true">
+        <rect x="1344" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1382.0" y="174.0" text-anchor="middle" font-size="10">Bank 3</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--memory-bank-4-button" data-part="memory-bank-4-button" data-kind="button" role="button" aria-label="Bank 4" aria-disabled="true" tabindex="-1">
+      <title>Bank 4</title>
+      <g aria-hidden="true">
+        <rect x="1439" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1477.0" y="174.0" text-anchor="middle" font-size="10">Bank 4</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--memory-bank-5-button" data-part="memory-bank-5-button" data-kind="button" role="button" aria-label="Bank 5" aria-disabled="true" tabindex="-1">
+      <title>Bank 5</title>
+      <g aria-hidden="true">
+        <rect x="1534" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1572.0" y="174.0" text-anchor="middle" font-size="10">Bank 5</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--memory-bank-6-button" data-part="memory-bank-6-button" data-kind="button" role="button" aria-label="Bank 6" aria-disabled="true" tabindex="-1">
+      <title>Bank 6</title>
+      <g aria-hidden="true">
+        <rect x="1629" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1667.0" y="174.0" text-anchor="middle" font-size="10">Bank 6</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--memory-bank-7-button" data-part="memory-bank-7-button" data-kind="button" role="button" aria-label="Bank 7" aria-disabled="true" tabindex="-1">
+      <title>Bank 7</title>
+      <g aria-hidden="true">
+        <rect x="1154" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1192.0" y="260.0" text-anchor="middle" font-size="10">Bank 7</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--memory-bank-8-button" data-part="memory-bank-8-button" data-kind="button" role="button" aria-label="Bank 8" aria-disabled="true" tabindex="-1">
+      <title>Bank 8</title>
+      <g aria-hidden="true">
+        <rect x="1249" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1287.0" y="260.0" text-anchor="middle" font-size="10">Bank 8</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--memory-patch-1-button" data-part="memory-patch-1-button" data-kind="button" role="button" aria-label="Patch 1" aria-disabled="true" tabindex="-1">
+      <title>Patch 1</title>
+      <g aria-hidden="true">
+        <rect x="1344" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1382.0" y="260.0" text-anchor="middle" font-size="10">Patch 1</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--memory-patch-2-button" data-part="memory-patch-2-button" data-kind="button" role="button" aria-label="Patch 2" aria-disabled="true" tabindex="-1">
+      <title>Patch 2</title>
+      <g aria-hidden="true">
+        <rect x="1439" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1477.0" y="260.0" text-anchor="middle" font-size="10">Patch 2</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--memory-patch-3-button" data-part="memory-patch-3-button" data-kind="button" role="button" aria-label="Patch 3" aria-disabled="true" tabindex="-1">
+      <title>Patch 3</title>
+      <g aria-hidden="true">
+        <rect x="1534" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1572.0" y="260.0" text-anchor="middle" font-size="10">Patch 3</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--memory-patch-4-button" data-part="memory-patch-4-button" data-kind="button" role="button" aria-label="Patch 4" aria-disabled="true" tabindex="-1">
+      <title>Patch 4</title>
+      <g aria-hidden="true">
+        <rect x="1629" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1667.0" y="260.0" text-anchor="middle" font-size="10">Patch 4</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--memory-patch-5-button" data-part="memory-patch-5-button" data-kind="button" role="button" aria-label="Patch 5" aria-disabled="true" tabindex="-1">
+      <title>Patch 5</title>
+      <g aria-hidden="true">
+        <rect x="1154" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1192.0" y="346.0" text-anchor="middle" font-size="10">Patch 5</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--memory-patch-6-button" data-part="memory-patch-6-button" data-kind="button" role="button" aria-label="Patch 6" aria-disabled="true" tabindex="-1">
+      <title>Patch 6</title>
+      <g aria-hidden="true">
+        <rect x="1249" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1287.0" y="346.0" text-anchor="middle" font-size="10">Patch 6</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--memory-patch-7-button" data-part="memory-patch-7-button" data-kind="button" role="button" aria-label="Patch 7" aria-disabled="true" tabindex="-1">
+      <title>Patch 7</title>
+      <g aria-hidden="true">
+        <rect x="1344" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1382.0" y="346.0" text-anchor="middle" font-size="10">Patch 7</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--memory-patch-8-button" data-part="memory-patch-8-button" data-kind="button" role="button" aria-label="Patch 8" aria-disabled="true" tabindex="-1">
+      <title>Patch 8</title>
+      <g aria-hidden="true">
+        <rect x="1439" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1477.0" y="346.0" text-anchor="middle" font-size="10">Patch 8</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--power" data-part="power" data-kind="button" role="button" aria-label="Power" aria-disabled="true" tabindex="-1">
+      <title>Power</title>
+      <g aria-hidden="true">
+        <rect x="1671" y="45" width="65" height="25" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1703.5" y="61.5" text-anchor="middle" font-size="10">Power</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--usb-midi" data-part="usb-midi" data-kind="socket" role="group" aria-label="USB MIDI" aria-roledescription="connector">
+      <title>USB MIDI</title>
+      <g aria-hidden="true">
+        <rect x="25" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="69.0" y="62.5" text-anchor="middle" font-size="10">USB MIDI</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--midi-in" data-part="midi-in" data-kind="socket" role="group" aria-label="MIDI IN" aria-roledescription="connector">
+      <title>MIDI IN</title>
+      <g aria-hidden="true">
+        <rect x="125" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="169.0" y="62.5" text-anchor="middle" font-size="10">MIDI IN</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--midi-out" data-part="midi-out" data-kind="socket" role="group" aria-label="MIDI OUT" aria-roledescription="connector">
+      <title>MIDI OUT</title>
+      <g aria-hidden="true">
+        <rect x="225" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="269.0" y="62.5" text-anchor="middle" font-size="10">MIDI OUT</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--audio-out" data-part="audio-out" data-kind="socket" role="group" aria-label="Audio OUT" aria-roledescription="connector">
+      <title>Audio OUT</title>
+      <g aria-hidden="true">
+        <rect x="325" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="369.0" y="62.5" text-anchor="middle" font-size="10">Audio OUT</text>
+      </g>
+    </g>
+    <g id="roland-d-05-icon--headphones" data-part="headphones" data-kind="socket" role="group" aria-label="Headphones" aria-roledescription="connector">
+      <title>Headphones</title>
+      <g aria-hidden="true">
+        <rect x="425" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="469.0" y="62.5" text-anchor="middle" font-size="10">Headphones</text>
+      </g>
+    </g>
+  </g>
+</svg>

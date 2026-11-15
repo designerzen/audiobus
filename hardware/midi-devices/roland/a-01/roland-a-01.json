@@ -1,0 +1,175 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "roland-a-01",
+	"name": "Roland A-01",
+	"manufacturer": "Roland",
+	"manufacturerUrl": "https://www.roland.com/",
+	"productUrl": "https://www.roland.com/global/products/a-01/",
+	"description": "Assignable MIDI/Bluetooth controller with an 8-bit synthesizer.",
+	"ids": ["roland-a-01"],
+	"portNames": ["A-01", "A-01 MIDI 1", "Roland A-01"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Roland A-01 owner manual",
+			"url": "https://static.roland.com/assets/media/pdf/A-01_e02_W.pdf"
+		}
+	],
+	"abilities": ["USB MIDI", "DIN MIDI IN/OUT", "MIDI notes", "Documented controller mappings"],
+	"hardwareControls": [
+		"Performance: Volume, Ribbon C1, Ribbon C2",
+		"Encoders: Encoder 1, Encoder 2, Encoder 3, Encoder 4",
+		"Mode: Controller, Synth, Sequencer, Menu, Write, Bank, Play Stop, Function",
+		"Memory: Patch 1, Patch 2, Patch 3, Patch 4"
+	],
+	"notice": "Use USB MIDI or a DIN MIDI interface. Match the MIDI channel and enable the required MIDI transmit/receive settings. A-01 encoders and ribbons are assignable. CC16-19, pitch bend and CC1 are explicit virtual starting mappings, not a claimed factory preset; use MIDI learn to match the configured messages. Bluetooth MIDI requires the operating system to expose a MIDI port.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "performance-ribbon-c1-touch",
+			"label": "Performance: Ribbon C1",
+			"widget": "slider",
+			"message": {
+				"type": "pitchBend"
+			},
+			"default": 8192
+		},
+		{
+			"id": "performance-ribbon-c2-touch",
+			"label": "Performance: Ribbon C2",
+			"widget": "slider",
+			"cc": 1
+		},
+		{
+			"id": "encoders-encoder-1-knob",
+			"label": "Encoders: Encoder 1",
+			"widget": "slider",
+			"cc": 16
+		},
+		{
+			"id": "encoders-encoder-2-knob",
+			"label": "Encoders: Encoder 2",
+			"widget": "slider",
+			"cc": 17
+		},
+		{
+			"id": "encoders-encoder-3-knob",
+			"label": "Encoders: Encoder 3",
+			"widget": "slider",
+			"cc": 18
+		},
+		{
+			"id": "encoders-encoder-4-knob",
+			"label": "Encoders: Encoder 4",
+			"widget": "slider",
+			"cc": 19
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Roland A-01 overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 1200,
+		"height": 540,
+		"elements": [
+			{
+				"id": "performance-ribbon-c1-touch",
+				"label": "Ribbon C1",
+				"kind": "fader",
+				"position": {
+					"x": 3.0833333333333335,
+					"y": 42.77777777777778,
+					"width": 6.333333333333334,
+					"height": 9.25925925925926
+				},
+				"control": "performance-ribbon-c1-touch"
+			},
+			{
+				"id": "performance-ribbon-c2-touch",
+				"label": "Ribbon C2",
+				"kind": "fader",
+				"position": {
+					"x": 3.0833333333333335,
+					"y": 58.7037037037037,
+					"width": 6.333333333333334,
+					"height": 9.25925925925926
+				},
+				"control": "performance-ribbon-c2-touch"
+			},
+			{
+				"id": "encoders-encoder-1-knob",
+				"label": "Encoder 1",
+				"kind": "knob",
+				"position": {
+					"x": 15.416666666666668,
+					"y": 26.851851851851855,
+					"width": 6.333333333333334,
+					"height": 9.25925925925926
+				},
+				"control": "encoders-encoder-1-knob"
+			},
+			{
+				"id": "encoders-encoder-2-knob",
+				"label": "Encoder 2",
+				"kind": "knob",
+				"position": {
+					"x": 23.333333333333332,
+					"y": 26.851851851851855,
+					"width": 6.333333333333334,
+					"height": 9.25925925925926
+				},
+				"control": "encoders-encoder-2-knob"
+			},
+			{
+				"id": "encoders-encoder-3-knob",
+				"label": "Encoder 3",
+				"kind": "knob",
+				"position": {
+					"x": 15.416666666666668,
+					"y": 42.77777777777778,
+					"width": 6.333333333333334,
+					"height": 9.25925925925926
+				},
+				"control": "encoders-encoder-3-knob"
+			},
+			{
+				"id": "encoders-encoder-4-knob",
+				"label": "Encoder 4",
+				"kind": "knob",
+				"position": {
+					"x": 23.333333333333332,
+					"y": 42.77777777777778,
+					"width": 6.333333333333334,
+					"height": 9.25925925925926
+				},
+				"control": "encoders-encoder-4-knob"
+			}
+		]
+	}
+}

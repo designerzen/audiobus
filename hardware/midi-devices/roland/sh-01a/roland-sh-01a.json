@@ -1,0 +1,580 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "roland-sh-01a",
+	"name": "Roland SH-01A",
+	"manufacturer": "Roland",
+	"manufacturerUrl": "https://www.roland.com/",
+	"productUrl": "https://www.roland.com/global/products/sh-01a/",
+	"description": "Boutique SH-101-style synthesizer with polyphonic modes.",
+	"ids": ["roland-sh-01a"],
+	"portNames": ["SH-01A", "SH-01A MIDI 1", "Roland SH-01A"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Roland SH-01A owner manual",
+			"url": "https://static.roland.com/assets/media/pdf/SH-01A_eng04_W.pdf"
+		},
+		{
+			"title": "Roland SH-01A MIDI implementation chart",
+			"url": "https://static.roland.com/assets/media/pdf/SH-01A_MIDI_Imple_Chart_eng01_W.pdf"
+		}
+	],
+	"abilities": ["USB MIDI", "DIN MIDI IN/OUT", "MIDI notes", "Documented controller mappings"],
+	"hardwareControls": [
+		"Performance: Volume, Ribbon C1, Ribbon C2, Manual",
+		"LFO: Rate, Waveform",
+		"VCO: Mod depth, Range, Pulse width, PWM source",
+		"Source Mixer: Pulse, Saw, Sub, Sub type, Noise",
+		"VCF: Cutoff, Resonance, Envelope, Mod depth, Key follow",
+		"VCA: Envelope Gate",
+		"Envelope: Trigger mode, Attack, Decay, Sustain, Release",
+		"Controller: Transpose, VCO bend depth, VCF bend depth, LFO depth, Portamento, Portamento time, Menu",
+		"Sequencer Arp: Function 1, Function 2, Function 3, Function 4, Function 5, Function 6, Function 7, Function 8"
+	],
+	"notice": "Use USB MIDI or a DIN MIDI interface. Match the MIDI channel and enable the required MIDI transmit/receive settings.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "performance-ribbon-c1-touch",
+			"label": "Performance: Ribbon C1",
+			"widget": "slider",
+			"message": {
+				"type": "pitchBend"
+			},
+			"default": 8192
+		},
+		{
+			"id": "performance-ribbon-c2-touch",
+			"label": "Performance: Ribbon C2",
+			"widget": "slider",
+			"cc": 1
+		},
+		{
+			"id": "lfo-rate-fader",
+			"label": "LFO: Rate",
+			"widget": "slider",
+			"cc": 3
+		},
+		{
+			"id": "lfo-waveform-knob",
+			"label": "LFO: Waveform",
+			"widget": "slider",
+			"cc": 12
+		},
+		{
+			"id": "vco-mod-depth-fader",
+			"label": "VCO: Mod depth",
+			"widget": "slider",
+			"cc": 13
+		},
+		{
+			"id": "vco-range-knob",
+			"label": "VCO: Range",
+			"widget": "slider",
+			"cc": 14
+		},
+		{
+			"id": "vco-pulse-width-fader",
+			"label": "VCO: Pulse width",
+			"widget": "slider",
+			"cc": 15
+		},
+		{
+			"id": "vco-pwm-source-switch",
+			"label": "VCO: PWM source",
+			"widget": "slider",
+			"cc": 16
+		},
+		{
+			"id": "source-mixer-pulse-fader",
+			"label": "Source Mixer: Pulse",
+			"widget": "slider",
+			"cc": 19
+		},
+		{
+			"id": "source-mixer-saw-fader",
+			"label": "Source Mixer: Saw",
+			"widget": "slider",
+			"cc": 20
+		},
+		{
+			"id": "source-mixer-sub-fader",
+			"label": "Source Mixer: Sub",
+			"widget": "slider",
+			"cc": 21
+		},
+		{
+			"id": "source-mixer-sub-type-switch",
+			"label": "Source Mixer: Sub type",
+			"widget": "slider",
+			"cc": 22
+		},
+		{
+			"id": "source-mixer-noise-fader",
+			"label": "Source Mixer: Noise",
+			"widget": "slider",
+			"cc": 23
+		},
+		{
+			"id": "vcf-cutoff-fader",
+			"label": "VCF: Cutoff",
+			"widget": "slider",
+			"cc": 74
+		},
+		{
+			"id": "vcf-resonance-fader",
+			"label": "VCF: Resonance",
+			"widget": "slider",
+			"cc": 71
+		},
+		{
+			"id": "vcf-envelope-fader",
+			"label": "VCF: Envelope",
+			"widget": "slider",
+			"cc": 24
+		},
+		{
+			"id": "vcf-mod-depth-fader",
+			"label": "VCF: Mod depth",
+			"widget": "slider",
+			"cc": 25
+		},
+		{
+			"id": "vcf-key-follow-fader",
+			"label": "VCF: Key follow",
+			"widget": "slider",
+			"cc": 26
+		},
+		{
+			"id": "vca-envelope-gate-switch",
+			"label": "VCA: Envelope Gate",
+			"widget": "slider",
+			"cc": 28
+		},
+		{
+			"id": "envelope-trigger-mode-switch",
+			"label": "Envelope: Trigger mode",
+			"widget": "slider",
+			"cc": 29
+		},
+		{
+			"id": "envelope-attack-fader",
+			"label": "Envelope: Attack",
+			"widget": "slider",
+			"cc": 73
+		},
+		{
+			"id": "envelope-decay-fader",
+			"label": "Envelope: Decay",
+			"widget": "slider",
+			"cc": 75
+		},
+		{
+			"id": "envelope-sustain-fader",
+			"label": "Envelope: Sustain",
+			"widget": "slider",
+			"cc": 30
+		},
+		{
+			"id": "envelope-release-fader",
+			"label": "Envelope: Release",
+			"widget": "slider",
+			"cc": 72
+		},
+		{
+			"id": "controller-vco-bend-depth-fader",
+			"label": "Controller: VCO bend depth",
+			"widget": "slider",
+			"cc": 18
+		},
+		{
+			"id": "controller-vcf-bend-depth-fader",
+			"label": "Controller: VCF bend depth",
+			"widget": "slider",
+			"cc": 27
+		},
+		{
+			"id": "controller-lfo-depth-fader",
+			"label": "Controller: LFO depth",
+			"widget": "slider",
+			"cc": 17
+		},
+		{
+			"id": "controller-portamento-time-knob",
+			"label": "Controller: Portamento time",
+			"widget": "slider",
+			"cc": 5
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Roland SH-01A overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 2034,
+		"height": 540,
+		"elements": [
+			{
+				"id": "performance-ribbon-c1-touch",
+				"label": "Ribbon C1",
+				"kind": "fader",
+				"position": {
+					"x": 6.489675516224189,
+					"y": 26.851851851851855,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "performance-ribbon-c1-touch"
+			},
+			{
+				"id": "performance-ribbon-c2-touch",
+				"label": "Ribbon C2",
+				"kind": "fader",
+				"position": {
+					"x": 1.8190757128810224,
+					"y": 42.77777777777778,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "performance-ribbon-c2-touch"
+			},
+			{
+				"id": "lfo-rate-fader",
+				"label": "Rate",
+				"kind": "fader",
+				"position": {
+					"x": 12.340216322517207,
+					"y": 26.851851851851855,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "lfo-rate-fader"
+			},
+			{
+				"id": "lfo-waveform-knob",
+				"label": "Waveform",
+				"kind": "knob",
+				"position": {
+					"x": 12.340216322517207,
+					"y": 42.77777777777778,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "lfo-waveform-knob"
+			},
+			{
+				"id": "vco-mod-depth-fader",
+				"label": "Mod depth",
+				"kind": "fader",
+				"position": {
+					"x": 19.616519174041297,
+					"y": 26.851851851851855,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "vco-mod-depth-fader"
+			},
+			{
+				"id": "vco-range-knob",
+				"label": "Range",
+				"kind": "knob",
+				"position": {
+					"x": 24.287118977384463,
+					"y": 26.851851851851855,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "vco-range-knob"
+			},
+			{
+				"id": "vco-pulse-width-fader",
+				"label": "Pulse width",
+				"kind": "fader",
+				"position": {
+					"x": 19.616519174041297,
+					"y": 42.77777777777778,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "vco-pulse-width-fader"
+			},
+			{
+				"id": "vco-pwm-source-switch",
+				"label": "PWM source",
+				"kind": "fader",
+				"position": {
+					"x": 24.287118977384463,
+					"y": 42.77777777777778,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "vco-pwm-source-switch"
+			},
+			{
+				"id": "source-mixer-pulse-fader",
+				"label": "Pulse",
+				"kind": "fader",
+				"position": {
+					"x": 30.137659783677485,
+					"y": 26.851851851851855,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "source-mixer-pulse-fader"
+			},
+			{
+				"id": "source-mixer-saw-fader",
+				"label": "Saw",
+				"kind": "fader",
+				"position": {
+					"x": 34.80825958702065,
+					"y": 26.851851851851855,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "source-mixer-saw-fader"
+			},
+			{
+				"id": "source-mixer-sub-fader",
+				"label": "Sub",
+				"kind": "fader",
+				"position": {
+					"x": 30.137659783677485,
+					"y": 42.77777777777778,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "source-mixer-sub-fader"
+			},
+			{
+				"id": "source-mixer-sub-type-switch",
+				"label": "Sub type",
+				"kind": "fader",
+				"position": {
+					"x": 34.80825958702065,
+					"y": 42.77777777777778,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "source-mixer-sub-type-switch"
+			},
+			{
+				"id": "source-mixer-noise-fader",
+				"label": "Noise",
+				"kind": "fader",
+				"position": {
+					"x": 30.137659783677485,
+					"y": 58.7037037037037,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "source-mixer-noise-fader"
+			},
+			{
+				"id": "vcf-cutoff-fader",
+				"label": "Cutoff",
+				"kind": "fader",
+				"position": {
+					"x": 40.65880039331367,
+					"y": 26.851851851851855,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "vcf-cutoff-fader"
+			},
+			{
+				"id": "vcf-resonance-fader",
+				"label": "Resonance",
+				"kind": "fader",
+				"position": {
+					"x": 45.329400196656835,
+					"y": 26.851851851851855,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "vcf-resonance-fader"
+			},
+			{
+				"id": "vcf-envelope-fader",
+				"label": "Envelope",
+				"kind": "fader",
+				"position": {
+					"x": 40.65880039331367,
+					"y": 42.77777777777778,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "vcf-envelope-fader"
+			},
+			{
+				"id": "vcf-mod-depth-fader",
+				"label": "Mod depth",
+				"kind": "fader",
+				"position": {
+					"x": 45.329400196656835,
+					"y": 42.77777777777778,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "vcf-mod-depth-fader"
+			},
+			{
+				"id": "vcf-key-follow-fader",
+				"label": "Key follow",
+				"kind": "fader",
+				"position": {
+					"x": 40.65880039331367,
+					"y": 58.7037037037037,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "vcf-key-follow-fader"
+			},
+			{
+				"id": "vca-envelope-gate-switch",
+				"label": "Envelope Gate",
+				"kind": "fader",
+				"position": {
+					"x": 51.17994100294986,
+					"y": 26.851851851851855,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "vca-envelope-gate-switch"
+			},
+			{
+				"id": "envelope-trigger-mode-switch",
+				"label": "Trigger mode",
+				"kind": "fader",
+				"position": {
+					"x": 58.456243854473946,
+					"y": 26.851851851851855,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-trigger-mode-switch"
+			},
+			{
+				"id": "envelope-attack-fader",
+				"label": "Attack",
+				"kind": "fader",
+				"position": {
+					"x": 63.12684365781711,
+					"y": 26.851851851851855,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-attack-fader"
+			},
+			{
+				"id": "envelope-decay-fader",
+				"label": "Decay",
+				"kind": "fader",
+				"position": {
+					"x": 58.456243854473946,
+					"y": 42.77777777777778,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-decay-fader"
+			},
+			{
+				"id": "envelope-sustain-fader",
+				"label": "Sustain",
+				"kind": "fader",
+				"position": {
+					"x": 63.12684365781711,
+					"y": 42.77777777777778,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-sustain-fader"
+			},
+			{
+				"id": "envelope-release-fader",
+				"label": "Release",
+				"kind": "fader",
+				"position": {
+					"x": 58.456243854473946,
+					"y": 58.7037037037037,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-release-fader"
+			},
+			{
+				"id": "controller-vco-bend-depth-fader",
+				"label": "VCO bend depth",
+				"kind": "fader",
+				"position": {
+					"x": 73.6479842674533,
+					"y": 26.851851851851855,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "controller-vco-bend-depth-fader"
+			},
+			{
+				"id": "controller-vcf-bend-depth-fader",
+				"label": "VCF bend depth",
+				"kind": "fader",
+				"position": {
+					"x": 78.31858407079646,
+					"y": 26.851851851851855,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "controller-vcf-bend-depth-fader"
+			},
+			{
+				"id": "controller-lfo-depth-fader",
+				"label": "LFO depth",
+				"kind": "fader",
+				"position": {
+					"x": 68.97738446411013,
+					"y": 42.77777777777778,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "controller-lfo-depth-fader"
+			},
+			{
+				"id": "controller-portamento-time-knob",
+				"label": "Portamento time",
+				"kind": "knob",
+				"position": {
+					"x": 78.31858407079646,
+					"y": 42.77777777777778,
+					"width": 3.736479842674533,
+					"height": 9.25925925925926
+				},
+				"control": "controller-portamento-time-knob"
+			}
+		]
+	}
+}

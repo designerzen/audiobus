@@ -1,0 +1,566 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650" role="group" aria-labelledby="roland-s-1-panel--title" aria-describedby="roland-s-1-panel--description" data-device="roland-s-1" style="background: #fff; color: #334155;" data-diagram-style="wireframe">
+  <title id="roland-s-1-panel--title">Roland S-1 overhead hardware diagram</title>
+  <desc id="roland-s-1-panel--description">Wireframe top-down schematic; positions are approximate. Each physical control has a stable device-prefixed ID and data-part name. Buttons in this standalone drawing are disabled until a host adds input handlers. Transparent regions marked data-surface-control correspond to the profile MIDI hit areas; multiple regions can share one context-dependent physical control.</desc>
+  <style>text { font-family: Arial, sans-serif; } .section-label { font-size: 11px; letter-spacing: 1px; } [data-part]:focus-visible { outline: 3px solid currentColor; }</style>
+  <g id="roland-s-1-panel--chassis" aria-hidden="true">
+    <rect x="3" y="3" width="994" height="644" rx="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="22" y="28" fill="currentColor" font-size="19" stroke="none">Roland S-1</text>
+  </g>
+  <g id="roland-s-1-panel--controls" role="group" aria-label="Top panel controls">
+    <g id="roland-s-1-panel--sync-in" data-part="sync-in" data-kind="socket" role="group" aria-roledescription="connector" aria-label="Sync In">
+      <title>Sync In</title>
+      <g aria-hidden="true">
+        <rect x="540" y="46" width="65" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="572.5" y="65.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Sync In</text>
+      </g>
+    </g>
+    <g id="roland-s-1-panel--sync-out" data-part="sync-out" data-kind="socket" role="group" aria-roledescription="connector" aria-label="Sync Out">
+      <title>Sync Out</title>
+      <g aria-hidden="true">
+        <rect x="625" y="46" width="65" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="657.5" y="65.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Sync Out</text>
+      </g>
+    </g>
+    <g id="roland-s-1-panel--mix-in" data-part="mix-in" data-kind="socket" role="group" aria-roledescription="connector" aria-label="Mix In">
+      <title>Mix In</title>
+      <g aria-hidden="true">
+        <rect x="710" y="46" width="65" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="742.5" y="65.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Mix In</text>
+      </g>
+    </g>
+    <g id="roland-s-1-panel--mix-out" data-part="mix-out" data-kind="socket" role="group" aria-roledescription="connector" aria-label="Mix Out">
+      <title>Mix Out</title>
+      <g aria-hidden="true">
+        <rect x="795" y="46" width="65" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="827.5" y="65.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Mix Out</text>
+      </g>
+    </g>
+    <g id="roland-s-1-panel--volume" data-part="volume" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Volume">
+      <title>Volume</title>
+      <g aria-hidden="true">
+        <circle cx="940.0" cy="60.0" r="21.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 940.0 44 v 11.760000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="940.0" y="95" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Volume</text>
+      </g>
+    </g>
+    <g id="roland-s-1-panel--display" data-part="display" data-kind="display" role="group" aria-roledescription="display" aria-label="Tempo / Value display">
+      <title>Tempo / Value display</title>
+      <g aria-hidden="true">
+        <rect x="25" y="118" width="180" height="65" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="115.0" y="154.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Tempo / Value display</text>
+      </g>
+    </g>
+    <g id="roland-s-1-panel--tempo-value" data-part="tempo-value" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Tempo / Value">
+      <title>Tempo / Value</title>
+      <g aria-hidden="true">
+        <circle cx="115.0" cy="240.0" r="32.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 115.0 213 v 17.92" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="115.0" y="286" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Tempo / Value</text>
+      </g>
+    </g>
+    <g id="roland-s-1-panel--play" data-part="play" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Play / Stop">
+      <title>Play / Stop</title>
+      <g aria-hidden="true">
+        <rect x="30" y="297" width="76" height="32" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="68.0" y="317.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Play / Stop</text>
+      </g>
+    </g>
+    <g id="roland-s-1-panel--record" data-part="record" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Record">
+      <title>Record</title>
+      <g aria-hidden="true">
+        <rect x="127" y="297" width="76" height="32" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="165.0" y="317.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Record</text>
+      </g>
+    </g>
+    <g id="roland-s-1-panel--lfo-rate" data-part="lfo-rate" data-kind="knob" data-surface-controls="lfo-rate" role="group" aria-roledescription="rotary control" aria-label="Rate">
+      <title>Rate</title>
+      <g aria-hidden="true">
+        <circle cx="270.0" cy="155.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 270.0 138 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="270.0" y="191" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Rate</text>
+      </g>
+      <g id="roland-s-1-panel--surface--lfo-rate" data-surface-control="lfo-rate" aria-hidden="true">
+        <rect x="248.0" y="133" width="44.0" height="44" fill="none" pointer-events="all" data-hit-area="lfo-rate" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--lfo-waveform" data-part="lfo-waveform" data-kind="knob" data-surface-controls="lfo-waveform" role="group" aria-roledescription="rotary control" aria-label="Waveform">
+      <title>Waveform</title>
+      <g aria-hidden="true">
+        <circle cx="270.0" cy="245.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 270.0 228 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="270.0" y="281" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Waveform</text>
+      </g>
+      <g id="roland-s-1-panel--surface--lfo-waveform" data-surface-control="lfo-waveform" aria-hidden="true">
+        <rect x="248.0" y="223" width="44.0" height="44" fill="none" pointer-events="all" data-hit-area="lfo-waveform" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--oscillator-range" data-part="oscillator-range" data-kind="knob" data-surface-controls="oscillator-range" role="group" aria-roledescription="rotary control" aria-label="Range">
+      <title>Range</title>
+      <g aria-hidden="true">
+        <circle cx="390.0" cy="155.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 390.0 138 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="390.0" y="191" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Range</text>
+      </g>
+      <g id="roland-s-1-panel--surface--oscillator-range" data-surface-control="oscillator-range" aria-hidden="true">
+        <rect x="368.0" y="133" width="44.0" height="44" fill="none" pointer-events="all" data-hit-area="oscillator-range" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--oscillator-lfo" data-part="oscillator-lfo" data-kind="knob" data-surface-controls="oscillator-lfo" role="group" aria-roledescription="rotary control" aria-label="LFO">
+      <title>LFO</title>
+      <g aria-hidden="true">
+        <circle cx="390.0" cy="245.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 390.0 228 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="390.0" y="281" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">LFO</text>
+      </g>
+      <g id="roland-s-1-panel--surface--oscillator-lfo" data-surface-control="oscillator-lfo" aria-hidden="true">
+        <rect x="368.0" y="223" width="44.0" height="44" fill="none" pointer-events="all" data-hit-area="oscillator-lfo" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--pulse-level" data-part="pulse-level" data-kind="knob" data-surface-controls="pulse-level" role="group" aria-roledescription="rotary control" aria-label="Pulse">
+      <title>Pulse</title>
+      <g aria-hidden="true">
+        <circle cx="500.0" cy="155.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 500.0 138 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="500.0" y="191" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Pulse</text>
+      </g>
+      <g id="roland-s-1-panel--surface--pulse-level" data-surface-control="pulse-level" aria-hidden="true">
+        <rect x="478.0" y="133" width="44.0" height="44" fill="none" pointer-events="all" data-hit-area="pulse-level" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--saw-level" data-part="saw-level" data-kind="knob" data-surface-controls="saw-level" role="group" aria-roledescription="rotary control" aria-label="Saw">
+      <title>Saw</title>
+      <g aria-hidden="true">
+        <circle cx="610.0" cy="155.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 610.0 138 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="610.0" y="191" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Saw</text>
+      </g>
+      <g id="roland-s-1-panel--surface--saw-level" data-surface-control="saw-level" aria-hidden="true">
+        <rect x="588.0" y="133" width="44.0" height="44" fill="none" pointer-events="all" data-hit-area="saw-level" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--sub-level" data-part="sub-level" data-kind="knob" data-surface-controls="sub-level" role="group" aria-roledescription="rotary control" aria-label="Sub">
+      <title>Sub</title>
+      <g aria-hidden="true">
+        <circle cx="500.0" cy="245.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 500.0 228 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="500.0" y="281" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Sub</text>
+      </g>
+      <g id="roland-s-1-panel--surface--sub-level" data-surface-control="sub-level" aria-hidden="true">
+        <rect x="478.0" y="223" width="44.0" height="44" fill="none" pointer-events="all" data-hit-area="sub-level" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--noise-level" data-part="noise-level" data-kind="knob" data-surface-controls="noise-level" role="group" aria-roledescription="rotary control" aria-label="Noise">
+      <title>Noise</title>
+      <g aria-hidden="true">
+        <circle cx="610.0" cy="245.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 610.0 228 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="610.0" y="281" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Noise</text>
+      </g>
+      <g id="roland-s-1-panel--surface--noise-level" data-surface-control="noise-level" aria-hidden="true">
+        <rect x="588.0" y="223" width="44.0" height="44" fill="none" pointer-events="all" data-hit-area="noise-level" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--filter-cutoff" data-part="filter-cutoff" data-kind="knob" data-surface-controls="filter-cutoff" role="group" aria-roledescription="rotary control" aria-label="Cutoff">
+      <title>Cutoff</title>
+      <g aria-hidden="true">
+        <circle cx="730.0" cy="155.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 730.0 138 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="730.0" y="191" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Cutoff</text>
+      </g>
+      <g id="roland-s-1-panel--surface--filter-cutoff" data-surface-control="filter-cutoff" aria-hidden="true">
+        <rect x="708.0" y="133" width="44.0" height="44" fill="none" pointer-events="all" data-hit-area="filter-cutoff" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--filter-resonance" data-part="filter-resonance" data-kind="knob" data-surface-controls="filter-resonance" role="group" aria-roledescription="rotary control" aria-label="Resonance">
+      <title>Resonance</title>
+      <g aria-hidden="true">
+        <circle cx="840.0" cy="155.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 840.0 138 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="840.0" y="191" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Resonance</text>
+      </g>
+      <g id="roland-s-1-panel--surface--filter-resonance" data-surface-control="filter-resonance" aria-hidden="true">
+        <rect x="818.0" y="133" width="44.0" height="44" fill="none" pointer-events="all" data-hit-area="filter-resonance" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--filter-lfo" data-part="filter-lfo" data-kind="knob" data-surface-controls="filter-lfo" role="group" aria-roledescription="rotary control" aria-label="LFO">
+      <title>LFO</title>
+      <g aria-hidden="true">
+        <circle cx="730.0" cy="245.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 730.0 228 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="730.0" y="281" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">LFO</text>
+      </g>
+      <g id="roland-s-1-panel--surface--filter-lfo" data-surface-control="filter-lfo" aria-hidden="true">
+        <rect x="708.0" y="223" width="44.0" height="44" fill="none" pointer-events="all" data-hit-area="filter-lfo" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--filter-envelope" data-part="filter-envelope" data-kind="knob" data-surface-controls="filter-envelope" role="group" aria-roledescription="rotary control" aria-label="Env">
+      <title>Env</title>
+      <g aria-hidden="true">
+        <circle cx="840.0" cy="245.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 840.0 228 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="840.0" y="281" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Env</text>
+      </g>
+      <g id="roland-s-1-panel--surface--filter-envelope" data-surface-control="filter-envelope" aria-hidden="true">
+        <rect x="818.0" y="223" width="44.0" height="44" fill="none" pointer-events="all" data-hit-area="filter-envelope" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--delay" data-part="delay" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Delay">
+      <title>Delay</title>
+      <g aria-hidden="true">
+        <circle cx="940.0" cy="155.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 940.0 138 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="940.0" y="191" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Delay</text>
+      </g>
+    </g>
+    <g id="roland-s-1-panel--reverb" data-part="reverb" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Reverb">
+      <title>Reverb</title>
+      <g aria-hidden="true">
+        <circle cx="940.0" cy="245.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 940.0 228 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="940.0" y="281" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Reverb</text>
+      </g>
+    </g>
+    <g id="roland-s-1-panel--pattern" data-part="pattern" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Pattern">
+      <title>Pattern</title>
+      <g aria-hidden="true">
+        <rect x="238" y="316" width="85" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="280.5" y="335.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pattern</text>
+      </g>
+    </g>
+    <g id="roland-s-1-panel--step" data-part="step" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Step">
+      <title>Step</title>
+      <g aria-hidden="true">
+        <rect x="350" y="316" width="85" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="392.5" y="335.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Step</text>
+      </g>
+    </g>
+    <g id="roland-s-1-panel--env-attack" data-part="env-attack" data-kind="knob" data-surface-controls="envelope-attack" role="group" aria-roledescription="rotary control" aria-label="Attack">
+      <title>Attack</title>
+      <g aria-hidden="true">
+        <circle cx="500.0" cy="335.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 500.0 318 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="500.0" y="371" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Attack</text>
+      </g>
+      <g id="roland-s-1-panel--surface--envelope-attack" data-surface-control="envelope-attack" aria-hidden="true">
+        <rect x="478.0" y="313" width="44.0" height="44" fill="none" pointer-events="all" data-hit-area="envelope-attack" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--env-decay" data-part="env-decay" data-kind="knob" data-surface-controls="envelope-decay" role="group" aria-roledescription="rotary control" aria-label="Decay">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <circle cx="613.0" cy="335.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 613.0 318 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="613.0" y="371" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Decay</text>
+      </g>
+      <g id="roland-s-1-panel--surface--envelope-decay" data-surface-control="envelope-decay" aria-hidden="true">
+        <rect x="591.0" y="313" width="44.0" height="44" fill="none" pointer-events="all" data-hit-area="envelope-decay" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--env-sustain" data-part="env-sustain" data-kind="knob" data-surface-controls="envelope-sustain" role="group" aria-roledescription="rotary control" aria-label="Sustain">
+      <title>Sustain</title>
+      <g aria-hidden="true">
+        <circle cx="726.0" cy="335.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 726.0 318 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="726.0" y="371" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Sustain</text>
+      </g>
+      <g id="roland-s-1-panel--surface--envelope-sustain" data-surface-control="envelope-sustain" aria-hidden="true">
+        <rect x="704.0" y="313" width="44.0" height="44" fill="none" pointer-events="all" data-hit-area="envelope-sustain" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--env-release" data-part="env-release" data-kind="knob" data-surface-controls="envelope-release" role="group" aria-roledescription="rotary control" aria-label="Release">
+      <title>Release</title>
+      <g aria-hidden="true">
+        <circle cx="839.0" cy="335.0" r="22.0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 839.0 318 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="839.0" y="371" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">Release</text>
+      </g>
+      <g id="roland-s-1-panel--surface--envelope-release" data-surface-control="envelope-release" aria-hidden="true">
+        <rect x="817.0" y="313" width="44.0" height="44" fill="none" pointer-events="all" data-hit-area="envelope-release" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--d-motion" data-part="d-motion" data-kind="button" data-surface-controls="pitch-bend" role="button" aria-disabled="true" tabindex="-1" aria-label="D-Motion">
+      <title>D-Motion</title>
+      <g aria-hidden="true">
+        <rect x="900" y="316" width="75" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="937.5" y="335.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">D-Motion</text>
+      </g>
+      <g id="roland-s-1-panel--surface--pitch-bend" data-surface-control="pitch-bend" aria-hidden="true">
+        <rect x="900.0" y="316" width="75.0" height="30" fill="none" pointer-events="all" data-hit-area="pitch-bend" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--shift" data-part="shift" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Shift">
+      <title>Shift</title>
+      <g aria-hidden="true">
+        <rect x="25" y="410" width="65" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="57.5" y="429.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Shift</text>
+      </g>
+    </g>
+    <g id="roland-s-1-panel--hold" data-part="hold" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Hold / Manual">
+      <title>Hold / Manual</title>
+      <g aria-hidden="true">
+        <rect x="900" y="410" width="75" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="937.5" y="429.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Hold / Manual</text>
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-0" data-part="key-0" data-kind="key" data-surface-controls="key-0" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 1">
+      <title>Keyboard pad 1</title>
+      <g aria-hidden="true">
+        <rect x="25" y="510" width="52" height="85" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="51.0" y="556.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">1</text>
+      </g>
+      <g id="roland-s-1-panel--surface--key-0" data-surface-control="key-0" aria-hidden="true">
+        <rect x="25.0" y="510" width="52.0" height="85" fill="none" pointer-events="all" data-hit-area="key-0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-1" data-part="key-1" data-kind="key" data-surface-controls="key-1" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 2">
+      <title>Keyboard pad 2</title>
+      <g aria-hidden="true">
+        <rect x="60.4" y="455" width="34" height="42" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="77.4" y="480.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none" />
+      </g>
+      <g id="roland-s-1-panel--surface--key-1" data-surface-control="key-1" aria-hidden="true">
+        <rect x="60.4" y="455" width="34.0" height="42" fill="none" pointer-events="all" data-hit-area="key-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-2" data-part="key-2" data-kind="key" data-surface-controls="key-2" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 3">
+      <title>Keyboard pad 3</title>
+      <g aria-hidden="true">
+        <rect x="84" y="510" width="52" height="85" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="110.0" y="556.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">2</text>
+      </g>
+      <g id="roland-s-1-panel--surface--key-2" data-surface-control="key-2" aria-hidden="true">
+        <rect x="84.0" y="510" width="52.0" height="85" fill="none" pointer-events="all" data-hit-area="key-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-3" data-part="key-3" data-kind="key" data-surface-controls="key-3" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 4">
+      <title>Keyboard pad 4</title>
+      <g aria-hidden="true">
+        <rect x="119.4" y="455" width="34" height="42" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="136.4" y="480.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none" />
+      </g>
+      <g id="roland-s-1-panel--surface--key-3" data-surface-control="key-3" aria-hidden="true">
+        <rect x="119.4" y="455" width="34.0" height="42" fill="none" pointer-events="all" data-hit-area="key-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-4" data-part="key-4" data-kind="key" data-surface-controls="key-4" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 5">
+      <title>Keyboard pad 5</title>
+      <g aria-hidden="true">
+        <rect x="143" y="510" width="52" height="85" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="169.0" y="556.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">3</text>
+      </g>
+      <g id="roland-s-1-panel--surface--key-4" data-surface-control="key-4" aria-hidden="true">
+        <rect x="143.0" y="510" width="52.0" height="85" fill="none" pointer-events="all" data-hit-area="key-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-5" data-part="key-5" data-kind="key" data-surface-controls="key-5" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 6">
+      <title>Keyboard pad 6</title>
+      <g aria-hidden="true">
+        <rect x="202" y="510" width="52" height="85" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="228.0" y="556.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">4</text>
+      </g>
+      <g id="roland-s-1-panel--surface--key-5" data-surface-control="key-5" aria-hidden="true">
+        <rect x="202.0" y="510" width="52.0" height="85" fill="none" pointer-events="all" data-hit-area="key-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-6" data-part="key-6" data-kind="key" data-surface-controls="key-6" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 7">
+      <title>Keyboard pad 7</title>
+      <g aria-hidden="true">
+        <rect x="237.4" y="455" width="34" height="42" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="254.4" y="480.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none" />
+      </g>
+      <g id="roland-s-1-panel--surface--key-6" data-surface-control="key-6" aria-hidden="true">
+        <rect x="237.4" y="455" width="34.0" height="42" fill="none" pointer-events="all" data-hit-area="key-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-7" data-part="key-7" data-kind="key" data-surface-controls="key-7" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 8">
+      <title>Keyboard pad 8</title>
+      <g aria-hidden="true">
+        <rect x="261" y="510" width="52" height="85" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="287.0" y="556.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">5</text>
+      </g>
+      <g id="roland-s-1-panel--surface--key-7" data-surface-control="key-7" aria-hidden="true">
+        <rect x="261.0" y="510" width="52.0" height="85" fill="none" pointer-events="all" data-hit-area="key-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-8" data-part="key-8" data-kind="key" data-surface-controls="key-8" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 9">
+      <title>Keyboard pad 9</title>
+      <g aria-hidden="true">
+        <rect x="296.4" y="455" width="34" height="42" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="313.4" y="480.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none" />
+      </g>
+      <g id="roland-s-1-panel--surface--key-8" data-surface-control="key-8" aria-hidden="true">
+        <rect x="296.4" y="455" width="34.0" height="42" fill="none" pointer-events="all" data-hit-area="key-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-9" data-part="key-9" data-kind="key" data-surface-controls="key-9" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 10">
+      <title>Keyboard pad 10</title>
+      <g aria-hidden="true">
+        <rect x="320" y="510" width="52" height="85" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="346.0" y="556.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">6</text>
+      </g>
+      <g id="roland-s-1-panel--surface--key-9" data-surface-control="key-9" aria-hidden="true">
+        <rect x="320.0" y="510" width="52.0" height="85" fill="none" pointer-events="all" data-hit-area="key-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-10" data-part="key-10" data-kind="key" data-surface-controls="key-10" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 11">
+      <title>Keyboard pad 11</title>
+      <g aria-hidden="true">
+        <rect x="355.4" y="455" width="34" height="42" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="372.4" y="480.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none" />
+      </g>
+      <g id="roland-s-1-panel--surface--key-10" data-surface-control="key-10" aria-hidden="true">
+        <rect x="355.4" y="455" width="34.0" height="42" fill="none" pointer-events="all" data-hit-area="key-10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-11" data-part="key-11" data-kind="key" data-surface-controls="key-11" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 12">
+      <title>Keyboard pad 12</title>
+      <g aria-hidden="true">
+        <rect x="379" y="510" width="52" height="85" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="405.0" y="556.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">7</text>
+      </g>
+      <g id="roland-s-1-panel--surface--key-11" data-surface-control="key-11" aria-hidden="true">
+        <rect x="379.0" y="510" width="52.0" height="85" fill="none" pointer-events="all" data-hit-area="key-11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-12" data-part="key-12" data-kind="key" data-surface-controls="key-12" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 13">
+      <title>Keyboard pad 13</title>
+      <g aria-hidden="true">
+        <rect x="438" y="510" width="52" height="85" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="464.0" y="556.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">8</text>
+      </g>
+      <g id="roland-s-1-panel--surface--key-12" data-surface-control="key-12" aria-hidden="true">
+        <rect x="438.0" y="510" width="52.0" height="85" fill="none" pointer-events="all" data-hit-area="key-12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-13" data-part="key-13" data-kind="key" data-surface-controls="key-13" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 14">
+      <title>Keyboard pad 14</title>
+      <g aria-hidden="true">
+        <rect x="473.4" y="455" width="34" height="42" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="490.4" y="480.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none" />
+      </g>
+      <g id="roland-s-1-panel--surface--key-13" data-surface-control="key-13" aria-hidden="true">
+        <rect x="473.4" y="455" width="34.0" height="42" fill="none" pointer-events="all" data-hit-area="key-13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-14" data-part="key-14" data-kind="key" data-surface-controls="key-14" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 15">
+      <title>Keyboard pad 15</title>
+      <g aria-hidden="true">
+        <rect x="497" y="510" width="52" height="85" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="523.0" y="556.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">9</text>
+      </g>
+      <g id="roland-s-1-panel--surface--key-14" data-surface-control="key-14" aria-hidden="true">
+        <rect x="497.0" y="510" width="52.0" height="85" fill="none" pointer-events="all" data-hit-area="key-14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-15" data-part="key-15" data-kind="key" data-surface-controls="key-15" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 16">
+      <title>Keyboard pad 16</title>
+      <g aria-hidden="true">
+        <rect x="532.4" y="455" width="34" height="42" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="549.4" y="480.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none" />
+      </g>
+      <g id="roland-s-1-panel--surface--key-15" data-surface-control="key-15" aria-hidden="true">
+        <rect x="532.4" y="455" width="34.0" height="42" fill="none" pointer-events="all" data-hit-area="key-15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-16" data-part="key-16" data-kind="key" data-surface-controls="key-16" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 17">
+      <title>Keyboard pad 17</title>
+      <g aria-hidden="true">
+        <rect x="556" y="510" width="52" height="85" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="582.0" y="556.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">10</text>
+      </g>
+      <g id="roland-s-1-panel--surface--key-16" data-surface-control="key-16" aria-hidden="true">
+        <rect x="556.0" y="510" width="52.0" height="85" fill="none" pointer-events="all" data-hit-area="key-16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-17" data-part="key-17" data-kind="key" data-surface-controls="key-17" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 18">
+      <title>Keyboard pad 18</title>
+      <g aria-hidden="true">
+        <rect x="615" y="510" width="52" height="85" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="641.0" y="556.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">11</text>
+      </g>
+      <g id="roland-s-1-panel--surface--key-17" data-surface-control="key-17" aria-hidden="true">
+        <rect x="615.0" y="510" width="52.0" height="85" fill="none" pointer-events="all" data-hit-area="key-17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-18" data-part="key-18" data-kind="key" data-surface-controls="key-18" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 19">
+      <title>Keyboard pad 19</title>
+      <g aria-hidden="true">
+        <rect x="650.4" y="455" width="34" height="42" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="667.4" y="480.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none" />
+      </g>
+      <g id="roland-s-1-panel--surface--key-18" data-surface-control="key-18" aria-hidden="true">
+        <rect x="650.4" y="455" width="34.0" height="42" fill="none" pointer-events="all" data-hit-area="key-18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-19" data-part="key-19" data-kind="key" data-surface-controls="key-19" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 20">
+      <title>Keyboard pad 20</title>
+      <g aria-hidden="true">
+        <rect x="674" y="510" width="52" height="85" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="700.0" y="556.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">12</text>
+      </g>
+      <g id="roland-s-1-panel--surface--key-19" data-surface-control="key-19" aria-hidden="true">
+        <rect x="674.0" y="510" width="52.0" height="85" fill="none" pointer-events="all" data-hit-area="key-19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-20" data-part="key-20" data-kind="key" data-surface-controls="key-20" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 21">
+      <title>Keyboard pad 21</title>
+      <g aria-hidden="true">
+        <rect x="709.4" y="455" width="34" height="42" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="726.4" y="480.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none" />
+      </g>
+      <g id="roland-s-1-panel--surface--key-20" data-surface-control="key-20" aria-hidden="true">
+        <rect x="709.4" y="455" width="34.0" height="42" fill="none" pointer-events="all" data-hit-area="key-20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-21" data-part="key-21" data-kind="key" data-surface-controls="key-21" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 22">
+      <title>Keyboard pad 22</title>
+      <g aria-hidden="true">
+        <rect x="733" y="510" width="52" height="85" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="759.0" y="556.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">13</text>
+      </g>
+      <g id="roland-s-1-panel--surface--key-21" data-surface-control="key-21" aria-hidden="true">
+        <rect x="733.0" y="510" width="52.0" height="85" fill="none" pointer-events="all" data-hit-area="key-21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-22" data-part="key-22" data-kind="key" data-surface-controls="key-22" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 23">
+      <title>Keyboard pad 23</title>
+      <g aria-hidden="true">
+        <rect x="768.4" y="455" width="34" height="42" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="785.4" y="480.0" text-anchor="middle" font-size="9" fill="currentColor" stroke="none" />
+      </g>
+      <g id="roland-s-1-panel--surface--key-22" data-surface-control="key-22" aria-hidden="true">
+        <rect x="768.4" y="455" width="34.0" height="42" fill="none" pointer-events="all" data-hit-area="key-22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-23" data-part="key-23" data-kind="key" data-surface-controls="key-23" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 24">
+      <title>Keyboard pad 24</title>
+      <g aria-hidden="true">
+        <rect x="792" y="510" width="52" height="85" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="818.0" y="556.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">14</text>
+      </g>
+      <g id="roland-s-1-panel--surface--key-23" data-surface-control="key-23" aria-hidden="true">
+        <rect x="792.0" y="510" width="52.0" height="85" fill="none" pointer-events="all" data-hit-area="key-23" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-24" data-part="key-24" data-kind="key" data-surface-controls="key-24" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 25">
+      <title>Keyboard pad 25</title>
+      <g aria-hidden="true">
+        <rect x="851" y="510" width="52" height="85" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="877.0" y="556.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">15</text>
+      </g>
+      <g id="roland-s-1-panel--surface--key-24" data-surface-control="key-24" aria-hidden="true">
+        <rect x="851.0" y="510" width="52.0" height="85" fill="none" pointer-events="all" data-hit-area="key-24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="roland-s-1-panel--key-25" data-part="key-25" data-kind="key" data-surface-controls="key-25" role="button" aria-disabled="true" tabindex="-1" aria-label="Keyboard pad 26">
+      <title>Keyboard pad 26</title>
+      <g aria-hidden="true">
+        <rect x="910" y="510" width="52" height="85" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="936.0" y="556.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">16</text>
+      </g>
+      <g id="roland-s-1-panel--surface--key-25" data-surface-control="key-25" aria-hidden="true">
+        <rect x="910.0" y="510" width="52.0" height="85" fill="none" pointer-events="all" data-hit-area="key-25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+  </g>
+</svg>

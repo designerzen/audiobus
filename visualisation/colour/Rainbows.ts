@@ -1,6 +1,6 @@
-import Colour from "./Colour"
+import Colour from "./Colour.ts"
 
-export default class Rainbows {
+export class Rainbows {
 	public static colour(
 		frequency1: number = 0.3,
 		frequency2: number = 0.3,
@@ -22,3 +22,4 @@ export default class Rainbows {
 		return rainbow
 	}
 }
+export default Rainbows

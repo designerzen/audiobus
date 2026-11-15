@@ -14,6 +14,7 @@ export const MICROPHONE_TRIGGER = "microphone-trigger" as const
 export const CAMERA_GESTURES = "camera-gestures" as const
 export const EVENT_LOOP = "event-loop" as const
 export const OSC = "osc" as const
+export const PROTOCOL = "protocol" as const
 export const GAMEPAD = "gamepad" as const
 export const GAMEPAD_MUSIC = "gamepad-music" as const
 export const WEBMIDI = "webmidi" as const

@@ -206,6 +206,42 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		icon: "/icons/output-wam2.svg",
 		category: "Synthesis"
 	},
+	[OUTPUT_TYPES.FM]: {
+		id: OUTPUT_TYPES.FM,
+		type: "engine",
+		subtype: "instrument",
+		name: "FM",
+		description: "DX7-style FM synthesizer with 128 General MIDI patches",
+		icon: "/icons/device-instrument.svg",
+		category: "Synthesis"
+	},
+	[OUTPUT_TYPES.MONOTRON]: {
+		id: OUTPUT_TYPES.MONOTRON,
+		type: "engine",
+		subtype: "instrument",
+		name: "Monotron",
+		description: "Resonant low-pass synthesizer with a cutoff LFO",
+		icon: "/icons/device-instrument.svg",
+		category: "Synthesis"
+	},
+	[OUTPUT_TYPES.WAVEGUIDE]: {
+		id: OUTPUT_TYPES.WAVEGUIDE,
+		type: "engine",
+		subtype: "instrument",
+		name: "Waveguide",
+		description: "Noise-excited plucked strings with damped delay feedback",
+		icon: "/icons/device-instrument.svg",
+		category: "Synthesis"
+	},
+	[OUTPUT_TYPES.MULTI_OSCILLATOR]: {
+		id: OUTPUT_TYPES.MULTI_OSCILLATOR,
+		type: "engine",
+		subtype: "instrument",
+		name: "Multi Oscillator",
+		description: "One to three detuned oscillators with envelopes, filtered noise and delay",
+		icon: "/icons/device-instrument.svg",
+		category: "Synthesis"
+	},
 	...Object.fromEntries(
 		CLAP_PATCHES.filter((patch) => patch.features?.includes("instrument")).map((patch) => [
 			OUTPUT_TYPES.webclapOutputId(patch.id),

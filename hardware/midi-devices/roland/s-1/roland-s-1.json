@@ -1,0 +1,827 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "roland-s-1",
+	"name": "Roland S-1",
+	"manufacturer": "Roland",
+	"manufacturerUrl": "https://www.roland.com/",
+	"ids": ["roland-s-1"],
+	"portNames": ["S-1", "S-1 MIDI", "Roland S-1"],
+	"description": "AIRA Compact S-1 Tweak Synth with a keyboard sequencer and MIDI panel controls.",
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Roland S-1 manual and MIDI reference",
+			"url": "https://static.roland.com/manuals/s-1_manual_v102/eng/87294690.html"
+		}
+	],
+	"abilities": [
+		"Keyboard and sequencer notes",
+		"Pitch bend",
+		"Oscillator CCs",
+		"Filter CCs",
+		"Envelope CCs"
+	],
+	"hardwareControls": [
+		"Keyboard pads",
+		"LFO controls",
+		"Oscillator controls",
+		"Filter controls",
+		"Envelope controls"
+	],
+	"notice": "Connect USB MIDI or TRS MIDI through a compatible interface and adapter. Match the MIDI channel and enable CC transmission on the hardware. These mappings follow the S-1 MIDI implementation chart. Virtual keys use chromatic notes starting at 48; use MIDI learn to match your octave. Controls generate MIDI into this chain; audio requires a separate audio connection.",
+	"controls": [
+		{
+			"id": "lfo-rate",
+			"label": "LFO rate",
+			"cc": 3,
+			"widget": "slider"
+		},
+		{
+			"id": "lfo-waveform",
+			"label": "LFO waveform",
+			"cc": 12,
+			"widget": "slider"
+		},
+		{
+			"id": "oscillator-lfo",
+			"label": "Oscillator LFO",
+			"cc": 13,
+			"widget": "slider"
+		},
+		{
+			"id": "oscillator-range",
+			"label": "Oscillator range",
+			"cc": 14,
+			"widget": "slider"
+		},
+		{
+			"id": "pulse-level",
+			"label": "Pulse level",
+			"cc": 19,
+			"widget": "slider"
+		},
+		{
+			"id": "saw-level",
+			"label": "Saw level",
+			"cc": 20,
+			"widget": "slider"
+		},
+		{
+			"id": "sub-level",
+			"label": "Sub level",
+			"cc": 21,
+			"widget": "slider"
+		},
+		{
+			"id": "noise-level",
+			"label": "Noise level",
+			"cc": 23,
+			"widget": "slider"
+		},
+		{
+			"id": "filter-envelope",
+			"label": "Filter envelope",
+			"cc": 24,
+			"widget": "slider"
+		},
+		{
+			"id": "filter-lfo",
+			"label": "Filter LFO",
+			"cc": 25,
+			"widget": "slider"
+		},
+		{
+			"id": "envelope-sustain",
+			"label": "Envelope sustain",
+			"cc": 30,
+			"widget": "slider"
+		},
+		{
+			"id": "filter-resonance",
+			"label": "Filter resonance",
+			"cc": 71,
+			"widget": "slider"
+		},
+		{
+			"id": "envelope-release",
+			"label": "Envelope release",
+			"cc": 72,
+			"widget": "slider"
+		},
+		{
+			"id": "envelope-attack",
+			"label": "Envelope attack",
+			"cc": 73,
+			"widget": "slider"
+		},
+		{
+			"id": "filter-cutoff",
+			"label": "Filter cutoff",
+			"cc": 74,
+			"widget": "slider"
+		},
+		{
+			"id": "envelope-decay",
+			"label": "Envelope decay",
+			"cc": 75,
+			"widget": "slider"
+		},
+		{
+			"id": "pitch-bend",
+			"label": "Pitch bend",
+			"message": {
+				"type": "pitchBend"
+			},
+			"widget": "slider",
+			"default": 8192
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Roland S-1 overhead hardware diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "section",
+				"label": "MIDI controls",
+				"children": [
+					{
+						"type": "controls"
+					}
+				]
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 1000,
+		"height": 650,
+		"elements": [
+			{
+				"id": "lfo-rate",
+				"label": "LFO rate",
+				"kind": "knob",
+				"position": {
+					"x": 24.8,
+					"y": 20.46153846153846,
+					"width": 4.3999999999999995,
+					"height": 6.769230769230769
+				},
+				"control": "lfo-rate"
+			},
+			{
+				"id": "lfo-waveform",
+				"label": "LFO waveform",
+				"kind": "knob",
+				"position": {
+					"x": 24.8,
+					"y": 34.30769230769231,
+					"width": 4.3999999999999995,
+					"height": 6.769230769230769
+				},
+				"control": "lfo-waveform"
+			},
+			{
+				"id": "oscillator-lfo",
+				"label": "Oscillator LFO",
+				"kind": "knob",
+				"position": {
+					"x": 36.8,
+					"y": 34.30769230769231,
+					"width": 4.3999999999999995,
+					"height": 6.769230769230769
+				},
+				"control": "oscillator-lfo"
+			},
+			{
+				"id": "oscillator-range",
+				"label": "Oscillator range",
+				"kind": "knob",
+				"position": {
+					"x": 36.8,
+					"y": 20.46153846153846,
+					"width": 4.3999999999999995,
+					"height": 6.769230769230769
+				},
+				"control": "oscillator-range"
+			},
+			{
+				"id": "pulse-level",
+				"label": "Pulse level",
+				"kind": "knob",
+				"position": {
+					"x": 47.8,
+					"y": 20.46153846153846,
+					"width": 4.3999999999999995,
+					"height": 6.769230769230769
+				},
+				"control": "pulse-level"
+			},
+			{
+				"id": "saw-level",
+				"label": "Saw level",
+				"kind": "knob",
+				"position": {
+					"x": 58.8,
+					"y": 20.46153846153846,
+					"width": 4.3999999999999995,
+					"height": 6.769230769230769
+				},
+				"control": "saw-level"
+			},
+			{
+				"id": "sub-level",
+				"label": "Sub level",
+				"kind": "knob",
+				"position": {
+					"x": 47.8,
+					"y": 34.30769230769231,
+					"width": 4.3999999999999995,
+					"height": 6.769230769230769
+				},
+				"control": "sub-level"
+			},
+			{
+				"id": "noise-level",
+				"label": "Noise level",
+				"kind": "knob",
+				"position": {
+					"x": 58.8,
+					"y": 34.30769230769231,
+					"width": 4.3999999999999995,
+					"height": 6.769230769230769
+				},
+				"control": "noise-level"
+			},
+			{
+				"id": "filter-envelope",
+				"label": "Filter envelope",
+				"kind": "knob",
+				"position": {
+					"x": 81.8,
+					"y": 34.30769230769231,
+					"width": 4.3999999999999995,
+					"height": 6.769230769230769
+				},
+				"control": "filter-envelope"
+			},
+			{
+				"id": "filter-lfo",
+				"label": "Filter LFO",
+				"kind": "knob",
+				"position": {
+					"x": 70.8,
+					"y": 34.30769230769231,
+					"width": 4.3999999999999995,
+					"height": 6.769230769230769
+				},
+				"control": "filter-lfo"
+			},
+			{
+				"id": "envelope-sustain",
+				"label": "Envelope sustain",
+				"kind": "knob",
+				"position": {
+					"x": 70.39999999999999,
+					"y": 48.15384615384615,
+					"width": 4.3999999999999995,
+					"height": 6.769230769230769
+				},
+				"control": "envelope-sustain"
+			},
+			{
+				"id": "filter-resonance",
+				"label": "Filter resonance",
+				"kind": "knob",
+				"position": {
+					"x": 81.8,
+					"y": 20.46153846153846,
+					"width": 4.3999999999999995,
+					"height": 6.769230769230769
+				},
+				"control": "filter-resonance"
+			},
+			{
+				"id": "envelope-release",
+				"label": "Envelope release",
+				"kind": "knob",
+				"position": {
+					"x": 81.69999999999999,
+					"y": 48.15384615384615,
+					"width": 4.3999999999999995,
+					"height": 6.769230769230769
+				},
+				"control": "envelope-release"
+			},
+			{
+				"id": "envelope-attack",
+				"label": "Envelope attack",
+				"kind": "knob",
+				"position": {
+					"x": 47.8,
+					"y": 48.15384615384615,
+					"width": 4.3999999999999995,
+					"height": 6.769230769230769
+				},
+				"control": "envelope-attack"
+			},
+			{
+				"id": "filter-cutoff",
+				"label": "Filter cutoff",
+				"kind": "knob",
+				"position": {
+					"x": 70.8,
+					"y": 20.46153846153846,
+					"width": 4.3999999999999995,
+					"height": 6.769230769230769
+				},
+				"control": "filter-cutoff"
+			},
+			{
+				"id": "envelope-decay",
+				"label": "Envelope decay",
+				"kind": "knob",
+				"position": {
+					"x": 59.099999999999994,
+					"y": 48.15384615384615,
+					"width": 4.3999999999999995,
+					"height": 6.769230769230769
+				},
+				"control": "envelope-decay"
+			},
+			{
+				"id": "pitch-bend",
+				"label": "Pitch bend",
+				"kind": "knob",
+				"position": {
+					"x": 90.0,
+					"y": 48.61538461538461,
+					"width": 7.5,
+					"height": 4.615384615384616
+				},
+				"control": "pitch-bend"
+			},
+			{
+				"id": "key-0",
+				"label": "Note 48",
+				"kind": "key",
+				"position": {
+					"x": 2.5,
+					"y": 78.46153846153847,
+					"width": 5.2,
+					"height": 13.076923076923078
+				},
+				"message": {
+					"type": "note",
+					"number": 48
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-2",
+				"label": "Note 50",
+				"kind": "key",
+				"position": {
+					"x": 8.4,
+					"y": 78.46153846153847,
+					"width": 5.2,
+					"height": 13.076923076923078
+				},
+				"message": {
+					"type": "note",
+					"number": 50
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-4",
+				"label": "Note 52",
+				"kind": "key",
+				"position": {
+					"x": 14.299999999999999,
+					"y": 78.46153846153847,
+					"width": 5.2,
+					"height": 13.076923076923078
+				},
+				"message": {
+					"type": "note",
+					"number": 52
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-5",
+				"label": "Note 53",
+				"kind": "key",
+				"position": {
+					"x": 20.200000000000003,
+					"y": 78.46153846153847,
+					"width": 5.2,
+					"height": 13.076923076923078
+				},
+				"message": {
+					"type": "note",
+					"number": 53
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-7",
+				"label": "Note 55",
+				"kind": "key",
+				"position": {
+					"x": 26.1,
+					"y": 78.46153846153847,
+					"width": 5.2,
+					"height": 13.076923076923078
+				},
+				"message": {
+					"type": "note",
+					"number": 55
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-9",
+				"label": "Note 57",
+				"kind": "key",
+				"position": {
+					"x": 32.0,
+					"y": 78.46153846153847,
+					"width": 5.2,
+					"height": 13.076923076923078
+				},
+				"message": {
+					"type": "note",
+					"number": 57
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-11",
+				"label": "Note 59",
+				"kind": "key",
+				"position": {
+					"x": 37.9,
+					"y": 78.46153846153847,
+					"width": 5.2,
+					"height": 13.076923076923078
+				},
+				"message": {
+					"type": "note",
+					"number": 59
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-12",
+				"label": "Note 60",
+				"kind": "key",
+				"position": {
+					"x": 43.8,
+					"y": 78.46153846153847,
+					"width": 5.2,
+					"height": 13.076923076923078
+				},
+				"message": {
+					"type": "note",
+					"number": 60
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-14",
+				"label": "Note 62",
+				"kind": "key",
+				"position": {
+					"x": 49.7,
+					"y": 78.46153846153847,
+					"width": 5.2,
+					"height": 13.076923076923078
+				},
+				"message": {
+					"type": "note",
+					"number": 62
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-16",
+				"label": "Note 64",
+				"kind": "key",
+				"position": {
+					"x": 55.60000000000001,
+					"y": 78.46153846153847,
+					"width": 5.2,
+					"height": 13.076923076923078
+				},
+				"message": {
+					"type": "note",
+					"number": 64
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-17",
+				"label": "Note 65",
+				"kind": "key",
+				"position": {
+					"x": 61.5,
+					"y": 78.46153846153847,
+					"width": 5.2,
+					"height": 13.076923076923078
+				},
+				"message": {
+					"type": "note",
+					"number": 65
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-19",
+				"label": "Note 67",
+				"kind": "key",
+				"position": {
+					"x": 67.4,
+					"y": 78.46153846153847,
+					"width": 5.2,
+					"height": 13.076923076923078
+				},
+				"message": {
+					"type": "note",
+					"number": 67
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-21",
+				"label": "Note 69",
+				"kind": "key",
+				"position": {
+					"x": 73.3,
+					"y": 78.46153846153847,
+					"width": 5.2,
+					"height": 13.076923076923078
+				},
+				"message": {
+					"type": "note",
+					"number": 69
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-23",
+				"label": "Note 71",
+				"kind": "key",
+				"position": {
+					"x": 79.2,
+					"y": 78.46153846153847,
+					"width": 5.2,
+					"height": 13.076923076923078
+				},
+				"message": {
+					"type": "note",
+					"number": 71
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-24",
+				"label": "Note 72",
+				"kind": "key",
+				"position": {
+					"x": 85.1,
+					"y": 78.46153846153847,
+					"width": 5.2,
+					"height": 13.076923076923078
+				},
+				"message": {
+					"type": "note",
+					"number": 72
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-25",
+				"label": "Note 73",
+				"kind": "key",
+				"position": {
+					"x": 91.0,
+					"y": 78.46153846153847,
+					"width": 5.2,
+					"height": 13.076923076923078
+				},
+				"message": {
+					"type": "note",
+					"number": 73
+				},
+				"learnable": true,
+				"dark": false
+			},
+			{
+				"id": "key-1",
+				"label": "Note 49",
+				"kind": "key",
+				"position": {
+					"x": 6.039999999999999,
+					"y": 70.0,
+					"width": 3.4000000000000004,
+					"height": 6.461538461538462
+				},
+				"message": {
+					"type": "note",
+					"number": 49
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "key-3",
+				"label": "Note 51",
+				"kind": "key",
+				"position": {
+					"x": 11.940000000000001,
+					"y": 70.0,
+					"width": 3.4000000000000004,
+					"height": 6.461538461538462
+				},
+				"message": {
+					"type": "note",
+					"number": 51
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "key-6",
+				"label": "Note 54",
+				"kind": "key",
+				"position": {
+					"x": 23.74,
+					"y": 70.0,
+					"width": 3.4000000000000004,
+					"height": 6.461538461538462
+				},
+				"message": {
+					"type": "note",
+					"number": 54
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "key-8",
+				"label": "Note 56",
+				"kind": "key",
+				"position": {
+					"x": 29.64,
+					"y": 70.0,
+					"width": 3.4000000000000004,
+					"height": 6.461538461538462
+				},
+				"message": {
+					"type": "note",
+					"number": 56
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "key-10",
+				"label": "Note 58",
+				"kind": "key",
+				"position": {
+					"x": 35.54,
+					"y": 70.0,
+					"width": 3.4000000000000004,
+					"height": 6.461538461538462
+				},
+				"message": {
+					"type": "note",
+					"number": 58
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "key-13",
+				"label": "Note 61",
+				"kind": "key",
+				"position": {
+					"x": 47.339999999999996,
+					"y": 70.0,
+					"width": 3.4000000000000004,
+					"height": 6.461538461538462
+				},
+				"message": {
+					"type": "note",
+					"number": 61
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "key-15",
+				"label": "Note 63",
+				"kind": "key",
+				"position": {
+					"x": 53.239999999999995,
+					"y": 70.0,
+					"width": 3.4000000000000004,
+					"height": 6.461538461538462
+				},
+				"message": {
+					"type": "note",
+					"number": 63
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "key-18",
+				"label": "Note 66",
+				"kind": "key",
+				"position": {
+					"x": 65.03999999999999,
+					"y": 70.0,
+					"width": 3.4000000000000004,
+					"height": 6.461538461538462
+				},
+				"message": {
+					"type": "note",
+					"number": 66
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "key-20",
+				"label": "Note 68",
+				"kind": "key",
+				"position": {
+					"x": 70.94,
+					"y": 70.0,
+					"width": 3.4000000000000004,
+					"height": 6.461538461538462
+				},
+				"message": {
+					"type": "note",
+					"number": 68
+				},
+				"learnable": true,
+				"dark": true
+			},
+			{
+				"id": "key-22",
+				"label": "Note 70",
+				"kind": "key",
+				"position": {
+					"x": 76.84,
+					"y": 70.0,
+					"width": 3.4000000000000004,
+					"height": 6.461538461538462
+				},
+				"message": {
+					"type": "note",
+					"number": 70
+				},
+				"learnable": true,
+				"dark": true
+			}
+		]
+	}
+}

@@ -185,7 +185,8 @@ export default class OutputSuperSonic implements IAudioOutput {
 		try {
 			// Create SuperSonic instance with base URL for assets
 			this.supersonic = new SuperSonic({
-				baseURL: new URL(`${import.meta.env.BASE_URL}supersonic/`, document.baseURI).href,
+				baseURL: new URL(`${import.meta.env?.BASE_URL ?? "/"}supersonic/`, document.baseURI)
+					.href,
 				audioContextOptions: {
 					latencyHint: "playback"
 				},

@@ -1,0 +1,625 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2272 650" role="group" aria-labelledby="roland-tr-08-icon--title" aria-describedby="roland-tr-08-icon--description" data-device="roland-tr-08" data-diagram-style="wireframe" style="background: #fff; color: #334155;">
+  <title id="roland-tr-08-icon--title">Roland TR-08 overhead wireframe diagram</title>
+  <desc id="roland-tr-08-icon--description">Schematic top view grouped by panel section. Every physical control has a stable ID and accessible label. Standalone buttons are disabled until a host supplies interaction. MIDI regions match the JSON surface; note and shared parameter regions use the setup described in the profile.</desc>
+  <style>text { font-family: Arial, sans-serif; fill: currentColor; stroke: none; } [data-part]:focus-visible { outline: 3px solid currentColor; }</style>
+  <g id="roland-tr-08-icon--chassis" aria-hidden="true">
+    <rect x="3" y="3" width="2266" height="644" rx="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="25" y="30" font-size="22">Roland TR-08</text>
+    <rect x="25" y="105" width="582" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="35" y="128" font-size="12">Master</text>
+    <rect x="619" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="629" y="128" font-size="12">Bass Drum</text>
+    <rect x="767" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="777" y="128" font-size="12">Snare</text>
+    <rect x="915" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="925" y="128" font-size="12">Low Tom Conga</text>
+    <rect x="1063" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1073" y="128" font-size="12">Mid Tom Conga</text>
+    <rect x="1211" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1221" y="128" font-size="12">High Tom Conga</text>
+    <rect x="1359" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1369" y="128" font-size="12">Claves Rim</text>
+    <rect x="1507" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1517" y="128" font-size="12">Maracas Clap</text>
+    <rect x="1655" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1665" y="128" font-size="12">Cowbell</text>
+    <rect x="1803" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1813" y="128" font-size="12">Cymbal</text>
+    <rect x="1951" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1961" y="128" font-size="12">Open Hat</text>
+    <rect x="2099" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="2109" y="128" font-size="12">Closed Hat</text>
+  </g>
+  <g id="roland-tr-08-icon--controls" role="group" aria-label="Physical hardware controls">
+    <g id="roland-tr-08-icon--master-volume-knob" data-part="master-volume-knob" data-kind="knob" role="group" aria-label="Volume" aria-roledescription="rotary control">
+      <title>Volume</title>
+      <g aria-hidden="true">
+        <circle cx="75.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 75.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="209" text-anchor="middle" font-size="10">Volume</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--master-tempo-knob" data-part="master-tempo-knob" data-kind="knob" role="group" aria-label="Tempo" aria-roledescription="rotary control">
+      <title>Tempo</title>
+      <g aria-hidden="true">
+        <circle cx="170.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 170.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="170.0" y="209" text-anchor="middle" font-size="10">Tempo</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--master-fine-value-knob" data-part="master-fine-value-knob" data-kind="knob" role="group" aria-label="Fine Value" aria-roledescription="rotary control">
+      <title>Fine Value</title>
+      <g aria-hidden="true">
+        <circle cx="265.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 265.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="265.0" y="209" text-anchor="middle" font-size="10">Fine Value</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--master-mode-knob" data-part="master-mode-knob" data-kind="knob" role="group" aria-label="Mode" aria-roledescription="rotary control">
+      <title>Mode</title>
+      <g aria-hidden="true">
+        <circle cx="360.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 360.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="360.0" y="209" text-anchor="middle" font-size="10">Mode</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--master-instrument-track-knob" data-part="master-instrument-track-knob" data-kind="knob" role="group" aria-label="Instrument Track" aria-roledescription="rotary control">
+      <title>Instrument Track</title>
+      <g aria-hidden="true">
+        <circle cx="455.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 455.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="455.0" y="209" text-anchor="middle" font-size="8">Instrument Track</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--master-auto-fill-knob" data-part="master-auto-fill-knob" data-kind="knob" role="group" aria-label="Auto Fill" aria-roledescription="rotary control">
+      <title>Auto Fill</title>
+      <g aria-hidden="true">
+        <circle cx="550.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 550.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="550.0" y="209" text-anchor="middle" font-size="10">Auto Fill</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--master-start-stop-button" data-part="master-start-stop-button" data-kind="button" role="button" aria-label="Start Stop" aria-disabled="true" tabindex="-1">
+      <title>Start Stop</title>
+      <g aria-hidden="true">
+        <rect x="37" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="260.0" text-anchor="middle" font-size="10">Start Stop</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--master-bank-tempo-shuffle-button" data-part="master-bank-tempo-shuffle-button" data-kind="button" role="button" aria-label="Bank Tempo Shuffle" aria-disabled="true" tabindex="-1">
+      <title>Bank Tempo Shuffle</title>
+      <g aria-hidden="true">
+        <rect x="132" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="170.0" y="260.0" text-anchor="middle" font-size="8">Bank Tempo Shuffle</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--master-clear-button" data-part="master-clear-button" data-kind="button" role="button" aria-label="Clear" aria-disabled="true" tabindex="-1">
+      <title>Clear</title>
+      <g aria-hidden="true">
+        <rect x="227" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="265.0" y="260.0" text-anchor="middle" font-size="10">Clear</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--master-trigger-track-button" data-part="master-trigger-track-button" data-kind="button" role="button" aria-label="Trigger track" aria-disabled="true" tabindex="-1">
+      <title>Trigger track</title>
+      <g aria-hidden="true">
+        <rect x="322" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="360.0" y="260.0" text-anchor="middle" font-size="10">Trigger track</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--master-tap-button" data-part="master-tap-button" data-kind="button" role="button" aria-label="Tap" aria-disabled="true" tabindex="-1">
+      <title>Tap</title>
+      <g aria-hidden="true">
+        <rect x="417" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="455.0" y="260.0" text-anchor="middle" font-size="10">Tap</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--master-menu-substep-button" data-part="master-menu-substep-button" data-kind="button" role="button" aria-label="Menu Substep" aria-disabled="true" tabindex="-1">
+      <title>Menu Substep</title>
+      <g aria-hidden="true">
+        <rect x="512" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="550.0" y="260.0" text-anchor="middle" font-size="10">Menu Substep</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--master-basic-variation-switch" data-part="master-basic-variation-switch" data-kind="switch" role="group" aria-label="Basic variation" aria-roledescription="selector switch">
+      <title>Basic variation</title>
+      <g aria-hidden="true">
+        <rect x="37" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="346.0" text-anchor="middle" font-size="10">Basic variation</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--master-prescale-switch" data-part="master-prescale-switch" data-kind="switch" role="group" aria-label="Prescale" aria-roledescription="selector switch">
+      <title>Prescale</title>
+      <g aria-hidden="true">
+        <rect x="132" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="170.0" y="346.0" text-anchor="middle" font-size="10">Prescale</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--master-fill-variation-switch" data-part="master-fill-variation-switch" data-kind="switch" role="group" aria-label="Fill variation" aria-roledescription="selector switch">
+      <title>Fill variation</title>
+      <g aria-hidden="true">
+        <rect x="227" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="265.0" y="346.0" text-anchor="middle" font-size="10">Fill variation</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--master-accent-knob" data-part="master-accent-knob" data-kind="knob" role="group" aria-label="Accent" aria-roledescription="rotary control" data-surface-controls="master-accent-knob">
+      <title>Accent</title>
+      <g aria-hidden="true">
+        <circle cx="360.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 360.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="360.0" y="381" text-anchor="middle" font-size="10">Accent</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--master-accent-knob" data-surface-control="master-accent-knob" aria-hidden="true">
+        <rect x="322.0" y="317" width="76.0" height="50" data-hit-area="master-accent-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--bass-drum-level-knob" data-part="bass-drum-level-knob" data-kind="knob" role="group" aria-label="Level" aria-roledescription="rotary control" data-surface-controls="bass-drum-level-knob">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="669.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 669.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="669.0" y="209" text-anchor="middle" font-size="10">Level</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--bass-drum-level-knob" data-surface-control="bass-drum-level-knob" aria-hidden="true">
+        <rect x="631.0" y="145" width="76.0" height="50" data-hit-area="bass-drum-level-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--bass-drum-tone-knob" data-part="bass-drum-tone-knob" data-kind="knob" role="group" aria-label="Tone" aria-roledescription="rotary control" data-surface-controls="bass-drum-tone-knob">
+      <title>Tone</title>
+      <g aria-hidden="true">
+        <circle cx="669.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 669.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="669.0" y="295" text-anchor="middle" font-size="10">Tone</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--bass-drum-tone-knob" data-surface-control="bass-drum-tone-knob" aria-hidden="true">
+        <rect x="631.0" y="231" width="76.0" height="50" data-hit-area="bass-drum-tone-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--bass-drum-decay-knob" data-part="bass-drum-decay-knob" data-kind="knob" role="group" aria-label="Decay" aria-roledescription="rotary control" data-surface-controls="bass-drum-decay-knob">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <circle cx="669.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 669.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="669.0" y="381" text-anchor="middle" font-size="10">Decay</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--bass-drum-decay-knob" data-surface-control="bass-drum-decay-knob" aria-hidden="true">
+        <rect x="631.0" y="317" width="76.0" height="50" data-hit-area="bass-drum-decay-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--snare-level-knob" data-part="snare-level-knob" data-kind="knob" role="group" aria-label="Level" aria-roledescription="rotary control" data-surface-controls="snare-level-knob">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="817.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 817.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="817.0" y="209" text-anchor="middle" font-size="10">Level</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--snare-level-knob" data-surface-control="snare-level-knob" aria-hidden="true">
+        <rect x="779.0" y="145" width="76.0" height="50" data-hit-area="snare-level-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--snare-tone-knob" data-part="snare-tone-knob" data-kind="knob" role="group" aria-label="Tone" aria-roledescription="rotary control" data-surface-controls="snare-tone-knob">
+      <title>Tone</title>
+      <g aria-hidden="true">
+        <circle cx="817.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 817.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="817.0" y="295" text-anchor="middle" font-size="10">Tone</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--snare-tone-knob" data-surface-control="snare-tone-knob" aria-hidden="true">
+        <rect x="779.0" y="231" width="76.0" height="50" data-hit-area="snare-tone-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--snare-snappy-knob" data-part="snare-snappy-knob" data-kind="knob" role="group" aria-label="Snappy" aria-roledescription="rotary control" data-surface-controls="snare-snappy-knob">
+      <title>Snappy</title>
+      <g aria-hidden="true">
+        <circle cx="817.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 817.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="817.0" y="381" text-anchor="middle" font-size="10">Snappy</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--snare-snappy-knob" data-surface-control="snare-snappy-knob" aria-hidden="true">
+        <rect x="779.0" y="317" width="76.0" height="50" data-hit-area="snare-snappy-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--low-tom-conga-level-knob" data-part="low-tom-conga-level-knob" data-kind="knob" role="group" aria-label="Level" aria-roledescription="rotary control" data-surface-controls="low-tom-conga-level-knob">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="965.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 965.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="965.0" y="209" text-anchor="middle" font-size="10">Level</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--low-tom-conga-level-knob" data-surface-control="low-tom-conga-level-knob" aria-hidden="true">
+        <rect x="927.0" y="145" width="76.0" height="50" data-hit-area="low-tom-conga-level-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--low-tom-conga-tune-knob" data-part="low-tom-conga-tune-knob" data-kind="knob" role="group" aria-label="Tune" aria-roledescription="rotary control" data-surface-controls="low-tom-conga-tune-knob">
+      <title>Tune</title>
+      <g aria-hidden="true">
+        <circle cx="965.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 965.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="965.0" y="295" text-anchor="middle" font-size="10">Tune</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--low-tom-conga-tune-knob" data-surface-control="low-tom-conga-tune-knob" aria-hidden="true">
+        <rect x="927.0" y="231" width="76.0" height="50" data-hit-area="low-tom-conga-tune-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--low-tom-conga-voice-switch" data-part="low-tom-conga-voice-switch" data-kind="switch" role="group" aria-label="Voice" aria-roledescription="selector switch">
+      <title>Voice</title>
+      <g aria-hidden="true">
+        <rect x="927" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="965.0" y="346.0" text-anchor="middle" font-size="10">Voice</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--mid-tom-conga-level-knob" data-part="mid-tom-conga-level-knob" data-kind="knob" role="group" aria-label="Level" aria-roledescription="rotary control" data-surface-controls="mid-tom-conga-level-knob">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="1113.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1113.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1113.0" y="209" text-anchor="middle" font-size="10">Level</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--mid-tom-conga-level-knob" data-surface-control="mid-tom-conga-level-knob" aria-hidden="true">
+        <rect x="1075.0" y="145" width="76.0" height="50" data-hit-area="mid-tom-conga-level-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--mid-tom-conga-tune-knob" data-part="mid-tom-conga-tune-knob" data-kind="knob" role="group" aria-label="Tune" aria-roledescription="rotary control" data-surface-controls="mid-tom-conga-tune-knob">
+      <title>Tune</title>
+      <g aria-hidden="true">
+        <circle cx="1113.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1113.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1113.0" y="295" text-anchor="middle" font-size="10">Tune</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--mid-tom-conga-tune-knob" data-surface-control="mid-tom-conga-tune-knob" aria-hidden="true">
+        <rect x="1075.0" y="231" width="76.0" height="50" data-hit-area="mid-tom-conga-tune-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--mid-tom-conga-voice-switch" data-part="mid-tom-conga-voice-switch" data-kind="switch" role="group" aria-label="Voice" aria-roledescription="selector switch">
+      <title>Voice</title>
+      <g aria-hidden="true">
+        <rect x="1075" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1113.0" y="346.0" text-anchor="middle" font-size="10">Voice</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--high-tom-conga-level-knob" data-part="high-tom-conga-level-knob" data-kind="knob" role="group" aria-label="Level" aria-roledescription="rotary control" data-surface-controls="high-tom-conga-level-knob">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="1261.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1261.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1261.0" y="209" text-anchor="middle" font-size="10">Level</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--high-tom-conga-level-knob" data-surface-control="high-tom-conga-level-knob" aria-hidden="true">
+        <rect x="1223.0" y="145" width="76.0" height="50" data-hit-area="high-tom-conga-level-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--high-tom-conga-tune-knob" data-part="high-tom-conga-tune-knob" data-kind="knob" role="group" aria-label="Tune" aria-roledescription="rotary control" data-surface-controls="high-tom-conga-tune-knob">
+      <title>Tune</title>
+      <g aria-hidden="true">
+        <circle cx="1261.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1261.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1261.0" y="295" text-anchor="middle" font-size="10">Tune</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--high-tom-conga-tune-knob" data-surface-control="high-tom-conga-tune-knob" aria-hidden="true">
+        <rect x="1223.0" y="231" width="76.0" height="50" data-hit-area="high-tom-conga-tune-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--high-tom-conga-voice-switch" data-part="high-tom-conga-voice-switch" data-kind="switch" role="group" aria-label="Voice" aria-roledescription="selector switch">
+      <title>Voice</title>
+      <g aria-hidden="true">
+        <rect x="1223" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1261.0" y="346.0" text-anchor="middle" font-size="10">Voice</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--claves-rim-level-knob" data-part="claves-rim-level-knob" data-kind="knob" role="group" aria-label="Level" aria-roledescription="rotary control" data-surface-controls="claves-rim-level-knob">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="1409.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1409.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1409.0" y="209" text-anchor="middle" font-size="10">Level</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--claves-rim-level-knob" data-surface-control="claves-rim-level-knob" aria-hidden="true">
+        <rect x="1371.0" y="145" width="76.0" height="50" data-hit-area="claves-rim-level-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--claves-rim-voice-switch" data-part="claves-rim-voice-switch" data-kind="switch" role="group" aria-label="Voice" aria-roledescription="selector switch">
+      <title>Voice</title>
+      <g aria-hidden="true">
+        <rect x="1371" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1409.0" y="260.0" text-anchor="middle" font-size="10">Voice</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--maracas-clap-level-knob" data-part="maracas-clap-level-knob" data-kind="knob" role="group" aria-label="Level" aria-roledescription="rotary control" data-surface-controls="maracas-clap-level-knob">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="1557.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1557.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1557.0" y="209" text-anchor="middle" font-size="10">Level</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--maracas-clap-level-knob" data-surface-control="maracas-clap-level-knob" aria-hidden="true">
+        <rect x="1519.0" y="145" width="76.0" height="50" data-hit-area="maracas-clap-level-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--maracas-clap-voice-switch" data-part="maracas-clap-voice-switch" data-kind="switch" role="group" aria-label="Voice" aria-roledescription="selector switch">
+      <title>Voice</title>
+      <g aria-hidden="true">
+        <rect x="1519" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1557.0" y="260.0" text-anchor="middle" font-size="10">Voice</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--cowbell-level-knob" data-part="cowbell-level-knob" data-kind="knob" role="group" aria-label="Level" aria-roledescription="rotary control" data-surface-controls="cowbell-level-knob">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="1705.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1705.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1705.0" y="209" text-anchor="middle" font-size="10">Level</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--cowbell-level-knob" data-surface-control="cowbell-level-knob" aria-hidden="true">
+        <rect x="1667.0" y="145" width="76.0" height="50" data-hit-area="cowbell-level-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--cymbal-level-knob" data-part="cymbal-level-knob" data-kind="knob" role="group" aria-label="Level" aria-roledescription="rotary control" data-surface-controls="cymbal-level-knob">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="1853.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1853.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1853.0" y="209" text-anchor="middle" font-size="10">Level</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--cymbal-level-knob" data-surface-control="cymbal-level-knob" aria-hidden="true">
+        <rect x="1815.0" y="145" width="76.0" height="50" data-hit-area="cymbal-level-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--cymbal-tone-knob" data-part="cymbal-tone-knob" data-kind="knob" role="group" aria-label="Tone" aria-roledescription="rotary control" data-surface-controls="cymbal-tone-knob">
+      <title>Tone</title>
+      <g aria-hidden="true">
+        <circle cx="1853.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1853.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1853.0" y="295" text-anchor="middle" font-size="10">Tone</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--cymbal-tone-knob" data-surface-control="cymbal-tone-knob" aria-hidden="true">
+        <rect x="1815.0" y="231" width="76.0" height="50" data-hit-area="cymbal-tone-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--cymbal-decay-knob" data-part="cymbal-decay-knob" data-kind="knob" role="group" aria-label="Decay" aria-roledescription="rotary control" data-surface-controls="cymbal-decay-knob">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <circle cx="1853.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1853.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1853.0" y="381" text-anchor="middle" font-size="10">Decay</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--cymbal-decay-knob" data-surface-control="cymbal-decay-knob" aria-hidden="true">
+        <rect x="1815.0" y="317" width="76.0" height="50" data-hit-area="cymbal-decay-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--open-hat-level-knob" data-part="open-hat-level-knob" data-kind="knob" role="group" aria-label="Level" aria-roledescription="rotary control" data-surface-controls="open-hat-level-knob">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="2001.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 2001.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2001.0" y="209" text-anchor="middle" font-size="10">Level</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--open-hat-level-knob" data-surface-control="open-hat-level-knob" aria-hidden="true">
+        <rect x="1963.0" y="145" width="76.0" height="50" data-hit-area="open-hat-level-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--open-hat-decay-knob" data-part="open-hat-decay-knob" data-kind="knob" role="group" aria-label="Decay" aria-roledescription="rotary control" data-surface-controls="open-hat-decay-knob">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <circle cx="2001.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 2001.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2001.0" y="295" text-anchor="middle" font-size="10">Decay</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--open-hat-decay-knob" data-surface-control="open-hat-decay-knob" aria-hidden="true">
+        <rect x="1963.0" y="231" width="76.0" height="50" data-hit-area="open-hat-decay-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--closed-hat-level-knob" data-part="closed-hat-level-knob" data-kind="knob" role="group" aria-label="Level" aria-roledescription="rotary control" data-surface-controls="closed-hat-level-knob">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <circle cx="2149.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 2149.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2149.0" y="209" text-anchor="middle" font-size="10">Level</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--closed-hat-level-knob" data-surface-control="closed-hat-level-knob" aria-hidden="true">
+        <rect x="2111.0" y="145" width="76.0" height="50" data-hit-area="closed-hat-level-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--power" data-part="power" data-kind="button" role="button" aria-label="Power" aria-disabled="true" tabindex="-1">
+      <title>Power</title>
+      <g aria-hidden="true">
+        <rect x="2182" y="45" width="65" height="25" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2214.5" y="61.5" text-anchor="middle" font-size="10">Power</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--usb-midi" data-part="usb-midi" data-kind="socket" role="group" aria-label="USB MIDI" aria-roledescription="connector">
+      <title>USB MIDI</title>
+      <g aria-hidden="true">
+        <rect x="25" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="69.0" y="62.5" text-anchor="middle" font-size="10">USB MIDI</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--midi-in" data-part="midi-in" data-kind="socket" role="group" aria-label="MIDI IN" aria-roledescription="connector">
+      <title>MIDI IN</title>
+      <g aria-hidden="true">
+        <rect x="125" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="169.0" y="62.5" text-anchor="middle" font-size="10">MIDI IN</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--midi-out" data-part="midi-out" data-kind="socket" role="group" aria-label="MIDI OUT" aria-roledescription="connector">
+      <title>MIDI OUT</title>
+      <g aria-hidden="true">
+        <rect x="225" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="269.0" y="62.5" text-anchor="middle" font-size="10">MIDI OUT</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--audio-out" data-part="audio-out" data-kind="socket" role="group" aria-label="Audio OUT" aria-roledescription="connector">
+      <title>Audio OUT</title>
+      <g aria-hidden="true">
+        <rect x="325" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="369.0" y="62.5" text-anchor="middle" font-size="10">Audio OUT</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--headphones" data-part="headphones" data-kind="socket" role="group" aria-label="Headphones" aria-roledescription="connector">
+      <title>Headphones</title>
+      <g aria-hidden="true">
+        <rect x="425" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="469.0" y="62.5" text-anchor="middle" font-size="10">Headphones</text>
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--key-1" data-part="key-1" data-kind="key" role="button" aria-label="Kick" aria-disabled="true" tabindex="-1" data-surface-controls="key-1">
+      <title>Kick</title>
+      <g aria-hidden="true">
+        <rect x="25.0" y="538" width="133.875" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="91.9375" y="579.5" text-anchor="middle" font-size="10">Kick</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--key-1" data-surface-control="key-1" aria-hidden="true">
+        <rect x="25.0" y="538" width="133.875" height="75" data-hit-area="key-1" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--key-2" data-part="key-2" data-kind="key" role="button" aria-label="Snare" aria-disabled="true" tabindex="-1" data-surface-controls="key-2">
+      <title>Snare</title>
+      <g aria-hidden="true">
+        <rect x="163.875" y="538" width="133.875" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="230.8125" y="579.5" text-anchor="middle" font-size="10">Snare</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--key-2" data-surface-control="key-2" aria-hidden="true">
+        <rect x="163.875" y="538" width="133.875" height="75" data-hit-area="key-2" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--key-3" data-part="key-3" data-kind="key" role="button" aria-label="Low tom" aria-disabled="true" tabindex="-1" data-surface-controls="key-3">
+      <title>Low tom</title>
+      <g aria-hidden="true">
+        <rect x="302.75" y="538" width="133.875" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="369.6875" y="579.5" text-anchor="middle" font-size="10">Low tom</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--key-3" data-surface-control="key-3" aria-hidden="true">
+        <rect x="302.75" y="538" width="133.875" height="75" data-hit-area="key-3" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--key-4" data-part="key-4" data-kind="key" role="button" aria-label="Mid tom" aria-disabled="true" tabindex="-1" data-surface-controls="key-4">
+      <title>Mid tom</title>
+      <g aria-hidden="true">
+        <rect x="441.625" y="538" width="133.875" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="508.5625" y="579.5" text-anchor="middle" font-size="10">Mid tom</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--key-4" data-surface-control="key-4" aria-hidden="true">
+        <rect x="441.625" y="538" width="133.875" height="75" data-hit-area="key-4" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--key-5" data-part="key-5" data-kind="key" role="button" aria-label="High tom" aria-disabled="true" tabindex="-1" data-surface-controls="key-5">
+      <title>High tom</title>
+      <g aria-hidden="true">
+        <rect x="580.5" y="538" width="133.875" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="647.4375" y="579.5" text-anchor="middle" font-size="10">High tom</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--key-5" data-surface-control="key-5" aria-hidden="true">
+        <rect x="580.5" y="538" width="133.875" height="75" data-hit-area="key-5" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--key-6" data-part="key-6" data-kind="key" role="button" aria-label="Rim" aria-disabled="true" tabindex="-1" data-surface-controls="key-6">
+      <title>Rim</title>
+      <g aria-hidden="true">
+        <rect x="719.375" y="538" width="133.875" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="786.3125" y="579.5" text-anchor="middle" font-size="10">Rim</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--key-6" data-surface-control="key-6" aria-hidden="true">
+        <rect x="719.375" y="538" width="133.875" height="75" data-hit-area="key-6" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--key-7" data-part="key-7" data-kind="key" role="button" aria-label="Clap" aria-disabled="true" tabindex="-1" data-surface-controls="key-7">
+      <title>Clap</title>
+      <g aria-hidden="true">
+        <rect x="858.25" y="538" width="133.875" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="925.1875" y="579.5" text-anchor="middle" font-size="10">Clap</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--key-7" data-surface-control="key-7" aria-hidden="true">
+        <rect x="858.25" y="538" width="133.875" height="75" data-hit-area="key-7" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--key-8" data-part="key-8" data-kind="key" role="button" aria-label="Closed hat" aria-disabled="true" tabindex="-1" data-surface-controls="key-8">
+      <title>Closed hat</title>
+      <g aria-hidden="true">
+        <rect x="997.125" y="538" width="133.875" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1064.0625" y="579.5" text-anchor="middle" font-size="10">Closed hat</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--key-8" data-surface-control="key-8" aria-hidden="true">
+        <rect x="997.125" y="538" width="133.875" height="75" data-hit-area="key-8" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--key-9" data-part="key-9" data-kind="key" role="button" aria-label="Open hat" aria-disabled="true" tabindex="-1" data-surface-controls="key-9">
+      <title>Open hat</title>
+      <g aria-hidden="true">
+        <rect x="1136.0" y="538" width="133.875" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1202.9375" y="579.5" text-anchor="middle" font-size="10">Open hat</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--key-9" data-surface-control="key-9" aria-hidden="true">
+        <rect x="1136.0" y="538" width="133.875" height="75" data-hit-area="key-9" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--key-10" data-part="key-10" data-kind="key" role="button" aria-label="Cymbal" aria-disabled="true" tabindex="-1" data-surface-controls="key-10">
+      <title>Cymbal</title>
+      <g aria-hidden="true">
+        <rect x="1274.875" y="538" width="133.875" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1341.8125" y="579.5" text-anchor="middle" font-size="10">Cymbal</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--key-10" data-surface-control="key-10" aria-hidden="true">
+        <rect x="1274.875" y="538" width="133.875" height="75" data-hit-area="key-10" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--key-11" data-part="key-11" data-kind="key" role="button" aria-label="Cowbell" aria-disabled="true" tabindex="-1" data-surface-controls="key-11">
+      <title>Cowbell</title>
+      <g aria-hidden="true">
+        <rect x="1413.75" y="538" width="133.875" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1480.6875" y="579.5" text-anchor="middle" font-size="10">Cowbell</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--key-11" data-surface-control="key-11" aria-hidden="true">
+        <rect x="1413.75" y="538" width="133.875" height="75" data-hit-area="key-11" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--key-12" data-part="key-12" data-kind="key" role="button" aria-label="Hi conga" aria-disabled="true" tabindex="-1" data-surface-controls="key-12">
+      <title>Hi conga</title>
+      <g aria-hidden="true">
+        <rect x="1552.625" y="538" width="133.875" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1619.5625" y="579.5" text-anchor="middle" font-size="10">Hi conga</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--key-12" data-surface-control="key-12" aria-hidden="true">
+        <rect x="1552.625" y="538" width="133.875" height="75" data-hit-area="key-12" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--key-13" data-part="key-13" data-kind="key" role="button" aria-label="Mid conga" aria-disabled="true" tabindex="-1" data-surface-controls="key-13">
+      <title>Mid conga</title>
+      <g aria-hidden="true">
+        <rect x="1691.5" y="538" width="133.875" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1758.4375" y="579.5" text-anchor="middle" font-size="10">Mid conga</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--key-13" data-surface-control="key-13" aria-hidden="true">
+        <rect x="1691.5" y="538" width="133.875" height="75" data-hit-area="key-13" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--key-14" data-part="key-14" data-kind="key" role="button" aria-label="Low conga" aria-disabled="true" tabindex="-1" data-surface-controls="key-14">
+      <title>Low conga</title>
+      <g aria-hidden="true">
+        <rect x="1830.375" y="538" width="133.875" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1897.3125" y="579.5" text-anchor="middle" font-size="10">Low conga</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--key-14" data-surface-control="key-14" aria-hidden="true">
+        <rect x="1830.375" y="538" width="133.875" height="75" data-hit-area="key-14" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--key-15" data-part="key-15" data-kind="key" role="button" aria-label="Maracas" aria-disabled="true" tabindex="-1" data-surface-controls="key-15">
+      <title>Maracas</title>
+      <g aria-hidden="true">
+        <rect x="1969.25" y="538" width="133.875" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2036.1875" y="579.5" text-anchor="middle" font-size="10">Maracas</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--key-15" data-surface-control="key-15" aria-hidden="true">
+        <rect x="1969.25" y="538" width="133.875" height="75" data-hit-area="key-15" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tr-08-icon--key-16" data-part="key-16" data-kind="key" role="button" aria-label="Claves" aria-disabled="true" tabindex="-1" data-surface-controls="key-16">
+      <title>Claves</title>
+      <g aria-hidden="true">
+        <rect x="2108.125" y="538" width="133.875" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2175.0625" y="579.5" text-anchor="middle" font-size="10">Claves</text>
+      </g>
+      <g id="roland-tr-08-icon--surface--key-16" data-surface-control="key-16" aria-hidden="true">
+        <rect x="2108.125" y="538" width="133.875" height="75" data-hit-area="key-16" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+  </g>
+</svg>

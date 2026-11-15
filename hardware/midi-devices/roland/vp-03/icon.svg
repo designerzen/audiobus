@@ -1,0 +1,456 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1944 540" role="group" aria-labelledby="roland-vp-03-icon--title" aria-describedby="roland-vp-03-icon--description" data-device="roland-vp-03" data-diagram-style="wireframe" style="background: #fff; color: #334155;">
+  <title id="roland-vp-03-icon--title">Roland VP-03 overhead wireframe diagram</title>
+  <desc id="roland-vp-03-icon--description">Schematic top view grouped by panel section. Every physical control has a stable ID and accessible label. Standalone buttons are disabled until a host supplies interaction. MIDI regions match the JSON surface; note and shared parameter regions use the setup described in the profile.</desc>
+  <style>text { font-family: Arial, sans-serif; fill: currentColor; stroke: none; } [data-part]:focus-visible { outline: 3px solid currentColor; }</style>
+  <g id="roland-vp-03-icon--chassis" aria-hidden="true">
+    <rect x="3" y="3" width="1938" height="534" rx="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="25" y="30" font-size="22">Roland VP-03</text>
+    <rect x="25" y="105" width="202" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="35" y="128" font-size="12">Performance</text>
+    <rect x="239" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="249" y="128" font-size="12">Pitch Shift</text>
+    <rect x="387" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="397" y="128" font-size="12">Balance</text>
+    <rect x="535" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="545" y="128" font-size="12">Vibrato</text>
+    <rect x="683" y="105" width="202" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="693" y="128" font-size="12">Vocoder</text>
+    <rect x="897" y="105" width="202" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="907" y="128" font-size="12">Human Voice</text>
+    <rect x="1111" y="105" width="202" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1121" y="128" font-size="12">Strings</text>
+    <rect x="1325" y="105" width="582" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1335" y="128" font-size="12">Memory</text>
+  </g>
+  <g id="roland-vp-03-icon--controls" role="group" aria-label="Physical hardware controls">
+    <g id="roland-vp-03-icon--performance-volume-knob" data-part="performance-volume-knob" data-kind="knob" role="group" aria-label="Volume" aria-roledescription="rotary control">
+      <title>Volume</title>
+      <g aria-hidden="true">
+        <circle cx="75.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 75.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="209" text-anchor="middle" font-size="10">Volume</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--performance-tune-knob" data-part="performance-tune-knob" data-kind="knob" role="group" aria-label="Tune" aria-roledescription="rotary control" data-surface-controls="performance-tune-knob">
+      <title>Tune</title>
+      <g aria-hidden="true">
+        <circle cx="170.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 170.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="170.0" y="209" text-anchor="middle" font-size="10">Tune</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--performance-tune-knob" data-surface-control="performance-tune-knob" aria-hidden="true">
+        <rect x="132.0" y="145" width="76.0" height="50" data-hit-area="performance-tune-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--performance-ribbon-c1-touch" data-part="performance-ribbon-c1-touch" data-kind="touch" role="group" aria-label="Ribbon C1" aria-roledescription="touch strip" data-surface-controls="performance-ribbon-c1-touch">
+      <title>Ribbon C1</title>
+      <g aria-hidden="true">
+        <rect x="37" y="231" width="76" height="50" rx="4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 42 256.0 H 108" stroke-dasharray="3 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="260.0" text-anchor="middle" font-size="10">Ribbon C1</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--performance-ribbon-c1-touch" data-surface-control="performance-ribbon-c1-touch" aria-hidden="true">
+        <rect x="37.0" y="231" width="76.0" height="50" data-hit-area="performance-ribbon-c1-touch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--performance-ribbon-c2-touch" data-part="performance-ribbon-c2-touch" data-kind="touch" role="group" aria-label="Ribbon C2" aria-roledescription="touch strip" data-surface-controls="performance-ribbon-c2-touch">
+      <title>Ribbon C2</title>
+      <g aria-hidden="true">
+        <rect x="132" y="231" width="76" height="50" rx="4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 137 256.0 H 203" stroke-dasharray="3 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="170.0" y="260.0" text-anchor="middle" font-size="10">Ribbon C2</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--performance-ribbon-c2-touch" data-surface-control="performance-ribbon-c2-touch" aria-hidden="true">
+        <rect x="132.0" y="231" width="76.0" height="50" data-hit-area="performance-ribbon-c2-touch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--performance-mic-power-switch" data-part="performance-mic-power-switch" data-kind="switch" role="group" aria-label="Mic power" aria-roledescription="selector switch">
+      <title>Mic power</title>
+      <g aria-hidden="true">
+        <rect x="37" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="346.0" text-anchor="middle" font-size="10">Mic power</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--performance-c1-mode-switch" data-part="performance-c1-mode-switch" data-kind="switch" role="group" aria-label="C1 mode" aria-roledescription="selector switch">
+      <title>C1 mode</title>
+      <g aria-hidden="true">
+        <rect x="132" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="170.0" y="346.0" text-anchor="middle" font-size="10">C1 mode</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--pitch-shift-time-knob" data-part="pitch-shift-time-knob" data-kind="knob" role="group" aria-label="Time" aria-roledescription="rotary control" data-surface-controls="pitch-shift-time-knob">
+      <title>Time</title>
+      <g aria-hidden="true">
+        <circle cx="289.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 289.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="289.0" y="209" text-anchor="middle" font-size="10">Time</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--pitch-shift-time-knob" data-surface-control="pitch-shift-time-knob" aria-hidden="true">
+        <rect x="251.0" y="145" width="76.0" height="50" data-hit-area="pitch-shift-time-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--pitch-shift-pitch-set-knob" data-part="pitch-shift-pitch-set-knob" data-kind="knob" role="group" aria-label="Pitch set" aria-roledescription="rotary control" data-surface-controls="pitch-shift-pitch-set-knob">
+      <title>Pitch set</title>
+      <g aria-hidden="true">
+        <circle cx="289.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 289.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="289.0" y="295" text-anchor="middle" font-size="10">Pitch set</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--pitch-shift-pitch-set-knob" data-surface-control="pitch-shift-pitch-set-knob" aria-hidden="true">
+        <rect x="251.0" y="231" width="76.0" height="50" data-hit-area="pitch-shift-pitch-set-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--pitch-shift-auto-off-manual-switch" data-part="pitch-shift-auto-off-manual-switch" data-kind="switch" role="group" aria-label="Auto Off Manual" aria-roledescription="selector switch" data-surface-controls="pitch-shift-auto-off-manual-switch">
+      <title>Auto Off Manual</title>
+      <g aria-hidden="true">
+        <rect x="251" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="289.0" y="346.0" text-anchor="middle" font-size="10">Auto Off Manual</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--pitch-shift-auto-off-manual-switch" data-surface-control="pitch-shift-auto-off-manual-switch" aria-hidden="true">
+        <rect x="251.0" y="317" width="76.0" height="50" data-hit-area="pitch-shift-auto-off-manual-switch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--balance-direct-mic-fader" data-part="balance-direct-mic-fader" data-kind="fader" role="group" aria-label="Direct mic" aria-roledescription="slider" data-surface-controls="balance-direct-mic-fader">
+      <title>Direct mic</title>
+      <g aria-hidden="true">
+        <rect x="434.0" y="145" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="424.0" y="172.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="437.0" y="209" text-anchor="middle" font-size="10">Direct mic</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--balance-direct-mic-fader" data-surface-control="balance-direct-mic-fader" aria-hidden="true">
+        <rect x="399.0" y="145" width="76.0" height="50" data-hit-area="balance-direct-mic-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--balance-human-voice-fader" data-part="balance-human-voice-fader" data-kind="fader" role="group" aria-label="Human voice" aria-roledescription="slider" data-surface-controls="balance-human-voice-fader">
+      <title>Human voice</title>
+      <g aria-hidden="true">
+        <rect x="434.0" y="231" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="424.0" y="258.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="437.0" y="295" text-anchor="middle" font-size="10">Human voice</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--balance-human-voice-fader" data-surface-control="balance-human-voice-fader" aria-hidden="true">
+        <rect x="399.0" y="231" width="76.0" height="50" data-hit-area="balance-human-voice-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--balance-strings-fader" data-part="balance-strings-fader" data-kind="fader" role="group" aria-label="Strings" aria-roledescription="slider" data-surface-controls="balance-strings-fader">
+      <title>Strings</title>
+      <g aria-hidden="true">
+        <rect x="434.0" y="317" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="424.0" y="344.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="437.0" y="381" text-anchor="middle" font-size="10">Strings</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--balance-strings-fader" data-surface-control="balance-strings-fader" aria-hidden="true">
+        <rect x="399.0" y="317" width="76.0" height="50" data-hit-area="balance-strings-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--vibrato-rate-fader" data-part="vibrato-rate-fader" data-kind="fader" role="group" aria-label="Rate" aria-roledescription="slider" data-surface-controls="vibrato-rate-fader">
+      <title>Rate</title>
+      <g aria-hidden="true">
+        <rect x="582.0" y="145" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="572.0" y="172.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="585.0" y="209" text-anchor="middle" font-size="10">Rate</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--vibrato-rate-fader" data-surface-control="vibrato-rate-fader" aria-hidden="true">
+        <rect x="547.0" y="145" width="76.0" height="50" data-hit-area="vibrato-rate-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--vibrato-delay-fader" data-part="vibrato-delay-fader" data-kind="fader" role="group" aria-label="Delay" aria-roledescription="slider" data-surface-controls="vibrato-delay-fader">
+      <title>Delay</title>
+      <g aria-hidden="true">
+        <rect x="582.0" y="231" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="572.0" y="258.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="585.0" y="295" text-anchor="middle" font-size="10">Delay</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--vibrato-delay-fader" data-surface-control="vibrato-delay-fader" aria-hidden="true">
+        <rect x="547.0" y="231" width="76.0" height="50" data-hit-area="vibrato-delay-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--vibrato-depth-fader" data-part="vibrato-depth-fader" data-kind="fader" role="group" aria-label="Depth" aria-roledescription="slider" data-surface-controls="vibrato-depth-fader">
+      <title>Depth</title>
+      <g aria-hidden="true">
+        <rect x="582.0" y="317" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="572.0" y="344.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="585.0" y="381" text-anchor="middle" font-size="10">Depth</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--vibrato-depth-fader" data-surface-control="vibrato-depth-fader" aria-hidden="true">
+        <rect x="547.0" y="317" width="76.0" height="50" data-hit-area="vibrato-depth-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--vocoder-on-off-switch" data-part="vocoder-on-off-switch" data-kind="switch" role="group" aria-label="On Off" aria-roledescription="selector switch">
+      <title>On Off</title>
+      <g aria-hidden="true">
+        <rect x="695" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="733.0" y="174.0" text-anchor="middle" font-size="10">On Off</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--vocoder-ensemble-switch" data-part="vocoder-ensemble-switch" data-kind="switch" role="group" aria-label="Ensemble" aria-roledescription="selector switch">
+      <title>Ensemble</title>
+      <g aria-hidden="true">
+        <rect x="790" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="828.0" y="174.0" text-anchor="middle" font-size="10">Ensemble</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--vocoder-level-fader" data-part="vocoder-level-fader" data-kind="fader" role="group" aria-label="Level" aria-roledescription="slider" data-surface-controls="vocoder-level-fader">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <rect x="730.0" y="231" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="720.0" y="258.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="733.0" y="295" text-anchor="middle" font-size="10">Level</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--vocoder-level-fader" data-surface-control="vocoder-level-fader" aria-hidden="true">
+        <rect x="695.0" y="231" width="76.0" height="50" data-hit-area="vocoder-level-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--vocoder-tone-fader" data-part="vocoder-tone-fader" data-kind="fader" role="group" aria-label="Tone" aria-roledescription="slider" data-surface-controls="vocoder-tone-fader">
+      <title>Tone</title>
+      <g aria-hidden="true">
+        <rect x="825.0" y="231" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="815.0" y="258.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="828.0" y="295" text-anchor="middle" font-size="10">Tone</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--vocoder-tone-fader" data-surface-control="vocoder-tone-fader" aria-hidden="true">
+        <rect x="790.0" y="231" width="76.0" height="50" data-hit-area="vocoder-tone-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--human-voice-male-8-foot-switch" data-part="human-voice-male-8-foot-switch" data-kind="switch" role="group" aria-label="Male 8 foot" aria-roledescription="selector switch">
+      <title>Male 8 foot</title>
+      <g aria-hidden="true">
+        <rect x="909" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="947.0" y="174.0" text-anchor="middle" font-size="10">Male 8 foot</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--human-voice-female-4-foot-switch" data-part="human-voice-female-4-foot-switch" data-kind="switch" role="group" aria-label="Female 4 foot" aria-roledescription="selector switch">
+      <title>Female 4 foot</title>
+      <g aria-hidden="true">
+        <rect x="1004" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1042.0" y="174.0" text-anchor="middle" font-size="10">Female 4 foot</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--human-voice-ensemble-switch" data-part="human-voice-ensemble-switch" data-kind="switch" role="group" aria-label="Ensemble" aria-roledescription="selector switch">
+      <title>Ensemble</title>
+      <g aria-hidden="true">
+        <rect x="909" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="947.0" y="260.0" text-anchor="middle" font-size="10">Ensemble</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--human-voice-attack-fader" data-part="human-voice-attack-fader" data-kind="fader" role="group" aria-label="Attack" aria-roledescription="slider" data-surface-controls="human-voice-attack-fader">
+      <title>Attack</title>
+      <g aria-hidden="true">
+        <rect x="1039.0" y="231" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="1029.0" y="258.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1042.0" y="295" text-anchor="middle" font-size="10">Attack</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--human-voice-attack-fader" data-surface-control="human-voice-attack-fader" aria-hidden="true">
+        <rect x="1004.0" y="231" width="76.0" height="50" data-hit-area="human-voice-attack-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--strings-on-off-switch" data-part="strings-on-off-switch" data-kind="switch" role="group" aria-label="On Off" aria-roledescription="selector switch">
+      <title>On Off</title>
+      <g aria-hidden="true">
+        <rect x="1123" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1161.0" y="174.0" text-anchor="middle" font-size="10">On Off</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--strings-attack-fader" data-part="strings-attack-fader" data-kind="fader" role="group" aria-label="Attack" aria-roledescription="slider" data-surface-controls="strings-attack-fader">
+      <title>Attack</title>
+      <g aria-hidden="true">
+        <rect x="1253.0" y="145" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="1243.0" y="172.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1256.0" y="209" text-anchor="middle" font-size="10">Attack</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--strings-attack-fader" data-surface-control="strings-attack-fader" aria-hidden="true">
+        <rect x="1218.0" y="145" width="76.0" height="50" data-hit-area="strings-attack-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--strings-tone-fader" data-part="strings-tone-fader" data-kind="fader" role="group" aria-label="Tone" aria-roledescription="slider" data-surface-controls="strings-tone-fader">
+      <title>Tone</title>
+      <g aria-hidden="true">
+        <rect x="1158.0" y="231" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="1148.0" y="258.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1161.0" y="295" text-anchor="middle" font-size="10">Tone</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--strings-tone-fader" data-surface-control="strings-tone-fader" aria-hidden="true">
+        <rect x="1123.0" y="231" width="76.0" height="50" data-hit-area="strings-tone-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--strings-release-fader" data-part="strings-release-fader" data-kind="fader" role="group" aria-label="Release" aria-roledescription="slider" data-surface-controls="strings-release-fader">
+      <title>Release</title>
+      <g aria-hidden="true">
+        <rect x="1253.0" y="231" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="1243.0" y="258.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1256.0" y="295" text-anchor="middle" font-size="10">Release</text>
+      </g>
+      <g id="roland-vp-03-icon--surface--strings-release-fader" data-surface-control="strings-release-fader" aria-hidden="true">
+        <rect x="1218.0" y="231" width="76.0" height="50" data-hit-area="strings-release-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-memory-button" data-part="memory-memory-button" data-kind="button" role="button" aria-label="Memory" aria-disabled="true" tabindex="-1">
+      <title>Memory</title>
+      <g aria-hidden="true">
+        <rect x="1337" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1375.0" y="174.0" text-anchor="middle" font-size="10">Memory</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-play-stop-button" data-part="memory-play-stop-button" data-kind="button" role="button" aria-label="Play Stop" aria-disabled="true" tabindex="-1">
+      <title>Play Stop</title>
+      <g aria-hidden="true">
+        <rect x="1432" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1470.0" y="174.0" text-anchor="middle" font-size="10">Play Stop</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-step-1-button" data-part="memory-step-1-button" data-kind="button" role="button" aria-label="Step 1" aria-disabled="true" tabindex="-1">
+      <title>Step 1</title>
+      <g aria-hidden="true">
+        <rect x="1527" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1565.0" y="174.0" text-anchor="middle" font-size="10">Step 1</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-step-2-button" data-part="memory-step-2-button" data-kind="button" role="button" aria-label="Step 2" aria-disabled="true" tabindex="-1">
+      <title>Step 2</title>
+      <g aria-hidden="true">
+        <rect x="1622" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1660.0" y="174.0" text-anchor="middle" font-size="10">Step 2</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-step-3-button" data-part="memory-step-3-button" data-kind="button" role="button" aria-label="Step 3" aria-disabled="true" tabindex="-1">
+      <title>Step 3</title>
+      <g aria-hidden="true">
+        <rect x="1717" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1755.0" y="174.0" text-anchor="middle" font-size="10">Step 3</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-step-4-button" data-part="memory-step-4-button" data-kind="button" role="button" aria-label="Step 4" aria-disabled="true" tabindex="-1">
+      <title>Step 4</title>
+      <g aria-hidden="true">
+        <rect x="1812" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1850.0" y="174.0" text-anchor="middle" font-size="10">Step 4</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-step-5-button" data-part="memory-step-5-button" data-kind="button" role="button" aria-label="Step 5" aria-disabled="true" tabindex="-1">
+      <title>Step 5</title>
+      <g aria-hidden="true">
+        <rect x="1337" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1375.0" y="260.0" text-anchor="middle" font-size="10">Step 5</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-step-6-button" data-part="memory-step-6-button" data-kind="button" role="button" aria-label="Step 6" aria-disabled="true" tabindex="-1">
+      <title>Step 6</title>
+      <g aria-hidden="true">
+        <rect x="1432" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1470.0" y="260.0" text-anchor="middle" font-size="10">Step 6</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-step-7-button" data-part="memory-step-7-button" data-kind="button" role="button" aria-label="Step 7" aria-disabled="true" tabindex="-1">
+      <title>Step 7</title>
+      <g aria-hidden="true">
+        <rect x="1527" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1565.0" y="260.0" text-anchor="middle" font-size="10">Step 7</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-step-8-button" data-part="memory-step-8-button" data-kind="button" role="button" aria-label="Step 8" aria-disabled="true" tabindex="-1">
+      <title>Step 8</title>
+      <g aria-hidden="true">
+        <rect x="1622" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1660.0" y="260.0" text-anchor="middle" font-size="10">Step 8</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-step-9-button" data-part="memory-step-9-button" data-kind="button" role="button" aria-label="Step 9" aria-disabled="true" tabindex="-1">
+      <title>Step 9</title>
+      <g aria-hidden="true">
+        <rect x="1717" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1755.0" y="260.0" text-anchor="middle" font-size="10">Step 9</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-step-10-button" data-part="memory-step-10-button" data-kind="button" role="button" aria-label="Step 10" aria-disabled="true" tabindex="-1">
+      <title>Step 10</title>
+      <g aria-hidden="true">
+        <rect x="1812" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1850.0" y="260.0" text-anchor="middle" font-size="10">Step 10</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-step-11-button" data-part="memory-step-11-button" data-kind="button" role="button" aria-label="Step 11" aria-disabled="true" tabindex="-1">
+      <title>Step 11</title>
+      <g aria-hidden="true">
+        <rect x="1337" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1375.0" y="346.0" text-anchor="middle" font-size="10">Step 11</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-step-12-button" data-part="memory-step-12-button" data-kind="button" role="button" aria-label="Step 12" aria-disabled="true" tabindex="-1">
+      <title>Step 12</title>
+      <g aria-hidden="true">
+        <rect x="1432" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1470.0" y="346.0" text-anchor="middle" font-size="10">Step 12</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-step-13-button" data-part="memory-step-13-button" data-kind="button" role="button" aria-label="Step 13" aria-disabled="true" tabindex="-1">
+      <title>Step 13</title>
+      <g aria-hidden="true">
+        <rect x="1527" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1565.0" y="346.0" text-anchor="middle" font-size="10">Step 13</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-step-14-button" data-part="memory-step-14-button" data-kind="button" role="button" aria-label="Step 14" aria-disabled="true" tabindex="-1">
+      <title>Step 14</title>
+      <g aria-hidden="true">
+        <rect x="1622" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1660.0" y="346.0" text-anchor="middle" font-size="10">Step 14</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-step-15-button" data-part="memory-step-15-button" data-kind="button" role="button" aria-label="Step 15" aria-disabled="true" tabindex="-1">
+      <title>Step 15</title>
+      <g aria-hidden="true">
+        <rect x="1717" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1755.0" y="346.0" text-anchor="middle" font-size="10">Step 15</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--memory-step-16-button" data-part="memory-step-16-button" data-kind="button" role="button" aria-label="Step 16" aria-disabled="true" tabindex="-1">
+      <title>Step 16</title>
+      <g aria-hidden="true">
+        <rect x="1812" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1850.0" y="346.0" text-anchor="middle" font-size="10">Step 16</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--power" data-part="power" data-kind="button" role="button" aria-label="Power" aria-disabled="true" tabindex="-1">
+      <title>Power</title>
+      <g aria-hidden="true">
+        <rect x="1854" y="45" width="65" height="25" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1886.5" y="61.5" text-anchor="middle" font-size="10">Power</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--usb-midi" data-part="usb-midi" data-kind="socket" role="group" aria-label="USB MIDI" aria-roledescription="connector">
+      <title>USB MIDI</title>
+      <g aria-hidden="true">
+        <rect x="25" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="69.0" y="62.5" text-anchor="middle" font-size="10">USB MIDI</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--midi-in" data-part="midi-in" data-kind="socket" role="group" aria-label="MIDI IN" aria-roledescription="connector">
+      <title>MIDI IN</title>
+      <g aria-hidden="true">
+        <rect x="125" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="169.0" y="62.5" text-anchor="middle" font-size="10">MIDI IN</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--midi-out" data-part="midi-out" data-kind="socket" role="group" aria-label="MIDI OUT" aria-roledescription="connector">
+      <title>MIDI OUT</title>
+      <g aria-hidden="true">
+        <rect x="225" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="269.0" y="62.5" text-anchor="middle" font-size="10">MIDI OUT</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--audio-out" data-part="audio-out" data-kind="socket" role="group" aria-label="Audio OUT" aria-roledescription="connector">
+      <title>Audio OUT</title>
+      <g aria-hidden="true">
+        <rect x="325" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="369.0" y="62.5" text-anchor="middle" font-size="10">Audio OUT</text>
+      </g>
+    </g>
+    <g id="roland-vp-03-icon--headphones" data-part="headphones" data-kind="socket" role="group" aria-label="Headphones" aria-roledescription="connector">
+      <title>Headphones</title>
+      <g aria-hidden="true">
+        <rect x="425" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="469.0" y="62.5" text-anchor="middle" font-size="10">Headphones</text>
+      </g>
+    </g>
+  </g>
+</svg>

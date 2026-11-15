@@ -1,79 +1,96 @@
-/**
- * Filter Display
- * Visualizes frequency response of a biquad filter
- */
+import { RenderSurface } from "./renderers/RenderSurface.ts"
+
+/** Logarithmic filter response from 20 Hz to Nyquist, with dB magnitude and phase. */
 export class FilterDisplay {
 	private canvas: HTMLCanvasElement
-	private context: CanvasRenderingContext2D
-
-	private myFrequencyArray: Float32Array
-	private magResponseOutput: Float32Array
-	private phaseResponseOutput: Float32Array
-
-	private resolution: number
-
-	public get element(): HTMLCanvasElement {
+	private surface: RenderSurface
+	private frequencies: Float32Array<ArrayBuffer>
+	private magnitude: Float32Array<ArrayBuffer>
+	private phase: Float32Array<ArrayBuffer>
+	private magnitudeLine: Uint8Array<ArrayBuffer>
+	private phaseLine: Uint8Array<ArrayBuffer>
+	private sampleRate = 0
+	get element(): HTMLCanvasElement {
 		return this.canvas
 	}
-
-	constructor(width: number, height: number, bars: number = 100) {
-		const canvas: HTMLCanvasElement = document.createElement("canvas")
-		const ctx = canvas.getContext("2d")
-		if (!ctx) {
-			throw new Error("Could not get 2D context")
-		}
-
-		canvas.width = width
-		canvas.height = height
-		this.canvas = canvas
-		this.context = ctx
-		this.resolution = bars
-
-		// Array containing all the frequencies we want to get response for
-		this.myFrequencyArray = new Float32Array(bars)
-		for (let i = 0; i < bars; ++i) {
-			this.myFrequencyArray[i] = (2000 / bars) * (i + 1)
-		}
-
-		// We receive the result in these two arrays
-		this.magResponseOutput = new Float32Array(bars)
-		this.phaseResponseOutput = new Float32Array(bars)
+	get ready(): Promise<void> {
+		return this.surface.ready
 	}
-
-	private drawFrequencyResponse(mag: Float32Array, phase: Float32Array): void {
-		const barWidth: number = this.canvas.width / this.resolution
-		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
-
-		// Magnitude response
-		this.context.strokeStyle = "white"
-		this.context.beginPath()
-		for (let frequencyStep = 0; frequencyStep < this.resolution; ++frequencyStep) {
-			this.context.lineTo(
-				frequencyStep * barWidth,
-				this.canvas.height - mag[frequencyStep] * this.canvas.height
-			)
-		}
-		this.context.stroke()
-
-		// Phase response
-		this.context.strokeStyle = "red"
-		this.context.beginPath()
-
-		for (let frequencyStep = 0; frequencyStep < this.resolution; ++frequencyStep) {
-			this.context.lineTo(
-				frequencyStep * barWidth,
-				this.canvas.height - (phase[frequencyStep] * 90 + 300) / Math.PI
-			)
-		}
-		this.context.stroke()
+	get backend() {
+		return this.surface.backend
 	}
-
-	public updateFrequencyResponse(filter: BiquadFilterNode): void {
-		filter.getFrequencyResponse(
-			this.myFrequencyArray,
-			this.magResponseOutput,
-			this.phaseResponseOutput
+	constructor(width: number, height: number, bars = 256) {
+		if (!Number.isInteger(bars) || bars < 2 || bars > 32768) {
+			throw new RangeError("Response resolution must be between 2 and 32768")
+		}
+		this.canvas = document.createElement("canvas")
+		this.canvas.setAttribute("role", "img")
+		this.canvas.setAttribute(
+			"aria-label",
+			"Filter frequency response: magnitude and phase, 20 Hz to Nyquist"
 		)
-		this.drawFrequencyResponse(this.magResponseOutput, this.phaseResponseOutput)
+		this.setSize(width, height)
+		this.surface = new RenderSurface(this.canvas)
+		this.frequencies = new Float32Array(bars)
+		this.magnitude = new Float32Array(bars)
+		this.phase = new Float32Array(bars)
+		this.magnitudeLine = new Uint8Array(bars)
+		this.phaseLine = new Uint8Array(bars)
+	}
+	setSize(width: number, height: number): void {
+		if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+			throw new RangeError("Canvas size must be positive")
+		}
+		const ratio = Math.min(2, globalThis.devicePixelRatio || 1)
+		this.canvas.width = Math.min(4096, Math.max(1, Math.round(width * ratio)))
+		this.canvas.height = Math.min(4096, Math.max(1, Math.round(height * ratio)))
+		this.canvas.style.width = `${width}px`
+		this.canvas.style.height = `${height}px`
+	}
+	updateFrequencyResponse(filter: BiquadFilterNode): void {
+		if (this.sampleRate !== filter.context.sampleRate) {
+			this.sampleRate = filter.context.sampleRate
+			const max = this.sampleRate / 2
+			const min = Math.min(20, max / 2)
+			for (let i = 0; i < this.frequencies.length; i++) {
+				this.frequencies[i] = min * (max / min) ** (i / (this.frequencies.length - 1))
+			}
+		}
+		filter.getFrequencyResponse(this.frequencies, this.magnitude, this.phase)
+		for (let i = 0; i < this.frequencies.length; i++) {
+			const db = 20 * Math.log10(Math.max(1e-6, this.magnitude[i]))
+			this.magnitudeLine[i] = Math.round(Math.max(0, Math.min(1, (24 - db) / 84)) * 255)
+			this.phaseLine[i] = Math.round(
+				Math.max(0, Math.min(1, (Math.PI - this.phase[i]) / (2 * Math.PI))) * 255
+			)
+		}
+		const render = () => {
+			this.surface.beginFrame()
+			for (const [data, colour] of [
+				[this.magnitudeLine, [0.4, 0.85, 1, 1]],
+				[this.phaseLine, [1, 0.4, 0.55, 0.8]]
+			] as const) {
+				this.surface.add({
+					mode: "scope",
+					data,
+					colour,
+					time: 0,
+					thickness: 2,
+					amplitude: 0,
+					decay: 0,
+					ratios: [0, 0, 0],
+					phases: [0, 0, 0]
+				})
+			}
+			this.surface.endFrame()
+		}
+		if (this.backend === "pending") {
+			void this.ready.then(render)
+		} else {
+			render()
+		}
+	}
+	dispose(): void {
+		this.surface.dispose()
 	}
 }

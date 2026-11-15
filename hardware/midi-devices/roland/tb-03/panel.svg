@@ -1,0 +1,411 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 650" role="group" aria-labelledby="roland-tb-03-panel--title" aria-describedby="roland-tb-03-panel--description" data-device="roland-tb-03" data-diagram-style="wireframe" style="background: #fff; color: #334155;">
+  <title id="roland-tb-03-panel--title">Roland TB-03 overhead wireframe diagram</title>
+  <desc id="roland-tb-03-panel--description">Schematic top view grouped by panel section. Every physical control has a stable ID and accessible label. Standalone buttons are disabled until a host supplies interaction. MIDI regions match the JSON surface; note and shared parameter regions use the setup described in the profile.</desc>
+  <style>text { font-family: Arial, sans-serif; fill: currentColor; stroke: none; } [data-part]:focus-visible { outline: 3px solid currentColor; }</style>
+  <g id="roland-tb-03-panel--chassis" aria-hidden="true">
+    <rect x="3" y="3" width="1194" height="644" rx="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="25" y="30" font-size="22">Roland TB-03</text>
+    <rect x="25" y="105" width="202" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="35" y="128" font-size="12">Sound</text>
+    <rect x="239" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="249" y="128" font-size="12">Effects</text>
+    <rect x="387" y="105" width="582" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="397" y="128" font-size="12">Sequencer</text>
+  </g>
+  <g id="roland-tb-03-panel--controls" role="group" aria-label="Physical hardware controls">
+    <g id="roland-tb-03-panel--sound-tuning-knob" data-part="sound-tuning-knob" data-kind="knob" role="group" aria-label="Tuning" aria-roledescription="rotary control" data-surface-controls="sound-tuning-knob">
+      <title>Tuning</title>
+      <g aria-hidden="true">
+        <circle cx="75.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 75.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="209" text-anchor="middle" font-size="10">Tuning</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--sound-tuning-knob" data-surface-control="sound-tuning-knob" aria-hidden="true">
+        <rect x="37.0" y="145" width="76.0" height="50" data-hit-area="sound-tuning-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sound-cutoff-knob" data-part="sound-cutoff-knob" data-kind="knob" role="group" aria-label="Cutoff" aria-roledescription="rotary control" data-surface-controls="sound-cutoff-knob">
+      <title>Cutoff</title>
+      <g aria-hidden="true">
+        <circle cx="170.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 170.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="170.0" y="209" text-anchor="middle" font-size="10">Cutoff</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--sound-cutoff-knob" data-surface-control="sound-cutoff-knob" aria-hidden="true">
+        <rect x="132.0" y="145" width="76.0" height="50" data-hit-area="sound-cutoff-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sound-resonance-knob" data-part="sound-resonance-knob" data-kind="knob" role="group" aria-label="Resonance" aria-roledescription="rotary control" data-surface-controls="sound-resonance-knob">
+      <title>Resonance</title>
+      <g aria-hidden="true">
+        <circle cx="75.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 75.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="295" text-anchor="middle" font-size="10">Resonance</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--sound-resonance-knob" data-surface-control="sound-resonance-knob" aria-hidden="true">
+        <rect x="37.0" y="231" width="76.0" height="50" data-hit-area="sound-resonance-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sound-env-mod-knob" data-part="sound-env-mod-knob" data-kind="knob" role="group" aria-label="Env mod" aria-roledescription="rotary control" data-surface-controls="sound-env-mod-knob">
+      <title>Env mod</title>
+      <g aria-hidden="true">
+        <circle cx="170.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 170.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="170.0" y="295" text-anchor="middle" font-size="10">Env mod</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--sound-env-mod-knob" data-surface-control="sound-env-mod-knob" aria-hidden="true">
+        <rect x="132.0" y="231" width="76.0" height="50" data-hit-area="sound-env-mod-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sound-decay-knob" data-part="sound-decay-knob" data-kind="knob" role="group" aria-label="Decay" aria-roledescription="rotary control" data-surface-controls="sound-decay-knob">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <circle cx="75.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 75.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="381" text-anchor="middle" font-size="10">Decay</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--sound-decay-knob" data-surface-control="sound-decay-knob" aria-hidden="true">
+        <rect x="37.0" y="317" width="76.0" height="50" data-hit-area="sound-decay-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sound-accent-knob" data-part="sound-accent-knob" data-kind="knob" role="group" aria-label="Accent" aria-roledescription="rotary control" data-surface-controls="sound-accent-knob">
+      <title>Accent</title>
+      <g aria-hidden="true">
+        <circle cx="170.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 170.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="170.0" y="381" text-anchor="middle" font-size="10">Accent</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--sound-accent-knob" data-surface-control="sound-accent-knob" aria-hidden="true">
+        <rect x="132.0" y="317" width="76.0" height="50" data-hit-area="sound-accent-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--effects-overdrive-knob" data-part="effects-overdrive-knob" data-kind="knob" role="group" aria-label="Overdrive" aria-roledescription="rotary control" data-surface-controls="effects-overdrive-knob">
+      <title>Overdrive</title>
+      <g aria-hidden="true">
+        <circle cx="289.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 289.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="289.0" y="209" text-anchor="middle" font-size="10">Overdrive</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--effects-overdrive-knob" data-surface-control="effects-overdrive-knob" aria-hidden="true">
+        <rect x="251.0" y="145" width="76.0" height="50" data-hit-area="effects-overdrive-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--effects-delay-time-knob" data-part="effects-delay-time-knob" data-kind="knob" role="group" aria-label="Delay time" aria-roledescription="rotary control" data-surface-controls="effects-delay-time-knob">
+      <title>Delay time</title>
+      <g aria-hidden="true">
+        <circle cx="289.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 289.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="289.0" y="295" text-anchor="middle" font-size="10">Delay time</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--effects-delay-time-knob" data-surface-control="effects-delay-time-knob" aria-hidden="true">
+        <rect x="251.0" y="231" width="76.0" height="50" data-hit-area="effects-delay-time-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--effects-delay-feedback-knob" data-part="effects-delay-feedback-knob" data-kind="knob" role="group" aria-label="Delay feedback" aria-roledescription="rotary control" data-surface-controls="effects-delay-feedback-knob">
+      <title>Delay feedback</title>
+      <g aria-hidden="true">
+        <circle cx="289.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 289.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="289.0" y="381" text-anchor="middle" font-size="10">Delay feedback</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--effects-delay-feedback-knob" data-surface-control="effects-delay-feedback-knob" aria-hidden="true">
+        <rect x="251.0" y="317" width="76.0" height="50" data-hit-area="effects-delay-feedback-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sequencer-volume-knob" data-part="sequencer-volume-knob" data-kind="knob" role="group" aria-label="Volume" aria-roledescription="rotary control">
+      <title>Volume</title>
+      <g aria-hidden="true">
+        <circle cx="437.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 437.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="437.0" y="209" text-anchor="middle" font-size="10">Volume</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sequencer-waveform-switch" data-part="sequencer-waveform-switch" data-kind="switch" role="group" aria-label="Waveform" aria-roledescription="selector switch">
+      <title>Waveform</title>
+      <g aria-hidden="true">
+        <rect x="494" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="532.0" y="174.0" text-anchor="middle" font-size="10">Waveform</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sequencer-track-group-knob" data-part="sequencer-track-group-knob" data-kind="knob" role="group" aria-label="Track Group" aria-roledescription="rotary control">
+      <title>Track Group</title>
+      <g aria-hidden="true">
+        <circle cx="627.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 627.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="627.0" y="209" text-anchor="middle" font-size="10">Track Group</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sequencer-mode-knob" data-part="sequencer-mode-knob" data-kind="knob" role="group" aria-label="Mode" aria-roledescription="rotary control">
+      <title>Mode</title>
+      <g aria-hidden="true">
+        <circle cx="722.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 722.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="722.0" y="209" text-anchor="middle" font-size="10">Mode</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sequencer-value-knob" data-part="sequencer-value-knob" data-kind="knob" role="group" aria-label="Value" aria-roledescription="rotary control">
+      <title>Value</title>
+      <g aria-hidden="true">
+        <circle cx="817.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 817.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="817.0" y="209" text-anchor="middle" font-size="10">Value</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sequencer-tempo-button" data-part="sequencer-tempo-button" data-kind="button" role="button" aria-label="Tempo" aria-disabled="true" tabindex="-1">
+      <title>Tempo</title>
+      <g aria-hidden="true">
+        <rect x="874" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="912.0" y="174.0" text-anchor="middle" font-size="10">Tempo</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sequencer-pattern-clear-button" data-part="sequencer-pattern-clear-button" data-kind="button" role="button" aria-label="Pattern clear" aria-disabled="true" tabindex="-1">
+      <title>Pattern clear</title>
+      <g aria-hidden="true">
+        <rect x="399" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="437.0" y="260.0" text-anchor="middle" font-size="10">Pattern clear</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sequencer-run-stop-button" data-part="sequencer-run-stop-button" data-kind="button" role="button" aria-label="Run Stop" aria-disabled="true" tabindex="-1">
+      <title>Run Stop</title>
+      <g aria-hidden="true">
+        <rect x="494" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="532.0" y="260.0" text-anchor="middle" font-size="10">Run Stop</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sequencer-pitch-mode-button" data-part="sequencer-pitch-mode-button" data-kind="button" role="button" aria-label="Pitch mode" aria-disabled="true" tabindex="-1">
+      <title>Pitch mode</title>
+      <g aria-hidden="true">
+        <rect x="589" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="627.0" y="260.0" text-anchor="middle" font-size="10">Pitch mode</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sequencer-function-button" data-part="sequencer-function-button" data-kind="button" role="button" aria-label="Function" aria-disabled="true" tabindex="-1">
+      <title>Function</title>
+      <g aria-hidden="true">
+        <rect x="684" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="722.0" y="260.0" text-anchor="middle" font-size="10">Function</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sequencer-time-mode-button" data-part="sequencer-time-mode-button" data-kind="button" role="button" aria-label="Time mode" aria-disabled="true" tabindex="-1">
+      <title>Time mode</title>
+      <g aria-hidden="true">
+        <rect x="779" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="817.0" y="260.0" text-anchor="middle" font-size="10">Time mode</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sequencer-transpose-down-button" data-part="sequencer-transpose-down-button" data-kind="button" role="button" aria-label="Transpose down" aria-disabled="true" tabindex="-1">
+      <title>Transpose down</title>
+      <g aria-hidden="true">
+        <rect x="874" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="912.0" y="260.0" text-anchor="middle" font-size="10">Transpose down</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sequencer-transpose-up-button" data-part="sequencer-transpose-up-button" data-kind="button" role="button" aria-label="Transpose up" aria-disabled="true" tabindex="-1">
+      <title>Transpose up</title>
+      <g aria-hidden="true">
+        <rect x="399" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="437.0" y="346.0" text-anchor="middle" font-size="10">Transpose up</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sequencer-accent-button" data-part="sequencer-accent-button" data-kind="button" role="button" aria-label="Accent" aria-disabled="true" tabindex="-1">
+      <title>Accent</title>
+      <g aria-hidden="true">
+        <rect x="494" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="532.0" y="346.0" text-anchor="middle" font-size="10">Accent</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sequencer-slide-button" data-part="sequencer-slide-button" data-kind="button" role="button" aria-label="Slide" aria-disabled="true" tabindex="-1">
+      <title>Slide</title>
+      <g aria-hidden="true">
+        <rect x="589" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="627.0" y="346.0" text-anchor="middle" font-size="10">Slide</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sequencer-back-button" data-part="sequencer-back-button" data-kind="button" role="button" aria-label="Back" aria-disabled="true" tabindex="-1">
+      <title>Back</title>
+      <g aria-hidden="true">
+        <rect x="684" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="722.0" y="346.0" text-anchor="middle" font-size="10">Back</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--sequencer-tap-button" data-part="sequencer-tap-button" data-kind="button" role="button" aria-label="Tap" aria-disabled="true" tabindex="-1">
+      <title>Tap</title>
+      <g aria-hidden="true">
+        <rect x="779" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="817.0" y="346.0" text-anchor="middle" font-size="10">Tap</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--power" data-part="power" data-kind="button" role="button" aria-label="Power" aria-disabled="true" tabindex="-1">
+      <title>Power</title>
+      <g aria-hidden="true">
+        <rect x="1110" y="45" width="65" height="25" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1142.5" y="61.5" text-anchor="middle" font-size="10">Power</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--usb-midi" data-part="usb-midi" data-kind="socket" role="group" aria-label="USB MIDI" aria-roledescription="connector">
+      <title>USB MIDI</title>
+      <g aria-hidden="true">
+        <rect x="25" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="69.0" y="62.5" text-anchor="middle" font-size="10">USB MIDI</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--midi-in" data-part="midi-in" data-kind="socket" role="group" aria-label="MIDI IN" aria-roledescription="connector">
+      <title>MIDI IN</title>
+      <g aria-hidden="true">
+        <rect x="125" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="169.0" y="62.5" text-anchor="middle" font-size="10">MIDI IN</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--midi-out" data-part="midi-out" data-kind="socket" role="group" aria-label="MIDI OUT" aria-roledescription="connector">
+      <title>MIDI OUT</title>
+      <g aria-hidden="true">
+        <rect x="225" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="269.0" y="62.5" text-anchor="middle" font-size="10">MIDI OUT</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--audio-out" data-part="audio-out" data-kind="socket" role="group" aria-label="Audio OUT" aria-roledescription="connector">
+      <title>Audio OUT</title>
+      <g aria-hidden="true">
+        <rect x="325" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="369.0" y="62.5" text-anchor="middle" font-size="10">Audio OUT</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--headphones" data-part="headphones" data-kind="socket" role="group" aria-label="Headphones" aria-roledescription="connector">
+      <title>Headphones</title>
+      <g aria-hidden="true">
+        <rect x="425" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="469.0" y="62.5" text-anchor="middle" font-size="10">Headphones</text>
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--key-1" data-part="key-1" data-kind="key" role="button" aria-label="Key 1" aria-disabled="true" tabindex="-1" data-surface-controls="key-1">
+      <title>Key 1</title>
+      <g aria-hidden="true">
+        <rect x="25.0" y="538" width="83.46153846153847" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="66.73076923076923" y="579.5" text-anchor="middle" font-size="10">Key 1</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--key-1" data-surface-control="key-1" aria-hidden="true">
+        <rect x="25.0" y="538" width="83.46153846153847" height="75" data-hit-area="key-1" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--key-2" data-part="key-2" data-kind="key" role="button" aria-label="Key 2" aria-disabled="true" tabindex="-1" data-surface-controls="key-2">
+      <title>Key 2</title>
+      <g aria-hidden="true">
+        <rect x="113.46153846153847" y="538" width="83.46153846153847" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="155.1923076923077" y="579.5" text-anchor="middle" font-size="10">Key 2</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--key-2" data-surface-control="key-2" aria-hidden="true">
+        <rect x="113.46153846153847" y="538" width="83.46153846153847" height="75" data-hit-area="key-2" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--key-3" data-part="key-3" data-kind="key" role="button" aria-label="Key 3" aria-disabled="true" tabindex="-1" data-surface-controls="key-3">
+      <title>Key 3</title>
+      <g aria-hidden="true">
+        <rect x="201.92307692307693" y="538" width="83.46153846153847" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="243.65384615384616" y="579.5" text-anchor="middle" font-size="10">Key 3</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--key-3" data-surface-control="key-3" aria-hidden="true">
+        <rect x="201.92307692307693" y="538" width="83.46153846153847" height="75" data-hit-area="key-3" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--key-4" data-part="key-4" data-kind="key" role="button" aria-label="Key 4" aria-disabled="true" tabindex="-1" data-surface-controls="key-4">
+      <title>Key 4</title>
+      <g aria-hidden="true">
+        <rect x="290.3846153846154" y="538" width="83.46153846153847" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="332.11538461538464" y="579.5" text-anchor="middle" font-size="10">Key 4</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--key-4" data-surface-control="key-4" aria-hidden="true">
+        <rect x="290.3846153846154" y="538" width="83.46153846153847" height="75" data-hit-area="key-4" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--key-5" data-part="key-5" data-kind="key" role="button" aria-label="Key 5" aria-disabled="true" tabindex="-1" data-surface-controls="key-5">
+      <title>Key 5</title>
+      <g aria-hidden="true">
+        <rect x="378.84615384615387" y="538" width="83.46153846153847" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="420.5769230769231" y="579.5" text-anchor="middle" font-size="10">Key 5</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--key-5" data-surface-control="key-5" aria-hidden="true">
+        <rect x="378.84615384615387" y="538" width="83.46153846153847" height="75" data-hit-area="key-5" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--key-6" data-part="key-6" data-kind="key" role="button" aria-label="Key 6" aria-disabled="true" tabindex="-1" data-surface-controls="key-6">
+      <title>Key 6</title>
+      <g aria-hidden="true">
+        <rect x="467.3076923076923" y="538" width="83.46153846153847" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="509.03846153846155" y="579.5" text-anchor="middle" font-size="10">Key 6</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--key-6" data-surface-control="key-6" aria-hidden="true">
+        <rect x="467.3076923076923" y="538" width="83.46153846153847" height="75" data-hit-area="key-6" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--key-7" data-part="key-7" data-kind="key" role="button" aria-label="Key 7" aria-disabled="true" tabindex="-1" data-surface-controls="key-7">
+      <title>Key 7</title>
+      <g aria-hidden="true">
+        <rect x="555.7692307692308" y="538" width="83.46153846153847" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="597.5000000000001" y="579.5" text-anchor="middle" font-size="10">Key 7</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--key-7" data-surface-control="key-7" aria-hidden="true">
+        <rect x="555.7692307692308" y="538" width="83.46153846153847" height="75" data-hit-area="key-7" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--key-8" data-part="key-8" data-kind="key" role="button" aria-label="Key 8" aria-disabled="true" tabindex="-1" data-surface-controls="key-8">
+      <title>Key 8</title>
+      <g aria-hidden="true">
+        <rect x="644.2307692307693" y="538" width="83.46153846153847" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="685.9615384615386" y="579.5" text-anchor="middle" font-size="10">Key 8</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--key-8" data-surface-control="key-8" aria-hidden="true">
+        <rect x="644.2307692307693" y="538" width="83.46153846153847" height="75" data-hit-area="key-8" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--key-9" data-part="key-9" data-kind="key" role="button" aria-label="Key 9" aria-disabled="true" tabindex="-1" data-surface-controls="key-9">
+      <title>Key 9</title>
+      <g aria-hidden="true">
+        <rect x="732.6923076923077" y="538" width="83.46153846153847" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="774.423076923077" y="579.5" text-anchor="middle" font-size="10">Key 9</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--key-9" data-surface-control="key-9" aria-hidden="true">
+        <rect x="732.6923076923077" y="538" width="83.46153846153847" height="75" data-hit-area="key-9" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--key-10" data-part="key-10" data-kind="key" role="button" aria-label="Key 10" aria-disabled="true" tabindex="-1" data-surface-controls="key-10">
+      <title>Key 10</title>
+      <g aria-hidden="true">
+        <rect x="821.1538461538462" y="538" width="83.46153846153847" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="862.8846153846155" y="579.5" text-anchor="middle" font-size="10">Key 10</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--key-10" data-surface-control="key-10" aria-hidden="true">
+        <rect x="821.1538461538462" y="538" width="83.46153846153847" height="75" data-hit-area="key-10" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--key-11" data-part="key-11" data-kind="key" role="button" aria-label="Key 11" aria-disabled="true" tabindex="-1" data-surface-controls="key-11">
+      <title>Key 11</title>
+      <g aria-hidden="true">
+        <rect x="909.6153846153846" y="538" width="83.46153846153847" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="951.3461538461539" y="579.5" text-anchor="middle" font-size="10">Key 11</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--key-11" data-surface-control="key-11" aria-hidden="true">
+        <rect x="909.6153846153846" y="538" width="83.46153846153847" height="75" data-hit-area="key-11" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--key-12" data-part="key-12" data-kind="key" role="button" aria-label="Key 12" aria-disabled="true" tabindex="-1" data-surface-controls="key-12">
+      <title>Key 12</title>
+      <g aria-hidden="true">
+        <rect x="998.0769230769231" y="538" width="83.46153846153847" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1039.8076923076924" y="579.5" text-anchor="middle" font-size="10">Key 12</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--key-12" data-surface-control="key-12" aria-hidden="true">
+        <rect x="998.0769230769231" y="538" width="83.46153846153847" height="75" data-hit-area="key-12" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-tb-03-panel--key-13" data-part="key-13" data-kind="key" role="button" aria-label="Key 13" aria-disabled="true" tabindex="-1" data-surface-controls="key-13">
+      <title>Key 13</title>
+      <g aria-hidden="true">
+        <rect x="1086.5384615384617" y="538" width="83.46153846153847" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1128.269230769231" y="579.5" text-anchor="middle" font-size="10">Key 13</text>
+      </g>
+      <g id="roland-tb-03-panel--surface--key-13" data-surface-control="key-13" aria-hidden="true">
+        <rect x="1086.5384615384617" y="538" width="83.46153846153847" height="75" data-hit-area="key-13" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+  </g>
+</svg>

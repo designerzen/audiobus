@@ -275,7 +275,7 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 			const route = songsByFile.get(select.value)?.route
 			songLink.hidden = !route
 			if (route) {
-				songLink.href = `${import.meta.env.BASE_URL}${route}/`
+				songLink.href = `${import.meta.env?.BASE_URL ?? "/"}${route}/`
 			}
 			status.classList.toggle("is-error", !!this.loadError)
 			status.textContent = this.isLoading
@@ -302,7 +302,7 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 		this.gui = gui
 		this.sync()
 		try {
-			const response = await fetch(`${import.meta.env.BASE_URL}midi/index.json`)
+			const response = await fetch(`${import.meta.env?.BASE_URL ?? "/"}midi/index.json`)
 			if (!response.ok) {
 				throw new Error("Song library unavailable")
 			}

@@ -12,13 +12,28 @@ const mockTimer = {
 
 describe("TransformerArpeggiator", () => {
 	let transformer: TransformerArpeggiator
+	const noteOns = (commands: IAudioCommand[]) =>
+		commands.filter((command) => command.type === Commands.NOTE_ON)
+	const noteOffs = (commands: IAudioCommand[]) =>
+		commands.filter((command) => command.type === Commands.NOTE_OFF)
+	/** Everything played from the given commands until the given time */
+	const play = (commands: IAudioCommand[], until = 4) => [
+		...transformer.transform(commands, mockTimer),
+		...transformer.tick(until, { ...mockTimer, now: until })
+	]
+	const chord = (velocity = 100, startAt = 0) => [
+		createAudioCommand(Commands.NOTE_ON, 60, velocity, startAt),
+		createAudioCommand(Commands.NOTE_ON, 64, velocity, startAt),
+		createAudioCommand(Commands.NOTE_ON, 67, velocity, startAt)
+	]
 
 	beforeEach(() => {
 		transformer = new TransformerArpeggiator({
 			enabled: true,
 			pattern: "up",
 			rate: "1/16",
-			octaves: 1
+			octaves: 1,
+			collect: 0
 		})
 	})
 
@@ -27,196 +42,73 @@ describe("TransformerArpeggiator", () => {
 	})
 
 	it("should pass through single note when disabled", () => {
-		transformer = new TransformerArpeggiator({
-			enabled: false,
-			pattern: "up",
-			rate: "1/16",
-			octaves: 1
-		})
-
+		transformer = new TransformerArpeggiator({ enabled: false })
 		const commands = [createAudioCommand(Commands.NOTE_ON, 60)]
-		const result = transformer.transform(commands, mockTimer)
-
-		expect(result).toEqual(commands)
+		expect(transformer.transform(commands, mockTimer)).toEqual(commands)
 	})
 
 	it("should handle empty command array", () => {
-		const result = transformer.transform([], mockTimer)
-		expect(result).toEqual([])
+		expect(transformer.transform([], mockTimer)).toEqual([])
 	})
 
-	it("should pass through single note", () => {
-		const commands = [createAudioCommand(Commands.NOTE_ON, 60)]
-		const result = transformer.transform(commands, mockTimer)
-
-		expect(result.length).toBeGreaterThanOrEqual(1)
-		expect(result[0].number).toBe(60)
+	it("should play a single note", () => {
+		const result = play([createAudioCommand(Commands.NOTE_ON, 60)])
+		expect(noteOns(result).map((command) => command.number)).toEqual([60])
 	})
 
 	it("should arpeggiate chord notes in up pattern", () => {
-		transformer = new TransformerArpeggiator({
-			enabled: true,
-			pattern: "up",
-			rate: "1/16",
-			octaves: 1
-		})
-
-		const commands = [
-			createAudioCommand(Commands.NOTE_ON, 60, 100, 0),
-			createAudioCommand(Commands.NOTE_ON, 64, 100, 0),
-			createAudioCommand(Commands.NOTE_ON, 67, 100, 0)
-		]
-
-		const result = transformer.transform(commands, mockTimer)
-
-		// Should generate arpeggio with multiple notes
-		expect(result.length).toBeGreaterThan(1)
-
-		// Notes should be in ascending order for 'up' pattern
-		const noteOns = result.filter((r) => r.type === Commands.NOTE_ON)
-		expect(noteOns.length).toBeGreaterThanOrEqual(3)
+		expect(noteOns(play(chord())).map((command) => command.number)).toEqual([60, 64, 67])
 	})
 
 	it("should arpeggiate chord notes in down pattern", () => {
-		transformer = new TransformerArpeggiator({
-			enabled: true,
-			pattern: "down",
-			rate: "1/16",
-			octaves: 1
-		})
-
-		const commands = [
-			createAudioCommand(Commands.NOTE_ON, 60, 100, 0),
-			createAudioCommand(Commands.NOTE_ON, 64, 100, 0),
-			createAudioCommand(Commands.NOTE_ON, 67, 100, 0)
-		]
-
-		const result = transformer.transform(commands, mockTimer)
-		expect(result.length).toBeGreaterThan(1)
+		transformer.setConfig("pattern", "down")
+		expect(noteOns(play(chord())).map((command) => command.number)).toEqual([67, 64, 60])
 	})
 
 	it("should preserve velocity in arpeggio", () => {
-		const commands = [
-			createAudioCommand(Commands.NOTE_ON, 60, 85, 0),
-			createAudioCommand(Commands.NOTE_ON, 64, 90, 0)
-		]
-
-		const result = transformer.transform(commands, mockTimer)
-		const noteOns = result.filter((r) => r.type === Commands.NOTE_ON)
-
-		// Arpeggio notes should have velocity
-		noteOns.forEach((note) => {
-			expect(note.velocity).toBeGreaterThan(0)
-		})
+		expect(noteOns(play(chord(85))).map((command) => command.velocity)).toEqual([85, 85, 85])
 	})
 
-	it("should handle NOTE_OFF for chord notes", () => {
-		const commands = [
-			createAudioCommand(Commands.NOTE_ON, 60, 100, 0),
-			createAudioCommand(Commands.NOTE_ON, 64, 100, 0),
-			createAudioCommand(Commands.NOTE_OFF, 60, 100, 1.0)
-		]
-
-		const result = transformer.transform(commands, mockTimer)
-
-		// Should have generated NOTE_OFFs
-		const noteOffs = result.filter((r) => r.type === Commands.NOTE_OFF)
-		expect(noteOffs.length).toBeGreaterThanOrEqual(1)
+	it("should release every arpeggiated note once its key is released", () => {
+		play(chord())
+		const result = transformer.transform(
+			[60, 64, 67].map((number) => createAudioCommand(Commands.NOTE_OFF, number, 0, 5)),
+			{ ...mockTimer, now: 5 }
+		)
+		expect(noteOffs(result).map((command) => command.number)).toEqual([60, 64, 67])
 	})
 
 	it("should reset state", () => {
-		const commands1 = [
-			createAudioCommand(Commands.NOTE_ON, 60),
-			createAudioCommand(Commands.NOTE_ON, 64)
-		]
-
-		transformer.transform(commands1, mockTimer)
+		transformer.transform(chord(), mockTimer)
 		transformer.reset()
-
-		// After reset, single note should pass through
-		const commands2 = [createAudioCommand(Commands.NOTE_ON, 60)]
-		const result = transformer.transform(commands2, mockTimer)
-
-		expect(result.length).toBeGreaterThanOrEqual(1)
+		expect(transformer.tick(4, { ...mockTimer, now: 4 })).toEqual([])
+		const result = play([createAudioCommand(Commands.NOTE_ON, 62)])
+		expect(noteOns(result).map((command) => command.number)).toEqual([62])
 	})
 
 	it("should expand notes across multiple octaves", () => {
-		transformer = new TransformerArpeggiator({
-			enabled: true,
-			pattern: "up",
-			rate: "1/16",
-			octaves: 2
-		})
-
-		const commands = [
-			createAudioCommand(Commands.NOTE_ON, 60, 100, 0),
-			createAudioCommand(Commands.NOTE_ON, 64, 100, 0)
-		]
-
-		const result = transformer.transform(commands, mockTimer)
-		const noteOns = result.filter((r) => r.type === Commands.NOTE_ON)
-
-		// With 2 octaves and 2 notes, should generate more than 2 notes
-		expect(noteOns.length).toBeGreaterThanOrEqual(2)
+		transformer.setConfig("octaves", 2)
+		expect(noteOns(play(chord())).map((command) => command.number)).toEqual([
+			60, 64, 67, 72, 76, 79
+		])
 	})
 
 	it("should delay arpeggio notes based on rate", () => {
-		transformer = new TransformerArpeggiator({
-			enabled: true,
-			pattern: "up",
-			rate: "1/4",
-			octaves: 1
-		})
-
-		const baseTime = 0.5
-		const commands = [
-			createAudioCommand(Commands.NOTE_ON, 60, 100, baseTime),
-			createAudioCommand(Commands.NOTE_ON, 64, 100, baseTime)
-		]
-
-		const result = transformer.transform(commands, mockTimer)
-		const noteOns = result.filter((r) => r.type === Commands.NOTE_ON)
-
-		// Check that notes have increasing startAt times
-		if (noteOns.length > 1) {
-			for (let i = 1; i < noteOns.length; i++) {
-				expect(noteOns[i].startAt).toBeGreaterThanOrEqual(noteOns[i - 1].startAt)
-			}
-		}
+		transformer.setConfig("rate", "1/4")
+		expect(noteOns(play(chord())).map((command) => command.startAt)).toEqual([0, 0.5, 1])
 	})
 
 	it("should handle chord pattern (all notes at once)", () => {
-		transformer = new TransformerArpeggiator({
-			enabled: true,
-			pattern: "chord",
-			rate: "1/16",
-			octaves: 1
-		})
-
-		const commands = [
-			createAudioCommand(Commands.NOTE_ON, 60, 100, 0),
-			createAudioCommand(Commands.NOTE_ON, 64, 100, 0),
-			createAudioCommand(Commands.NOTE_ON, 67, 100, 0)
-		]
-
-		const result = transformer.transform(commands, mockTimer)
-		const noteOns = result.filter((r) => r.type === Commands.NOTE_ON)
-
-		// Chord mode should play notes at same time
-		expect(noteOns.length).toBeGreaterThanOrEqual(3)
+		transformer.setConfig("pattern", "chord")
+		const result = noteOns(transformer.transform(chord(), mockTimer))
+		expect(result.map((command) => command.number)).toEqual([60, 64, 67])
 	})
 
-	it("should preserve command properties", () => {
-		const commands = [
-			createAudioCommand(Commands.NOTE_ON, 60, 95, 0.25),
-			createAudioCommand(Commands.NOTE_ON, 64, 100, 0.25)
-		]
-
-		const result = transformer.transform(commands, mockTimer)
-
-		// Check first NOTE_ON maintains original properties
-		const firstNote = result.find((r) => r.type === Commands.NOTE_ON && r.number === 60)
-		expect(firstNote?.type).toBe(Commands.NOTE_ON)
+	it("should keep cycling while keys are held when repeat is on", () => {
+		transformer.setConfig("repeat", 1)
+		expect(noteOns(play(chord(), 0.99)).map((command) => command.number)).toEqual([
+			60, 64, 67, 60, 64, 67, 60, 64
+		])
 	})
 })
 

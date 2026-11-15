@@ -8,7 +8,7 @@ import {
 	MIDI_DEVICE_PROFILES,
 	ensureMidiDeviceProfile,
 	onMidiDeviceProfilesChanged
-} from "../midi/hardware/device-profiles"
+} from "../hardware/midi-devices/device-profiles"
 /**
  * Factory for creating audio input instances
  * Handles instantiation of available input types
@@ -37,6 +37,8 @@ const loadSupportingLibrary = async (type: string) => {
 	}
 	// Create and return instance based on type
 	switch (type) {
+		case INPUT_TYPES.PROTOCOL:
+			return await import("./inputs/input-protocol")
 		case INPUT_TYPES.CHANNEL_TRIGGER:
 			return await import("./inputs/input-channel-trigger")
 		case INPUT_TYPES.SCALE_EXPLORER:
@@ -153,7 +155,8 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		INPUT_TYPES.PADS,
 		INPUT_TYPES.CHANNEL_TRIGGER,
 		INPUT_TYPES.COSMO_DOTS,
-		INPUT_TYPES.EVENT_LOOP
+		INPUT_TYPES.EVENT_LOOP,
+		INPUT_TYPES.PROTOCOL
 	].map((id) => ({
 		...INPUT_DEFINITIONS[id],
 		isAvailable: () => true,
@@ -358,7 +361,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.DVS_CONTROL_VINYL].subtype,
 		name: "DVS Control Vinyl",
 		description:
-			"Control vinyl pilot-tone clock - estimates relative speed and generates DVS_CLOCK or MIDI_CLOCK (no direction or absolute position decoding)",
+			"Control vinyl pilot-tone clock - estimates relative speed and generates DVS_CLOCK ticks, DVS_START and DVS_STOP (no direction or absolute position decoding)",
 		isAvailable: () => typeof navigator !== "undefined" && !!navigator.mediaDevices,
 		create: (options) => createInput(INPUT_TYPES.DVS_CONTROL_VINYL, options)
 	}

@@ -23,6 +23,10 @@ export const SPEECH_SYNTHESIS = "speech-synthesis" as const
 export const VIBRATOR = "vibrator" as const
 export const WAM2 = "wam2" as const
 export const MOOG = "moog" as const
+export const FM = "fm" as const
+export const MONOTRON = "monotron" as const
+export const WAVEGUIDE = "waveguide" as const
+export const MULTI_OSCILLATOR = "multi-oscillator" as const
 export const TB303 = "tb303" as const
 export const SYNTH_303 = "303" as const
 export const WAM = "wam" as const
@@ -69,6 +73,10 @@ export type OutputId =
 	| typeof VIBRATOR
 	| typeof WAM2
 	| typeof MOOG
+	| typeof FM
+	| typeof MONOTRON
+	| typeof WAVEGUIDE
+	| typeof MULTI_OSCILLATOR
 	| typeof TB303
 	| typeof SYNTH_303
 	| typeof WAM

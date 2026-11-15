@@ -18,7 +18,7 @@ export class CLAPRegistry {
 			this.patches.set(patch.id, patch)
 		}
 		// Add default local registry
-		this.registryUrls.add(`${import.meta.env.BASE_URL ?? "/"}clap-registry.json`)
+		this.registryUrls.add(`${import.meta.env?.BASE_URL ?? "/"}clap-registry.json`)
 	}
 
 	/**

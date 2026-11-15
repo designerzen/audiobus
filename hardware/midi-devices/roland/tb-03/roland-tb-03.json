@@ -1,0 +1,437 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "roland-tb-03",
+	"name": "Roland TB-03",
+	"manufacturer": "Roland",
+	"manufacturerUrl": "https://www.roland.com/",
+	"productUrl": "https://www.roland.com/global/products/tb-03/",
+	"description": "Boutique TB-303-style monophonic bass sequencer.",
+	"ids": ["roland-tb-03"],
+	"portNames": ["TB-03", "TB-03 MIDI 1", "Roland TB-03"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Roland TB-03 owner manual",
+			"url": "https://static.roland.com/assets/media/pdf/TB-03_eng03_W.pdf"
+		},
+		{
+			"title": "Roland TB-03 MIDI implementation chart",
+			"url": "https://static.roland.com/assets/media/pdf/TB-03_MIDI_Imple_e01_W.pdf"
+		}
+	],
+	"abilities": ["USB MIDI", "DIN MIDI IN/OUT", "MIDI notes", "Documented controller mappings"],
+	"hardwareControls": [
+		"Sound: Tuning, Cutoff, Resonance, Env mod, Decay, Accent",
+		"Effects: Overdrive, Delay time, Delay feedback",
+		"Sequencer: Volume, Waveform, Track Group, Mode, Value, Tempo, Pattern clear, Run Stop, Pitch mode, Function, Time mode, Transpose down, Transpose up, Accent, Slide, Back, Tap"
+	],
+	"notice": "Use USB MIDI or a DIN MIDI interface. Match the MIDI channel and enable the required MIDI transmit/receive settings. TB-03 is separate from TB-3. Factory MIDI channel is 2; note velocity 100-127 selects accent. Slide is CC102/overlapping notes, not pitch bend; the published chart does not support pitch bend.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "sound-tuning-knob",
+			"label": "Sound: Tuning",
+			"widget": "slider",
+			"cc": 104
+		},
+		{
+			"id": "sound-cutoff-knob",
+			"label": "Sound: Cutoff",
+			"widget": "slider",
+			"cc": 74
+		},
+		{
+			"id": "sound-resonance-knob",
+			"label": "Sound: Resonance",
+			"widget": "slider",
+			"cc": 71
+		},
+		{
+			"id": "sound-env-mod-knob",
+			"label": "Sound: Env mod",
+			"widget": "slider",
+			"cc": 12
+		},
+		{
+			"id": "sound-decay-knob",
+			"label": "Sound: Decay",
+			"widget": "slider",
+			"cc": 75
+		},
+		{
+			"id": "sound-accent-knob",
+			"label": "Sound: Accent",
+			"widget": "slider",
+			"cc": 16
+		},
+		{
+			"id": "effects-overdrive-knob",
+			"label": "Effects: Overdrive",
+			"widget": "slider",
+			"cc": 17
+		},
+		{
+			"id": "effects-delay-time-knob",
+			"label": "Effects: Delay time",
+			"widget": "slider",
+			"cc": 18
+		},
+		{
+			"id": "effects-delay-feedback-knob",
+			"label": "Effects: Delay feedback",
+			"widget": "slider",
+			"cc": 19
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Roland TB-03 overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 1200,
+		"height": 650,
+		"elements": [
+			{
+				"id": "sound-tuning-knob",
+				"label": "Tuning",
+				"kind": "knob",
+				"position": {
+					"x": 3.0833333333333335,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "sound-tuning-knob"
+			},
+			{
+				"id": "sound-cutoff-knob",
+				"label": "Cutoff",
+				"kind": "knob",
+				"position": {
+					"x": 11.0,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "sound-cutoff-knob"
+			},
+			{
+				"id": "sound-resonance-knob",
+				"label": "Resonance",
+				"kind": "knob",
+				"position": {
+					"x": 3.0833333333333335,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "sound-resonance-knob"
+			},
+			{
+				"id": "sound-env-mod-knob",
+				"label": "Env mod",
+				"kind": "knob",
+				"position": {
+					"x": 11.0,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "sound-env-mod-knob"
+			},
+			{
+				"id": "sound-decay-knob",
+				"label": "Decay",
+				"kind": "knob",
+				"position": {
+					"x": 3.0833333333333335,
+					"y": 48.769230769230774,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "sound-decay-knob"
+			},
+			{
+				"id": "sound-accent-knob",
+				"label": "Accent",
+				"kind": "knob",
+				"position": {
+					"x": 11.0,
+					"y": 48.769230769230774,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "sound-accent-knob"
+			},
+			{
+				"id": "effects-overdrive-knob",
+				"label": "Overdrive",
+				"kind": "knob",
+				"position": {
+					"x": 20.916666666666668,
+					"y": 22.30769230769231,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "effects-overdrive-knob"
+			},
+			{
+				"id": "effects-delay-time-knob",
+				"label": "Delay time",
+				"kind": "knob",
+				"position": {
+					"x": 20.916666666666668,
+					"y": 35.53846153846154,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "effects-delay-time-knob"
+			},
+			{
+				"id": "effects-delay-feedback-knob",
+				"label": "Delay feedback",
+				"kind": "knob",
+				"position": {
+					"x": 20.916666666666668,
+					"y": 48.769230769230774,
+					"width": 6.333333333333334,
+					"height": 7.6923076923076925
+				},
+				"control": "effects-delay-feedback-knob"
+			},
+			{
+				"id": "key-1",
+				"label": "Key 1",
+				"kind": "key",
+				"position": {
+					"x": 2.083333333333333,
+					"y": 82.76923076923077,
+					"width": 6.955128205128205,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 48
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-2",
+				"label": "Key 2",
+				"kind": "key",
+				"position": {
+					"x": 9.455128205128206,
+					"y": 82.76923076923077,
+					"width": 6.955128205128205,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 49
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-3",
+				"label": "Key 3",
+				"kind": "key",
+				"position": {
+					"x": 16.826923076923077,
+					"y": 82.76923076923077,
+					"width": 6.955128205128205,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 50
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-4",
+				"label": "Key 4",
+				"kind": "key",
+				"position": {
+					"x": 24.198717948717952,
+					"y": 82.76923076923077,
+					"width": 6.955128205128205,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 51
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-5",
+				"label": "Key 5",
+				"kind": "key",
+				"position": {
+					"x": 31.570512820512825,
+					"y": 82.76923076923077,
+					"width": 6.955128205128205,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 52
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-6",
+				"label": "Key 6",
+				"kind": "key",
+				"position": {
+					"x": 38.94230769230769,
+					"y": 82.76923076923077,
+					"width": 6.955128205128205,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 53
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-7",
+				"label": "Key 7",
+				"kind": "key",
+				"position": {
+					"x": 46.31410256410257,
+					"y": 82.76923076923077,
+					"width": 6.955128205128205,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 54
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-8",
+				"label": "Key 8",
+				"kind": "key",
+				"position": {
+					"x": 53.685897435897445,
+					"y": 82.76923076923077,
+					"width": 6.955128205128205,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 55
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-9",
+				"label": "Key 9",
+				"kind": "key",
+				"position": {
+					"x": 61.057692307692314,
+					"y": 82.76923076923077,
+					"width": 6.955128205128205,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 56
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-10",
+				"label": "Key 10",
+				"kind": "key",
+				"position": {
+					"x": 68.42948717948718,
+					"y": 82.76923076923077,
+					"width": 6.955128205128205,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 57
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-11",
+				"label": "Key 11",
+				"kind": "key",
+				"position": {
+					"x": 75.80128205128204,
+					"y": 82.76923076923077,
+					"width": 6.955128205128205,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 58
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-12",
+				"label": "Key 12",
+				"kind": "key",
+				"position": {
+					"x": 83.17307692307693,
+					"y": 82.76923076923077,
+					"width": 6.955128205128205,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 59
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-13",
+				"label": "Key 13",
+				"kind": "key",
+				"position": {
+					"x": 90.54487179487181,
+					"y": 82.76923076923077,
+					"width": 6.955128205128205,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 60
+				},
+				"learnable": true
+			}
+		]
+	}
+}

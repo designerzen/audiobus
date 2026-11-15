@@ -1,3 +1,4 @@
+import { PercussionRecipes, type EnvelopeScheduler } from "./percussion-recipes.ts"
 import { GENERAL_MIDI_PERCUSSION_NOTES } from "../../timing/percussion-note-map.ts"
 import type { IPercussionOutput, PercussionHit } from "../../timing/percussion-types.ts"
 import { noteNumberToFrequency } from "../../conversion/note-to-frequency.ts"
@@ -24,6 +25,7 @@ export class PercussionSynth implements IPercussionOutput {
 	private readonly wet: GainNode
 	private readonly noise: AudioBuffer
 	private readonly voices = new Set<PercussionVoice>()
+	private readonly recipes: PercussionRecipes
 
 	constructor(
 		private readonly context: AudioContext,
@@ -51,6 +53,13 @@ export class PercussionSynth implements IPercussionOutput {
 		for (let index = 0; index < data.length; index++) {
 			data[index] = Math.random() * 2 - 1
 		}
+		this.recipes = new PercussionRecipes(
+			context,
+			this.noise,
+			(source, nodes, part, at, length, envelope) => {
+				this.voice(source, nodes, part, at, 1, length, envelope)
+			}
+		)
 	}
 
 	setVolume(volume: number): void {
@@ -84,7 +93,7 @@ export class PercussionSynth implements IPercussionOutput {
 		}
 		const at = Math.max(this.context.currentTime, hit.triggerAt)
 		const velocity = Math.min(1, hit.velocity)
-		const scale = hit.lengthScale ?? 1
+		const scale = Number.isFinite(hit.lengthScale) ? Math.max(0.001, hit.lengthScale!) : 1
 		const pitchScale =
 			hit.tuningNote === undefined ? 1 : noteNumberToFrequency(hit.tuningNote) / 42
 		if (part === "hatClosed" || part === "hatPedal") {
@@ -105,27 +114,17 @@ export class PercussionSynth implements IPercussionOutput {
 				0.32 * scale,
 				"sine"
 			)
-		} else if (note === 38 || note === 40 || note === 39) {
-			this.noiseHit(
+		} else if (note === 38 || note === 40) {
+			this.noiseHit(part, at, velocity * 0.45, 0.18, 1600, "highpass", scale)
+			this.tone(
 				part,
 				at,
-				velocity * 0.45,
-				note === 39 ? 0.12 : 0.18,
-				1600,
-				"highpass",
-				scale
+				velocity * 0.22,
+				190 * pitchScale,
+				115 * pitchScale,
+				0.09 * scale,
+				"triangle"
 			)
-			if (note !== 39) {
-				this.tone(
-					part,
-					at,
-					velocity * 0.22,
-					190 * pitchScale,
-					115 * pitchScale,
-					0.09 * scale,
-					"triangle"
-				)
-			}
 		} else if ([42, 44, 46].includes(note)) {
 			// AudioBus TR808Hat: six metallic square waves through band/high-pass filters.
 			this.metalHit(
@@ -147,29 +146,8 @@ export class PercussionSynth implements IPercussionOutput {
 				0.4 * scale,
 				1000
 			)
-		} else if ([49, 51, 52, 53, 55, 57, 59, 69, 70, 54, 82, 83].includes(note)) {
-			const duration =
-				part === "hatOpen" ? 0.24 : part.startsWith("hat") ? 0.045 : note >= 69 ? 0.08 : 0.5
-			this.noiseHit(
-				part,
-				at,
-				velocity * 0.3,
-				duration,
-				note >= 69 ? 3500 : 6500,
-				"highpass",
-				scale
-			)
 		} else {
-			const frequency = 80 * 2 ** ((note - 41) / 16) * pitchScale
-			this.tone(
-				part,
-				at,
-				velocity * 0.45,
-				frequency * 1.5,
-				frequency,
-				0.16 * scale,
-				note >= 56 ? "square" : "sine"
-			)
+			this.recipes.trigger(part, at, velocity, scale, pitchScale)
 		}
 	}
 
@@ -243,13 +221,18 @@ export class PercussionSynth implements IPercussionOutput {
 		part: string,
 		at: number,
 		velocity: number,
-		length: number
+		length: number,
+		scheduleEnvelope?: EnvelopeScheduler
 	): void {
 		const duration = Math.max(0.015, length)
 		const envelope = this.context.createGain()
-		envelope.gain.setValueAtTime(0, at)
-		envelope.gain.linearRampToValueAtTime(velocity, at + 0.002)
-		envelope.gain.exponentialRampToValueAtTime(0.0001, at + duration)
+		if (scheduleEnvelope) {
+			scheduleEnvelope(envelope.gain)
+		} else {
+			envelope.gain.setValueAtTime(0, at)
+			envelope.gain.linearRampToValueAtTime(velocity, at + 0.002)
+			envelope.gain.exponentialRampToValueAtTime(0.0001, at + duration)
+		}
 		;(nodes.at(-1) ?? source).connect(envelope)
 		envelope.connect(this.input)
 		const voice: PercussionVoice = {
@@ -272,6 +255,7 @@ export class PercussionSynth implements IPercussionOutput {
 	}
 
 	allNotesOff(): void {
+		this.recipes.reset()
 		for (const voice of this.voices) {
 			voice.source.stop()
 			voice.source.disconnect()

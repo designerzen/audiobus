@@ -91,7 +91,7 @@ export function midiSong(midi: Midi): MidiSong {
 export async function loadMidi(url: string): Promise<Midi> {
 	const resolved = /^(?:[a-z][a-z\d+.-]*:|\/)/i.test(url)
 		? url
-		: `${import.meta.env.BASE_URL}${url}`
+		: `${import.meta.env?.BASE_URL ?? "/"}${url}`
 	const response = await fetch(resolved)
 	if (!response.ok) {
 		throw new Error(`Failed to fetch MIDI file: ${response.statusText}`)

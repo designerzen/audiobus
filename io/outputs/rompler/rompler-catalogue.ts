@@ -1,14 +1,8 @@
 /**
- * Soundfont packs in the midi-js-soundfonts layout:
- * `${baseUrl}${pack}/${preset}-mp3/${NoteName}.mp3`
+ * OpenGM24 soundfont (github.com/designerzen/Open-GeneralMIDI-SoundFont)
+ * laid out as `${baseUrl}${preset}-mp3/${NoteName}.mp3`
  */
-export const ROMPLER_HOST = "https://gleitz.github.io/midi-js-soundfonts/"
-
-export const ROMPLER_PACKS = [
-	{ id: "FluidR3_GM", title: "Fluid R3 (balanced)" },
-	{ id: "MusyngKite", title: "Musyng Kite (detailed, larger)" },
-	{ id: "FatBoy", title: "FatBoy (punchy)" }
-] as const
+export const ROMPLER_HOST = "https://designerzen.github.io/Open-GeneralMIDI-SoundFont/OpenGM24/"
 
 export const ROMPLER_FAMILIES = [
 	"Piano",
@@ -35,7 +29,7 @@ export const ROMPLER_PRESETS =
 		" "
 	)
 
-// The packs only ship the 88 piano keys
+// OpenGM24 ships the 88 piano keys
 export const LOWEST_NOTE = 21
 export const HIGHEST_NOTE = 108
 
@@ -53,8 +47,33 @@ export const presetTitle = (program: number): string =>
 
 export const presetFamily = (program: number): string => ROMPLER_FAMILIES[program >> 3]
 
-export const sampleUrl = (baseUrl: string, pack: string, program: number, note: number): string =>
-	`${baseUrl}${pack}/${ROMPLER_PRESETS[program]}-mp3/${noteName(note)}.mp3`
+const range = (from: number, to: number) =>
+	Array.from({ length: to - from + 1 }, (_, i) => from + i)
+
+// Programs whose OpenGM24 samples hold their level to the end of the file,
+// so they loop while held rather than stopping after ~3 seconds
+const SUSTAINED = new Set([
+	...range(16, 23),
+	29,
+	30,
+	...range(40, 44),
+	...range(48, 54),
+	...range(56, 95),
+	97,
+	98,
+	99,
+	...range(101, 103),
+	...range(109, 111),
+	121,
+	122,
+	125,
+	126
+])
+
+export const isSustained = (program: number): boolean => SUSTAINED.has(program)
+
+export const sampleUrl = (baseUrl: string, program: number, note: number): string =>
+	`${baseUrl}${ROMPLER_PRESETS[program]}-mp3/${noteName(note)}.mp3`
 
 /** Keys that get their own sample; the rest are pitched from the nearest one */
 export const sampleGrid = (spacing: number): number[] => {

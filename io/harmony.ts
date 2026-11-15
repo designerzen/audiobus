@@ -1,4 +1,16 @@
 import { mapPitchSet, mod12, pitchClasses, pitchSetMask } from "../tuning/pitch-class-set"
+import {
+	CHROMATIC_SCALE,
+	HARMONY_MODE_FREE_RANGE,
+	MAJOR_SCALE,
+	SCALE_FORMULA_LIBRARY,
+	getPitchClassForKey,
+	getScaleFormula,
+	isChromaticScale,
+	normaliseKeyName,
+	type KeyInput,
+	type ScaleFormula
+} from "../tuning/keys.ts"
 
 /** Masks are absolute pitch classes (bit 0 = C), independent of the tonic. */
 export interface HarmonicState {
@@ -200,4 +212,82 @@ export function chordTab(
 	}
 	visit(0, [], 0, 0)
 	return best?.frets ?? tuning.map(() => null)
+}
+
+/** A PhotoSYNTH-style shared key: a tonic plus a scale formula. Free range is the whole chromatic scale. */
+export interface HarmonyKey {
+	/** Note name such as "Bb", or "free-range" */
+	tonic: string
+	/** Pitch class 0-11 (0 when free range) */
+	root: number
+	/** Ascending semitone offsets from the tonic */
+	scale: number[]
+	/** Name from SCALE_FORMULA_LIBRARY, e.g. "MAJOR_SCALE", when the scale matches one */
+	scaleName?: string
+	freeRange: boolean
+}
+
+const chordMaskFor = (root: number, formula: readonly number[]) => {
+	const third = [4, 3].find((interval) => formula.includes(interval))
+	const fifth = [7, 6, 8].find((interval) => formula.includes(interval))
+	return [0, third, fifth].reduce<number>(
+		(mask, interval) => (interval === undefined ? mask : mask | (1 << mod12(root + interval))),
+		0
+	)
+}
+
+/**
+ * Build the shared harmony for a key. "free-range" (or any chromatic scale) allows every
+ * pitch class. The chord defaults to the tonic triad that the scale supports.
+ */
+export function harmonyFromKey(
+	tonic: KeyInput = 0,
+	scale: ScaleFormula | string = MAJOR_SCALE,
+	chord?: number
+): HarmonicState {
+	const freeRange = tonic === HARMONY_MODE_FREE_RANGE
+	const root = freeRange ? 0 : getPitchClassForKey(tonic)
+	const formula = freeRange ? CHROMATIC_SCALE : getScaleFormula(scale)
+	const mask = formula.reduce((result, interval) => result | (1 << mod12(root + interval)), 0)
+	return {
+		root,
+		scale: mask,
+		chord: chord === undefined ? chordMaskFor(root, formula) : pitchSetMask(chord)
+	}
+}
+
+/** Inverse of harmonyFromKey. A scale holding all twelve pitch classes reads as free range. */
+export function keyFromHarmony(state: HarmonicState): HarmonyKey {
+	const scale = pitchClasses(state.scale)
+		.map((pitch) => mod12(pitch - state.root))
+		.sort((a, b) => a - b)
+	const freeRange = isChromaticScale(scale)
+	const scaleName = Object.entries(SCALE_FORMULA_LIBRARY).find(
+		([, formula]) => formula.length === scale.length && formula.every((v, i) => v === scale[i])
+	)?.[0]
+	return {
+		tonic: freeRange ? HARMONY_MODE_FREE_RANGE : normaliseKeyName(state.root),
+		root: freeRange ? 0 : state.root,
+		scale,
+		scaleName,
+		freeRange
+	}
+}
+
+/**
+ * Move a MIDI note (0-127) to the nearest pitch class in the harmony's scale.
+ * Notes already in the scale are unchanged; ties go to the lower note.
+ */
+export function constrainNoteToHarmony(note: number, state: HarmonicState): number {
+	if (!state.scale) {
+		return note
+	}
+	for (let distance = 0; distance < 12; distance++) {
+		for (const candidate of [note - distance, note + distance]) {
+			if (candidate >= 0 && candidate <= 127 && state.scale & (1 << mod12(candidate))) {
+				return candidate
+			}
+		}
+	}
+	return note
 }

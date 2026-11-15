@@ -328,3 +328,119 @@ export const UTILITY: EffectDefinition = {
 export const NON_RESONANT_Q = -3.0103
 
 export const dbToGain = (decibels: number) => Math.pow(10, decibels / 20)
+
+const SWITCH: readonly EffectChoice[] = [
+	{ value: "off", label: "Off" },
+	{ value: "on", label: "On" }
+]
+const seconds = (
+	id: string,
+	name: string,
+	initial: number,
+	min: number,
+	max: number,
+	step = 0.01
+) => ({
+	id,
+	name,
+	initial,
+	min,
+	max,
+	step,
+	unit: "s"
+})
+
+export const DUB_DELAY: EffectDefinition = {
+	id: "dub-delay",
+	name: "Dub Delay",
+	description: "Dark tape-style echoes that sweep in pitch when the time changes",
+	mix: 0.4,
+	parameters: [
+		seconds("time", "Time", 0.5, 0.01, 2.5),
+		// The 1 dB low-pass in the loop peaks at about 1.25, so feedback stays below 1 / 1.25.
+		amount("feedback", "Feedback", 0.4, 0, 0.75),
+		frequency("filter", "Filter", 1000, 100, 8000)
+	]
+}
+
+export const SNARE_REVERB: EffectDefinition = {
+	id: "snare-reverb",
+	name: "Snare Reverb",
+	description: "A short, bright room added to the dry sound, for drums",
+	mix: false,
+	parameters: [
+		amount("amount", "Amount", 0.24),
+		milliseconds("preDelay", "Pre-delay", 14, 0, 100),
+		seconds("decay", "Decay", 1.2, 0.1, 3, 0.1),
+		frequency("lowCut", "Low cut", 480, 20, 4000)
+	]
+}
+
+export const SATURATOR: EffectDefinition = {
+	id: "saturator",
+	name: "Saturator",
+	description: "Asymmetric tube-style saturation that adds even harmonics",
+	mix: 1,
+	parameters: [decibels("drive", "Drive", 0, 0, 24), decibels("level", "Level", 0, -24, 12)]
+}
+
+/** Ids are amount, filter, compression, echo and reverb, or expression, expressionFilter... with a prefix. */
+const expressionParameters = (prefix: string, initialAmount: number, depth: number) => {
+	const id = (name: string) => (prefix ? prefix + name[0].toUpperCase() + name.slice(1) : name)
+	return [
+		amount(prefix || "amount", prefix ? "Expression" : "Amount", initialAmount),
+		amount(id("filter"), "Low-pass depth", depth),
+		amount(id("compression"), "Compression depth", depth),
+		amount(id("echo"), "Echo depth", depth),
+		amount(id("reverb"), "Reverb depth", depth)
+	]
+}
+
+export const EXPRESSION: EffectDefinition = {
+	id: "expression",
+	name: "Expression",
+	description: "One control that darkens, compresses and adds echo and reverb as it rises",
+	mix: false,
+	parameters: expressionParameters("", 0.5, 1)
+}
+
+export const CHANNEL_STRIP: EffectDefinition = {
+	id: "channel-strip",
+	name: "Channel Strip",
+	description:
+		"One player's gain, echo, stereo position, compression, expression and trim in a single device",
+	mix: false,
+	parameters: [
+		amount("gain", "Gain", 1),
+		{ id: "delay", name: "Echo", initial: "off", choices: SWITCH },
+		seconds("delayTime", "Echo time", 0.14, 0.01, 2),
+		amount("delayFeedback", "Echo feedback", 0.1, 0, 0.95),
+		amount("delayLevel", "Echo level", 0.5),
+		amount("pan", "Pan", 0, -1, 1),
+		{ id: "compressor", name: "Compressor", initial: "off", choices: SWITCH },
+		decibels("threshold", "Threshold", -24, -100, 0),
+		{ id: "ratio", name: "Ratio", initial: 12, min: 1, max: 20, step: 0.1, unit: ":1" },
+		decibels("knee", "Knee", 30, 0, 40),
+		{ id: "attack", name: "Attack", initial: 0.003, min: 0, max: 1, step: 0.001, unit: "s" },
+		{ id: "release", name: "Release", initial: 0.25, min: 0, max: 1, step: 0.01, unit: "s" },
+		...expressionParameters("expression", 0, 0),
+		// Photosynth runs its players at 8/3 to lift quiet instruments; unity is the safe default here.
+		{ id: "trim", name: "Trim", initial: 1, min: 0, max: 5, step: 0.01 }
+	]
+}
+
+export const DRUM_BUS: EffectDefinition = {
+	id: "drum-bus",
+	name: "Drum Bus",
+	description: "A heavy compressor into a limiter that glues percussion together",
+	mix: false,
+	parameters: [
+		decibels("threshold", "Threshold", -50, -100, 0),
+		decibels("knee", "Knee", 40, 0, 40),
+		{ id: "ratio", name: "Ratio", initial: 12, min: 1, max: 20, step: 0.1, unit: ":1" },
+		{ id: "attack", name: "Attack", initial: 0, min: 0, max: 1, step: 0.001, unit: "s" },
+		{ id: "release", name: "Release", initial: 0.25, min: 0, max: 1, step: 0.01, unit: "s" },
+		decibels("limitThreshold", "Limiter threshold", -5, -30, 0),
+		seconds("limitRelease", "Limiter release", 0.1, 0.01, 1)
+	]
+}

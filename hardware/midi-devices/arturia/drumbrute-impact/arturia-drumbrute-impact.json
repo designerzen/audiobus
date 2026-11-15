@@ -1,0 +1,371 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "arturia-drumbrute-impact",
+	"name": "Arturia DrumBrute Impact",
+	"manufacturer": "Arturia",
+	"manufacturerUrl": "https://www.arturia.com/",
+	"ids": ["arturia-drumbrute-impact"],
+	"portNames": [
+		"DrumBrute Impact",
+		"Arturia DrumBrute Impact",
+		"Arturia DrumBrute Impact MIDI 1"
+	],
+	"description": "Analog drum machine with ten instruments and a MIDI note sequencer.",
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Arturia DrumBrute Impact manual and MIDI reference",
+			"url": "https://downloads.arturia.net/products/drumbrute-impact/manual/drumbrute-impact_Manual_1_0_EN.pdf"
+		}
+	],
+	"abilities": [
+		"Velocity-sensitive drum notes",
+		"Sequencer MIDI output",
+		"Configurable drum note map"
+	],
+	"hardwareControls": [
+		"Ten instrument pads",
+		"Color variations",
+		"Roller/Looper strip",
+		"Step sequencer"
+	],
+	"notice": "Connect USB MIDI or DIN MIDI out. Drum notes use the manual factory map (36-45), with Color variants at 48-53 and 55-57; Cowbell has no Color variant. MIDI channel and note assignments can be changed in MIDI Control Center; use MIDI learn to match them. Analog sound knobs do not send MIDI CC. Roller/Looper and transport messages are configurable and have no fixed mapping in this profile.",
+	"controls": [],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Arturia DrumBrute Impact overhead hardware diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 1200,
+		"height": 680,
+		"elements": [
+			{
+				"id": "drum-0",
+				"label": "Kick",
+				"kind": "pad",
+				"position": {
+					"x": 10.416666666666668,
+					"y": 84.70588235294117,
+					"width": 3.6666666666666665,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 36
+				},
+				"learnable": true
+			},
+			{
+				"id": "drum-1",
+				"label": "Snare 1",
+				"kind": "pad",
+				"position": {
+					"x": 21.0,
+					"y": 84.70588235294117,
+					"width": 3.6666666666666665,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 37
+				},
+				"learnable": true
+			},
+			{
+				"id": "drum-2",
+				"label": "Snare 2",
+				"kind": "pad",
+				"position": {
+					"x": 31.583333333333336,
+					"y": 84.70588235294117,
+					"width": 3.6666666666666665,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 38
+				},
+				"learnable": true
+			},
+			{
+				"id": "drum-3",
+				"label": "High tom",
+				"kind": "pad",
+				"position": {
+					"x": 42.16666666666667,
+					"y": 84.70588235294117,
+					"width": 1.8333333333333333,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 39
+				},
+				"learnable": true
+			},
+			{
+				"id": "drum-4",
+				"label": "Low tom",
+				"kind": "pad",
+				"position": {
+					"x": 45.83333333333333,
+					"y": 84.70588235294117,
+					"width": 1.8333333333333333,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 40
+				},
+				"learnable": true
+			},
+			{
+				"id": "drum-5",
+				"label": "Cymbal",
+				"kind": "pad",
+				"position": {
+					"x": 52.75,
+					"y": 84.70588235294117,
+					"width": 2.444444444444444,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 41
+				},
+				"learnable": true
+			},
+			{
+				"id": "drum-6",
+				"label": "Cowbell",
+				"kind": "pad",
+				"position": {
+					"x": 57.638888888888886,
+					"y": 84.70588235294117,
+					"width": 2.444444444444444,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 42
+				},
+				"learnable": true
+			},
+			{
+				"id": "drum-7",
+				"label": "Closed hat",
+				"kind": "pad",
+				"position": {
+					"x": 63.33333333333333,
+					"y": 84.70588235294117,
+					"width": 3.6666666666666665,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 43
+				},
+				"learnable": true
+			},
+			{
+				"id": "drum-8",
+				"label": "Open hat",
+				"kind": "pad",
+				"position": {
+					"x": 73.91666666666666,
+					"y": 84.70588235294117,
+					"width": 3.6666666666666665,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 44
+				},
+				"learnable": true
+			},
+			{
+				"id": "drum-9",
+				"label": "FM drum",
+				"kind": "pad",
+				"position": {
+					"x": 84.5,
+					"y": 84.70588235294117,
+					"width": 3.6666666666666665,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 45
+				},
+				"learnable": true
+			},
+			{
+				"id": "color-0",
+				"label": "Color Kick",
+				"kind": "pad",
+				"position": {
+					"x": 14.083333333333334,
+					"y": 84.70588235294117,
+					"width": 3.6666666666666665,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 48
+				},
+				"learnable": true
+			},
+			{
+				"id": "color-1",
+				"label": "Color Snare 1",
+				"kind": "pad",
+				"position": {
+					"x": 24.666666666666668,
+					"y": 84.70588235294117,
+					"width": 3.6666666666666665,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 49
+				},
+				"learnable": true
+			},
+			{
+				"id": "color-2",
+				"label": "Color Snare 2",
+				"kind": "pad",
+				"position": {
+					"x": 35.25,
+					"y": 84.70588235294117,
+					"width": 3.6666666666666665,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 50
+				},
+				"learnable": true
+			},
+			{
+				"id": "color-3",
+				"label": "Color High tom",
+				"kind": "pad",
+				"position": {
+					"x": 44.0,
+					"y": 84.70588235294117,
+					"width": 1.8333333333333333,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 51
+				},
+				"learnable": true
+			},
+			{
+				"id": "color-4",
+				"label": "Color Low tom",
+				"kind": "pad",
+				"position": {
+					"x": 47.66666666666667,
+					"y": 84.70588235294117,
+					"width": 1.8333333333333333,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 52
+				},
+				"learnable": true
+			},
+			{
+				"id": "color-5",
+				"label": "Color Cymbal",
+				"kind": "pad",
+				"position": {
+					"x": 55.19444444444444,
+					"y": 84.70588235294117,
+					"width": 2.444444444444444,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 53
+				},
+				"learnable": true
+			},
+			{
+				"id": "color-7",
+				"label": "Color Closed hat",
+				"kind": "pad",
+				"position": {
+					"x": 67.0,
+					"y": 84.70588235294117,
+					"width": 3.6666666666666665,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 55
+				},
+				"learnable": true
+			},
+			{
+				"id": "color-8",
+				"label": "Color Open hat",
+				"kind": "pad",
+				"position": {
+					"x": 77.58333333333334,
+					"y": 84.70588235294117,
+					"width": 3.6666666666666665,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 56
+				},
+				"learnable": true
+			},
+			{
+				"id": "color-9",
+				"label": "Color FM drum",
+				"kind": "pad",
+				"position": {
+					"x": 88.16666666666667,
+					"y": 84.70588235294117,
+					"width": 3.6666666666666665,
+					"height": 9.558823529411764
+				},
+				"message": {
+					"type": "note",
+					"number": 57
+				},
+				"learnable": true
+			}
+		]
+	}
+}

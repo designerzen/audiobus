@@ -1,0 +1,745 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2982 540" role="group" aria-labelledby="roland-se-02-panel--title" aria-describedby="roland-se-02-panel--description" data-device="roland-se-02" data-diagram-style="wireframe" style="background: #fff; color: #334155;">
+  <title id="roland-se-02-panel--title">Roland SE-02 overhead wireframe diagram</title>
+  <desc id="roland-se-02-panel--description">Schematic top view grouped by panel section. Every physical control has a stable ID and accessible label. Standalone buttons are disabled until a host supplies interaction. MIDI regions match the JSON surface; note and shared parameter regions use the setup described in the profile.</desc>
+  <style>text { font-family: Arial, sans-serif; fill: currentColor; stroke: none; } [data-part]:focus-visible { outline: 3px solid currentColor; }</style>
+  <g id="roland-se-02-panel--chassis" aria-hidden="true">
+    <rect x="3" y="3" width="2976" height="534" rx="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="25" y="30" font-size="22">Roland SE-02</text>
+    <rect x="25" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="35" y="128" font-size="12">Control</text>
+    <rect x="173" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="183" y="128" font-size="12">VCO 1</text>
+    <rect x="321" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="331" y="128" font-size="12">VCO 2</text>
+    <rect x="469" y="105" width="297" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="479" y="128" font-size="12">VCO 3</text>
+    <rect x="778" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="788" y="128" font-size="12">Xmod</text>
+    <rect x="926" y="105" width="202" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="936" y="128" font-size="12">Mixer</text>
+    <rect x="1140" y="105" width="297" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1150" y="128" font-size="12">Filter</text>
+    <rect x="1449" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1459" y="128" font-size="12">Filter Envelope</text>
+    <rect x="1597" y="105" width="202" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1607" y="128" font-size="12">Amp Envelope</text>
+    <rect x="1811" y="105" width="297" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1821" y="128" font-size="12">LFO</text>
+    <rect x="2120" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="2130" y="128" font-size="12">Delay</text>
+    <rect x="2268" y="105" width="677" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="2278" y="128" font-size="12">Sequencer</text>
+  </g>
+  <g id="roland-se-02-panel--controls" role="group" aria-label="Physical hardware controls">
+    <g id="roland-se-02-panel--control-glide-knob" data-part="control-glide-knob" data-kind="knob" role="group" aria-label="Glide" aria-roledescription="rotary control" data-surface-controls="control-glide-knob">
+      <title>Glide</title>
+      <g aria-hidden="true">
+        <circle cx="75.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 75.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="209" text-anchor="middle" font-size="10">Glide</text>
+      </g>
+      <g id="roland-se-02-panel--surface--control-glide-knob" data-surface-control="control-glide-knob" aria-hidden="true">
+        <rect x="37.0" y="145" width="76.0" height="50" data-hit-area="control-glide-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--control-glide-type-switch" data-part="control-glide-type-switch" data-kind="switch" role="group" aria-label="Glide type" aria-roledescription="selector switch" data-surface-controls="control-glide-type-switch">
+      <title>Glide type</title>
+      <g aria-hidden="true">
+        <rect x="37" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="260.0" text-anchor="middle" font-size="10">Glide type</text>
+      </g>
+      <g id="roland-se-02-panel--surface--control-glide-type-switch" data-surface-control="control-glide-type-switch" aria-hidden="true">
+        <rect x="37.0" y="231" width="76.0" height="50" data-hit-area="control-glide-type-switch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--control-wheel-mix-knob" data-part="control-wheel-mix-knob" data-kind="knob" role="group" aria-label="Wheel mix" aria-roledescription="rotary control" data-surface-controls="control-wheel-mix-knob">
+      <title>Wheel mix</title>
+      <g aria-hidden="true">
+        <circle cx="75.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 75.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="381" text-anchor="middle" font-size="10">Wheel mix</text>
+      </g>
+      <g id="roland-se-02-panel--surface--control-wheel-mix-knob" data-surface-control="control-wheel-mix-knob" aria-hidden="true">
+        <rect x="37.0" y="317" width="76.0" height="50" data-hit-area="control-wheel-mix-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--vco-1-range-knob" data-part="vco-1-range-knob" data-kind="knob" role="group" aria-label="Range" aria-roledescription="rotary control" data-surface-controls="vco-1-range-knob">
+      <title>Range</title>
+      <g aria-hidden="true">
+        <circle cx="223.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 223.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="223.0" y="209" text-anchor="middle" font-size="10">Range</text>
+      </g>
+      <g id="roland-se-02-panel--surface--vco-1-range-knob" data-surface-control="vco-1-range-knob" aria-hidden="true">
+        <rect x="185.0" y="145" width="76.0" height="50" data-hit-area="vco-1-range-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--vco-1-tune-knob" data-part="vco-1-tune-knob" data-kind="knob" role="group" aria-label="Tune" aria-roledescription="rotary control" data-surface-controls="vco-1-tune-knob">
+      <title>Tune</title>
+      <g aria-hidden="true">
+        <circle cx="223.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 223.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="223.0" y="295" text-anchor="middle" font-size="10">Tune</text>
+      </g>
+      <g id="roland-se-02-panel--surface--vco-1-tune-knob" data-surface-control="vco-1-tune-knob" aria-hidden="true">
+        <rect x="185.0" y="231" width="76.0" height="50" data-hit-area="vco-1-tune-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--vco-1-waveform-knob" data-part="vco-1-waveform-knob" data-kind="knob" role="group" aria-label="Waveform" aria-roledescription="rotary control" data-surface-controls="vco-1-waveform-knob">
+      <title>Waveform</title>
+      <g aria-hidden="true">
+        <circle cx="223.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 223.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="223.0" y="381" text-anchor="middle" font-size="10">Waveform</text>
+      </g>
+      <g id="roland-se-02-panel--surface--vco-1-waveform-knob" data-surface-control="vco-1-waveform-knob" aria-hidden="true">
+        <rect x="185.0" y="317" width="76.0" height="50" data-hit-area="vco-1-waveform-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--vco-2-range-knob" data-part="vco-2-range-knob" data-kind="knob" role="group" aria-label="Range" aria-roledescription="rotary control" data-surface-controls="vco-2-range-knob">
+      <title>Range</title>
+      <g aria-hidden="true">
+        <circle cx="371.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 371.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="371.0" y="209" text-anchor="middle" font-size="10">Range</text>
+      </g>
+      <g id="roland-se-02-panel--surface--vco-2-range-knob" data-surface-control="vco-2-range-knob" aria-hidden="true">
+        <rect x="333.0" y="145" width="76.0" height="50" data-hit-area="vco-2-range-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--vco-2-fine-knob" data-part="vco-2-fine-knob" data-kind="knob" role="group" aria-label="Fine" aria-roledescription="rotary control" data-surface-controls="vco-2-fine-knob">
+      <title>Fine</title>
+      <g aria-hidden="true">
+        <circle cx="371.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 371.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="371.0" y="295" text-anchor="middle" font-size="10">Fine</text>
+      </g>
+      <g id="roland-se-02-panel--surface--vco-2-fine-knob" data-surface-control="vco-2-fine-knob" aria-hidden="true">
+        <rect x="333.0" y="231" width="76.0" height="50" data-hit-area="vco-2-fine-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--vco-2-waveform-knob" data-part="vco-2-waveform-knob" data-kind="knob" role="group" aria-label="Waveform" aria-roledescription="rotary control" data-surface-controls="vco-2-waveform-knob">
+      <title>Waveform</title>
+      <g aria-hidden="true">
+        <circle cx="371.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 371.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="371.0" y="381" text-anchor="middle" font-size="10">Waveform</text>
+      </g>
+      <g id="roland-se-02-panel--surface--vco-2-waveform-knob" data-surface-control="vco-2-waveform-knob" aria-hidden="true">
+        <rect x="333.0" y="317" width="76.0" height="50" data-hit-area="vco-2-waveform-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--vco-3-range-knob" data-part="vco-3-range-knob" data-kind="knob" role="group" aria-label="Range" aria-roledescription="rotary control" data-surface-controls="vco-3-range-knob">
+      <title>Range</title>
+      <g aria-hidden="true">
+        <circle cx="519.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 519.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="519.0" y="209" text-anchor="middle" font-size="10">Range</text>
+      </g>
+      <g id="roland-se-02-panel--surface--vco-3-range-knob" data-surface-control="vco-3-range-knob" aria-hidden="true">
+        <rect x="481.0" y="145" width="76.0" height="50" data-hit-area="vco-3-range-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--vco-3-fine-knob" data-part="vco-3-fine-knob" data-kind="knob" role="group" aria-label="Fine" aria-roledescription="rotary control">
+      <title>Fine</title>
+      <g aria-hidden="true">
+        <circle cx="614.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 614.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="614.0" y="209" text-anchor="middle" font-size="10">Fine</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--vco-3-waveform-knob" data-part="vco-3-waveform-knob" data-kind="knob" role="group" aria-label="Waveform" aria-roledescription="rotary control" data-surface-controls="vco-3-waveform-knob">
+      <title>Waveform</title>
+      <g aria-hidden="true">
+        <circle cx="709.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 709.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="709.0" y="209" text-anchor="middle" font-size="10">Waveform</text>
+      </g>
+      <g id="roland-se-02-panel--surface--vco-3-waveform-knob" data-surface-control="vco-3-waveform-knob" aria-hidden="true">
+        <rect x="671.0" y="145" width="76.0" height="50" data-hit-area="vco-3-waveform-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--vco-3-sync-switch" data-part="vco-3-sync-switch" data-kind="switch" role="group" aria-label="Sync" aria-roledescription="selector switch" data-surface-controls="vco-3-sync-switch">
+      <title>Sync</title>
+      <g aria-hidden="true">
+        <rect x="481" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="519.0" y="260.0" text-anchor="middle" font-size="10">Sync</text>
+      </g>
+      <g id="roland-se-02-panel--surface--vco-3-sync-switch" data-surface-control="vco-3-sync-switch" aria-hidden="true">
+        <rect x="481.0" y="231" width="76.0" height="50" data-hit-area="vco-3-sync-switch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--vco-3-env-depth-knob" data-part="vco-3-env-depth-knob" data-kind="knob" role="group" aria-label="Env depth" aria-roledescription="rotary control" data-surface-controls="vco-3-env-depth-knob">
+      <title>Env depth</title>
+      <g aria-hidden="true">
+        <circle cx="614.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 614.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="614.0" y="295" text-anchor="middle" font-size="10">Env depth</text>
+      </g>
+      <g id="roland-se-02-panel--surface--vco-3-env-depth-knob" data-surface-control="vco-3-env-depth-knob" aria-hidden="true">
+        <rect x="576.0" y="231" width="76.0" height="50" data-hit-area="vco-3-env-depth-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--vco-3-keyboard-switch" data-part="vco-3-keyboard-switch" data-kind="switch" role="group" aria-label="Keyboard" aria-roledescription="selector switch" data-surface-controls="vco-3-keyboard-switch">
+      <title>Keyboard</title>
+      <g aria-hidden="true">
+        <rect x="671" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="709.0" y="260.0" text-anchor="middle" font-size="10">Keyboard</text>
+      </g>
+      <g id="roland-se-02-panel--surface--vco-3-keyboard-switch" data-surface-control="vco-3-keyboard-switch" aria-hidden="true">
+        <rect x="671.0" y="231" width="76.0" height="50" data-hit-area="vco-3-keyboard-switch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--vco-3-xmod-wheel-switch" data-part="vco-3-xmod-wheel-switch" data-kind="switch" role="group" aria-label="Xmod wheel" aria-roledescription="selector switch" data-surface-controls="vco-3-xmod-wheel-switch">
+      <title>Xmod wheel</title>
+      <g aria-hidden="true">
+        <rect x="481" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="519.0" y="346.0" text-anchor="middle" font-size="10">Xmod wheel</text>
+      </g>
+      <g id="roland-se-02-panel--surface--vco-3-xmod-wheel-switch" data-surface-control="vco-3-xmod-wheel-switch" aria-hidden="true">
+        <rect x="481.0" y="317" width="76.0" height="50" data-hit-area="vco-3-xmod-wheel-switch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--xmod-osc-2-filter-knob" data-part="xmod-osc-2-filter-knob" data-kind="knob" role="group" aria-label="Osc 2 filter" aria-roledescription="rotary control" data-surface-controls="xmod-osc-2-filter-knob">
+      <title>Osc 2 filter</title>
+      <g aria-hidden="true">
+        <circle cx="828.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 828.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="828.0" y="209" text-anchor="middle" font-size="10">Osc 2 filter</text>
+      </g>
+      <g id="roland-se-02-panel--surface--xmod-osc-2-filter-knob" data-surface-control="xmod-osc-2-filter-knob" aria-hidden="true">
+        <rect x="790.0" y="145" width="76.0" height="50" data-hit-area="xmod-osc-2-filter-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--xmod-osc-3-to-2-knob" data-part="xmod-osc-3-to-2-knob" data-kind="knob" role="group" aria-label="Osc 3 to 2" aria-roledescription="rotary control" data-surface-controls="xmod-osc-3-to-2-knob">
+      <title>Osc 3 to 2</title>
+      <g aria-hidden="true">
+        <circle cx="828.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 828.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="828.0" y="295" text-anchor="middle" font-size="10">Osc 3 to 2</text>
+      </g>
+      <g id="roland-se-02-panel--surface--xmod-osc-3-to-2-knob" data-surface-control="xmod-osc-3-to-2-knob" aria-hidden="true">
+        <rect x="790.0" y="231" width="76.0" height="50" data-hit-area="xmod-osc-3-to-2-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--xmod-osc-3-pwm-knob" data-part="xmod-osc-3-pwm-knob" data-kind="knob" role="group" aria-label="Osc 3 PWM" aria-roledescription="rotary control" data-surface-controls="xmod-osc-3-pwm-knob">
+      <title>Osc 3 PWM</title>
+      <g aria-hidden="true">
+        <circle cx="828.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 828.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="828.0" y="381" text-anchor="middle" font-size="10">Osc 3 PWM</text>
+      </g>
+      <g id="roland-se-02-panel--surface--xmod-osc-3-pwm-knob" data-surface-control="xmod-osc-3-pwm-knob" aria-hidden="true">
+        <rect x="790.0" y="317" width="76.0" height="50" data-hit-area="xmod-osc-3-pwm-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--mixer-osc-1-knob" data-part="mixer-osc-1-knob" data-kind="knob" role="group" aria-label="Osc 1" aria-roledescription="rotary control" data-surface-controls="mixer-osc-1-knob">
+      <title>Osc 1</title>
+      <g aria-hidden="true">
+        <circle cx="976.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 976.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="976.0" y="209" text-anchor="middle" font-size="10">Osc 1</text>
+      </g>
+      <g id="roland-se-02-panel--surface--mixer-osc-1-knob" data-surface-control="mixer-osc-1-knob" aria-hidden="true">
+        <rect x="938.0" y="145" width="76.0" height="50" data-hit-area="mixer-osc-1-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--mixer-osc-2-knob" data-part="mixer-osc-2-knob" data-kind="knob" role="group" aria-label="Osc 2" aria-roledescription="rotary control" data-surface-controls="mixer-osc-2-knob">
+      <title>Osc 2</title>
+      <g aria-hidden="true">
+        <circle cx="1071.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1071.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1071.0" y="209" text-anchor="middle" font-size="10">Osc 2</text>
+      </g>
+      <g id="roland-se-02-panel--surface--mixer-osc-2-knob" data-surface-control="mixer-osc-2-knob" aria-hidden="true">
+        <rect x="1033.0" y="145" width="76.0" height="50" data-hit-area="mixer-osc-2-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--mixer-osc-3-knob" data-part="mixer-osc-3-knob" data-kind="knob" role="group" aria-label="Osc 3" aria-roledescription="rotary control" data-surface-controls="mixer-osc-3-knob">
+      <title>Osc 3</title>
+      <g aria-hidden="true">
+        <circle cx="976.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 976.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="976.0" y="295" text-anchor="middle" font-size="10">Osc 3</text>
+      </g>
+      <g id="roland-se-02-panel--surface--mixer-osc-3-knob" data-surface-control="mixer-osc-3-knob" aria-hidden="true">
+        <rect x="938.0" y="231" width="76.0" height="50" data-hit-area="mixer-osc-3-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--mixer-feedback-knob" data-part="mixer-feedback-knob" data-kind="knob" role="group" aria-label="Feedback" aria-roledescription="rotary control" data-surface-controls="mixer-feedback-knob">
+      <title>Feedback</title>
+      <g aria-hidden="true">
+        <circle cx="1071.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1071.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1071.0" y="295" text-anchor="middle" font-size="10">Feedback</text>
+      </g>
+      <g id="roland-se-02-panel--surface--mixer-feedback-knob" data-surface-control="mixer-feedback-knob" aria-hidden="true">
+        <rect x="1033.0" y="231" width="76.0" height="50" data-hit-area="mixer-feedback-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--mixer-noise-knob" data-part="mixer-noise-knob" data-kind="knob" role="group" aria-label="Noise" aria-roledescription="rotary control" data-surface-controls="mixer-noise-knob">
+      <title>Noise</title>
+      <g aria-hidden="true">
+        <circle cx="976.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 976.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="976.0" y="381" text-anchor="middle" font-size="10">Noise</text>
+      </g>
+      <g id="roland-se-02-panel--surface--mixer-noise-knob" data-surface-control="mixer-noise-knob" aria-hidden="true">
+        <rect x="938.0" y="317" width="76.0" height="50" data-hit-area="mixer-noise-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--filter-cutoff-knob" data-part="filter-cutoff-knob" data-kind="knob" role="group" aria-label="Cutoff" aria-roledescription="rotary control" data-surface-controls="filter-cutoff-knob">
+      <title>Cutoff</title>
+      <g aria-hidden="true">
+        <circle cx="1190.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1190.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1190.0" y="209" text-anchor="middle" font-size="10">Cutoff</text>
+      </g>
+      <g id="roland-se-02-panel--surface--filter-cutoff-knob" data-surface-control="filter-cutoff-knob" aria-hidden="true">
+        <rect x="1152.0" y="145" width="76.0" height="50" data-hit-area="filter-cutoff-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--filter-emphasis-knob" data-part="filter-emphasis-knob" data-kind="knob" role="group" aria-label="Emphasis" aria-roledescription="rotary control" data-surface-controls="filter-emphasis-knob">
+      <title>Emphasis</title>
+      <g aria-hidden="true">
+        <circle cx="1285.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1285.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1285.0" y="209" text-anchor="middle" font-size="10">Emphasis</text>
+      </g>
+      <g id="roland-se-02-panel--surface--filter-emphasis-knob" data-surface-control="filter-emphasis-knob" aria-hidden="true">
+        <rect x="1247.0" y="145" width="76.0" height="50" data-hit-area="filter-emphasis-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--filter-key-track-1-3-switch" data-part="filter-key-track-1-3-switch" data-kind="switch" role="group" aria-label="Key track 1 3" aria-roledescription="selector switch" data-surface-controls="filter-key-track-1-3-switch">
+      <title>Key track 1 3</title>
+      <g aria-hidden="true">
+        <rect x="1342" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1380.0" y="174.0" text-anchor="middle" font-size="10">Key track 1 3</text>
+      </g>
+      <g id="roland-se-02-panel--surface--filter-key-track-1-3-switch" data-surface-control="filter-key-track-1-3-switch" aria-hidden="true">
+        <rect x="1342.0" y="145" width="76.0" height="50" data-hit-area="filter-key-track-1-3-switch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--filter-key-track-2-3-switch" data-part="filter-key-track-2-3-switch" data-kind="switch" role="group" aria-label="Key track 2 3" aria-roledescription="selector switch" data-surface-controls="filter-key-track-2-3-switch">
+      <title>Key track 2 3</title>
+      <g aria-hidden="true">
+        <rect x="1152" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1190.0" y="260.0" text-anchor="middle" font-size="10">Key track 2 3</text>
+      </g>
+      <g id="roland-se-02-panel--surface--filter-key-track-2-3-switch" data-surface-control="filter-key-track-2-3-switch" aria-hidden="true">
+        <rect x="1152.0" y="231" width="76.0" height="50" data-hit-area="filter-key-track-2-3-switch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--filter-contour-knob" data-part="filter-contour-knob" data-kind="knob" role="group" aria-label="Contour" aria-roledescription="rotary control" data-surface-controls="filter-contour-knob">
+      <title>Contour</title>
+      <g aria-hidden="true">
+        <circle cx="1285.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1285.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1285.0" y="295" text-anchor="middle" font-size="10">Contour</text>
+      </g>
+      <g id="roland-se-02-panel--surface--filter-contour-knob" data-surface-control="filter-contour-knob" aria-hidden="true">
+        <rect x="1247.0" y="231" width="76.0" height="50" data-hit-area="filter-contour-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--filter-multiple-trigger-switch" data-part="filter-multiple-trigger-switch" data-kind="switch" role="group" aria-label="Multiple trigger" aria-roledescription="selector switch" data-surface-controls="filter-multiple-trigger-switch">
+      <title>Multiple trigger</title>
+      <g aria-hidden="true">
+        <rect x="1342" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1380.0" y="260.0" text-anchor="middle" font-size="8">Multiple trigger</text>
+      </g>
+      <g id="roland-se-02-panel--surface--filter-multiple-trigger-switch" data-surface-control="filter-multiple-trigger-switch" aria-hidden="true">
+        <rect x="1342.0" y="231" width="76.0" height="50" data-hit-area="filter-multiple-trigger-switch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--filter-polarity-switch" data-part="filter-polarity-switch" data-kind="switch" role="group" aria-label="Polarity" aria-roledescription="selector switch" data-surface-controls="filter-polarity-switch">
+      <title>Polarity</title>
+      <g aria-hidden="true">
+        <rect x="1152" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1190.0" y="346.0" text-anchor="middle" font-size="10">Polarity</text>
+      </g>
+      <g id="roland-se-02-panel--surface--filter-polarity-switch" data-surface-control="filter-polarity-switch" aria-hidden="true">
+        <rect x="1152.0" y="317" width="76.0" height="50" data-hit-area="filter-polarity-switch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--filter-envelope-attack-knob" data-part="filter-envelope-attack-knob" data-kind="knob" role="group" aria-label="Attack" aria-roledescription="rotary control" data-surface-controls="filter-envelope-attack-knob">
+      <title>Attack</title>
+      <g aria-hidden="true">
+        <circle cx="1499.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1499.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1499.0" y="209" text-anchor="middle" font-size="10">Attack</text>
+      </g>
+      <g id="roland-se-02-panel--surface--filter-envelope-attack-knob" data-surface-control="filter-envelope-attack-knob" aria-hidden="true">
+        <rect x="1461.0" y="145" width="76.0" height="50" data-hit-area="filter-envelope-attack-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--filter-envelope-decay-knob" data-part="filter-envelope-decay-knob" data-kind="knob" role="group" aria-label="Decay" aria-roledescription="rotary control" data-surface-controls="filter-envelope-decay-knob">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <circle cx="1499.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1499.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1499.0" y="295" text-anchor="middle" font-size="10">Decay</text>
+      </g>
+      <g id="roland-se-02-panel--surface--filter-envelope-decay-knob" data-surface-control="filter-envelope-decay-knob" aria-hidden="true">
+        <rect x="1461.0" y="231" width="76.0" height="50" data-hit-area="filter-envelope-decay-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--filter-envelope-sustain-knob" data-part="filter-envelope-sustain-knob" data-kind="knob" role="group" aria-label="Sustain" aria-roledescription="rotary control" data-surface-controls="filter-envelope-sustain-knob">
+      <title>Sustain</title>
+      <g aria-hidden="true">
+        <circle cx="1499.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1499.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1499.0" y="381" text-anchor="middle" font-size="10">Sustain</text>
+      </g>
+      <g id="roland-se-02-panel--surface--filter-envelope-sustain-knob" data-surface-control="filter-envelope-sustain-knob" aria-hidden="true">
+        <rect x="1461.0" y="317" width="76.0" height="50" data-hit-area="filter-envelope-sustain-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--amp-envelope-attack-knob" data-part="amp-envelope-attack-knob" data-kind="knob" role="group" aria-label="Attack" aria-roledescription="rotary control" data-surface-controls="amp-envelope-attack-knob">
+      <title>Attack</title>
+      <g aria-hidden="true">
+        <circle cx="1647.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1647.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1647.0" y="209" text-anchor="middle" font-size="10">Attack</text>
+      </g>
+      <g id="roland-se-02-panel--surface--amp-envelope-attack-knob" data-surface-control="amp-envelope-attack-knob" aria-hidden="true">
+        <rect x="1609.0" y="145" width="76.0" height="50" data-hit-area="amp-envelope-attack-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--amp-envelope-decay-knob" data-part="amp-envelope-decay-knob" data-kind="knob" role="group" aria-label="Decay" aria-roledescription="rotary control" data-surface-controls="amp-envelope-decay-knob">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <circle cx="1742.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1742.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1742.0" y="209" text-anchor="middle" font-size="10">Decay</text>
+      </g>
+      <g id="roland-se-02-panel--surface--amp-envelope-decay-knob" data-surface-control="amp-envelope-decay-knob" aria-hidden="true">
+        <rect x="1704.0" y="145" width="76.0" height="50" data-hit-area="amp-envelope-decay-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--amp-envelope-sustain-knob" data-part="amp-envelope-sustain-knob" data-kind="knob" role="group" aria-label="Sustain" aria-roledescription="rotary control" data-surface-controls="amp-envelope-sustain-knob">
+      <title>Sustain</title>
+      <g aria-hidden="true">
+        <circle cx="1647.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1647.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1647.0" y="295" text-anchor="middle" font-size="10">Sustain</text>
+      </g>
+      <g id="roland-se-02-panel--surface--amp-envelope-sustain-knob" data-surface-control="amp-envelope-sustain-knob" aria-hidden="true">
+        <rect x="1609.0" y="231" width="76.0" height="50" data-hit-area="amp-envelope-sustain-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--amp-envelope-release-switch" data-part="amp-envelope-release-switch" data-kind="switch" role="group" aria-label="Release" aria-roledescription="selector switch" data-surface-controls="amp-envelope-release-switch">
+      <title>Release</title>
+      <g aria-hidden="true">
+        <rect x="1704" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1742.0" y="260.0" text-anchor="middle" font-size="10">Release</text>
+      </g>
+      <g id="roland-se-02-panel--surface--amp-envelope-release-switch" data-surface-control="amp-envelope-release-switch" aria-hidden="true">
+        <rect x="1704.0" y="231" width="76.0" height="50" data-hit-area="amp-envelope-release-switch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--amp-envelope-lfo-gate-switch" data-part="amp-envelope-lfo-gate-switch" data-kind="switch" role="group" aria-label="LFO Gate" aria-roledescription="selector switch" data-surface-controls="amp-envelope-lfo-gate-switch">
+      <title>LFO Gate</title>
+      <g aria-hidden="true">
+        <rect x="1609" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1647.0" y="346.0" text-anchor="middle" font-size="10">LFO Gate</text>
+      </g>
+      <g id="roland-se-02-panel--surface--amp-envelope-lfo-gate-switch" data-surface-control="amp-envelope-lfo-gate-switch" aria-hidden="true">
+        <rect x="1609.0" y="317" width="76.0" height="50" data-hit-area="amp-envelope-lfo-gate-switch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--lfo-rate-knob" data-part="lfo-rate-knob" data-kind="knob" role="group" aria-label="Rate" aria-roledescription="rotary control" data-surface-controls="lfo-rate-knob">
+      <title>Rate</title>
+      <g aria-hidden="true">
+        <circle cx="1861.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1861.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1861.0" y="209" text-anchor="middle" font-size="10">Rate</text>
+      </g>
+      <g id="roland-se-02-panel--surface--lfo-rate-knob" data-surface-control="lfo-rate-knob" aria-hidden="true">
+        <rect x="1823.0" y="145" width="76.0" height="50" data-hit-area="lfo-rate-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--lfo-osc-depth-knob" data-part="lfo-osc-depth-knob" data-kind="knob" role="group" aria-label="Osc depth" aria-roledescription="rotary control" data-surface-controls="lfo-osc-depth-knob">
+      <title>Osc depth</title>
+      <g aria-hidden="true">
+        <circle cx="1956.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1956.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1956.0" y="209" text-anchor="middle" font-size="10">Osc depth</text>
+      </g>
+      <g id="roland-se-02-panel--surface--lfo-osc-depth-knob" data-surface-control="lfo-osc-depth-knob" aria-hidden="true">
+        <rect x="1918.0" y="145" width="76.0" height="50" data-hit-area="lfo-osc-depth-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--lfo-wave-knob" data-part="lfo-wave-knob" data-kind="knob" role="group" aria-label="Wave" aria-roledescription="rotary control" data-surface-controls="lfo-wave-knob">
+      <title>Wave</title>
+      <g aria-hidden="true">
+        <circle cx="2051.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 2051.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2051.0" y="209" text-anchor="middle" font-size="10">Wave</text>
+      </g>
+      <g id="roland-se-02-panel--surface--lfo-wave-knob" data-surface-control="lfo-wave-knob" aria-hidden="true">
+        <rect x="2013.0" y="145" width="76.0" height="50" data-hit-area="lfo-wave-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--lfo-filter-depth-knob" data-part="lfo-filter-depth-knob" data-kind="knob" role="group" aria-label="Filter depth" aria-roledescription="rotary control" data-surface-controls="lfo-filter-depth-knob">
+      <title>Filter depth</title>
+      <g aria-hidden="true">
+        <circle cx="1861.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1861.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1861.0" y="295" text-anchor="middle" font-size="10">Filter depth</text>
+      </g>
+      <g id="roland-se-02-panel--surface--lfo-filter-depth-knob" data-surface-control="lfo-filter-depth-knob" aria-hidden="true">
+        <rect x="1823.0" y="231" width="76.0" height="50" data-hit-area="lfo-filter-depth-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--lfo-wheel-switch" data-part="lfo-wheel-switch" data-kind="switch" role="group" aria-label="Wheel" aria-roledescription="selector switch">
+      <title>Wheel</title>
+      <g aria-hidden="true">
+        <rect x="1918" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1956.0" y="260.0" text-anchor="middle" font-size="10">Wheel</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--lfo-mode-switch" data-part="lfo-mode-switch" data-kind="switch" role="group" aria-label="Mode" aria-roledescription="selector switch" data-surface-controls="lfo-mode-switch">
+      <title>Mode</title>
+      <g aria-hidden="true">
+        <rect x="2013" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2051.0" y="260.0" text-anchor="middle" font-size="10">Mode</text>
+      </g>
+      <g id="roland-se-02-panel--surface--lfo-mode-switch" data-surface-control="lfo-mode-switch" aria-hidden="true">
+        <rect x="2013.0" y="231" width="76.0" height="50" data-hit-area="lfo-mode-switch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--lfo-sync-switch" data-part="lfo-sync-switch" data-kind="switch" role="group" aria-label="Sync" aria-roledescription="selector switch" data-surface-controls="lfo-sync-switch">
+      <title>Sync</title>
+      <g aria-hidden="true">
+        <rect x="1823" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1861.0" y="346.0" text-anchor="middle" font-size="10">Sync</text>
+      </g>
+      <g id="roland-se-02-panel--surface--lfo-sync-switch" data-surface-control="lfo-sync-switch" aria-hidden="true">
+        <rect x="1823.0" y="317" width="76.0" height="50" data-hit-area="lfo-sync-switch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--delay-time-knob" data-part="delay-time-knob" data-kind="knob" role="group" aria-label="Time" aria-roledescription="rotary control" data-surface-controls="delay-time-knob">
+      <title>Time</title>
+      <g aria-hidden="true">
+        <circle cx="2170.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 2170.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2170.0" y="209" text-anchor="middle" font-size="10">Time</text>
+      </g>
+      <g id="roland-se-02-panel--surface--delay-time-knob" data-surface-control="delay-time-knob" aria-hidden="true">
+        <rect x="2132.0" y="145" width="76.0" height="50" data-hit-area="delay-time-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--delay-regen-knob" data-part="delay-regen-knob" data-kind="knob" role="group" aria-label="Regen" aria-roledescription="rotary control" data-surface-controls="delay-regen-knob">
+      <title>Regen</title>
+      <g aria-hidden="true">
+        <circle cx="2170.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 2170.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2170.0" y="295" text-anchor="middle" font-size="10">Regen</text>
+      </g>
+      <g id="roland-se-02-panel--surface--delay-regen-knob" data-surface-control="delay-regen-knob" aria-hidden="true">
+        <rect x="2132.0" y="231" width="76.0" height="50" data-hit-area="delay-regen-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--delay-amount-knob" data-part="delay-amount-knob" data-kind="knob" role="group" aria-label="Amount" aria-roledescription="rotary control" data-surface-controls="delay-amount-knob">
+      <title>Amount</title>
+      <g aria-hidden="true">
+        <circle cx="2170.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 2170.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2170.0" y="381" text-anchor="middle" font-size="10">Amount</text>
+      </g>
+      <g id="roland-se-02-panel--surface--delay-amount-knob" data-surface-control="delay-amount-knob" aria-hidden="true">
+        <rect x="2132.0" y="317" width="76.0" height="50" data-hit-area="delay-amount-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-value-knob" data-part="sequencer-value-knob" data-kind="knob" role="group" aria-label="Value" aria-roledescription="rotary control">
+      <title>Value</title>
+      <g aria-hidden="true">
+        <circle cx="2318.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 2318.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2318.0" y="209" text-anchor="middle" font-size="10">Value</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-mode-switch" data-part="sequencer-mode-switch" data-kind="switch" role="group" aria-label="Mode" aria-roledescription="selector switch">
+      <title>Mode</title>
+      <g aria-hidden="true">
+        <rect x="2375" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2413.0" y="174.0" text-anchor="middle" font-size="10">Mode</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-manual-button" data-part="sequencer-manual-button" data-kind="button" role="button" aria-label="Manual" aria-disabled="true" tabindex="-1">
+      <title>Manual</title>
+      <g aria-hidden="true">
+        <rect x="2470" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2508.0" y="174.0" text-anchor="middle" font-size="10">Manual</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-play-button" data-part="sequencer-play-button" data-kind="button" role="button" aria-label="Play" aria-disabled="true" tabindex="-1">
+      <title>Play</title>
+      <g aria-hidden="true">
+        <rect x="2565" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2603.0" y="174.0" text-anchor="middle" font-size="10">Play</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-stop-button" data-part="sequencer-stop-button" data-kind="button" role="button" aria-label="Stop" aria-disabled="true" tabindex="-1">
+      <title>Stop</title>
+      <g aria-hidden="true">
+        <rect x="2660" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2698.0" y="174.0" text-anchor="middle" font-size="10">Stop</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-step-1-button" data-part="sequencer-step-1-button" data-kind="button" role="button" aria-label="Step 1" aria-disabled="true" tabindex="-1">
+      <title>Step 1</title>
+      <g aria-hidden="true">
+        <rect x="2755" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2793.0" y="174.0" text-anchor="middle" font-size="10">Step 1</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-step-2-button" data-part="sequencer-step-2-button" data-kind="button" role="button" aria-label="Step 2" aria-disabled="true" tabindex="-1">
+      <title>Step 2</title>
+      <g aria-hidden="true">
+        <rect x="2850" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2888.0" y="174.0" text-anchor="middle" font-size="10">Step 2</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-step-3-button" data-part="sequencer-step-3-button" data-kind="button" role="button" aria-label="Step 3" aria-disabled="true" tabindex="-1">
+      <title>Step 3</title>
+      <g aria-hidden="true">
+        <rect x="2280" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2318.0" y="260.0" text-anchor="middle" font-size="10">Step 3</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-step-4-button" data-part="sequencer-step-4-button" data-kind="button" role="button" aria-label="Step 4" aria-disabled="true" tabindex="-1">
+      <title>Step 4</title>
+      <g aria-hidden="true">
+        <rect x="2375" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2413.0" y="260.0" text-anchor="middle" font-size="10">Step 4</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-step-5-button" data-part="sequencer-step-5-button" data-kind="button" role="button" aria-label="Step 5" aria-disabled="true" tabindex="-1">
+      <title>Step 5</title>
+      <g aria-hidden="true">
+        <rect x="2470" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2508.0" y="260.0" text-anchor="middle" font-size="10">Step 5</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-step-6-button" data-part="sequencer-step-6-button" data-kind="button" role="button" aria-label="Step 6" aria-disabled="true" tabindex="-1">
+      <title>Step 6</title>
+      <g aria-hidden="true">
+        <rect x="2565" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2603.0" y="260.0" text-anchor="middle" font-size="10">Step 6</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-step-7-button" data-part="sequencer-step-7-button" data-kind="button" role="button" aria-label="Step 7" aria-disabled="true" tabindex="-1">
+      <title>Step 7</title>
+      <g aria-hidden="true">
+        <rect x="2660" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2698.0" y="260.0" text-anchor="middle" font-size="10">Step 7</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-step-8-button" data-part="sequencer-step-8-button" data-kind="button" role="button" aria-label="Step 8" aria-disabled="true" tabindex="-1">
+      <title>Step 8</title>
+      <g aria-hidden="true">
+        <rect x="2755" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2793.0" y="260.0" text-anchor="middle" font-size="10">Step 8</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-step-9-button" data-part="sequencer-step-9-button" data-kind="button" role="button" aria-label="Step 9" aria-disabled="true" tabindex="-1">
+      <title>Step 9</title>
+      <g aria-hidden="true">
+        <rect x="2850" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2888.0" y="260.0" text-anchor="middle" font-size="10">Step 9</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-step-10-button" data-part="sequencer-step-10-button" data-kind="button" role="button" aria-label="Step 10" aria-disabled="true" tabindex="-1">
+      <title>Step 10</title>
+      <g aria-hidden="true">
+        <rect x="2280" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2318.0" y="346.0" text-anchor="middle" font-size="10">Step 10</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-step-11-button" data-part="sequencer-step-11-button" data-kind="button" role="button" aria-label="Step 11" aria-disabled="true" tabindex="-1">
+      <title>Step 11</title>
+      <g aria-hidden="true">
+        <rect x="2375" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2413.0" y="346.0" text-anchor="middle" font-size="10">Step 11</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-step-12-button" data-part="sequencer-step-12-button" data-kind="button" role="button" aria-label="Step 12" aria-disabled="true" tabindex="-1">
+      <title>Step 12</title>
+      <g aria-hidden="true">
+        <rect x="2470" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2508.0" y="346.0" text-anchor="middle" font-size="10">Step 12</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-step-13-button" data-part="sequencer-step-13-button" data-kind="button" role="button" aria-label="Step 13" aria-disabled="true" tabindex="-1">
+      <title>Step 13</title>
+      <g aria-hidden="true">
+        <rect x="2565" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2603.0" y="346.0" text-anchor="middle" font-size="10">Step 13</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-step-14-button" data-part="sequencer-step-14-button" data-kind="button" role="button" aria-label="Step 14" aria-disabled="true" tabindex="-1">
+      <title>Step 14</title>
+      <g aria-hidden="true">
+        <rect x="2660" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2698.0" y="346.0" text-anchor="middle" font-size="10">Step 14</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-step-15-button" data-part="sequencer-step-15-button" data-kind="button" role="button" aria-label="Step 15" aria-disabled="true" tabindex="-1">
+      <title>Step 15</title>
+      <g aria-hidden="true">
+        <rect x="2755" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2793.0" y="346.0" text-anchor="middle" font-size="10">Step 15</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--sequencer-step-16-button" data-part="sequencer-step-16-button" data-kind="button" role="button" aria-label="Step 16" aria-disabled="true" tabindex="-1">
+      <title>Step 16</title>
+      <g aria-hidden="true">
+        <rect x="2850" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2888.0" y="346.0" text-anchor="middle" font-size="10">Step 16</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--power" data-part="power" data-kind="button" role="button" aria-label="Power" aria-disabled="true" tabindex="-1">
+      <title>Power</title>
+      <g aria-hidden="true">
+        <rect x="2892" y="45" width="65" height="25" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2924.5" y="61.5" text-anchor="middle" font-size="10">Power</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--usb-midi" data-part="usb-midi" data-kind="socket" role="group" aria-label="USB MIDI" aria-roledescription="connector">
+      <title>USB MIDI</title>
+      <g aria-hidden="true">
+        <rect x="25" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="69.0" y="62.5" text-anchor="middle" font-size="10">USB MIDI</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--midi-in" data-part="midi-in" data-kind="socket" role="group" aria-label="MIDI IN" aria-roledescription="connector">
+      <title>MIDI IN</title>
+      <g aria-hidden="true">
+        <rect x="125" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="169.0" y="62.5" text-anchor="middle" font-size="10">MIDI IN</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--midi-out" data-part="midi-out" data-kind="socket" role="group" aria-label="MIDI OUT" aria-roledescription="connector">
+      <title>MIDI OUT</title>
+      <g aria-hidden="true">
+        <rect x="225" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="269.0" y="62.5" text-anchor="middle" font-size="10">MIDI OUT</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--audio-out" data-part="audio-out" data-kind="socket" role="group" aria-label="Audio OUT" aria-roledescription="connector">
+      <title>Audio OUT</title>
+      <g aria-hidden="true">
+        <rect x="325" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="369.0" y="62.5" text-anchor="middle" font-size="10">Audio OUT</text>
+      </g>
+    </g>
+    <g id="roland-se-02-panel--headphones" data-part="headphones" data-kind="socket" role="group" aria-label="Headphones" aria-roledescription="connector">
+      <title>Headphones</title>
+      <g aria-hidden="true">
+        <rect x="425" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="469.0" y="62.5" text-anchor="middle" font-size="10">Headphones</text>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -17,7 +17,7 @@ import { INPUT_EVENT } from "../commands/commands"
 import AbstractInput from "./inputs/abstract-input"
 import type { IAudioInput } from "./inputs/input-interface"
 import type InputAudioEvent from "./events/input-audio-event"
-import { refreshMidiDeviceProfiles } from "../midi/hardware/device-profiles"
+import { refreshMidiDeviceProfiles } from "../hardware/midi-devices/device-profiles"
 import { deviceId } from "./device-definition"
 
 export default class InputManager extends AbstractInput {

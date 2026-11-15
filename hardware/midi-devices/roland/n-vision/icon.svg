@@ -1,0 +1,944 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2884 650" role="group" aria-labelledby="roland-n-vision-icon--title" aria-describedby="roland-n-vision-icon--description" data-device="roland-n-vision" data-diagram-style="wireframe" style="background: #fff; color: #334155;">
+  <title id="roland-n-vision-icon--title">Roland n/vision overhead wireframe diagram</title>
+  <desc id="roland-n-vision-icon--description">Schematic top view grouped by panel section. Every physical control has a stable ID and accessible label. Standalone buttons are disabled until a host supplies interaction. MIDI regions match the JSON surface; note and shared parameter regions use the setup described in the profile.</desc>
+  <style>text { font-family: Arial, sans-serif; fill: currentColor; stroke: none; } [data-part]:focus-visible { outline: 3px solid currentColor; }</style>
+  <g id="roland-n-vision-icon--chassis" aria-hidden="true">
+    <rect x="3" y="3" width="2878" height="644" rx="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="25" y="30" font-size="22">Roland n/vision</text>
+    <rect x="25" y="105" width="202" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="35" y="128" font-size="12">LFO</text>
+    <rect x="239" y="105" width="297" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="249" y="128" font-size="12">Position</text>
+    <rect x="548" y="105" width="297" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="558" y="128" font-size="12">Oscillator</text>
+    <rect x="857" y="105" width="202" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="867" y="128" font-size="12">Waveshaper</text>
+    <rect x="1071" y="105" width="297" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1081" y="128" font-size="12">Filter</text>
+    <rect x="1380" y="105" width="136" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1390" y="128" font-size="12">Amp</text>
+    <rect x="1528" y="105" width="297" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1538" y="128" font-size="12">Envelope</text>
+    <rect x="1837" y="105" width="202" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="1847" y="128" font-size="12">Effects</text>
+    <rect x="2051" y="105" width="582" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="2061" y="128" font-size="12">Performance</text>
+    <rect x="2645" y="105" width="202" height="300" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="2655" y="128" font-size="12">Patches</text>
+  </g>
+  <g id="roland-n-vision-icon--controls" role="group" aria-label="Physical hardware controls">
+    <g id="roland-n-vision-icon--lfo-amp-knob" data-part="lfo-amp-knob" data-kind="knob" role="group" aria-label="Amp" aria-roledescription="rotary control">
+      <title>Amp</title>
+      <g aria-hidden="true">
+        <circle cx="75.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 75.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="209" text-anchor="middle" font-size="10">Amp</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--lfo-delay-knob" data-part="lfo-delay-knob" data-kind="knob" role="group" aria-label="Delay" aria-roledescription="rotary control" data-surface-controls="lfo-delay-knob">
+      <title>Delay</title>
+      <g aria-hidden="true">
+        <circle cx="170.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 170.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="170.0" y="209" text-anchor="middle" font-size="10">Delay</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--lfo-delay-knob" data-surface-control="lfo-delay-knob" aria-hidden="true">
+        <rect x="132.0" y="145" width="76.0" height="50" data-hit-area="lfo-delay-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--lfo-wave-knob" data-part="lfo-wave-knob" data-kind="knob" role="group" aria-label="Wave" aria-roledescription="rotary control" data-surface-controls="lfo-wave-knob">
+      <title>Wave</title>
+      <g aria-hidden="true">
+        <circle cx="75.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 75.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="295" text-anchor="middle" font-size="10">Wave</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--lfo-wave-knob" data-surface-control="lfo-wave-knob" aria-hidden="true">
+        <rect x="37.0" y="231" width="76.0" height="50" data-hit-area="lfo-wave-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--lfo-rate-fader" data-part="lfo-rate-fader" data-kind="fader" role="group" aria-label="Rate" aria-roledescription="slider" data-surface-controls="lfo-rate-fader">
+      <title>Rate</title>
+      <g aria-hidden="true">
+        <rect x="167.0" y="231" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="157.0" y="258.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="170.0" y="295" text-anchor="middle" font-size="10">Rate</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--lfo-rate-fader" data-surface-control="lfo-rate-fader" aria-hidden="true">
+        <rect x="132.0" y="231" width="76.0" height="50" data-hit-area="lfo-rate-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--lfo-key-trigger-switch" data-part="lfo-key-trigger-switch" data-kind="switch" role="group" aria-label="Key trigger" aria-roledescription="selector switch" data-surface-controls="lfo-key-trigger-switch">
+      <title>Key trigger</title>
+      <g aria-hidden="true">
+        <rect x="37" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="75.0" y="346.0" text-anchor="middle" font-size="10">Key trigger</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--lfo-key-trigger-switch" data-surface-control="lfo-key-trigger-switch" aria-hidden="true">
+        <rect x="37.0" y="317" width="76.0" height="50" data-hit-area="lfo-key-trigger-switch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--position-lfo-fader" data-part="position-lfo-fader" data-kind="fader" role="group" aria-label="LFO" aria-roledescription="slider" data-surface-controls="position-lfo-fader">
+      <title>LFO</title>
+      <g aria-hidden="true">
+        <rect x="286.0" y="145" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="276.0" y="172.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="289.0" y="209" text-anchor="middle" font-size="10">LFO</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--position-lfo-fader" data-surface-control="position-lfo-fader" aria-hidden="true">
+        <rect x="251.0" y="145" width="76.0" height="50" data-hit-area="position-lfo-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--position-lfo-polarity-switch" data-part="position-lfo-polarity-switch" data-kind="switch" role="group" aria-label="LFO polarity" aria-roledescription="selector switch">
+      <title>LFO polarity</title>
+      <g aria-hidden="true">
+        <rect x="346" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="384.0" y="174.0" text-anchor="middle" font-size="10">LFO polarity</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--position-random-knob" data-part="position-random-knob" data-kind="knob" role="group" aria-label="Random" aria-roledescription="rotary control" data-surface-controls="position-random-knob">
+      <title>Random</title>
+      <g aria-hidden="true">
+        <circle cx="479.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 479.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="479.0" y="209" text-anchor="middle" font-size="10">Random</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--position-random-knob" data-surface-control="position-random-knob" aria-hidden="true">
+        <rect x="441.0" y="145" width="76.0" height="50" data-hit-area="position-random-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--position-spread-knob" data-part="position-spread-knob" data-kind="knob" role="group" aria-label="Spread" aria-roledescription="rotary control" data-surface-controls="position-spread-knob">
+      <title>Spread</title>
+      <g aria-hidden="true">
+        <circle cx="289.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 289.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="289.0" y="295" text-anchor="middle" font-size="10">Spread</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--position-spread-knob" data-surface-control="position-spread-knob" aria-hidden="true">
+        <rect x="251.0" y="231" width="76.0" height="50" data-hit-area="position-spread-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--position-position-fader" data-part="position-position-fader" data-kind="fader" role="group" aria-label="Position" aria-roledescription="slider" data-surface-controls="position-position-fader">
+      <title>Position</title>
+      <g aria-hidden="true">
+        <rect x="381.0" y="231" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="371.0" y="258.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="384.0" y="295" text-anchor="middle" font-size="10">Position</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--position-position-fader" data-surface-control="position-position-fader" aria-hidden="true">
+        <rect x="346.0" y="231" width="76.0" height="50" data-hit-area="position-position-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--position-env-fader" data-part="position-env-fader" data-kind="fader" role="group" aria-label="Env" aria-roledescription="slider" data-surface-controls="position-env-fader">
+      <title>Env</title>
+      <g aria-hidden="true">
+        <rect x="476.0" y="231" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="466.0" y="258.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="479.0" y="295" text-anchor="middle" font-size="10">Env</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--position-env-fader" data-surface-control="position-env-fader" aria-hidden="true">
+        <rect x="441.0" y="231" width="76.0" height="50" data-hit-area="position-env-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--position-env-polarity-switch" data-part="position-env-polarity-switch" data-kind="switch" role="group" aria-label="Env polarity" aria-roledescription="selector switch">
+      <title>Env polarity</title>
+      <g aria-hidden="true">
+        <rect x="251" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="289.0" y="346.0" text-anchor="middle" font-size="10">Env polarity</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--oscillator-layer-1-wave-knob" data-part="oscillator-layer-1-wave-knob" data-kind="knob" role="group" aria-label="Layer 1 wave" aria-roledescription="rotary control">
+      <title>Layer 1 wave</title>
+      <g aria-hidden="true">
+        <circle cx="598.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 598.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="598.0" y="209" text-anchor="middle" font-size="10">Layer 1 wave</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--oscillator-range-switch" data-part="oscillator-range-switch" data-kind="switch" role="group" aria-label="Range" aria-roledescription="selector switch" data-surface-controls="oscillator-range-switch">
+      <title>Range</title>
+      <g aria-hidden="true">
+        <rect x="655" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="693.0" y="174.0" text-anchor="middle" font-size="10">Range</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--oscillator-range-switch" data-surface-control="oscillator-range-switch" aria-hidden="true">
+        <rect x="655.0" y="145" width="76.0" height="50" data-hit-area="oscillator-range-switch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--oscillator-layer-2-wave-knob" data-part="oscillator-layer-2-wave-knob" data-kind="knob" role="group" aria-label="Layer 2 wave" aria-roledescription="rotary control">
+      <title>Layer 2 wave</title>
+      <g aria-hidden="true">
+        <circle cx="788.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 788.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="788.0" y="209" text-anchor="middle" font-size="10">Layer 2 wave</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--oscillator-layer-2-octave-switch" data-part="oscillator-layer-2-octave-switch" data-kind="switch" role="group" aria-label="Layer 2 octave" aria-roledescription="selector switch" data-surface-controls="oscillator-layer-2-octave-switch">
+      <title>Layer 2 octave</title>
+      <g aria-hidden="true">
+        <rect x="560" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="598.0" y="260.0" text-anchor="middle" font-size="10">Layer 2 octave</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--oscillator-layer-2-octave-switch" data-surface-control="oscillator-layer-2-octave-switch" aria-hidden="true">
+        <rect x="560.0" y="231" width="76.0" height="50" data-hit-area="oscillator-layer-2-octave-switch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--oscillator-layer-mix-fader" data-part="oscillator-layer-mix-fader" data-kind="fader" role="group" aria-label="Layer mix" aria-roledescription="slider" data-surface-controls="oscillator-layer-mix-fader">
+      <title>Layer mix</title>
+      <g aria-hidden="true">
+        <rect x="690.0" y="231" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="680.0" y="258.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="693.0" y="295" text-anchor="middle" font-size="10">Layer mix</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--oscillator-layer-mix-fader" data-surface-control="oscillator-layer-mix-fader" aria-hidden="true">
+        <rect x="655.0" y="231" width="76.0" height="50" data-hit-area="oscillator-layer-mix-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--oscillator-mix-env-knob" data-part="oscillator-mix-env-knob" data-kind="knob" role="group" aria-label="Mix env" aria-roledescription="rotary control" data-surface-controls="oscillator-mix-env-knob">
+      <title>Mix env</title>
+      <g aria-hidden="true">
+        <circle cx="788.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 788.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="788.0" y="295" text-anchor="middle" font-size="10">Mix env</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--oscillator-mix-env-knob" data-surface-control="oscillator-mix-env-knob" aria-hidden="true">
+        <rect x="750.0" y="231" width="76.0" height="50" data-hit-area="oscillator-mix-env-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--oscillator-mix-lfo-knob" data-part="oscillator-mix-lfo-knob" data-kind="knob" role="group" aria-label="Mix LFO" aria-roledescription="rotary control" data-surface-controls="oscillator-mix-lfo-knob">
+      <title>Mix LFO</title>
+      <g aria-hidden="true">
+        <circle cx="598.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 598.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="598.0" y="381" text-anchor="middle" font-size="10">Mix LFO</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--oscillator-mix-lfo-knob" data-surface-control="oscillator-mix-lfo-knob" aria-hidden="true">
+        <rect x="560.0" y="317" width="76.0" height="50" data-hit-area="oscillator-mix-lfo-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--waveshaper-pitch-lfo-knob" data-part="waveshaper-pitch-lfo-knob" data-kind="knob" role="group" aria-label="Pitch LFO" aria-roledescription="rotary control" data-surface-controls="waveshaper-pitch-lfo-knob">
+      <title>Pitch LFO</title>
+      <g aria-hidden="true">
+        <circle cx="907.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 907.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="907.0" y="209" text-anchor="middle" font-size="10">Pitch LFO</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--waveshaper-pitch-lfo-knob" data-surface-control="waveshaper-pitch-lfo-knob" aria-hidden="true">
+        <rect x="869.0" y="145" width="76.0" height="50" data-hit-area="waveshaper-pitch-lfo-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--waveshaper-lfo-knob" data-part="waveshaper-lfo-knob" data-kind="knob" role="group" aria-label="LFO" aria-roledescription="rotary control" data-surface-controls="waveshaper-lfo-knob">
+      <title>LFO</title>
+      <g aria-hidden="true">
+        <circle cx="1002.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1002.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1002.0" y="209" text-anchor="middle" font-size="10">LFO</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--waveshaper-lfo-knob" data-surface-control="waveshaper-lfo-knob" aria-hidden="true">
+        <rect x="964.0" y="145" width="76.0" height="50" data-hit-area="waveshaper-lfo-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--waveshaper-shape-knob" data-part="waveshaper-shape-knob" data-kind="knob" role="group" aria-label="Shape" aria-roledescription="rotary control" data-surface-controls="waveshaper-shape-knob">
+      <title>Shape</title>
+      <g aria-hidden="true">
+        <circle cx="907.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 907.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="907.0" y="295" text-anchor="middle" font-size="10">Shape</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--waveshaper-shape-knob" data-surface-control="waveshaper-shape-knob" aria-hidden="true">
+        <rect x="869.0" y="231" width="76.0" height="50" data-hit-area="waveshaper-shape-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--waveshaper-env-knob" data-part="waveshaper-env-knob" data-kind="knob" role="group" aria-label="Env" aria-roledescription="rotary control" data-surface-controls="waveshaper-env-knob">
+      <title>Env</title>
+      <g aria-hidden="true">
+        <circle cx="1002.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1002.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1002.0" y="295" text-anchor="middle" font-size="10">Env</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--waveshaper-env-knob" data-surface-control="waveshaper-env-knob" aria-hidden="true">
+        <rect x="964.0" y="231" width="76.0" height="50" data-hit-area="waveshaper-env-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--filter-cutoff-fader" data-part="filter-cutoff-fader" data-kind="fader" role="group" aria-label="Cutoff" aria-roledescription="slider" data-surface-controls="filter-cutoff-fader">
+      <title>Cutoff</title>
+      <g aria-hidden="true">
+        <rect x="1118.0" y="145" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="1108.0" y="172.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1121.0" y="209" text-anchor="middle" font-size="10">Cutoff</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--filter-cutoff-fader" data-surface-control="filter-cutoff-fader" aria-hidden="true">
+        <rect x="1083.0" y="145" width="76.0" height="50" data-hit-area="filter-cutoff-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--filter-resonance-fader" data-part="filter-resonance-fader" data-kind="fader" role="group" aria-label="Resonance" aria-roledescription="slider" data-surface-controls="filter-resonance-fader">
+      <title>Resonance</title>
+      <g aria-hidden="true">
+        <rect x="1213.0" y="145" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="1203.0" y="172.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1216.0" y="209" text-anchor="middle" font-size="10">Resonance</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--filter-resonance-fader" data-surface-control="filter-resonance-fader" aria-hidden="true">
+        <rect x="1178.0" y="145" width="76.0" height="50" data-hit-area="filter-resonance-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--filter-env-fader" data-part="filter-env-fader" data-kind="fader" role="group" aria-label="Env" aria-roledescription="slider" data-surface-controls="filter-env-fader">
+      <title>Env</title>
+      <g aria-hidden="true">
+        <rect x="1308.0" y="145" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="1298.0" y="172.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1311.0" y="209" text-anchor="middle" font-size="10">Env</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--filter-env-fader" data-surface-control="filter-env-fader" aria-hidden="true">
+        <rect x="1273.0" y="145" width="76.0" height="50" data-hit-area="filter-env-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--filter-lfo-fader" data-part="filter-lfo-fader" data-kind="fader" role="group" aria-label="LFO" aria-roledescription="slider" data-surface-controls="filter-lfo-fader">
+      <title>LFO</title>
+      <g aria-hidden="true">
+        <rect x="1118.0" y="231" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="1108.0" y="258.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1121.0" y="295" text-anchor="middle" font-size="10">LFO</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--filter-lfo-fader" data-surface-control="filter-lfo-fader" aria-hidden="true">
+        <rect x="1083.0" y="231" width="76.0" height="50" data-hit-area="filter-lfo-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--filter-drive-switch" data-part="filter-drive-switch" data-kind="switch" role="group" aria-label="Drive" aria-roledescription="selector switch" data-surface-controls="filter-drive-switch">
+      <title>Drive</title>
+      <g aria-hidden="true">
+        <rect x="1178" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1216.0" y="260.0" text-anchor="middle" font-size="10">Drive</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--filter-drive-switch" data-surface-control="filter-drive-switch" aria-hidden="true">
+        <rect x="1178.0" y="231" width="76.0" height="50" data-hit-area="filter-drive-switch" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--filter-hpf-knob" data-part="filter-hpf-knob" data-kind="knob" role="group" aria-label="HPF" aria-roledescription="rotary control" data-surface-controls="filter-hpf-knob">
+      <title>HPF</title>
+      <g aria-hidden="true">
+        <circle cx="1311.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1311.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1311.0" y="295" text-anchor="middle" font-size="10">HPF</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--filter-hpf-knob" data-surface-control="filter-hpf-knob" aria-hidden="true">
+        <rect x="1273.0" y="231" width="76.0" height="50" data-hit-area="filter-hpf-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--filter-type-button" data-part="filter-type-button" data-kind="button" role="button" aria-label="Type" aria-disabled="true" tabindex="-1">
+      <title>Type</title>
+      <g aria-hidden="true">
+        <rect x="1083" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1121.0" y="346.0" text-anchor="middle" font-size="10">Type</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--filter-key-follow-knob" data-part="filter-key-follow-knob" data-kind="knob" role="group" aria-label="Key follow" aria-roledescription="rotary control" data-surface-controls="filter-key-follow-knob">
+      <title>Key follow</title>
+      <g aria-hidden="true">
+        <circle cx="1216.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1216.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1216.0" y="381" text-anchor="middle" font-size="10">Key follow</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--filter-key-follow-knob" data-surface-control="filter-key-follow-knob" aria-hidden="true">
+        <rect x="1178.0" y="317" width="76.0" height="50" data-hit-area="filter-key-follow-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--amp-level-fader" data-part="amp-level-fader" data-kind="fader" role="group" aria-label="Level" aria-roledescription="slider" data-surface-controls="amp-level-fader">
+      <title>Level</title>
+      <g aria-hidden="true">
+        <rect x="1427.0" y="145" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="1417.0" y="172.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1430.0" y="209" text-anchor="middle" font-size="10">Level</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--amp-level-fader" data-surface-control="amp-level-fader" aria-hidden="true">
+        <rect x="1392.0" y="145" width="76.0" height="50" data-hit-area="amp-level-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--envelope-attack-fader" data-part="envelope-attack-fader" data-kind="fader" role="group" aria-label="Attack" aria-roledescription="slider" data-surface-controls="envelope-attack-fader">
+      <title>Attack</title>
+      <g aria-hidden="true">
+        <rect x="1575.0" y="145" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="1565.0" y="172.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1578.0" y="209" text-anchor="middle" font-size="10">Attack</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--envelope-attack-fader" data-surface-control="envelope-attack-fader" aria-hidden="true">
+        <rect x="1540.0" y="145" width="76.0" height="50" data-hit-area="envelope-attack-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--envelope-decay-fader" data-part="envelope-decay-fader" data-kind="fader" role="group" aria-label="Decay" aria-roledescription="slider" data-surface-controls="envelope-decay-fader">
+      <title>Decay</title>
+      <g aria-hidden="true">
+        <rect x="1670.0" y="145" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="1660.0" y="172.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1673.0" y="209" text-anchor="middle" font-size="10">Decay</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--envelope-decay-fader" data-surface-control="envelope-decay-fader" aria-hidden="true">
+        <rect x="1635.0" y="145" width="76.0" height="50" data-hit-area="envelope-decay-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--envelope-sustain-fader" data-part="envelope-sustain-fader" data-kind="fader" role="group" aria-label="Sustain" aria-roledescription="slider" data-surface-controls="envelope-sustain-fader">
+      <title>Sustain</title>
+      <g aria-hidden="true">
+        <rect x="1765.0" y="145" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="1755.0" y="172.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1768.0" y="209" text-anchor="middle" font-size="10">Sustain</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--envelope-sustain-fader" data-surface-control="envelope-sustain-fader" aria-hidden="true">
+        <rect x="1730.0" y="145" width="76.0" height="50" data-hit-area="envelope-sustain-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--envelope-release-fader" data-part="envelope-release-fader" data-kind="fader" role="group" aria-label="Release" aria-roledescription="slider" data-surface-controls="envelope-release-fader">
+      <title>Release</title>
+      <g aria-hidden="true">
+        <rect x="1575.0" y="231" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="1565.0" y="258.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1578.0" y="295" text-anchor="middle" font-size="10">Release</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--envelope-release-fader" data-surface-control="envelope-release-fader" aria-hidden="true">
+        <rect x="1540.0" y="231" width="76.0" height="50" data-hit-area="envelope-release-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--envelope-portamento-button" data-part="envelope-portamento-button" data-kind="button" role="button" aria-label="Portamento" aria-disabled="true" tabindex="-1">
+      <title>Portamento</title>
+      <g aria-hidden="true">
+        <rect x="1635" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1673.0" y="260.0" text-anchor="middle" font-size="10">Portamento</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--envelope-portamento-time-knob" data-part="envelope-portamento-time-knob" data-kind="knob" role="group" aria-label="Portamento time" aria-roledescription="rotary control" data-surface-controls="envelope-portamento-time-knob">
+      <title>Portamento time</title>
+      <g aria-hidden="true">
+        <circle cx="1768.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1768.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1768.0" y="295" text-anchor="middle" font-size="10">Portamento time</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--envelope-portamento-time-knob" data-surface-control="envelope-portamento-time-knob" aria-hidden="true">
+        <rect x="1730.0" y="231" width="76.0" height="50" data-hit-area="envelope-portamento-time-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--envelope-env-select-switch" data-part="envelope-env-select-switch" data-kind="switch" role="group" aria-label="ENV select" aria-roledescription="selector switch">
+      <title>ENV select</title>
+      <g aria-hidden="true">
+        <rect x="1540" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1578.0" y="346.0" text-anchor="middle" font-size="10">ENV select</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--effects-delay-fader" data-part="effects-delay-fader" data-kind="fader" role="group" aria-label="Delay" aria-roledescription="slider" data-surface-controls="effects-delay-fader">
+      <title>Delay</title>
+      <g aria-hidden="true">
+        <rect x="1884.0" y="145" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="1874.0" y="172.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1887.0" y="209" text-anchor="middle" font-size="10">Delay</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--effects-delay-fader" data-surface-control="effects-delay-fader" aria-hidden="true">
+        <rect x="1849.0" y="145" width="76.0" height="50" data-hit-area="effects-delay-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--effects-time-fader" data-part="effects-time-fader" data-kind="fader" role="group" aria-label="Time" aria-roledescription="slider" data-surface-controls="effects-time-fader">
+      <title>Time</title>
+      <g aria-hidden="true">
+        <rect x="1979.0" y="145" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="1969.0" y="172.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1982.0" y="209" text-anchor="middle" font-size="10">Time</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--effects-time-fader" data-surface-control="effects-time-fader" aria-hidden="true">
+        <rect x="1944.0" y="145" width="76.0" height="50" data-hit-area="effects-time-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--effects-feedback-fader" data-part="effects-feedback-fader" data-kind="fader" role="group" aria-label="Feedback" aria-roledescription="slider" data-surface-controls="effects-feedback-fader">
+      <title>Feedback</title>
+      <g aria-hidden="true">
+        <rect x="1884.0" y="231" width="6" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="1874.0" y="258.5" width="26" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1887.0" y="295" text-anchor="middle" font-size="10">Feedback</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--effects-feedback-fader" data-surface-control="effects-feedback-fader" aria-hidden="true">
+        <rect x="1849.0" y="231" width="76.0" height="50" data-hit-area="effects-feedback-fader" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--effects-reverb-knob" data-part="effects-reverb-knob" data-kind="knob" role="group" aria-label="Reverb" aria-roledescription="rotary control" data-surface-controls="effects-reverb-knob">
+      <title>Reverb</title>
+      <g aria-hidden="true">
+        <circle cx="1982.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1982.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1982.0" y="295" text-anchor="middle" font-size="10">Reverb</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--effects-reverb-knob" data-surface-control="effects-reverb-knob" aria-hidden="true">
+        <rect x="1944.0" y="231" width="76.0" height="50" data-hit-area="effects-reverb-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--effects-reverb-time-knob" data-part="effects-reverb-time-knob" data-kind="knob" role="group" aria-label="Reverb time" aria-roledescription="rotary control" data-surface-controls="effects-reverb-time-knob">
+      <title>Reverb time</title>
+      <g aria-hidden="true">
+        <circle cx="1887.0" cy="339" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1887.0 324 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1887.0" y="381" text-anchor="middle" font-size="10">Reverb time</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--effects-reverb-time-knob" data-surface-control="effects-reverb-time-knob" aria-hidden="true">
+        <rect x="1849.0" y="317" width="76.0" height="50" data-hit-area="effects-reverb-time-knob" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-volume-knob" data-part="performance-volume-knob" data-kind="knob" role="group" aria-label="Volume" aria-roledescription="rotary control">
+      <title>Volume</title>
+      <g aria-hidden="true">
+        <circle cx="2101.0" cy="167" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 2101.0 152 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2101.0" y="209" text-anchor="middle" font-size="10">Volume</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-note-button" data-part="performance-note-button" data-kind="button" role="button" aria-label="Note" aria-disabled="true" tabindex="-1">
+      <title>Note</title>
+      <g aria-hidden="true">
+        <rect x="2158" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2196.0" y="174.0" text-anchor="middle" font-size="10">Note</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-arpeggio-button" data-part="performance-arpeggio-button" data-kind="button" role="button" aria-label="Arpeggio" aria-disabled="true" tabindex="-1">
+      <title>Arpeggio</title>
+      <g aria-hidden="true">
+        <rect x="2253" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2291.0" y="174.0" text-anchor="middle" font-size="10">Arpeggio</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-sequencer-button" data-part="performance-sequencer-button" data-kind="button" role="button" aria-label="Sequencer" aria-disabled="true" tabindex="-1">
+      <title>Sequencer</title>
+      <g aria-hidden="true">
+        <rect x="2348" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2386.0" y="174.0" text-anchor="middle" font-size="10">Sequencer</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-start-button" data-part="performance-start-button" data-kind="button" role="button" aria-label="Start" aria-disabled="true" tabindex="-1">
+      <title>Start</title>
+      <g aria-hidden="true">
+        <rect x="2443" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2481.0" y="174.0" text-anchor="middle" font-size="10">Start</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-menu-button" data-part="performance-menu-button" data-kind="button" role="button" aria-label="Menu" aria-disabled="true" tabindex="-1">
+      <title>Menu</title>
+      <g aria-hidden="true">
+        <rect x="2538" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2576.0" y="174.0" text-anchor="middle" font-size="10">Menu</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-value-knob" data-part="performance-value-knob" data-kind="knob" role="group" aria-label="Value" aria-roledescription="rotary control">
+      <title>Value</title>
+      <g aria-hidden="true">
+        <circle cx="2101.0" cy="253" r="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 2101.0 238 v 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2101.0" y="295" text-anchor="middle" font-size="10">Value</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-hold-button" data-part="performance-hold-button" data-kind="button" role="button" aria-label="Hold" aria-disabled="true" tabindex="-1">
+      <title>Hold</title>
+      <g aria-hidden="true">
+        <rect x="2158" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2196.0" y="260.0" text-anchor="middle" font-size="10">Hold</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-dual-button" data-part="performance-dual-button" data-kind="button" role="button" aria-label="Dual" aria-disabled="true" tabindex="-1">
+      <title>Dual</title>
+      <g aria-hidden="true">
+        <rect x="2253" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2291.0" y="260.0" text-anchor="middle" font-size="10">Dual</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-split-button" data-part="performance-split-button" data-kind="button" role="button" aria-label="Split" aria-disabled="true" tabindex="-1">
+      <title>Split</title>
+      <g aria-hidden="true">
+        <rect x="2348" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2386.0" y="260.0" text-anchor="middle" font-size="10">Split</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-lower-button" data-part="performance-lower-button" data-kind="button" role="button" aria-label="Lower" aria-disabled="true" tabindex="-1">
+      <title>Lower</title>
+      <g aria-hidden="true">
+        <rect x="2443" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2481.0" y="260.0" text-anchor="middle" font-size="10">Lower</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-upper-button" data-part="performance-upper-button" data-kind="button" role="button" aria-label="Upper" aria-disabled="true" tabindex="-1">
+      <title>Upper</title>
+      <g aria-hidden="true">
+        <rect x="2538" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2576.0" y="260.0" text-anchor="middle" font-size="10">Upper</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-bank-1-4-button" data-part="performance-bank-1-4-button" data-kind="button" role="button" aria-label="Bank 1 4" aria-disabled="true" tabindex="-1">
+      <title>Bank 1 4</title>
+      <g aria-hidden="true">
+        <rect x="2063" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2101.0" y="346.0" text-anchor="middle" font-size="10">Bank 1 4</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-bank-5-8-button" data-part="performance-bank-5-8-button" data-kind="button" role="button" aria-label="Bank 5 8" aria-disabled="true" tabindex="-1">
+      <title>Bank 5 8</title>
+      <g aria-hidden="true">
+        <rect x="2158" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2196.0" y="346.0" text-anchor="middle" font-size="10">Bank 5 8</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-manual-button" data-part="performance-manual-button" data-kind="button" role="button" aria-label="Manual" aria-disabled="true" tabindex="-1">
+      <title>Manual</title>
+      <g aria-hidden="true">
+        <rect x="2253" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2291.0" y="346.0" text-anchor="middle" font-size="10">Manual</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-delay-reverb-button" data-part="performance-delay-reverb-button" data-kind="button" role="button" aria-label="Delay Reverb" aria-disabled="true" tabindex="-1">
+      <title>Delay Reverb</title>
+      <g aria-hidden="true">
+        <rect x="2348" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2386.0" y="346.0" text-anchor="middle" font-size="10">Delay Reverb</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-chorus-i-button" data-part="performance-chorus-i-button" data-kind="button" role="button" aria-label="Chorus I" aria-disabled="true" tabindex="-1">
+      <title>Chorus I</title>
+      <g aria-hidden="true">
+        <rect x="2443" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2481.0" y="346.0" text-anchor="middle" font-size="10">Chorus I</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--performance-chorus-ii-button" data-part="performance-chorus-ii-button" data-kind="button" role="button" aria-label="Chorus II" aria-disabled="true" tabindex="-1">
+      <title>Chorus II</title>
+      <g aria-hidden="true">
+        <rect x="2538" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2576.0" y="346.0" text-anchor="middle" font-size="10">Chorus II</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--patches-patch-1-button" data-part="patches-patch-1-button" data-kind="button" role="button" aria-label="Patch 1" aria-disabled="true" tabindex="-1">
+      <title>Patch 1</title>
+      <g aria-hidden="true">
+        <rect x="2657" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2695.0" y="174.0" text-anchor="middle" font-size="10">Patch 1</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--patches-patch-2-button" data-part="patches-patch-2-button" data-kind="button" role="button" aria-label="Patch 2" aria-disabled="true" tabindex="-1">
+      <title>Patch 2</title>
+      <g aria-hidden="true">
+        <rect x="2752" y="145" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2790.0" y="174.0" text-anchor="middle" font-size="10">Patch 2</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--patches-patch-3-button" data-part="patches-patch-3-button" data-kind="button" role="button" aria-label="Patch 3" aria-disabled="true" tabindex="-1">
+      <title>Patch 3</title>
+      <g aria-hidden="true">
+        <rect x="2657" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2695.0" y="260.0" text-anchor="middle" font-size="10">Patch 3</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--patches-patch-4-button" data-part="patches-patch-4-button" data-kind="button" role="button" aria-label="Patch 4" aria-disabled="true" tabindex="-1">
+      <title>Patch 4</title>
+      <g aria-hidden="true">
+        <rect x="2752" y="231" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2790.0" y="260.0" text-anchor="middle" font-size="10">Patch 4</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--patches-patch-5-button" data-part="patches-patch-5-button" data-kind="button" role="button" aria-label="Patch 5" aria-disabled="true" tabindex="-1">
+      <title>Patch 5</title>
+      <g aria-hidden="true">
+        <rect x="2657" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2695.0" y="346.0" text-anchor="middle" font-size="10">Patch 5</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--patches-patch-6-button" data-part="patches-patch-6-button" data-kind="button" role="button" aria-label="Patch 6" aria-disabled="true" tabindex="-1">
+      <title>Patch 6</title>
+      <g aria-hidden="true">
+        <rect x="2752" y="317" width="76" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2790.0" y="346.0" text-anchor="middle" font-size="10">Patch 6</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--power" data-part="power" data-kind="button" role="button" aria-label="Power" aria-disabled="true" tabindex="-1">
+      <title>Power</title>
+      <g aria-hidden="true">
+        <rect x="2794" y="45" width="65" height="25" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2826.5" y="61.5" text-anchor="middle" font-size="10">Power</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--usb-midi" data-part="usb-midi" data-kind="socket" role="group" aria-label="USB MIDI" aria-roledescription="connector">
+      <title>USB MIDI</title>
+      <g aria-hidden="true">
+        <rect x="25" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="69.0" y="62.5" text-anchor="middle" font-size="10">USB MIDI</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--midi-in" data-part="midi-in" data-kind="socket" role="group" aria-label="MIDI IN" aria-roledescription="connector">
+      <title>MIDI IN</title>
+      <g aria-hidden="true">
+        <rect x="125" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="169.0" y="62.5" text-anchor="middle" font-size="10">MIDI IN</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--midi-out" data-part="midi-out" data-kind="socket" role="group" aria-label="MIDI OUT" aria-roledescription="connector">
+      <title>MIDI OUT</title>
+      <g aria-hidden="true">
+        <rect x="225" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="269.0" y="62.5" text-anchor="middle" font-size="10">MIDI OUT</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--audio-out" data-part="audio-out" data-kind="socket" role="group" aria-label="Audio OUT" aria-roledescription="connector">
+      <title>Audio OUT</title>
+      <g aria-hidden="true">
+        <rect x="325" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="369.0" y="62.5" text-anchor="middle" font-size="10">Audio OUT</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--headphones" data-part="headphones" data-kind="socket" role="group" aria-label="Headphones" aria-roledescription="connector">
+      <title>Headphones</title>
+      <g aria-hidden="true">
+        <rect x="425" y="47" width="88" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="469.0" y="62.5" text-anchor="middle" font-size="10">Headphones</text>
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-1" data-part="keyboard-1" data-kind="key" role="button" aria-label="Keyboard note 48" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-1">
+      <title>Keyboard note 48</title>
+      <g aria-hidden="true">
+        <rect x="25.0" y="500" width="181.376" height="120" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="115.688" y="564.0" text-anchor="middle" font-size="10">C3</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-1" data-surface-control="keyboard-1" aria-hidden="true">
+        <rect x="25.0" y="500" width="181.376" height="120" data-hit-area="keyboard-1" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-2" data-part="keyboard-2" data-kind="key" role="button" aria-label="Keyboard note 49" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-2">
+      <title>Keyboard note 49</title>
+      <g aria-hidden="true">
+        <rect x="157.25333333333333" y="500" width="113.36" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="213.93333333333334" y="541.5" text-anchor="middle" font-size="10">C#3</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-2" data-surface-control="keyboard-2" aria-hidden="true">
+        <rect x="157.25333333333333" y="500" width="113.36" height="75" data-hit-area="keyboard-2" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-3" data-part="keyboard-3" data-kind="key" role="button" aria-label="Keyboard note 50" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-3">
+      <title>Keyboard note 50</title>
+      <g aria-hidden="true">
+        <rect x="213.93333333333334" y="500" width="181.376" height="120" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="304.6213333333333" y="564.0" text-anchor="middle" font-size="10">D3</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-3" data-surface-control="keyboard-3" aria-hidden="true">
+        <rect x="213.93333333333334" y="500" width="181.376" height="120" data-hit-area="keyboard-3" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-4" data-part="keyboard-4" data-kind="key" role="button" aria-label="Keyboard note 51" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-4">
+      <title>Keyboard note 51</title>
+      <g aria-hidden="true">
+        <rect x="346.18666666666667" y="500" width="113.36" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="402.8666666666667" y="541.5" text-anchor="middle" font-size="10">D#3</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-4" data-surface-control="keyboard-4" aria-hidden="true">
+        <rect x="346.18666666666667" y="500" width="113.36" height="75" data-hit-area="keyboard-4" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-5" data-part="keyboard-5" data-kind="key" role="button" aria-label="Keyboard note 52" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-5">
+      <title>Keyboard note 52</title>
+      <g aria-hidden="true">
+        <rect x="402.8666666666667" y="500" width="181.376" height="120" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="493.55466666666666" y="564.0" text-anchor="middle" font-size="10">E3</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-5" data-surface-control="keyboard-5" aria-hidden="true">
+        <rect x="402.8666666666667" y="500" width="181.376" height="120" data-hit-area="keyboard-5" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-6" data-part="keyboard-6" data-kind="key" role="button" aria-label="Keyboard note 53" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-6">
+      <title>Keyboard note 53</title>
+      <g aria-hidden="true">
+        <rect x="591.8" y="500" width="181.376" height="120" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="682.4879999999999" y="564.0" text-anchor="middle" font-size="10">F3</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-6" data-surface-control="keyboard-6" aria-hidden="true">
+        <rect x="591.8" y="500" width="181.376" height="120" data-hit-area="keyboard-6" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-7" data-part="keyboard-7" data-kind="key" role="button" aria-label="Keyboard note 54" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-7">
+      <title>Keyboard note 54</title>
+      <g aria-hidden="true">
+        <rect x="724.0533333333334" y="500" width="113.36" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="780.7333333333333" y="541.5" text-anchor="middle" font-size="10">F#3</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-7" data-surface-control="keyboard-7" aria-hidden="true">
+        <rect x="724.0533333333334" y="500" width="113.36" height="75" data-hit-area="keyboard-7" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-8" data-part="keyboard-8" data-kind="key" role="button" aria-label="Keyboard note 55" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-8">
+      <title>Keyboard note 55</title>
+      <g aria-hidden="true">
+        <rect x="780.7333333333333" y="500" width="181.376" height="120" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="871.4213333333333" y="564.0" text-anchor="middle" font-size="10">G3</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-8" data-surface-control="keyboard-8" aria-hidden="true">
+        <rect x="780.7333333333333" y="500" width="181.376" height="120" data-hit-area="keyboard-8" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-9" data-part="keyboard-9" data-kind="key" role="button" aria-label="Keyboard note 56" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-9">
+      <title>Keyboard note 56</title>
+      <g aria-hidden="true">
+        <rect x="912.9866666666667" y="500" width="113.36" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="969.6666666666666" y="541.5" text-anchor="middle" font-size="10">G#3</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-9" data-surface-control="keyboard-9" aria-hidden="true">
+        <rect x="912.9866666666667" y="500" width="113.36" height="75" data-hit-area="keyboard-9" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-10" data-part="keyboard-10" data-kind="key" role="button" aria-label="Keyboard note 57" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-10">
+      <title>Keyboard note 57</title>
+      <g aria-hidden="true">
+        <rect x="969.6666666666667" y="500" width="181.376" height="120" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1060.3546666666668" y="564.0" text-anchor="middle" font-size="10">A3</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-10" data-surface-control="keyboard-10" aria-hidden="true">
+        <rect x="969.6666666666667" y="500" width="181.376" height="120" data-hit-area="keyboard-10" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-11" data-part="keyboard-11" data-kind="key" role="button" aria-label="Keyboard note 58" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-11">
+      <title>Keyboard note 58</title>
+      <g aria-hidden="true">
+        <rect x="1101.92" y="500" width="113.36" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1158.6000000000001" y="541.5" text-anchor="middle" font-size="10">A#3</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-11" data-surface-control="keyboard-11" aria-hidden="true">
+        <rect x="1101.92" y="500" width="113.36" height="75" data-hit-area="keyboard-11" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-12" data-part="keyboard-12" data-kind="key" role="button" aria-label="Keyboard note 59" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-12">
+      <title>Keyboard note 59</title>
+      <g aria-hidden="true">
+        <rect x="1158.6" y="500" width="181.376" height="120" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1249.288" y="564.0" text-anchor="middle" font-size="10">B3</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-12" data-surface-control="keyboard-12" aria-hidden="true">
+        <rect x="1158.6" y="500" width="181.376" height="120" data-hit-area="keyboard-12" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-13" data-part="keyboard-13" data-kind="key" role="button" aria-label="Keyboard note 60" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-13">
+      <title>Keyboard note 60</title>
+      <g aria-hidden="true">
+        <rect x="1347.5333333333333" y="500" width="181.376" height="120" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1438.2213333333334" y="564.0" text-anchor="middle" font-size="10">C4</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-13" data-surface-control="keyboard-13" aria-hidden="true">
+        <rect x="1347.5333333333333" y="500" width="181.376" height="120" data-hit-area="keyboard-13" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-14" data-part="keyboard-14" data-kind="key" role="button" aria-label="Keyboard note 61" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-14">
+      <title>Keyboard note 61</title>
+      <g aria-hidden="true">
+        <rect x="1479.7866666666666" y="500" width="113.36" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1536.4666666666667" y="541.5" text-anchor="middle" font-size="10">C#4</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-14" data-surface-control="keyboard-14" aria-hidden="true">
+        <rect x="1479.7866666666666" y="500" width="113.36" height="75" data-hit-area="keyboard-14" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-15" data-part="keyboard-15" data-kind="key" role="button" aria-label="Keyboard note 62" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-15">
+      <title>Keyboard note 62</title>
+      <g aria-hidden="true">
+        <rect x="1536.4666666666667" y="500" width="181.376" height="120" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1627.1546666666668" y="564.0" text-anchor="middle" font-size="10">D4</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-15" data-surface-control="keyboard-15" aria-hidden="true">
+        <rect x="1536.4666666666667" y="500" width="181.376" height="120" data-hit-area="keyboard-15" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-16" data-part="keyboard-16" data-kind="key" role="button" aria-label="Keyboard note 63" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-16">
+      <title>Keyboard note 63</title>
+      <g aria-hidden="true">
+        <rect x="1668.7199999999998" y="500" width="113.36" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1725.3999999999999" y="541.5" text-anchor="middle" font-size="10">D#4</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-16" data-surface-control="keyboard-16" aria-hidden="true">
+        <rect x="1668.7199999999998" y="500" width="113.36" height="75" data-hit-area="keyboard-16" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-17" data-part="keyboard-17" data-kind="key" role="button" aria-label="Keyboard note 64" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-17">
+      <title>Keyboard note 64</title>
+      <g aria-hidden="true">
+        <rect x="1725.4" y="500" width="181.376" height="120" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1816.0880000000002" y="564.0" text-anchor="middle" font-size="10">E4</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-17" data-surface-control="keyboard-17" aria-hidden="true">
+        <rect x="1725.4" y="500" width="181.376" height="120" data-hit-area="keyboard-17" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-18" data-part="keyboard-18" data-kind="key" role="button" aria-label="Keyboard note 65" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-18">
+      <title>Keyboard note 65</title>
+      <g aria-hidden="true">
+        <rect x="1914.3333333333335" y="500" width="181.376" height="120" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2005.0213333333336" y="564.0" text-anchor="middle" font-size="10">F4</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-18" data-surface-control="keyboard-18" aria-hidden="true">
+        <rect x="1914.3333333333335" y="500" width="181.376" height="120" data-hit-area="keyboard-18" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-19" data-part="keyboard-19" data-kind="key" role="button" aria-label="Keyboard note 66" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-19">
+      <title>Keyboard note 66</title>
+      <g aria-hidden="true">
+        <rect x="2046.5866666666666" y="500" width="113.36" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2103.2666666666664" y="541.5" text-anchor="middle" font-size="10">F#4</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-19" data-surface-control="keyboard-19" aria-hidden="true">
+        <rect x="2046.5866666666666" y="500" width="113.36" height="75" data-hit-area="keyboard-19" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-20" data-part="keyboard-20" data-kind="key" role="button" aria-label="Keyboard note 67" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-20">
+      <title>Keyboard note 67</title>
+      <g aria-hidden="true">
+        <rect x="2103.266666666667" y="500" width="181.376" height="120" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2193.954666666667" y="564.0" text-anchor="middle" font-size="10">G4</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-20" data-surface-control="keyboard-20" aria-hidden="true">
+        <rect x="2103.266666666667" y="500" width="181.376" height="120" data-hit-area="keyboard-20" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-21" data-part="keyboard-21" data-kind="key" role="button" aria-label="Keyboard note 68" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-21">
+      <title>Keyboard note 68</title>
+      <g aria-hidden="true">
+        <rect x="2235.52" y="500" width="113.36" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2292.2" y="541.5" text-anchor="middle" font-size="10">G#4</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-21" data-surface-control="keyboard-21" aria-hidden="true">
+        <rect x="2235.52" y="500" width="113.36" height="75" data-hit-area="keyboard-21" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-22" data-part="keyboard-22" data-kind="key" role="button" aria-label="Keyboard note 69" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-22">
+      <title>Keyboard note 69</title>
+      <g aria-hidden="true">
+        <rect x="2292.2" y="500" width="181.376" height="120" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2382.888" y="564.0" text-anchor="middle" font-size="10">A4</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-22" data-surface-control="keyboard-22" aria-hidden="true">
+        <rect x="2292.2" y="500" width="181.376" height="120" data-hit-area="keyboard-22" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-23" data-part="keyboard-23" data-kind="key" role="button" aria-label="Keyboard note 70" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-23">
+      <title>Keyboard note 70</title>
+      <g aria-hidden="true">
+        <rect x="2424.4533333333334" y="500" width="113.36" height="75" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2481.133333333333" y="541.5" text-anchor="middle" font-size="10">A#4</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-23" data-surface-control="keyboard-23" aria-hidden="true">
+        <rect x="2424.4533333333334" y="500" width="113.36" height="75" data-hit-area="keyboard-23" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-24" data-part="keyboard-24" data-kind="key" role="button" aria-label="Keyboard note 71" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-24">
+      <title>Keyboard note 71</title>
+      <g aria-hidden="true">
+        <rect x="2481.133333333333" y="500" width="181.376" height="120" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2571.8213333333333" y="564.0" text-anchor="middle" font-size="10">B4</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-24" data-surface-control="keyboard-24" aria-hidden="true">
+        <rect x="2481.133333333333" y="500" width="181.376" height="120" data-hit-area="keyboard-24" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="roland-n-vision-icon--keyboard-25" data-part="keyboard-25" data-kind="key" role="button" aria-label="Keyboard note 72" aria-disabled="true" tabindex="-1" data-surface-controls="keyboard-25">
+      <title>Keyboard note 72</title>
+      <g aria-hidden="true">
+        <rect x="2670.0666666666666" y="500" width="181.376" height="120" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="2760.7546666666667" y="564.0" text-anchor="middle" font-size="10">C5</text>
+      </g>
+      <g id="roland-n-vision-icon--surface--keyboard-25" data-surface-control="keyboard-25" aria-hidden="true">
+        <rect x="2670.0666666666666" y="500" width="181.376" height="120" data-hit-area="keyboard-25" stroke-opacity="0" pointer-events="all" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+  </g>
+</svg>

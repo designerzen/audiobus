@@ -1,0 +1,111 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "roland-jx-03",
+	"name": "Roland JX-03",
+	"manufacturer": "Roland",
+	"manufacturerUrl": "https://www.roland.com/",
+	"productUrl": "https://www.roland.com/global/products/jx-03/",
+	"description": "Original four-voice JX-3P-inspired Boutique module.",
+	"ids": ["roland-jx-03"],
+	"portNames": ["JX-03", "JX-03 MIDI 1", "Roland JX-03"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Roland JX-03 owner manual",
+			"url": "https://www.roland.com/global/support/by_product/jx-03/owners_manuals/"
+		},
+		{
+			"title": "Roland JX-03 MIDI implementation chart",
+			"url": "https://static.roland.com/assets/media/pdf/JX-03_MIDI_Imple_e01_W.pdf"
+		}
+	],
+	"abilities": ["USB MIDI", "DIN MIDI IN/OUT", "MIDI notes", "Documented controller mappings"],
+	"hardwareControls": [
+		"Performance: Volume, Ribbon C1, Ribbon C2, Manual",
+		"DCO 1: Range, Waveform, LFO, Envelope",
+		"DCO 2: Range, Waveform, Cross mod, Tune, Fine tune, LFO, Envelope, LFO depth, Env depth, Polarity",
+		"Filter Mixer: Source mix, HPF, LPF cutoff, Resonance, LFO, Key follow, Env depth, Env polarity",
+		"VCA: Mode, Level",
+		"LFO: Waveform, Delay, Rate",
+		"Envelope: Attack, Decay, Sustain, Release",
+		"Memory: Chorus, Bank A, Bank B, Bank C, Patch 1, Patch 2, Patch 3, Patch 4, Patch 5, Patch 6, Patch 7, Patch 8, Patch 9, Patch 10, Patch 11, Patch 12, Patch 13, Patch 14, Patch 15, Patch 16"
+	],
+	"notice": "Use USB MIDI or a DIN MIDI interface. Match the MIDI channel and enable the required MIDI transmit/receive settings. The linked version 1.00 chart documents modulation, expression, hold and pitch bend but no fixed panel-parameter CC map. Only the ribbons are pre-mapped; use MIDI learn to match later firmware or edited controller settings.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "performance-ribbon-c1-touch",
+			"label": "Performance: Ribbon C1",
+			"widget": "slider",
+			"message": {
+				"type": "pitchBend"
+			},
+			"default": 8192
+		},
+		{
+			"id": "performance-ribbon-c2-touch",
+			"label": "Performance: Ribbon C2",
+			"widget": "slider",
+			"cc": 1
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Roland JX-03 overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 2390,
+		"height": 540,
+		"elements": [
+			{
+				"id": "performance-ribbon-c1-touch",
+				"label": "Ribbon C1",
+				"kind": "fader",
+				"position": {
+					"x": 5.523012552301256,
+					"y": 26.851851851851855,
+					"width": 3.1799163179916317,
+					"height": 9.25925925925926
+				},
+				"control": "performance-ribbon-c1-touch"
+			},
+			{
+				"id": "performance-ribbon-c2-touch",
+				"label": "Ribbon C2",
+				"kind": "fader",
+				"position": {
+					"x": 1.5481171548117154,
+					"y": 42.77777777777778,
+					"width": 3.1799163179916317,
+					"height": 9.25925925925926
+				},
+				"control": "performance-ribbon-c2-touch"
+			}
+		]
+	}
+}

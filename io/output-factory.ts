@@ -74,6 +74,14 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./outputs/output-wam2.ts")
 		case OUTPUT_TYPES.MOOG:
 			return await import("./outputs/output-moog.ts")
+		case OUTPUT_TYPES.FM:
+			return await import("./outputs/output-fm.ts")
+		case OUTPUT_TYPES.MONOTRON:
+			return await import("./outputs/output-monotron.ts")
+		case OUTPUT_TYPES.WAVEGUIDE:
+			return await import("./outputs/output-waveguide.ts")
+		case OUTPUT_TYPES.MULTI_OSCILLATOR:
+			return await import("./outputs/output-multi-oscillator.ts")
 		case OUTPUT_TYPES.TB303:
 			return await import("./outputs/output-tb303.ts")
 		case OUTPUT_TYPES.WAM:
@@ -278,6 +286,16 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		isAvailable: () => typeof AudioWorklet !== "undefined",
 		create: (options) => createOutput(OUTPUT_TYPES.MOOG, options)
 	},
+	{
+		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.FM],
+		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		create: (options) => createOutput(OUTPUT_TYPES.FM, options)
+	},
+	...[OUTPUT_TYPES.MONOTRON, OUTPUT_TYPES.WAVEGUIDE, OUTPUT_TYPES.MULTI_OSCILLATOR].map((id) => ({
+		...OUTPUT_DEFINITIONS[id],
+		isAvailable: () => typeof AudioContext !== "undefined",
+		create: (options?: Record<string, any>) => createOutput(id, options)
+	})),
 	...Object.values(OUTPUT_DEFINITIONS)
 		.filter((definition) => definition.id.startsWith(OUTPUT_TYPES.WEBCLAP_PREFIX))
 		.map((definition) => ({
@@ -330,7 +348,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.CONSOLE].subtype,
 		name: "Console",
 		description: "Logs MIDI events to browser console (dev mode only)",
-		isAvailable: () => import.meta.env.DEV,
+		isAvailable: () => import.meta.env?.DEV,
 		create: (options) => createOutput(OUTPUT_TYPES.CONSOLE, options)
 	},
 	{

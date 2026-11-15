@@ -1,0 +1,591 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "korg-volca-beats",
+	"name": "Korg volca beats",
+	"manufacturer": "Korg",
+	"manufacturerUrl": "https://www.korg.com/",
+	"productUrl": "https://www.korg.com/us/products/dj/volca_beats/",
+	"description": "Hybrid analog and PCM drum sequencer.",
+	"ids": ["korg-volca-beats"],
+	"portNames": ["volca beats", "Korg volca beats"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Korg volca beats owner manual",
+			"url": "https://cdn.korg.com/us/support/download/files/a8a87f14c9e3aef6f0e4429d15c92c36.pdf"
+		},
+		{
+			"title": "Korg volca beats MIDI implementation chart",
+			"url": "https://cdn.korg.com/us/support/download/files/456d19dc4cc9e6e73f7ed9ac34e38aec.pdf"
+		}
+	],
+	"abilities": ["DIN MIDI IN only", "MIDI note reception", "Documented CC reception"],
+	"hardwareControls": [
+		"Master: Volume, Tempo, Memory, Play, Record, Function",
+		"Kick: Pitch, Click, Decay",
+		"Snare: Pitch, Snappy, Decay",
+		"Tom: Lo pitch, Hi pitch, Decay",
+		"Hi Hat: Grain, Closed decay, Open decay",
+		"Stutter: Time, Depth",
+		"Part: Level, PCM speed, Part left, Part right"
+	],
+	"notice": "Most controls are MIDI receive mappings. The unmodified hardware has no MIDI output and cannot send panel movements or notes to Harmoneasy. Level regions address parts 1-10; PCM speed regions address Clap, Claves, Agogo and Crash. Notes use the factory drum map.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "tom-decay-knob",
+			"label": "Tom: Decay",
+			"widget": "slider",
+			"cc": 56
+		},
+		{
+			"id": "hi-hat-grain-knob",
+			"label": "Hi Hat: Grain",
+			"widget": "slider",
+			"cc": 59
+		},
+		{
+			"id": "hi-hat-closed-decay-knob",
+			"label": "Hi Hat: Closed decay",
+			"widget": "slider",
+			"cc": 57
+		},
+		{
+			"id": "hi-hat-open-decay-knob",
+			"label": "Hi Hat: Open decay",
+			"widget": "slider",
+			"cc": 58
+		},
+		{
+			"id": "stutter-time-knob",
+			"label": "Stutter: Time",
+			"widget": "slider",
+			"cc": 54
+		},
+		{
+			"id": "stutter-depth-knob",
+			"label": "Stutter: Depth",
+			"widget": "slider",
+			"cc": 55
+		},
+		{
+			"id": "part-level-knob-1",
+			"label": "Part: Level (part 1)",
+			"widget": "slider",
+			"cc": 40
+		},
+		{
+			"id": "part-level-knob-2",
+			"label": "Part: Level (part 2)",
+			"widget": "slider",
+			"cc": 41
+		},
+		{
+			"id": "part-level-knob-3",
+			"label": "Part: Level (part 3)",
+			"widget": "slider",
+			"cc": 42
+		},
+		{
+			"id": "part-level-knob-4",
+			"label": "Part: Level (part 4)",
+			"widget": "slider",
+			"cc": 43
+		},
+		{
+			"id": "part-level-knob-5",
+			"label": "Part: Level (part 5)",
+			"widget": "slider",
+			"cc": 44
+		},
+		{
+			"id": "part-level-knob-6",
+			"label": "Part: Level (part 6)",
+			"widget": "slider",
+			"cc": 45
+		},
+		{
+			"id": "part-level-knob-7",
+			"label": "Part: Level (part 7)",
+			"widget": "slider",
+			"cc": 46
+		},
+		{
+			"id": "part-level-knob-8",
+			"label": "Part: Level (part 8)",
+			"widget": "slider",
+			"cc": 47
+		},
+		{
+			"id": "part-level-knob-9",
+			"label": "Part: Level (part 9)",
+			"widget": "slider",
+			"cc": 48
+		},
+		{
+			"id": "part-level-knob-10",
+			"label": "Part: Level (part 10)",
+			"widget": "slider",
+			"cc": 49
+		},
+		{
+			"id": "part-pcm-speed-knob-1",
+			"label": "Part: PCM speed (part 1)",
+			"widget": "slider",
+			"cc": 50
+		},
+		{
+			"id": "part-pcm-speed-knob-2",
+			"label": "Part: PCM speed (part 2)",
+			"widget": "slider",
+			"cc": 51
+		},
+		{
+			"id": "part-pcm-speed-knob-3",
+			"label": "Part: PCM speed (part 3)",
+			"widget": "slider",
+			"cc": 52
+		},
+		{
+			"id": "part-pcm-speed-knob-4",
+			"label": "Part: PCM speed (part 4)",
+			"widget": "slider",
+			"cc": 53
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Korg volca beats overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 1218,
+		"height": 650,
+		"elements": [
+			{
+				"id": "tom-decay-knob",
+				"label": "Decay",
+				"kind": "knob",
+				"position": {
+					"x": 44.90968801313629,
+					"y": 48.769230769230774,
+					"width": 6.239737274220033,
+					"height": 7.6923076923076925
+				},
+				"control": "tom-decay-knob"
+			},
+			{
+				"id": "hi-hat-grain-knob",
+				"label": "Grain",
+				"kind": "knob",
+				"position": {
+					"x": 57.060755336617405,
+					"y": 22.30769230769231,
+					"width": 6.239737274220033,
+					"height": 7.6923076923076925
+				},
+				"control": "hi-hat-grain-knob"
+			},
+			{
+				"id": "hi-hat-closed-decay-knob",
+				"label": "Closed decay",
+				"kind": "knob",
+				"position": {
+					"x": 57.060755336617405,
+					"y": 35.53846153846154,
+					"width": 6.239737274220033,
+					"height": 7.6923076923076925
+				},
+				"control": "hi-hat-closed-decay-knob"
+			},
+			{
+				"id": "hi-hat-open-decay-knob",
+				"label": "Open decay",
+				"kind": "knob",
+				"position": {
+					"x": 57.060755336617405,
+					"y": 48.769230769230774,
+					"width": 6.239737274220033,
+					"height": 7.6923076923076925
+				},
+				"control": "hi-hat-open-decay-knob"
+			},
+			{
+				"id": "stutter-time-knob",
+				"label": "Time",
+				"kind": "knob",
+				"position": {
+					"x": 69.21182266009852,
+					"y": 22.30769230769231,
+					"width": 6.239737274220033,
+					"height": 7.6923076923076925
+				},
+				"control": "stutter-time-knob"
+			},
+			{
+				"id": "stutter-depth-knob",
+				"label": "Depth",
+				"kind": "knob",
+				"position": {
+					"x": 69.21182266009852,
+					"y": 35.53846153846154,
+					"width": 6.239737274220033,
+					"height": 7.6923076923076925
+				},
+				"control": "stutter-depth-knob"
+			},
+			{
+				"id": "part-level-knob-1",
+				"label": "Level (part 1)",
+				"kind": "knob",
+				"position": {
+					"x": 81.36288998357963,
+					"y": 22.30769230769231,
+					"width": 0.6239737274220033,
+					"height": 7.6923076923076925
+				},
+				"control": "part-level-knob-1"
+			},
+			{
+				"id": "part-level-knob-2",
+				"label": "Level (part 2)",
+				"kind": "knob",
+				"position": {
+					"x": 81.98686371100165,
+					"y": 22.30769230769231,
+					"width": 0.6239737274220033,
+					"height": 7.6923076923076925
+				},
+				"control": "part-level-knob-2"
+			},
+			{
+				"id": "part-level-knob-3",
+				"label": "Level (part 3)",
+				"kind": "knob",
+				"position": {
+					"x": 82.61083743842364,
+					"y": 22.30769230769231,
+					"width": 0.6239737274220033,
+					"height": 7.6923076923076925
+				},
+				"control": "part-level-knob-3"
+			},
+			{
+				"id": "part-level-knob-4",
+				"label": "Level (part 4)",
+				"kind": "knob",
+				"position": {
+					"x": 83.23481116584564,
+					"y": 22.30769230769231,
+					"width": 0.6239737274220033,
+					"height": 7.6923076923076925
+				},
+				"control": "part-level-knob-4"
+			},
+			{
+				"id": "part-level-knob-5",
+				"label": "Level (part 5)",
+				"kind": "knob",
+				"position": {
+					"x": 83.85878489326764,
+					"y": 22.30769230769231,
+					"width": 0.6239737274220033,
+					"height": 7.6923076923076925
+				},
+				"control": "part-level-knob-5"
+			},
+			{
+				"id": "part-level-knob-6",
+				"label": "Level (part 6)",
+				"kind": "knob",
+				"position": {
+					"x": 84.48275862068965,
+					"y": 22.30769230769231,
+					"width": 0.6239737274220033,
+					"height": 7.6923076923076925
+				},
+				"control": "part-level-knob-6"
+			},
+			{
+				"id": "part-level-knob-7",
+				"label": "Level (part 7)",
+				"kind": "knob",
+				"position": {
+					"x": 85.10673234811165,
+					"y": 22.30769230769231,
+					"width": 0.6239737274220033,
+					"height": 7.6923076923076925
+				},
+				"control": "part-level-knob-7"
+			},
+			{
+				"id": "part-level-knob-8",
+				"label": "Level (part 8)",
+				"kind": "knob",
+				"position": {
+					"x": 85.73070607553367,
+					"y": 22.30769230769231,
+					"width": 0.6239737274220033,
+					"height": 7.6923076923076925
+				},
+				"control": "part-level-knob-8"
+			},
+			{
+				"id": "part-level-knob-9",
+				"label": "Level (part 9)",
+				"kind": "knob",
+				"position": {
+					"x": 86.35467980295566,
+					"y": 22.30769230769231,
+					"width": 0.6239737274220033,
+					"height": 7.6923076923076925
+				},
+				"control": "part-level-knob-9"
+			},
+			{
+				"id": "part-level-knob-10",
+				"label": "Level (part 10)",
+				"kind": "knob",
+				"position": {
+					"x": 86.97865353037768,
+					"y": 22.30769230769231,
+					"width": 0.6239737274220033,
+					"height": 7.6923076923076925
+				},
+				"control": "part-level-knob-10"
+			},
+			{
+				"id": "part-pcm-speed-knob-1",
+				"label": "PCM speed (part 1)",
+				"kind": "knob",
+				"position": {
+					"x": 89.16256157635468,
+					"y": 22.30769230769231,
+					"width": 1.5599343185550083,
+					"height": 7.6923076923076925
+				},
+				"control": "part-pcm-speed-knob-1"
+			},
+			{
+				"id": "part-pcm-speed-knob-2",
+				"label": "PCM speed (part 2)",
+				"kind": "knob",
+				"position": {
+					"x": 90.72249589490968,
+					"y": 22.30769230769231,
+					"width": 1.5599343185550083,
+					"height": 7.6923076923076925
+				},
+				"control": "part-pcm-speed-knob-2"
+			},
+			{
+				"id": "part-pcm-speed-knob-3",
+				"label": "PCM speed (part 3)",
+				"kind": "knob",
+				"position": {
+					"x": 92.28243021346469,
+					"y": 22.30769230769231,
+					"width": 1.5599343185550083,
+					"height": 7.6923076923076925
+				},
+				"control": "part-pcm-speed-knob-3"
+			},
+			{
+				"id": "part-pcm-speed-knob-4",
+				"label": "PCM speed (part 4)",
+				"kind": "knob",
+				"position": {
+					"x": 93.8423645320197,
+					"y": 22.30769230769231,
+					"width": 1.5599343185550083,
+					"height": 7.6923076923076925
+				},
+				"control": "part-pcm-speed-knob-4"
+			},
+			{
+				"id": "key-1",
+				"label": "Kick",
+				"kind": "key",
+				"position": {
+					"x": 2.052545155993432,
+					"y": 82.76923076923077,
+					"width": 9.178981937602627,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 36
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-2",
+				"label": "Snare",
+				"kind": "key",
+				"position": {
+					"x": 11.642036124794746,
+					"y": 82.76923076923077,
+					"width": 9.178981937602627,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 38
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-3",
+				"label": "Low tom",
+				"kind": "key",
+				"position": {
+					"x": 21.23152709359606,
+					"y": 82.76923076923077,
+					"width": 9.178981937602627,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 43
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-4",
+				"label": "High tom",
+				"kind": "key",
+				"position": {
+					"x": 30.82101806239737,
+					"y": 82.76923076923077,
+					"width": 9.178981937602627,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 50
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-5",
+				"label": "Closed hat",
+				"kind": "key",
+				"position": {
+					"x": 40.410509031198686,
+					"y": 82.76923076923077,
+					"width": 9.178981937602627,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 42
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-6",
+				"label": "Open hat",
+				"kind": "key",
+				"position": {
+					"x": 50.0,
+					"y": 82.76923076923077,
+					"width": 9.178981937602627,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 46
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-7",
+				"label": "Clap",
+				"kind": "key",
+				"position": {
+					"x": 59.58949096880131,
+					"y": 82.76923076923077,
+					"width": 9.178981937602627,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 39
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-8",
+				"label": "Claves",
+				"kind": "key",
+				"position": {
+					"x": 69.17898193760263,
+					"y": 82.76923076923077,
+					"width": 9.178981937602627,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 75
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-9",
+				"label": "Agogo",
+				"kind": "key",
+				"position": {
+					"x": 78.76847290640394,
+					"y": 82.76923076923077,
+					"width": 9.178981937602627,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 67
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-10",
+				"label": "Crash",
+				"kind": "key",
+				"position": {
+					"x": 88.35796387520526,
+					"y": 82.76923076923077,
+					"width": 9.178981937602627,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 49
+				},
+				"learnable": true
+			}
+		]
+	}
+}

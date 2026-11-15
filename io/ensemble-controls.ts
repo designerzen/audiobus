@@ -94,7 +94,14 @@ export function installEnsembleControls(chain: IOChain, signal: AbortSignal): vo
 			const surfaces = chain.options.controlSurfaces ?? []
 			const current = surfaces.find((surface) => surface.id === id)
 			const previous = new Map(current?.widgets.map((widget) => [widget.key, widget]))
-			const songControls = ["uploadSong", "midiFileUrl", "autoInputs", "assist", "mode"]
+			const songControls = [
+				"uploadSong",
+				"songLibrary",
+				"midiFileUrl",
+				"autoInputs",
+				"assist",
+				"mode"
+			]
 			const songComponentId = `transformer:${ensemble.midiControlId}`
 			const surface: SurfaceState = {
 				...current,
@@ -109,6 +116,9 @@ export function installEnsembleControls(chain: IOChain, signal: AbortSignal): vo
 					{ componentId: songComponentId, controlIds: songControls }
 				],
 				widgets: [
+					...songControls.map((control) => ({
+						key: JSON.stringify([songComponentId, control])
+					})),
 					...inputs.map((input) => {
 						const key = JSON.stringify([deviceId(input), "trigger"])
 						return {
@@ -120,10 +130,7 @@ export function installEnsembleControls(chain: IOChain, signal: AbortSignal): vo
 									? { key: input.options.key as string }
 									: undefined
 						}
-					}),
-					...songControls.map((control) => ({
-						key: JSON.stringify([songComponentId, control])
-					}))
+					})
 				]
 			}
 			if (JSON.stringify(surface) !== JSON.stringify(current)) {
@@ -149,6 +156,9 @@ export function installEnsembleControls(chain: IOChain, signal: AbortSignal): vo
 			}
 		}
 		for (const ensemble of ensembles) {
+			if (ensemble.options.autoInputs !== "off") {
+				void ensemble.loadSongLibrary()
+			}
 			if (!subscriptions.has(ensemble)) {
 				subscriptions.set(
 					ensemble,

@@ -1,0 +1,384 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" role="group" aria-labelledby="akai-mpc-live-icon--title" aria-describedby="akai-mpc-live-icon--description" data-device="akai-mpc-live" style="background: #fff; color: #334155;" data-diagram-style="wireframe">
+  <title id="akai-mpc-live-icon--title">Akai MPC Live overhead hardware diagram</title>
+  <desc id="akai-mpc-live-icon--description">Wireframe top-down schematic; positions are approximate. Each physical control has a stable device-prefixed ID and data-part name. Buttons in this standalone drawing are disabled until a host adds input handlers. Transparent regions marked data-surface-control correspond to the profile MIDI hit areas; multiple regions can share one context-dependent physical control.</desc>
+  <style>text { font-family: Arial, sans-serif; } .section-label { font-size: 11px; letter-spacing: 1px; } [data-part]:focus-visible { outline: 3px solid currentColor; }</style>
+  <g id="akai-mpc-live-icon--chassis" aria-hidden="true">
+    <rect x="3" y="3" width="1194" height="614" rx="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="22" y="28" fill="currentColor" font-size="19" stroke="none">Akai MPC Live</text>
+  </g>
+  <g id="akai-mpc-live-icon--controls" role="group" aria-label="Top panel controls">
+    <g id="akai-mpc-live-icon--pad-bank-1" data-part="pad-bank-1" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="A / E">
+      <title>A / E</title>
+      <g aria-hidden="true">
+        <rect x="25" y="55" width="105" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="77.5" y="73" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">A / E</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-bank-2" data-part="pad-bank-2" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="B / F">
+      <title>B / F</title>
+      <g aria-hidden="true">
+        <rect x="145" y="55" width="105" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="197.5" y="73" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">B / F</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-bank-3" data-part="pad-bank-3" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="C / G">
+      <title>C / G</title>
+      <g aria-hidden="true">
+        <rect x="265" y="55" width="105" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="317.5" y="73" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">C / G</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-bank-4" data-part="pad-bank-4" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="D / H">
+      <title>D / H</title>
+      <g aria-hidden="true">
+        <rect x="385" y="55" width="105" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="437.5" y="73" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">D / H</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--note-repeat" data-part="note-repeat" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Note Repeat">
+      <title>Note Repeat</title>
+      <g aria-hidden="true">
+        <rect x="25" y="99" width="105" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="77.5" y="117" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Note Repeat</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--full-level" data-part="full-level" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Full Level">
+      <title>Full Level</title>
+      <g aria-hidden="true">
+        <rect x="145" y="99" width="105" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="197.5" y="117" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Full Level</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--16-level" data-part="16-level" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="16 Level">
+      <title>16 Level</title>
+      <g aria-hidden="true">
+        <rect x="265" y="99" width="105" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="317.5" y="117" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">16 Level</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--erase" data-part="erase" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Erase">
+      <title>Erase</title>
+      <g aria-hidden="true">
+        <rect x="385" y="99" width="105" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="437.5" y="117" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Erase</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-1" data-part="pad-1" data-kind="pad" data-surface-controls="pad-1" role="button" aria-disabled="true" tabindex="-1" aria-label="Pad 1">
+      <title>Pad 1</title>
+      <g aria-hidden="true">
+        <rect x="25" y="486" width="105" height="92" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="77.5" y="536" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pad 1</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--pad-1" data-surface-control="pad-1" aria-hidden="true">
+        <rect x="25" y="486" width="105" height="92" fill="none" pointer-events="all" data-hit-area="pad-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-2" data-part="pad-2" data-kind="pad" data-surface-controls="pad-2" role="button" aria-disabled="true" tabindex="-1" aria-label="Pad 2">
+      <title>Pad 2</title>
+      <g aria-hidden="true">
+        <rect x="145" y="486" width="105" height="92" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="197.5" y="536" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pad 2</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--pad-2" data-surface-control="pad-2" aria-hidden="true">
+        <rect x="145" y="486" width="105" height="92" fill="none" pointer-events="all" data-hit-area="pad-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-3" data-part="pad-3" data-kind="pad" data-surface-controls="pad-3" role="button" aria-disabled="true" tabindex="-1" aria-label="Pad 3">
+      <title>Pad 3</title>
+      <g aria-hidden="true">
+        <rect x="265" y="486" width="105" height="92" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="317.5" y="536" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pad 3</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--pad-3" data-surface-control="pad-3" aria-hidden="true">
+        <rect x="265" y="486" width="105" height="92" fill="none" pointer-events="all" data-hit-area="pad-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-4" data-part="pad-4" data-kind="pad" data-surface-controls="pad-4" role="button" aria-disabled="true" tabindex="-1" aria-label="Pad 4">
+      <title>Pad 4</title>
+      <g aria-hidden="true">
+        <rect x="385" y="486" width="105" height="92" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="437.5" y="536" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pad 4</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--pad-4" data-surface-control="pad-4" aria-hidden="true">
+        <rect x="385" y="486" width="105" height="92" fill="none" pointer-events="all" data-hit-area="pad-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-5" data-part="pad-5" data-kind="pad" data-surface-controls="pad-5" role="button" aria-disabled="true" tabindex="-1" aria-label="Pad 5">
+      <title>Pad 5</title>
+      <g aria-hidden="true">
+        <rect x="25" y="379" width="105" height="92" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="77.5" y="429" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pad 5</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--pad-5" data-surface-control="pad-5" aria-hidden="true">
+        <rect x="25" y="379" width="105" height="92" fill="none" pointer-events="all" data-hit-area="pad-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-6" data-part="pad-6" data-kind="pad" data-surface-controls="pad-6" role="button" aria-disabled="true" tabindex="-1" aria-label="Pad 6">
+      <title>Pad 6</title>
+      <g aria-hidden="true">
+        <rect x="145" y="379" width="105" height="92" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="197.5" y="429" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pad 6</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--pad-6" data-surface-control="pad-6" aria-hidden="true">
+        <rect x="145" y="379" width="105" height="92" fill="none" pointer-events="all" data-hit-area="pad-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-7" data-part="pad-7" data-kind="pad" data-surface-controls="pad-7" role="button" aria-disabled="true" tabindex="-1" aria-label="Pad 7">
+      <title>Pad 7</title>
+      <g aria-hidden="true">
+        <rect x="265" y="379" width="105" height="92" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="317.5" y="429" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pad 7</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--pad-7" data-surface-control="pad-7" aria-hidden="true">
+        <rect x="265" y="379" width="105" height="92" fill="none" pointer-events="all" data-hit-area="pad-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-8" data-part="pad-8" data-kind="pad" data-surface-controls="pad-8" role="button" aria-disabled="true" tabindex="-1" aria-label="Pad 8">
+      <title>Pad 8</title>
+      <g aria-hidden="true">
+        <rect x="385" y="379" width="105" height="92" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="437.5" y="429" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pad 8</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--pad-8" data-surface-control="pad-8" aria-hidden="true">
+        <rect x="385" y="379" width="105" height="92" fill="none" pointer-events="all" data-hit-area="pad-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-9" data-part="pad-9" data-kind="pad" data-surface-controls="pad-9" role="button" aria-disabled="true" tabindex="-1" aria-label="Pad 9">
+      <title>Pad 9</title>
+      <g aria-hidden="true">
+        <rect x="25" y="272" width="105" height="92" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="77.5" y="322" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pad 9</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--pad-9" data-surface-control="pad-9" aria-hidden="true">
+        <rect x="25" y="272" width="105" height="92" fill="none" pointer-events="all" data-hit-area="pad-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-10" data-part="pad-10" data-kind="pad" data-surface-controls="pad-10" role="button" aria-disabled="true" tabindex="-1" aria-label="Pad 10">
+      <title>Pad 10</title>
+      <g aria-hidden="true">
+        <rect x="145" y="272" width="105" height="92" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="197.5" y="322" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pad 10</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--pad-10" data-surface-control="pad-10" aria-hidden="true">
+        <rect x="145" y="272" width="105" height="92" fill="none" pointer-events="all" data-hit-area="pad-10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-11" data-part="pad-11" data-kind="pad" data-surface-controls="pad-11" role="button" aria-disabled="true" tabindex="-1" aria-label="Pad 11">
+      <title>Pad 11</title>
+      <g aria-hidden="true">
+        <rect x="265" y="272" width="105" height="92" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="317.5" y="322" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pad 11</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--pad-11" data-surface-control="pad-11" aria-hidden="true">
+        <rect x="265" y="272" width="105" height="92" fill="none" pointer-events="all" data-hit-area="pad-11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-12" data-part="pad-12" data-kind="pad" data-surface-controls="pad-12" role="button" aria-disabled="true" tabindex="-1" aria-label="Pad 12">
+      <title>Pad 12</title>
+      <g aria-hidden="true">
+        <rect x="385" y="272" width="105" height="92" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="437.5" y="322" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pad 12</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--pad-12" data-surface-control="pad-12" aria-hidden="true">
+        <rect x="385" y="272" width="105" height="92" fill="none" pointer-events="all" data-hit-area="pad-12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-13" data-part="pad-13" data-kind="pad" data-surface-controls="pad-13" role="button" aria-disabled="true" tabindex="-1" aria-label="Pad 13">
+      <title>Pad 13</title>
+      <g aria-hidden="true">
+        <rect x="25" y="165" width="105" height="92" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="77.5" y="215" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pad 13</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--pad-13" data-surface-control="pad-13" aria-hidden="true">
+        <rect x="25" y="165" width="105" height="92" fill="none" pointer-events="all" data-hit-area="pad-13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-14" data-part="pad-14" data-kind="pad" data-surface-controls="pad-14" role="button" aria-disabled="true" tabindex="-1" aria-label="Pad 14">
+      <title>Pad 14</title>
+      <g aria-hidden="true">
+        <rect x="145" y="165" width="105" height="92" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="197.5" y="215" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pad 14</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--pad-14" data-surface-control="pad-14" aria-hidden="true">
+        <rect x="145" y="165" width="105" height="92" fill="none" pointer-events="all" data-hit-area="pad-14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-15" data-part="pad-15" data-kind="pad" data-surface-controls="pad-15" role="button" aria-disabled="true" tabindex="-1" aria-label="Pad 15">
+      <title>Pad 15</title>
+      <g aria-hidden="true">
+        <rect x="265" y="165" width="105" height="92" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="317.5" y="215" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pad 15</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--pad-15" data-surface-control="pad-15" aria-hidden="true">
+        <rect x="265" y="165" width="105" height="92" fill="none" pointer-events="all" data-hit-area="pad-15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--pad-16" data-part="pad-16" data-kind="pad" data-surface-controls="pad-16" role="button" aria-disabled="true" tabindex="-1" aria-label="Pad 16">
+      <title>Pad 16</title>
+      <g aria-hidden="true">
+        <rect x="385" y="165" width="105" height="92" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="437.5" y="215" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pad 16</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--pad-16" data-surface-control="pad-16" aria-hidden="true">
+        <rect x="385" y="165" width="105" height="92" fill="none" pointer-events="all" data-hit-area="pad-16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--touchscreen" data-part="touchscreen" data-kind="touchscreen" role="group" aria-roledescription="touch screen" aria-label="Touchscreen">
+      <title>Touchscreen</title>
+      <g aria-hidden="true">
+        <rect x="535" y="140" width="470" height="330" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="770" y="309" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Touchscreen</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--q-link-bank" data-part="q-link-bank" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Q-Link bank">
+      <title>Q-Link bank</title>
+      <g aria-hidden="true">
+        <rect x="1060" y="55" width="100" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1110" y="74" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Q-Link bank</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--q-link-1" data-part="q-link-1" data-kind="knob" data-surface-controls="q-link-1" role="group" aria-roledescription="rotary control" aria-label="Q-Link 1">
+      <title>Q-Link 1</title>
+      <g aria-hidden="true">
+        <circle cx="1110" cy="165" r="27" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1110 143 v 15.120000000000001" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1110" y="206" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Q-Link 1</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--q-link-1" data-surface-control="q-link-1" aria-hidden="true">
+        <rect x="1083" y="138" width="54" height="54" fill="none" pointer-events="all" data-hit-area="q-link-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--q-link-2" data-part="q-link-2" data-kind="knob" data-surface-controls="q-link-2" role="group" aria-roledescription="rotary control" aria-label="Q-Link 2">
+      <title>Q-Link 2</title>
+      <g aria-hidden="true">
+        <circle cx="1110" cy="253" r="27" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1110 231 v 15.120000000000001" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1110" y="294" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Q-Link 2</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--q-link-2" data-surface-control="q-link-2" aria-hidden="true">
+        <rect x="1083" y="226" width="54" height="54" fill="none" pointer-events="all" data-hit-area="q-link-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--q-link-3" data-part="q-link-3" data-kind="knob" data-surface-controls="q-link-3" role="group" aria-roledescription="rotary control" aria-label="Q-Link 3">
+      <title>Q-Link 3</title>
+      <g aria-hidden="true">
+        <circle cx="1110" cy="341" r="27" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1110 319 v 15.120000000000001" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1110" y="382" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Q-Link 3</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--q-link-3" data-surface-control="q-link-3" aria-hidden="true">
+        <rect x="1083" y="314" width="54" height="54" fill="none" pointer-events="all" data-hit-area="q-link-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--q-link-4" data-part="q-link-4" data-kind="knob" data-surface-controls="q-link-4" role="group" aria-roledescription="rotary control" aria-label="Q-Link 4">
+      <title>Q-Link 4</title>
+      <g aria-hidden="true">
+        <circle cx="1110" cy="429" r="27" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1110 407 v 15.120000000000001" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1110" y="470" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Q-Link 4</text>
+      </g>
+      <g id="akai-mpc-live-icon--surface--q-link-4" data-surface-control="q-link-4" aria-hidden="true">
+        <rect x="1083" y="402" width="54" height="54" fill="none" pointer-events="all" data-hit-area="q-link-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--data-dial" data-part="data-dial" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Data / Enter">
+      <title>Data / Enter</title>
+      <g aria-hidden="true">
+        <circle cx="1110" cy="545" r="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1110 510 v 22.400000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1110" y="599" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Data / Enter</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--shift" data-part="shift" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Shift">
+      <title>Shift</title>
+      <g aria-hidden="true">
+        <rect x="535" y="492" width="72" height="32" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="571" y="512" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Shift</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--menu-browse" data-part="menu-browse" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Menu / Browse">
+      <title>Menu / Browse</title>
+      <g aria-hidden="true">
+        <rect x="614" y="492" width="72" height="32" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="650" y="512" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Menu / Browse</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--main-track" data-part="main-track" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Main / Track">
+      <title>Main / Track</title>
+      <g aria-hidden="true">
+        <rect x="693" y="492" width="72" height="32" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="729" y="512" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Main / Track</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--undo-redo" data-part="undo-redo" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Undo / Redo">
+      <title>Undo / Redo</title>
+      <g aria-hidden="true">
+        <rect x="772" y="492" width="72" height="32" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="808" y="512" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Undo / Redo</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--copy-delete" data-part="copy-delete" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Copy / Delete">
+      <title>Copy / Delete</title>
+      <g aria-hidden="true">
+        <rect x="851" y="492" width="72" height="32" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="887" y="512" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Copy / Delete</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--plus" data-part="plus" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Plus">
+      <title>Plus</title>
+      <g aria-hidden="true">
+        <rect x="930" y="492" width="72" height="32" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="966" y="512" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Plus</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--tap" data-part="tap" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Tap">
+      <title>Tap</title>
+      <g aria-hidden="true">
+        <rect x="535" y="552" width="62" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="566" y="573.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Tap</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--record" data-part="record" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Record">
+      <title>Record</title>
+      <g aria-hidden="true">
+        <rect x="603" y="552" width="62" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="634" y="573.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Record</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--overdub" data-part="overdub" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Overdub">
+      <title>Overdub</title>
+      <g aria-hidden="true">
+        <rect x="671" y="552" width="62" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="702" y="573.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Overdub</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--stop" data-part="stop" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Stop">
+      <title>Stop</title>
+      <g aria-hidden="true">
+        <rect x="739" y="552" width="62" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="770" y="573.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Stop</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--play" data-part="play" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Play">
+      <title>Play</title>
+      <g aria-hidden="true">
+        <rect x="807" y="552" width="62" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="838" y="573.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Play</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--play-start" data-part="play-start" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Play Start">
+      <title>Play Start</title>
+      <g aria-hidden="true">
+        <rect x="875" y="552" width="62" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="906" y="573.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Play Start</text>
+      </g>
+    </g>
+    <g id="akai-mpc-live-icon--minus" data-part="minus" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Minus">
+      <title>Minus</title>
+      <g aria-hidden="true">
+        <rect x="943" y="552" width="62" height="35" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="974" y="573.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Minus</text>
+      </g>
+    </g>
+  </g>
+</svg>

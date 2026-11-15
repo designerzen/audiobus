@@ -3,15 +3,17 @@
  *
  * Captures line-in audio from a Serato v2 control vinyl/CD signal,
  * estimates relative speed from the pilot tone in an AudioWorklet, and
- * dispatches CLOCK signal AudioCommands for synchronization.
+ * dispatches DVS_CLOCK AudioCommands for synchronization.
  *
- * This pilot-tone tracker generates relative clock ticks. It does not
- * decode absolute timecode position or determine rotation direction.
+ * Ticks are musical: 24 per beat of referenceBPM x speed, so the reported
+ * bpm is the track tempo. DVS_START / DVS_STOP bracket a run of ticks.
+ * This pilot-tone tracker does not decode absolute timecode position or
+ * determine rotation direction.
  */
 import AbstractInput from "./abstract-input.ts"
 import { loadCaptureWorklet } from "./load-capture-worklet.ts"
 import { createAudioCommand } from "../../commands/audio-command-factory.ts"
-import { DVS_CLOCK, MIDI_CLOCK } from "../../commands/commands.ts"
+import { DVS_CLOCK, DVS_START, DVS_STOP } from "../../commands/commands.ts"
 
 import type { IAudioInput } from "./input-interface.ts"
 import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
@@ -21,11 +23,11 @@ export const DVS_CONTROL_VINYL_INPUT_ID = "DVS Control Vinyl"
 // Serato v2 control vinyl pilot tone frequency
 const PILOT_FREQUENCY = 1000
 
-// Clock ticks per revolution (matching MIDI clock: 24 per quarter note)
-const TICKS_PER_REVOLUTION = 24
+// Track tempo at speed 1.0 (24 ticks per beat, matching MIDI clock)
+const REFERENCE_BPM = 120
 
-// Reference RPM for standard turntable
-const REFERENCE_RPM = 33.333
+// Stop the run when no tick has arrived for this long (seconds)
+const STOP_TIMEOUT = 0.5
 
 // Minimum signal amplitude to consider valid
 const MIN_SIGNAL_THRESHOLD = 0.01
@@ -36,11 +38,9 @@ const SPEED_SMOOTHING = 0.85
 const DEFAULT_OPTIONS = {
 	audioContext: undefined as AudioContext | undefined,
 	deviceId: undefined as string | undefined,
-	ticksPerRevolution: TICKS_PER_REVOLUTION,
-	referenceRPM: REFERENCE_RPM,
+	referenceBPM: REFERENCE_BPM,
 	minSignalThreshold: MIN_SIGNAL_THRESHOLD,
-	speedSmoothing: SPEED_SMOOTHING,
-	useMidiClock: false
+	speedSmoothing: SPEED_SMOOTHING
 }
 
 const WORKLET_PROCESSOR_CODE = `
@@ -50,8 +50,7 @@ class DvsDecoderProcessor extends AudioWorkletProcessor {
 		this._sampleRate = sampleRate
 		this._pilotFreq = options.processorOptions?.pilotFrequency || 1000
 		this._threshold = options.processorOptions?.threshold || 0.01
-		this._ticksPerRevolution = options.processorOptions?.ticksPerRevolution || 24
-		this._referenceRPM = options.processorOptions?.referenceRPM || 33.333
+		this._referenceBPM = options.processorOptions?.referenceBPM || 120
 		this._smoothing = options.processorOptions?.speedSmoothing ?? 0.85
 		
 		// State
@@ -90,6 +89,13 @@ class DvsDecoderProcessor extends AudioWorkletProcessor {
 		this._rmsSum = 0
 		this._rmsCount = 0
 		this._rmsWindowSize = 512
+		
+		this.port.onmessage = (event) => {
+			const bpm = event.data?.referenceBPM
+			if (event.data?.type === 'referenceBPM' && Number.isFinite(bpm) && bpm > 0) {
+				this._referenceBPM = bpm
+			}
+		}
 	}
 	
 	_filter(sample) {
@@ -154,13 +160,11 @@ class DvsDecoderProcessor extends AudioWorkletProcessor {
 					this._instantSpeed = instantFreq / this._pilotFreq
 					this._smoothedSpeed = this._smoothedSpeed * this._smoothing + this._instantSpeed * (1 - this._smoothing)
 					
-					// Accumulate phase
-					this._totalPhase += this._referenceRPM / (60 * this._pilotFreq)
+					// Accumulate ticks: 24 per beat of referenceBPM at speed 1.0
+					this._totalPhase += this._referenceBPM * 24 / (60 * this._pilotFreq)
 					
-					// Generate tick when phase accumulator reaches threshold
-					const phasePerTick = 1 / this._ticksPerRevolution
-					while (this._totalPhase >= phasePerTick) {
-						this._totalPhase -= phasePerTick
+					while (this._totalPhase >= 1) {
+						this._totalPhase -= 1
 						this._tickCounter++
 						
 						this.port.postMessage({
@@ -211,6 +215,15 @@ interface IDvsStats {
 	bpm: number
 }
 
+const emptyStats = (): IDvsStats => ({
+	signalLevel: 0,
+	hasSignal: false,
+	speed: 0,
+	direction: 0,
+	tickCount: 0,
+	bpm: 0
+})
+
 export default class InputDvsControlVinyl extends AbstractInput implements IAudioInput {
 	#mediaStream: MediaStream | null = null
 	#sourceNode: MediaStreamAudioSourceNode | null = null
@@ -218,14 +231,9 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 	#isListening: boolean = false
 	#tickCount: number = 0
 	#tickTimes: number[] = []
-	#stats: IDvsStats = {
-		signalLevel: 0,
-		hasSignal: false,
-		speed: 0,
-		direction: 0,
-		tickCount: 0,
-		bpm: 0
-	}
+	#running: boolean = false
+	#referenceBPM: number
+	#stats: IDvsStats = emptyStats()
 
 	get name(): string {
 		return DVS_CONTROL_VINYL_INPUT_ID
@@ -243,9 +251,25 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 		return { ...this.#stats }
 	}
 
+	get referenceBPM(): number {
+		return this.#referenceBPM
+	}
+
+	/** Track tempo at speed 1.0; takes effect immediately in the worklet */
+	setReferenceBPM(bpm: number): void {
+		if (!Number.isFinite(bpm) || bpm <= 0) {
+			throw new RangeError("referenceBPM must be positive and finite")
+		}
+		this.#referenceBPM = bpm
+		this.#workletNode?.port.postMessage({
+			type: "referenceBPM",
+			referenceBPM: bpm
+		})
+	}
+
 	constructor(options: Record<string, any> = DEFAULT_OPTIONS) {
 		super({ ...DEFAULT_OPTIONS, ...options })
-		for (const name of ["ticksPerRevolution", "referenceRPM", "minSignalThreshold"]) {
+		for (const name of ["referenceBPM", "minSignalThreshold"]) {
 			if (!Number.isFinite(this.options[name]) || this.options[name] <= 0) {
 				throw new RangeError(`${name} must be positive and finite`)
 			}
@@ -257,6 +281,7 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 		) {
 			throw new RangeError("speedSmoothing must be between 0 (inclusive) and 1 (exclusive)")
 		}
+		this.#referenceBPM = this.options.referenceBPM
 	}
 
 	hasAudioInput(): boolean {
@@ -296,8 +321,7 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 			processorOptions: {
 				pilotFrequency: PILOT_FREQUENCY,
 				threshold: this.options.minSignalThreshold,
-				ticksPerRevolution: this.options.ticksPerRevolution,
-				referenceRPM: this.options.referenceRPM,
+				referenceBPM: this.#referenceBPM,
 				speedSmoothing: this.options.speedSmoothing
 			}
 		})
@@ -338,14 +362,8 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 
 		this.#tickTimes = []
 		this.#tickCount = 0
-		this.#stats = {
-			signalLevel: 0,
-			hasSignal: false,
-			speed: 0,
-			direction: 0,
-			tickCount: 0,
-			bpm: 0
-		}
+		this.#running = false
+		this.#stats = emptyStats()
 		this.setAsDisconnected()
 		console.info("[DVS Control Vinyl] Disconnected")
 	}
@@ -363,6 +381,15 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 			this.#stats.speed = data.speed
 			this.#stats.direction = data.direction
 			this.#stats.tickCount = data.tickCount
+			const lastTick = this.#tickTimes.at(-1)
+			if (
+				this.#running &&
+				(!data.hasSignal ||
+					(lastTick !== undefined && data.timestamp - lastTick > STOP_TIMEOUT))
+			) {
+				this.#running = false
+				this.#dispatchCommand(DVS_STOP, data.timestamp)
+			}
 			if (!data.hasSignal) {
 				this.#tickTimes = []
 				this.#stats.bpm = 0
@@ -371,7 +398,6 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 	}
 
 	#handleTick(data: any): void {
-		const now = this.now
 		const direction = data.direction
 		const speed = data.speed
 
@@ -393,19 +419,32 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 			}
 		}
 
-		const commandType = this.options.useMidiClock ? MIDI_CLOCK : DVS_CLOCK
+		if (!this.#running) {
+			this.#running = true
+			this.#dispatchCommand(DVS_START, data.timestamp)
+		}
 
-		// Dispatch clock command
+		this.#dispatchCommand(DVS_CLOCK, data.timestamp, (command) => {
+			command.value = speed * 1000
+			command.bpm = this.#stats.bpm
+			command.velocity = Math.abs(direction) * 127
+			command.text = "direction unknown"
+		})
+	}
+
+	#dispatchCommand(
+		type: string,
+		audioTime: number,
+		configure?: (command: IAudioCommand) => void
+	): void {
 		const command: IAudioCommand = createAudioCommand(
-			commandType,
+			type,
 			this.#tickCount,
-			now,
+			this.now,
 			this.name
 		)
-		command.value = speed * 1000
-		command.bpm = this.#stats.bpm
-		command.velocity = Math.abs(direction) * 127
-		command.text = "direction unknown"
+		command.audioTime = audioTime
+		configure?.(command)
 		this.dispatch(command)
 	}
 

@@ -1,0 +1,744 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "roland-tr-08",
+	"name": "Roland TR-08",
+	"manufacturer": "Roland",
+	"manufacturerUrl": "https://www.roland.com/",
+	"productUrl": "https://www.roland.com/global/products/tr-08/",
+	"description": "Boutique TR-808-style rhythm composer.",
+	"ids": ["roland-tr-08"],
+	"portNames": ["TR-08", "TR-08 MIDI 1", "Roland TR-08"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Roland TR-08 owner manual",
+			"url": "https://static.roland.com/assets/media/pdf/TR-08_eng04_W.pdf"
+		},
+		{
+			"title": "Roland TR-08 MIDI implementation chart",
+			"url": "https://static.roland.com/assets/media/pdf/TR-08_MIDI_Imple_Chart_eng01_W.pdf"
+		}
+	],
+	"abilities": ["USB MIDI", "DIN MIDI IN/OUT", "MIDI notes", "Documented controller mappings"],
+	"hardwareControls": [
+		"Master: Volume, Tempo, Fine Value, Mode, Instrument Track, Auto Fill, Start Stop, Bank Tempo Shuffle, Clear, Trigger track, Tap, Menu Substep, Basic variation, Prescale, Fill variation, Accent",
+		"Bass Drum: Level, Tone, Decay",
+		"Snare: Level, Tone, Snappy",
+		"Low Tom Conga: Level, Tune, Voice",
+		"Mid Tom Conga: Level, Tune, Voice",
+		"High Tom Conga: Level, Tune, Voice",
+		"Claves Rim: Level, Voice",
+		"Maracas Clap: Level, Voice",
+		"Cowbell: Level",
+		"Cymbal: Level, Tone, Decay",
+		"Open Hat: Level, Decay",
+		"Closed Hat: Level"
+	],
+	"notice": "Use USB MIDI or a DIN MIDI interface. Match the MIDI channel and enable the required MIDI transmit/receive settings. Factory drum channel is 10. Note regions use the transmitted factory drum map. Shared level regions address their alternative voices; other front-panel buttons retain local sequencer functions.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "master-accent-knob",
+			"label": "Master: Accent",
+			"widget": "slider",
+			"cc": 71
+		},
+		{
+			"id": "bass-drum-level-knob",
+			"label": "Bass Drum: Level",
+			"widget": "slider",
+			"cc": 24
+		},
+		{
+			"id": "bass-drum-tone-knob",
+			"label": "Bass Drum: Tone",
+			"widget": "slider",
+			"cc": 21
+		},
+		{
+			"id": "bass-drum-decay-knob",
+			"label": "Bass Drum: Decay",
+			"widget": "slider",
+			"cc": 23
+		},
+		{
+			"id": "snare-level-knob",
+			"label": "Snare: Level",
+			"widget": "slider",
+			"cc": 29
+		},
+		{
+			"id": "snare-tone-knob",
+			"label": "Snare: Tone",
+			"widget": "slider",
+			"cc": 25
+		},
+		{
+			"id": "snare-snappy-knob",
+			"label": "Snare: Snappy",
+			"widget": "slider",
+			"cc": 26
+		},
+		{
+			"id": "low-tom-conga-level-knob",
+			"label": "Low Tom Conga: Level",
+			"widget": "slider",
+			"cc": 48
+		},
+		{
+			"id": "low-tom-conga-tune-knob",
+			"label": "Low Tom Conga: Tune",
+			"widget": "slider",
+			"cc": 46
+		},
+		{
+			"id": "mid-tom-conga-level-knob",
+			"label": "Mid Tom Conga: Level",
+			"widget": "slider",
+			"cc": 51
+		},
+		{
+			"id": "mid-tom-conga-tune-knob",
+			"label": "Mid Tom Conga: Tune",
+			"widget": "slider",
+			"cc": 49
+		},
+		{
+			"id": "high-tom-conga-level-knob",
+			"label": "High Tom Conga: Level",
+			"widget": "slider",
+			"cc": 54
+		},
+		{
+			"id": "high-tom-conga-tune-knob",
+			"label": "High Tom Conga: Tune",
+			"widget": "slider",
+			"cc": 52
+		},
+		{
+			"id": "claves-rim-level-knob",
+			"label": "Claves Rim: Level",
+			"widget": "slider",
+			"cc": 57
+		},
+		{
+			"id": "maracas-clap-level-knob",
+			"label": "Maracas Clap: Level",
+			"widget": "slider",
+			"cc": 60
+		},
+		{
+			"id": "cowbell-level-knob",
+			"label": "Cowbell: Level",
+			"widget": "slider",
+			"cc": 88
+		},
+		{
+			"id": "cymbal-level-knob",
+			"label": "Cymbal: Level",
+			"widget": "slider",
+			"cc": 85
+		},
+		{
+			"id": "cymbal-tone-knob",
+			"label": "Cymbal: Tone",
+			"widget": "slider",
+			"cc": 83
+		},
+		{
+			"id": "cymbal-decay-knob",
+			"label": "Cymbal: Decay",
+			"widget": "slider",
+			"cc": 84
+		},
+		{
+			"id": "open-hat-level-knob",
+			"label": "Open Hat: Level",
+			"widget": "slider",
+			"cc": 82
+		},
+		{
+			"id": "open-hat-decay-knob",
+			"label": "Open Hat: Decay",
+			"widget": "slider",
+			"cc": 81
+		},
+		{
+			"id": "closed-hat-level-knob",
+			"label": "Closed Hat: Level",
+			"widget": "slider",
+			"cc": 63
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Roland TR-08 overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 2272,
+		"height": 650,
+		"elements": [
+			{
+				"id": "master-accent-knob",
+				"label": "Accent",
+				"kind": "knob",
+				"position": {
+					"x": 14.172535211267606,
+					"y": 48.769230769230774,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "master-accent-knob"
+			},
+			{
+				"id": "bass-drum-level-knob",
+				"label": "Level",
+				"kind": "knob",
+				"position": {
+					"x": 27.772887323943664,
+					"y": 22.30769230769231,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "bass-drum-level-knob"
+			},
+			{
+				"id": "bass-drum-tone-knob",
+				"label": "Tone",
+				"kind": "knob",
+				"position": {
+					"x": 27.772887323943664,
+					"y": 35.53846153846154,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "bass-drum-tone-knob"
+			},
+			{
+				"id": "bass-drum-decay-knob",
+				"label": "Decay",
+				"kind": "knob",
+				"position": {
+					"x": 27.772887323943664,
+					"y": 48.769230769230774,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "bass-drum-decay-knob"
+			},
+			{
+				"id": "snare-level-knob",
+				"label": "Level",
+				"kind": "knob",
+				"position": {
+					"x": 34.28697183098591,
+					"y": 22.30769230769231,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "snare-level-knob"
+			},
+			{
+				"id": "snare-tone-knob",
+				"label": "Tone",
+				"kind": "knob",
+				"position": {
+					"x": 34.28697183098591,
+					"y": 35.53846153846154,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "snare-tone-knob"
+			},
+			{
+				"id": "snare-snappy-knob",
+				"label": "Snappy",
+				"kind": "knob",
+				"position": {
+					"x": 34.28697183098591,
+					"y": 48.769230769230774,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "snare-snappy-knob"
+			},
+			{
+				"id": "low-tom-conga-level-knob",
+				"label": "Level",
+				"kind": "knob",
+				"position": {
+					"x": 40.80105633802817,
+					"y": 22.30769230769231,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "low-tom-conga-level-knob"
+			},
+			{
+				"id": "low-tom-conga-tune-knob",
+				"label": "Tune",
+				"kind": "knob",
+				"position": {
+					"x": 40.80105633802817,
+					"y": 35.53846153846154,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "low-tom-conga-tune-knob"
+			},
+			{
+				"id": "mid-tom-conga-level-knob",
+				"label": "Level",
+				"kind": "knob",
+				"position": {
+					"x": 47.315140845070424,
+					"y": 22.30769230769231,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "mid-tom-conga-level-knob"
+			},
+			{
+				"id": "mid-tom-conga-tune-knob",
+				"label": "Tune",
+				"kind": "knob",
+				"position": {
+					"x": 47.315140845070424,
+					"y": 35.53846153846154,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "mid-tom-conga-tune-knob"
+			},
+			{
+				"id": "high-tom-conga-level-knob",
+				"label": "Level",
+				"kind": "knob",
+				"position": {
+					"x": 53.82922535211267,
+					"y": 22.30769230769231,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "high-tom-conga-level-knob"
+			},
+			{
+				"id": "high-tom-conga-tune-knob",
+				"label": "Tune",
+				"kind": "knob",
+				"position": {
+					"x": 53.82922535211267,
+					"y": 35.53846153846154,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "high-tom-conga-tune-knob"
+			},
+			{
+				"id": "claves-rim-level-knob",
+				"label": "Level",
+				"kind": "knob",
+				"position": {
+					"x": 60.34330985915493,
+					"y": 22.30769230769231,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "claves-rim-level-knob"
+			},
+			{
+				"id": "maracas-clap-level-knob",
+				"label": "Level",
+				"kind": "knob",
+				"position": {
+					"x": 66.85739436619718,
+					"y": 22.30769230769231,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "maracas-clap-level-knob"
+			},
+			{
+				"id": "cowbell-level-knob",
+				"label": "Level",
+				"kind": "knob",
+				"position": {
+					"x": 73.37147887323944,
+					"y": 22.30769230769231,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "cowbell-level-knob"
+			},
+			{
+				"id": "cymbal-level-knob",
+				"label": "Level",
+				"kind": "knob",
+				"position": {
+					"x": 79.88556338028168,
+					"y": 22.30769230769231,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "cymbal-level-knob"
+			},
+			{
+				"id": "cymbal-tone-knob",
+				"label": "Tone",
+				"kind": "knob",
+				"position": {
+					"x": 79.88556338028168,
+					"y": 35.53846153846154,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "cymbal-tone-knob"
+			},
+			{
+				"id": "cymbal-decay-knob",
+				"label": "Decay",
+				"kind": "knob",
+				"position": {
+					"x": 79.88556338028168,
+					"y": 48.769230769230774,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "cymbal-decay-knob"
+			},
+			{
+				"id": "open-hat-level-knob",
+				"label": "Level",
+				"kind": "knob",
+				"position": {
+					"x": 86.39964788732394,
+					"y": 22.30769230769231,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "open-hat-level-knob"
+			},
+			{
+				"id": "open-hat-decay-knob",
+				"label": "Decay",
+				"kind": "knob",
+				"position": {
+					"x": 86.39964788732394,
+					"y": 35.53846153846154,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "open-hat-decay-knob"
+			},
+			{
+				"id": "closed-hat-level-knob",
+				"label": "Level",
+				"kind": "knob",
+				"position": {
+					"x": 92.9137323943662,
+					"y": 22.30769230769231,
+					"width": 3.345070422535211,
+					"height": 7.6923076923076925
+				},
+				"control": "closed-hat-level-knob"
+			},
+			{
+				"id": "key-1",
+				"label": "Kick",
+				"kind": "key",
+				"position": {
+					"x": 1.1003521126760563,
+					"y": 82.76923076923077,
+					"width": 5.892385563380282,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 36,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-2",
+				"label": "Snare",
+				"kind": "key",
+				"position": {
+					"x": 7.21280809859155,
+					"y": 82.76923076923077,
+					"width": 5.892385563380282,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 38,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-3",
+				"label": "Low tom",
+				"kind": "key",
+				"position": {
+					"x": 13.325264084507044,
+					"y": 82.76923076923077,
+					"width": 5.892385563380282,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 43,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-4",
+				"label": "Mid tom",
+				"kind": "key",
+				"position": {
+					"x": 19.437720070422536,
+					"y": 82.76923076923077,
+					"width": 5.892385563380282,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 47,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-5",
+				"label": "High tom",
+				"kind": "key",
+				"position": {
+					"x": 25.55017605633803,
+					"y": 82.76923076923077,
+					"width": 5.892385563380282,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 50,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-6",
+				"label": "Rim",
+				"kind": "key",
+				"position": {
+					"x": 31.66263204225352,
+					"y": 82.76923076923077,
+					"width": 5.892385563380282,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 37,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-7",
+				"label": "Clap",
+				"kind": "key",
+				"position": {
+					"x": 37.775088028169016,
+					"y": 82.76923076923077,
+					"width": 5.892385563380282,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 39,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-8",
+				"label": "Closed hat",
+				"kind": "key",
+				"position": {
+					"x": 43.887544014084504,
+					"y": 82.76923076923077,
+					"width": 5.892385563380282,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 42,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-9",
+				"label": "Open hat",
+				"kind": "key",
+				"position": {
+					"x": 50.0,
+					"y": 82.76923076923077,
+					"width": 5.892385563380282,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 46,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-10",
+				"label": "Cymbal",
+				"kind": "key",
+				"position": {
+					"x": 56.11245598591549,
+					"y": 82.76923076923077,
+					"width": 5.892385563380282,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 49,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-11",
+				"label": "Cowbell",
+				"kind": "key",
+				"position": {
+					"x": 62.224911971830984,
+					"y": 82.76923076923077,
+					"width": 5.892385563380282,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 56,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-12",
+				"label": "Hi conga",
+				"kind": "key",
+				"position": {
+					"x": 68.33736795774648,
+					"y": 82.76923076923077,
+					"width": 5.892385563380282,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 62,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-13",
+				"label": "Mid conga",
+				"kind": "key",
+				"position": {
+					"x": 74.44982394366197,
+					"y": 82.76923076923077,
+					"width": 5.892385563380282,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 63,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-14",
+				"label": "Low conga",
+				"kind": "key",
+				"position": {
+					"x": 80.56227992957746,
+					"y": 82.76923076923077,
+					"width": 5.892385563380282,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 64,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-15",
+				"label": "Maracas",
+				"kind": "key",
+				"position": {
+					"x": 86.67473591549296,
+					"y": 82.76923076923077,
+					"width": 5.892385563380282,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 70,
+					"channel": 10
+				},
+				"learnable": true
+			},
+			{
+				"id": "key-16",
+				"label": "Claves",
+				"kind": "key",
+				"position": {
+					"x": 92.78719190140845,
+					"y": 82.76923076923077,
+					"width": 5.892385563380282,
+					"height": 11.538461538461538
+				},
+				"message": {
+					"type": "note",
+					"number": 75,
+					"channel": 10
+				},
+				"learnable": true
+			}
+		]
+	}
+}

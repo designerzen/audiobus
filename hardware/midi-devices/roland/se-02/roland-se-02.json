@@ -1,0 +1,922 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "roland-se-02",
+	"name": "Roland SE-02",
+	"manufacturer": "Roland",
+	"manufacturerUrl": "https://www.roland.com/",
+	"productUrl": "https://www.roland.com/global/products/se-02/",
+	"description": "Three-oscillator analog Boutique synthesizer designed with Studio Electronics.",
+	"ids": ["roland-se-02"],
+	"portNames": ["SE-02", "SE-02 MIDI 1", "Roland SE-02"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Roland SE-02 owner manual",
+			"url": "https://static.roland.com/assets/media/pdf/SE-02_eng02_W.pdf"
+		},
+		{
+			"title": "Roland SE-02 MIDI implementation chart",
+			"url": "https://static.roland.com/assets/media/pdf/SE-02_MIDI_Imple_Chart_eng01_W.pdf"
+		}
+	],
+	"abilities": ["USB MIDI", "DIN MIDI IN/OUT", "MIDI notes", "Documented controller mappings"],
+	"hardwareControls": [
+		"Control: Glide, Glide type, Wheel mix",
+		"VCO 1: Range, Tune, Waveform",
+		"VCO 2: Range, Fine, Waveform",
+		"VCO 3: Range, Fine, Waveform, Sync, Env depth, Keyboard, Xmod wheel",
+		"Xmod: Osc 2 filter, Osc 3 to 2, Osc 3 PWM",
+		"Mixer: Osc 1, Osc 2, Osc 3, Feedback, Noise",
+		"Filter: Cutoff, Emphasis, Key track 1 3, Key track 2 3, Contour, Multiple trigger, Polarity",
+		"Filter Envelope: Attack, Decay, Sustain",
+		"Amp Envelope: Attack, Decay, Sustain, Release, LFO Gate",
+		"LFO: Rate, Osc depth, Wave, Filter depth, Wheel, Mode, Sync",
+		"Delay: Time, Regen, Amount",
+		"Sequencer: Value, Mode, Manual, Play, Stop, Step 1, Step 2, Step 3, Step 4, Step 5, Step 6, Step 7, Step 8, Step 9, Step 10, Step 11, Step 12, Step 13, Step 14, Step 15, Step 16"
+	],
+	"notice": "Use USB MIDI or a DIN MIDI interface. Match the MIDI channel and enable the required MIDI transmit/receive settings. SE-02 panel controls send their own documented CC numbers; this is not a generic SH/JUNO mapping.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "control-glide-knob",
+			"label": "Control: Glide",
+			"widget": "slider",
+			"cc": 5
+		},
+		{
+			"id": "control-glide-type-switch",
+			"label": "Control: Glide type",
+			"widget": "slider",
+			"cc": 9
+		},
+		{
+			"id": "control-wheel-mix-knob",
+			"label": "Control: Wheel mix",
+			"widget": "slider",
+			"cc": 13
+		},
+		{
+			"id": "vco-1-range-knob",
+			"label": "VCO 1: Range",
+			"widget": "slider",
+			"cc": 22
+		},
+		{
+			"id": "vco-1-tune-knob",
+			"label": "VCO 1: Tune",
+			"widget": "slider",
+			"cc": 27
+		},
+		{
+			"id": "vco-1-waveform-knob",
+			"label": "VCO 1: Waveform",
+			"widget": "slider",
+			"cc": 24
+		},
+		{
+			"id": "vco-2-range-knob",
+			"label": "VCO 2: Range",
+			"widget": "slider",
+			"cc": 19
+		},
+		{
+			"id": "vco-2-fine-knob",
+			"label": "VCO 2: Fine",
+			"widget": "slider",
+			"cc": 28
+		},
+		{
+			"id": "vco-2-waveform-knob",
+			"label": "VCO 2: Waveform",
+			"widget": "slider",
+			"cc": 20
+		},
+		{
+			"id": "vco-3-range-knob",
+			"label": "VCO 3: Range",
+			"widget": "slider",
+			"cc": 25
+		},
+		{
+			"id": "vco-3-waveform-knob",
+			"label": "VCO 3: Waveform",
+			"widget": "slider",
+			"cc": 26
+		},
+		{
+			"id": "vco-3-sync-switch",
+			"label": "VCO 3: Sync",
+			"widget": "slider",
+			"cc": 21
+		},
+		{
+			"id": "vco-3-env-depth-knob",
+			"label": "VCO 3: Env depth",
+			"widget": "slider",
+			"cc": 29
+		},
+		{
+			"id": "vco-3-keyboard-switch",
+			"label": "VCO 3: Keyboard",
+			"widget": "slider",
+			"cc": 30
+		},
+		{
+			"id": "vco-3-xmod-wheel-switch",
+			"label": "VCO 3: Xmod wheel",
+			"widget": "slider",
+			"cc": 31
+		},
+		{
+			"id": "xmod-osc-2-filter-knob",
+			"label": "Xmod: Osc 2 filter",
+			"widget": "slider",
+			"cc": 16
+		},
+		{
+			"id": "xmod-osc-3-to-2-knob",
+			"label": "Xmod: Osc 3 to 2",
+			"widget": "slider",
+			"cc": 17
+		},
+		{
+			"id": "xmod-osc-3-pwm-knob",
+			"label": "Xmod: Osc 3 PWM",
+			"widget": "slider",
+			"cc": 18
+		},
+		{
+			"id": "mixer-osc-1-knob",
+			"label": "Mixer: Osc 1",
+			"widget": "slider",
+			"cc": 48
+		},
+		{
+			"id": "mixer-osc-2-knob",
+			"label": "Mixer: Osc 2",
+			"widget": "slider",
+			"cc": 49
+		},
+		{
+			"id": "mixer-osc-3-knob",
+			"label": "Mixer: Osc 3",
+			"widget": "slider",
+			"cc": 50
+		},
+		{
+			"id": "mixer-feedback-knob",
+			"label": "Mixer: Feedback",
+			"widget": "slider",
+			"cc": 51
+		},
+		{
+			"id": "mixer-noise-knob",
+			"label": "Mixer: Noise",
+			"widget": "slider",
+			"cc": 41
+		},
+		{
+			"id": "filter-cutoff-knob",
+			"label": "Filter: Cutoff",
+			"widget": "slider",
+			"cc": 74
+		},
+		{
+			"id": "filter-emphasis-knob",
+			"label": "Filter: Emphasis",
+			"widget": "slider",
+			"cc": 71
+		},
+		{
+			"id": "filter-key-track-1-3-switch",
+			"label": "Filter: Key track 1 3",
+			"widget": "slider",
+			"cc": 57
+		},
+		{
+			"id": "filter-key-track-2-3-switch",
+			"label": "Filter: Key track 2 3",
+			"widget": "slider",
+			"cc": 58
+		},
+		{
+			"id": "filter-contour-knob",
+			"label": "Filter: Contour",
+			"widget": "slider",
+			"cc": 59
+		},
+		{
+			"id": "filter-multiple-trigger-switch",
+			"label": "Filter: Multiple trigger",
+			"widget": "slider",
+			"cc": 60
+		},
+		{
+			"id": "filter-polarity-switch",
+			"label": "Filter: Polarity",
+			"widget": "slider",
+			"cc": 61
+		},
+		{
+			"id": "filter-envelope-attack-knob",
+			"label": "Filter Envelope: Attack",
+			"widget": "slider",
+			"cc": 47
+		},
+		{
+			"id": "filter-envelope-decay-knob",
+			"label": "Filter Envelope: Decay",
+			"widget": "slider",
+			"cc": 52
+		},
+		{
+			"id": "filter-envelope-sustain-knob",
+			"label": "Filter Envelope: Sustain",
+			"widget": "slider",
+			"cc": 53
+		},
+		{
+			"id": "amp-envelope-attack-knob",
+			"label": "Amp Envelope: Attack",
+			"widget": "slider",
+			"cc": 73
+		},
+		{
+			"id": "amp-envelope-decay-knob",
+			"label": "Amp Envelope: Decay",
+			"widget": "slider",
+			"cc": 75
+		},
+		{
+			"id": "amp-envelope-sustain-knob",
+			"label": "Amp Envelope: Sustain",
+			"widget": "slider",
+			"cc": 56
+		},
+		{
+			"id": "amp-envelope-release-switch",
+			"label": "Amp Envelope: Release",
+			"widget": "slider",
+			"cc": 62
+		},
+		{
+			"id": "amp-envelope-lfo-gate-switch",
+			"label": "Amp Envelope: LFO Gate",
+			"widget": "slider",
+			"cc": 63
+		},
+		{
+			"id": "lfo-rate-knob",
+			"label": "LFO: Rate",
+			"widget": "slider",
+			"cc": 102
+		},
+		{
+			"id": "lfo-osc-depth-knob",
+			"label": "LFO: Osc depth",
+			"widget": "slider",
+			"cc": 103
+		},
+		{
+			"id": "lfo-wave-knob",
+			"label": "LFO: Wave",
+			"widget": "slider",
+			"cc": 104
+		},
+		{
+			"id": "lfo-filter-depth-knob",
+			"label": "LFO: Filter depth",
+			"widget": "slider",
+			"cc": 105
+		},
+		{
+			"id": "lfo-mode-switch",
+			"label": "LFO: Mode",
+			"widget": "slider",
+			"cc": 108
+		},
+		{
+			"id": "lfo-sync-switch",
+			"label": "LFO: Sync",
+			"widget": "slider",
+			"cc": 109
+		},
+		{
+			"id": "delay-time-knob",
+			"label": "Delay: Time",
+			"widget": "slider",
+			"cc": 82
+		},
+		{
+			"id": "delay-regen-knob",
+			"label": "Delay: Regen",
+			"widget": "slider",
+			"cc": 83
+		},
+		{
+			"id": "delay-amount-knob",
+			"label": "Delay: Amount",
+			"widget": "slider",
+			"cc": 91
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Roland SE-02 overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 2982,
+		"height": 540,
+		"elements": [
+			{
+				"id": "control-glide-knob",
+				"label": "Glide",
+				"kind": "knob",
+				"position": {
+					"x": 1.2407780013413816,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "control-glide-knob"
+			},
+			{
+				"id": "control-glide-type-switch",
+				"label": "Glide type",
+				"kind": "fader",
+				"position": {
+					"x": 1.2407780013413816,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "control-glide-type-switch"
+			},
+			{
+				"id": "control-wheel-mix-knob",
+				"label": "Wheel mix",
+				"kind": "knob",
+				"position": {
+					"x": 1.2407780013413816,
+					"y": 58.7037037037037,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "control-wheel-mix-knob"
+			},
+			{
+				"id": "vco-1-range-knob",
+				"label": "Range",
+				"kind": "knob",
+				"position": {
+					"x": 6.203890006706908,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "vco-1-range-knob"
+			},
+			{
+				"id": "vco-1-tune-knob",
+				"label": "Tune",
+				"kind": "knob",
+				"position": {
+					"x": 6.203890006706908,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "vco-1-tune-knob"
+			},
+			{
+				"id": "vco-1-waveform-knob",
+				"label": "Waveform",
+				"kind": "knob",
+				"position": {
+					"x": 6.203890006706908,
+					"y": 58.7037037037037,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "vco-1-waveform-knob"
+			},
+			{
+				"id": "vco-2-range-knob",
+				"label": "Range",
+				"kind": "knob",
+				"position": {
+					"x": 11.167002012072434,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "vco-2-range-knob"
+			},
+			{
+				"id": "vco-2-fine-knob",
+				"label": "Fine",
+				"kind": "knob",
+				"position": {
+					"x": 11.167002012072434,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "vco-2-fine-knob"
+			},
+			{
+				"id": "vco-2-waveform-knob",
+				"label": "Waveform",
+				"kind": "knob",
+				"position": {
+					"x": 11.167002012072434,
+					"y": 58.7037037037037,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "vco-2-waveform-knob"
+			},
+			{
+				"id": "vco-3-range-knob",
+				"label": "Range",
+				"kind": "knob",
+				"position": {
+					"x": 16.13011401743796,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "vco-3-range-knob"
+			},
+			{
+				"id": "vco-3-waveform-knob",
+				"label": "Waveform",
+				"kind": "knob",
+				"position": {
+					"x": 22.50167672702884,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "vco-3-waveform-knob"
+			},
+			{
+				"id": "vco-3-sync-switch",
+				"label": "Sync",
+				"kind": "fader",
+				"position": {
+					"x": 16.13011401743796,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "vco-3-sync-switch"
+			},
+			{
+				"id": "vco-3-env-depth-knob",
+				"label": "Env depth",
+				"kind": "knob",
+				"position": {
+					"x": 19.3158953722334,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "vco-3-env-depth-knob"
+			},
+			{
+				"id": "vco-3-keyboard-switch",
+				"label": "Keyboard",
+				"kind": "fader",
+				"position": {
+					"x": 22.50167672702884,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "vco-3-keyboard-switch"
+			},
+			{
+				"id": "vco-3-xmod-wheel-switch",
+				"label": "Xmod wheel",
+				"kind": "fader",
+				"position": {
+					"x": 16.13011401743796,
+					"y": 58.7037037037037,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "vco-3-xmod-wheel-switch"
+			},
+			{
+				"id": "xmod-osc-2-filter-knob",
+				"label": "Osc 2 filter",
+				"kind": "knob",
+				"position": {
+					"x": 26.492287055667337,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "xmod-osc-2-filter-knob"
+			},
+			{
+				"id": "xmod-osc-3-to-2-knob",
+				"label": "Osc 3 to 2",
+				"kind": "knob",
+				"position": {
+					"x": 26.492287055667337,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "xmod-osc-3-to-2-knob"
+			},
+			{
+				"id": "xmod-osc-3-pwm-knob",
+				"label": "Osc 3 PWM",
+				"kind": "knob",
+				"position": {
+					"x": 26.492287055667337,
+					"y": 58.7037037037037,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "xmod-osc-3-pwm-knob"
+			},
+			{
+				"id": "mixer-osc-1-knob",
+				"label": "Osc 1",
+				"kind": "knob",
+				"position": {
+					"x": 31.455399061032864,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "mixer-osc-1-knob"
+			},
+			{
+				"id": "mixer-osc-2-knob",
+				"label": "Osc 2",
+				"kind": "knob",
+				"position": {
+					"x": 34.6411804158283,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "mixer-osc-2-knob"
+			},
+			{
+				"id": "mixer-osc-3-knob",
+				"label": "Osc 3",
+				"kind": "knob",
+				"position": {
+					"x": 31.455399061032864,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "mixer-osc-3-knob"
+			},
+			{
+				"id": "mixer-feedback-knob",
+				"label": "Feedback",
+				"kind": "knob",
+				"position": {
+					"x": 34.6411804158283,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "mixer-feedback-knob"
+			},
+			{
+				"id": "mixer-noise-knob",
+				"label": "Noise",
+				"kind": "knob",
+				"position": {
+					"x": 31.455399061032864,
+					"y": 58.7037037037037,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "mixer-noise-knob"
+			},
+			{
+				"id": "filter-cutoff-knob",
+				"label": "Cutoff",
+				"kind": "knob",
+				"position": {
+					"x": 38.6317907444668,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "filter-cutoff-knob"
+			},
+			{
+				"id": "filter-emphasis-knob",
+				"label": "Emphasis",
+				"kind": "knob",
+				"position": {
+					"x": 41.81757209926224,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "filter-emphasis-knob"
+			},
+			{
+				"id": "filter-key-track-1-3-switch",
+				"label": "Key track 1 3",
+				"kind": "fader",
+				"position": {
+					"x": 45.00335345405768,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "filter-key-track-1-3-switch"
+			},
+			{
+				"id": "filter-key-track-2-3-switch",
+				"label": "Key track 2 3",
+				"kind": "fader",
+				"position": {
+					"x": 38.6317907444668,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "filter-key-track-2-3-switch"
+			},
+			{
+				"id": "filter-contour-knob",
+				"label": "Contour",
+				"kind": "knob",
+				"position": {
+					"x": 41.81757209926224,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "filter-contour-knob"
+			},
+			{
+				"id": "filter-multiple-trigger-switch",
+				"label": "Multiple trigger",
+				"kind": "fader",
+				"position": {
+					"x": 45.00335345405768,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "filter-multiple-trigger-switch"
+			},
+			{
+				"id": "filter-polarity-switch",
+				"label": "Polarity",
+				"kind": "fader",
+				"position": {
+					"x": 38.6317907444668,
+					"y": 58.7037037037037,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "filter-polarity-switch"
+			},
+			{
+				"id": "filter-envelope-attack-knob",
+				"label": "Attack",
+				"kind": "knob",
+				"position": {
+					"x": 48.99396378269618,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "filter-envelope-attack-knob"
+			},
+			{
+				"id": "filter-envelope-decay-knob",
+				"label": "Decay",
+				"kind": "knob",
+				"position": {
+					"x": 48.99396378269618,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "filter-envelope-decay-knob"
+			},
+			{
+				"id": "filter-envelope-sustain-knob",
+				"label": "Sustain",
+				"kind": "knob",
+				"position": {
+					"x": 48.99396378269618,
+					"y": 58.7037037037037,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "filter-envelope-sustain-knob"
+			},
+			{
+				"id": "amp-envelope-attack-knob",
+				"label": "Attack",
+				"kind": "knob",
+				"position": {
+					"x": 53.9570757880617,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "amp-envelope-attack-knob"
+			},
+			{
+				"id": "amp-envelope-decay-knob",
+				"label": "Decay",
+				"kind": "knob",
+				"position": {
+					"x": 57.14285714285714,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "amp-envelope-decay-knob"
+			},
+			{
+				"id": "amp-envelope-sustain-knob",
+				"label": "Sustain",
+				"kind": "knob",
+				"position": {
+					"x": 53.9570757880617,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "amp-envelope-sustain-knob"
+			},
+			{
+				"id": "amp-envelope-release-switch",
+				"label": "Release",
+				"kind": "fader",
+				"position": {
+					"x": 57.14285714285714,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "amp-envelope-release-switch"
+			},
+			{
+				"id": "amp-envelope-lfo-gate-switch",
+				"label": "LFO Gate",
+				"kind": "fader",
+				"position": {
+					"x": 53.9570757880617,
+					"y": 58.7037037037037,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "amp-envelope-lfo-gate-switch"
+			},
+			{
+				"id": "lfo-rate-knob",
+				"label": "Rate",
+				"kind": "knob",
+				"position": {
+					"x": 61.13346747149564,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "lfo-rate-knob"
+			},
+			{
+				"id": "lfo-osc-depth-knob",
+				"label": "Osc depth",
+				"kind": "knob",
+				"position": {
+					"x": 64.31924882629107,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "lfo-osc-depth-knob"
+			},
+			{
+				"id": "lfo-wave-knob",
+				"label": "Wave",
+				"kind": "knob",
+				"position": {
+					"x": 67.50503018108652,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "lfo-wave-knob"
+			},
+			{
+				"id": "lfo-filter-depth-knob",
+				"label": "Filter depth",
+				"kind": "knob",
+				"position": {
+					"x": 61.13346747149564,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "lfo-filter-depth-knob"
+			},
+			{
+				"id": "lfo-mode-switch",
+				"label": "Mode",
+				"kind": "fader",
+				"position": {
+					"x": 67.50503018108652,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "lfo-mode-switch"
+			},
+			{
+				"id": "lfo-sync-switch",
+				"label": "Sync",
+				"kind": "fader",
+				"position": {
+					"x": 61.13346747149564,
+					"y": 58.7037037037037,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "lfo-sync-switch"
+			},
+			{
+				"id": "delay-time-knob",
+				"label": "Time",
+				"kind": "knob",
+				"position": {
+					"x": 71.495640509725,
+					"y": 26.851851851851855,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "delay-time-knob"
+			},
+			{
+				"id": "delay-regen-knob",
+				"label": "Regen",
+				"kind": "knob",
+				"position": {
+					"x": 71.495640509725,
+					"y": 42.77777777777778,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "delay-regen-knob"
+			},
+			{
+				"id": "delay-amount-knob",
+				"label": "Amount",
+				"kind": "knob",
+				"position": {
+					"x": 71.495640509725,
+					"y": 58.7037037037037,
+					"width": 2.5486250838363516,
+					"height": 9.25925925925926
+				},
+				"control": "delay-amount-knob"
+			}
+		]
+	}
+}

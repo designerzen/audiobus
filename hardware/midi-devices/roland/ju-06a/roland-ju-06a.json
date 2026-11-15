@@ -1,0 +1,418 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "roland-ju-06a",
+	"name": "Roland JU-06A",
+	"manufacturer": "Roland",
+	"manufacturerUrl": "https://www.roland.com/",
+	"productUrl": "https://www.roland.com/global/products/ju-06a/",
+	"description": "JUNO-60/JUNO-106 Boutique synthesizer with arpeggiator.",
+	"ids": ["roland-ju-06a"],
+	"portNames": ["JU-06A", "JU-06A MIDI 1", "Roland JU-06A"],
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Roland JU-06A owner manual",
+			"url": "https://static.roland.com/assets/media/pdf/JU-06A_eng02_W.pdf"
+		},
+		{
+			"title": "Roland JU-06A MIDI implementation chart",
+			"url": "https://static.roland.com/assets/media/pdf/JU-06A_MIDIImpleChart_multi02_W.pdf"
+		}
+	],
+	"abilities": ["USB MIDI", "DIN MIDI IN/OUT", "MIDI notes", "Documented controller mappings"],
+	"hardwareControls": [
+		"Performance: Volume, Sound mode 60 106, Manual",
+		"LFO: Rate, Delay",
+		"DCO: 16 foot, 8 foot, 4 foot, LFO, PWM, PWM source, Square, Saw, Sub, Noise",
+		"HPF: Cutoff",
+		"VCF: Cutoff, Resonance, Polarity, Envelope, LFO, Key follow",
+		"VCA: Envelope Gate, Level",
+		"Envelope: Attack, Decay, Sustain, Release",
+		"Chorus: Chorus I, Chorus II",
+		"Keyboard: Hold, Chord, Note",
+		"Arpeggio: On Off, Mode, Range, Rate",
+		"Sequencer: Start, Edit, Value, Note Gate",
+		"Memory: Bank 1, Bank 2, Bank 3, Bank 4, Patch 1, Patch 2, Patch 3, Patch 4, Patch 5, Patch 6, Patch 7, Patch 8"
+	],
+	"notice": "Use USB MIDI or a DIN MIDI interface. Match the MIDI channel and enable the required MIDI transmit/receive settings. JU-06A normal instrument mode; its control-surface mode uses different CC numbers. The model is distinct from JU-06.  GUI controls generate MIDI into the chain; route that chain to a MIDI output to control the hardware. DIN devices normally appear under the MIDI interface name, so select the profile manually. Unmapped physical buttons and switches have stable SVG IDs for future bindings. Positions are schematic. Note surfaces use virtual defaults; use MIDI learn to match the hardware octave or configuration.",
+	"controls": [
+		{
+			"id": "lfo-rate-fader",
+			"label": "LFO: Rate",
+			"widget": "slider",
+			"cc": 3
+		},
+		{
+			"id": "lfo-delay-fader",
+			"label": "LFO: Delay",
+			"widget": "slider",
+			"cc": 9
+		},
+		{
+			"id": "dco-lfo-fader",
+			"label": "DCO: LFO",
+			"widget": "slider",
+			"cc": 13
+		},
+		{
+			"id": "dco-pwm-fader",
+			"label": "DCO: PWM",
+			"widget": "slider",
+			"cc": 14
+		},
+		{
+			"id": "dco-pwm-source-switch",
+			"label": "DCO: PWM source",
+			"widget": "slider",
+			"cc": 15
+		},
+		{
+			"id": "dco-sub-fader",
+			"label": "DCO: Sub",
+			"widget": "slider",
+			"cc": 18
+		},
+		{
+			"id": "dco-noise-fader",
+			"label": "DCO: Noise",
+			"widget": "slider",
+			"cc": 19
+		},
+		{
+			"id": "hpf-cutoff-fader",
+			"label": "HPF: Cutoff",
+			"widget": "slider",
+			"cc": 20
+		},
+		{
+			"id": "vcf-cutoff-fader",
+			"label": "VCF: Cutoff",
+			"widget": "slider",
+			"cc": 74
+		},
+		{
+			"id": "vcf-resonance-fader",
+			"label": "VCF: Resonance",
+			"widget": "slider",
+			"cc": 71
+		},
+		{
+			"id": "vcf-polarity-switch",
+			"label": "VCF: Polarity",
+			"widget": "slider",
+			"cc": 21
+		},
+		{
+			"id": "vcf-envelope-fader",
+			"label": "VCF: Envelope",
+			"widget": "slider",
+			"cc": 22
+		},
+		{
+			"id": "vcf-lfo-fader",
+			"label": "VCF: LFO",
+			"widget": "slider",
+			"cc": 23
+		},
+		{
+			"id": "vcf-key-follow-fader",
+			"label": "VCF: Key follow",
+			"widget": "slider",
+			"cc": 24
+		},
+		{
+			"id": "vca-envelope-gate-switch",
+			"label": "VCA: Envelope Gate",
+			"widget": "slider",
+			"cc": 25
+		},
+		{
+			"id": "vca-level-fader",
+			"label": "VCA: Level",
+			"widget": "slider",
+			"cc": 26
+		},
+		{
+			"id": "envelope-attack-fader",
+			"label": "Envelope: Attack",
+			"widget": "slider",
+			"cc": 73
+		},
+		{
+			"id": "envelope-decay-fader",
+			"label": "Envelope: Decay",
+			"widget": "slider",
+			"cc": 75
+		},
+		{
+			"id": "envelope-release-fader",
+			"label": "Envelope: Release",
+			"widget": "slider",
+			"cc": 72
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Roland JU-06A overhead wireframe diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "controls"
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and MIDI documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 2602,
+		"height": 540,
+		"elements": [
+			{
+				"id": "lfo-rate-fader",
+				"label": "Rate",
+				"kind": "fader",
+				"position": {
+					"x": 7.109915449654112,
+					"y": 26.851851851851855,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "lfo-rate-fader"
+			},
+			{
+				"id": "lfo-delay-fader",
+				"label": "Delay",
+				"kind": "fader",
+				"position": {
+					"x": 7.109915449654112,
+					"y": 42.77777777777778,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "lfo-delay-fader"
+			},
+			{
+				"id": "dco-lfo-fader",
+				"label": "LFO",
+				"kind": "fader",
+				"position": {
+					"x": 23.750960799385087,
+					"y": 26.851851851851855,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "dco-lfo-fader"
+			},
+			{
+				"id": "dco-pwm-fader",
+				"label": "PWM",
+				"kind": "fader",
+				"position": {
+					"x": 12.797847809377402,
+					"y": 42.77777777777778,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "dco-pwm-fader"
+			},
+			{
+				"id": "dco-pwm-source-switch",
+				"label": "PWM source",
+				"kind": "fader",
+				"position": {
+					"x": 16.448885472713297,
+					"y": 42.77777777777778,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "dco-pwm-source-switch"
+			},
+			{
+				"id": "dco-sub-fader",
+				"label": "Sub",
+				"kind": "fader",
+				"position": {
+					"x": 12.797847809377402,
+					"y": 58.7037037037037,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "dco-sub-fader"
+			},
+			{
+				"id": "dco-noise-fader",
+				"label": "Noise",
+				"kind": "fader",
+				"position": {
+					"x": 16.448885472713297,
+					"y": 58.7037037037037,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "dco-noise-fader"
+			},
+			{
+				"id": "hpf-cutoff-fader",
+				"label": "Cutoff",
+				"kind": "fader",
+				"position": {
+					"x": 28.324365872405842,
+					"y": 26.851851851851855,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "hpf-cutoff-fader"
+			},
+			{
+				"id": "vcf-cutoff-fader",
+				"label": "Cutoff",
+				"kind": "fader",
+				"position": {
+					"x": 34.012298232129126,
+					"y": 26.851851851851855,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "vcf-cutoff-fader"
+			},
+			{
+				"id": "vcf-resonance-fader",
+				"label": "Resonance",
+				"kind": "fader",
+				"position": {
+					"x": 37.663335895465025,
+					"y": 26.851851851851855,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "vcf-resonance-fader"
+			},
+			{
+				"id": "vcf-polarity-switch",
+				"label": "Polarity",
+				"kind": "fader",
+				"position": {
+					"x": 34.012298232129126,
+					"y": 42.77777777777778,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "vcf-polarity-switch"
+			},
+			{
+				"id": "vcf-envelope-fader",
+				"label": "Envelope",
+				"kind": "fader",
+				"position": {
+					"x": 37.663335895465025,
+					"y": 42.77777777777778,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "vcf-envelope-fader"
+			},
+			{
+				"id": "vcf-lfo-fader",
+				"label": "LFO",
+				"kind": "fader",
+				"position": {
+					"x": 34.012298232129126,
+					"y": 58.7037037037037,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "vcf-lfo-fader"
+			},
+			{
+				"id": "vcf-key-follow-fader",
+				"label": "Key follow",
+				"kind": "fader",
+				"position": {
+					"x": 37.663335895465025,
+					"y": 58.7037037037037,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "vcf-key-follow-fader"
+			},
+			{
+				"id": "vca-envelope-gate-switch",
+				"label": "Envelope Gate",
+				"kind": "fader",
+				"position": {
+					"x": 42.23674096848578,
+					"y": 26.851851851851855,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "vca-envelope-gate-switch"
+			},
+			{
+				"id": "vca-level-fader",
+				"label": "Level",
+				"kind": "fader",
+				"position": {
+					"x": 42.23674096848578,
+					"y": 42.77777777777778,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "vca-level-fader"
+			},
+			{
+				"id": "envelope-attack-fader",
+				"label": "Attack",
+				"kind": "fader",
+				"position": {
+					"x": 47.924673328209074,
+					"y": 26.851851851851855,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-attack-fader"
+			},
+			{
+				"id": "envelope-decay-fader",
+				"label": "Decay",
+				"kind": "fader",
+				"position": {
+					"x": 51.575710991544966,
+					"y": 26.851851851851855,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-decay-fader"
+			},
+			{
+				"id": "envelope-release-fader",
+				"label": "Release",
+				"kind": "fader",
+				"position": {
+					"x": 51.575710991544966,
+					"y": 42.77777777777778,
+					"width": 2.9208301306687163,
+					"height": 9.25925925925926
+				},
+				"control": "envelope-release-fader"
+			}
+		]
+	}
+}

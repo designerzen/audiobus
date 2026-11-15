@@ -20,7 +20,7 @@ class RomplerProcessor extends AudioWorkletProcessor {
 	receive(data) {
 		switch (data.type) {
 			case "sample":
-				this.samples.set(data.note, data.channels)
+				this.samples.set(data.note, data)
 				this.keys = [...this.samples.keys()]
 				for (const [id, held] of this.waiting) {
 					this.waiting.delete(id)
@@ -79,10 +79,14 @@ class RomplerProcessor extends AudioWorkletProcessor {
 		if (this.voices.length >= MAX_VOICES) {
 			this.voices.shift()
 		}
+		const { channels, loopStart, loopEnd } = this.samples.get(key)
 		this.voices.push({
 			channel,
 			note,
-			channels: this.samples.get(key),
+			channels,
+			// Looped voices sound until released; one-shots stop at their last frame
+			loopStart: loopEnd ? loopStart : -1,
+			loopEnd: loopEnd ?? channels[0].length - 1,
 			position: 0,
 			rate: 2 ** ((note - key) / 12),
 			gain: velocity * velocity,
@@ -105,15 +109,19 @@ class RomplerProcessor extends AudioWorkletProcessor {
 		for (const voice of this.voices) {
 			const l = voice.channels[0],
 				r = voice.channels[1] ?? l,
-				last = l.length - 1
+				looped = voice.loopStart >= 0,
+				span = voice.loopEnd - voice.loopStart
 			const rate = voice.rate * 2 ** (this.bends[voice.channel] / 12)
 			const gain = voice.gain * this.gains[voice.channel] * SCALE
 			for (let frame = 0; frame < left.length; frame++) {
-				const index = voice.position | 0
-				if (index >= last) {
-					voice.done = true
-					break
+				if (voice.position >= voice.loopEnd) {
+					if (!looped) {
+						voice.done = true
+						break
+					}
+					voice.position -= span
 				}
+				const index = voice.position | 0
 				if (voice.releasing) {
 					voice.level -= fall
 					if (voice.level <= 0) {
@@ -123,10 +131,12 @@ class RomplerProcessor extends AudioWorkletProcessor {
 				} else if (voice.level < 1) {
 					voice.level = Math.min(1, voice.level + rise)
 				}
-				const fraction = voice.position - index,
+				// The frame after a loop's last is its first
+				const next = index + 1 < l.length ? index + 1 : voice.loopStart,
+					fraction = voice.position - index,
 					amount = gain * voice.level
-				left[frame] += (l[index] + (l[index + 1] - l[index]) * fraction) * amount
-				right[frame] += (r[index] + (r[index + 1] - r[index]) * fraction) * amount
+				left[frame] += (l[index] + (l[next] - l[index]) * fraction) * amount
+				right[frame] += (r[index] + (r[next] - r[index]) * fraction) * amount
 				voice.position += rate
 			}
 		}

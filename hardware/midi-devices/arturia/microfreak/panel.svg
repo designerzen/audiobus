@@ -1,0 +1,705 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" role="group" aria-labelledby="arturia-microfreak-panel--title" aria-describedby="arturia-microfreak-panel--description" data-device="arturia-microfreak" style="background: #fff; color: #334155;" data-diagram-style="wireframe">
+  <title id="arturia-microfreak-panel--title">Arturia MicroFreak overhead hardware diagram</title>
+  <desc id="arturia-microfreak-panel--description">Wireframe top-down schematic; positions are approximate. Each physical control has a stable device-prefixed ID and data-part name. Buttons in this standalone drawing are disabled until a host adds input handlers. Transparent regions marked data-surface-control correspond to the profile MIDI hit areas; multiple regions can share one context-dependent physical control.</desc>
+  <style>text { font-family: Arial, sans-serif; } .section-label { font-size: 11px; letter-spacing: 1px; } [data-part]:focus-visible { outline: 3px solid currentColor; }</style>
+  <g id="arturia-microfreak-panel--chassis" aria-hidden="true">
+    <rect x="3" y="3" width="1194" height="614" rx="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="22" y="28" fill="currentColor" font-size="19" stroke="none">Arturia MicroFreak</text>
+    <text x="25" y="52" class="section-label" fill="currentColor" stroke="none">MATRIX</text>
+    <circle cx="35" cy="72" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="60" cy="72" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="85" cy="72" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="110" cy="72" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="135" cy="72" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="160" cy="72" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="185" cy="72" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="35" cy="84" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="60" cy="84" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="85" cy="84" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="110" cy="84" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="135" cy="84" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="160" cy="84" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="185" cy="84" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="35" cy="96" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="60" cy="96" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="85" cy="96" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="110" cy="96" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="135" cy="96" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="160" cy="96" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="185" cy="96" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="35" cy="108" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="60" cy="108" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="85" cy="108" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="110" cy="108" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="135" cy="108" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="160" cy="108" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="185" cy="108" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="35" cy="120" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="60" cy="120" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="85" cy="120" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="110" cy="120" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="135" cy="120" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="160" cy="120" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="185" cy="120" r="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+  <g id="arturia-microfreak-panel--controls" role="group" aria-label="Top panel controls">
+    <g id="arturia-microfreak-panel--matrix-assign-1" data-part="matrix-assign-1" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Assign 1">
+      <title>Assign 1</title>
+      <g aria-hidden="true">
+        <rect x="105" y="35" width="34" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="122" y="48" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Assign 1</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--matrix-assign-2" data-part="matrix-assign-2" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Assign 2">
+      <title>Assign 2</title>
+      <g aria-hidden="true">
+        <rect x="145" y="35" width="34" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="162" y="48" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Assign 2</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--matrix-assign-3" data-part="matrix-assign-3" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Assign 3">
+      <title>Assign 3</title>
+      <g aria-hidden="true">
+        <rect x="185" y="35" width="34" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="202" y="48" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Assign 3</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--matrix" data-part="matrix" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Matrix">
+      <title>Matrix</title>
+      <g aria-hidden="true">
+        <circle cx="260" cy="95" r="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 260 76 v 13.440000000000001" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="260" y="133" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Matrix</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--paraphonic" data-part="paraphonic" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Paraphonic">
+      <title>Paraphonic</title>
+      <g aria-hidden="true">
+        <rect x="310" y="78" width="78" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="349" y="97" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Paraphonic</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--panel" data-part="panel" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Panel">
+      <title>Panel</title>
+      <g aria-hidden="true">
+        <rect x="405" y="78" width="60" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="435" y="97" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Panel</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--display" data-part="display" data-kind="display" role="group" aria-roledescription="display" aria-label="Preset display">
+      <title>Preset display</title>
+      <g aria-hidden="true">
+        <rect x="500" y="62" width="120" height="55" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="560" y="93.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Preset display</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--preset" data-part="preset" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Preset / Enter">
+      <title>Preset / Enter</title>
+      <g aria-hidden="true">
+        <circle cx="665" cy="90" r="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 665 71 v 13.440000000000001" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="665" y="128" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Preset / Enter</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--save" data-part="save" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Save">
+      <title>Save</title>
+      <g aria-hidden="true">
+        <rect x="720" y="78" width="55" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="747.5" y="97" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Save</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--utility" data-part="utility" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Utility">
+      <title>Utility</title>
+      <g aria-hidden="true">
+        <rect x="790" y="78" width="55" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="817.5" y="97" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Utility</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--master-volume" data-part="master-volume" data-kind="knob" role="group" aria-roledescription="rotary control" aria-label="Volume">
+      <title>Volume</title>
+      <g aria-hidden="true">
+        <circle cx="1125" cy="90" r="26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1125 69 v 14.560000000000002" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1125" y="130" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Volume</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--glide" data-part="glide" data-kind="knob" data-surface-controls="glide" role="group" aria-roledescription="rotary control" aria-label="Glide">
+      <title>Glide</title>
+      <g aria-hidden="true">
+        <circle cx="50" cy="197" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 50 180 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="50" y="233" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Glide</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--glide" data-surface-control="glide" aria-hidden="true">
+        <rect x="28" y="175" width="44" height="44" fill="none" pointer-events="all" data-hit-area="glide" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--oscillator-type" data-part="oscillator-type" data-kind="knob" data-surface-controls="oscillator-type" role="group" aria-roledescription="rotary control" aria-label="Type">
+      <title>Type</title>
+      <g aria-hidden="true">
+        <circle cx="160" cy="197" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 160 180 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="160" y="233" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Type</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--oscillator-type" data-surface-control="oscillator-type" aria-hidden="true">
+        <rect x="138" y="175" width="44" height="44" fill="none" pointer-events="all" data-hit-area="oscillator-type" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--oscillator-wave" data-part="oscillator-wave" data-kind="knob" data-surface-controls="oscillator-wave" role="group" aria-roledescription="rotary control" aria-label="Wave">
+      <title>Wave</title>
+      <g aria-hidden="true">
+        <circle cx="260" cy="197" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 260 180 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="260" y="233" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Wave</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--oscillator-wave" data-surface-control="oscillator-wave" aria-hidden="true">
+        <rect x="238" y="175" width="44" height="44" fill="none" pointer-events="all" data-hit-area="oscillator-wave" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--oscillator-timbre" data-part="oscillator-timbre" data-kind="knob" data-surface-controls="oscillator-timbre" role="group" aria-roledescription="rotary control" aria-label="Timbre">
+      <title>Timbre</title>
+      <g aria-hidden="true">
+        <circle cx="360" cy="197" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 360 180 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="360" y="233" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Timbre</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--oscillator-timbre" data-surface-control="oscillator-timbre" aria-hidden="true">
+        <rect x="338" y="175" width="44" height="44" fill="none" pointer-events="all" data-hit-area="oscillator-timbre" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--oscillator-shape" data-part="oscillator-shape" data-kind="knob" data-surface-controls="oscillator-shape" role="group" aria-roledescription="rotary control" aria-label="Shape">
+      <title>Shape</title>
+      <g aria-hidden="true">
+        <circle cx="460" cy="197" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 460 180 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="460" y="233" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Shape</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--oscillator-shape" data-surface-control="oscillator-shape" aria-hidden="true">
+        <rect x="438" y="175" width="44" height="44" fill="none" pointer-events="all" data-hit-area="oscillator-shape" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--filter-cutoff" data-part="filter-cutoff" data-kind="knob" data-surface-controls="filter-cutoff" role="group" aria-roledescription="rotary control" aria-label="Cutoff">
+      <title>Cutoff</title>
+      <g aria-hidden="true">
+        <circle cx="610" cy="197" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 610 180 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="610" y="233" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Cutoff</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--filter-cutoff" data-surface-control="filter-cutoff" aria-hidden="true">
+        <rect x="588" y="175" width="44" height="44" fill="none" pointer-events="all" data-hit-area="filter-cutoff" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--filter-resonance" data-part="filter-resonance" data-kind="knob" data-surface-controls="filter-resonance" role="group" aria-roledescription="rotary control" aria-label="Resonance">
+      <title>Resonance</title>
+      <g aria-hidden="true">
+        <circle cx="710" cy="197" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 710 180 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="710" y="233" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Resonance</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--filter-resonance" data-surface-control="filter-resonance" aria-hidden="true">
+        <rect x="688" y="175" width="44" height="44" fill="none" pointer-events="all" data-hit-area="filter-resonance" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--cycling-rise" data-part="cycling-rise" data-kind="knob" data-surface-controls="cycling-envelope-rise" role="group" aria-roledescription="rotary control" aria-label="Rise">
+      <title>Rise</title>
+      <g aria-hidden="true">
+        <circle cx="850" cy="197" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 850 180 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="850" y="233" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Rise</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--cycling-envelope-rise" data-surface-control="cycling-envelope-rise" aria-hidden="true">
+        <rect x="828" y="175" width="44" height="44" fill="none" pointer-events="all" data-hit-area="cycling-envelope-rise" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--cycling-fall" data-part="cycling-fall" data-kind="knob" data-surface-controls="cycling-envelope-fall" role="group" aria-roledescription="rotary control" aria-label="Fall">
+      <title>Fall</title>
+      <g aria-hidden="true">
+        <circle cx="950" cy="197" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 950 180 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="950" y="233" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Fall</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--cycling-envelope-fall" data-surface-control="cycling-envelope-fall" aria-hidden="true">
+        <rect x="928" y="175" width="44" height="44" fill="none" pointer-events="all" data-hit-area="cycling-envelope-fall" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--cycling-hold" data-part="cycling-hold" data-kind="knob" data-surface-controls="cycling-envelope-hold" role="group" aria-roledescription="rotary control" aria-label="Hold">
+      <title>Hold</title>
+      <g aria-hidden="true">
+        <circle cx="1050" cy="197" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1050 180 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1050" y="233" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Hold</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--cycling-envelope-hold" data-surface-control="cycling-envelope-hold" aria-hidden="true">
+        <rect x="1028" y="175" width="44" height="44" fill="none" pointer-events="all" data-hit-area="cycling-envelope-hold" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--cycling-amount" data-part="cycling-amount" data-kind="knob" data-surface-controls="cycling-envelope-amount" role="group" aria-roledescription="rotary control" aria-label="Amount">
+      <title>Amount</title>
+      <g aria-hidden="true">
+        <circle cx="1150" cy="197" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1150 180 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1150" y="233" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Amount</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--cycling-envelope-amount" data-surface-control="cycling-envelope-amount" aria-hidden="true">
+        <rect x="1128" y="175" width="44" height="44" fill="none" pointer-events="all" data-hit-area="cycling-envelope-amount" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--filter-mode" data-part="filter-mode" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Filter mode">
+      <title>Filter mode</title>
+      <g aria-hidden="true">
+        <rect x="650" y="242" width="75" height="24" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="687.5" y="258" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Filter mode</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--cycling-mode" data-part="cycling-mode" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Cycle mode">
+      <title>Cycle mode</title>
+      <g aria-hidden="true">
+        <rect x="1000" y="242" width="90" height="24" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1045" y="258" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Cycle mode</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--octave-down" data-part="octave-down" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Oct down">
+      <title>Oct down</title>
+      <g aria-hidden="true">
+        <rect x="25" y="310" width="70" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="60" y="329" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Oct down</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--octave-up" data-part="octave-up" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Oct up">
+      <title>Oct up</title>
+      <g aria-hidden="true">
+        <rect x="110" y="310" width="70" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="145" y="329" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Oct up</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--shift" data-part="shift" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Shift">
+      <title>Shift</title>
+      <g aria-hidden="true">
+        <rect x="195" y="310" width="65" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="227.5" y="329" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Shift</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--arp-seq" data-part="arp-seq" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Arp / Seq">
+      <title>Arp / Seq</title>
+      <g aria-hidden="true">
+        <rect x="285" y="310" width="80" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="325" y="329" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Arp / Seq</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--oct-mod" data-part="oct-mod" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Oct / Mod">
+      <title>Oct / Mod</title>
+      <g aria-hidden="true">
+        <rect x="385" y="310" width="80" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="425" y="329" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Oct / Mod</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--arp-seq-rate" data-part="arp-seq-rate" data-kind="knob" data-surface-controls="arp-seq-rate-free arp-seq-rate-sync" role="group" aria-roledescription="rotary control" aria-label="Arp/Seq rate">
+      <title>Arp/Seq rate</title>
+      <g aria-hidden="true">
+        <circle cx="510" cy="320" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 510 303 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="510" y="356" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Arp/Seq rate</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--arp-seq-rate-free" data-surface-control="arp-seq-rate-free" aria-hidden="true">
+        <rect x="488" y="298" width="22" height="44" fill="none" pointer-events="all" data-hit-area="arp-seq-rate-free" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+      <g id="arturia-microfreak-panel--surface--arp-seq-rate-sync" data-surface-control="arp-seq-rate-sync" aria-hidden="true">
+        <rect x="510" y="298" width="22" height="44" fill="none" pointer-events="all" data-hit-area="arp-seq-rate-sync" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--lfo-shape" data-part="lfo-shape" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="LFO shape">
+      <title>LFO shape</title>
+      <g aria-hidden="true">
+        <rect x="560" y="310" width="80" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="600" y="329" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">LFO shape</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--lfo-rate" data-part="lfo-rate" data-kind="knob" data-surface-controls="lfo-rate-free lfo-rate-sync" role="group" aria-roledescription="rotary control" aria-label="LFO rate">
+      <title>LFO rate</title>
+      <g aria-hidden="true">
+        <circle cx="685" cy="320" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 685 303 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="685" y="356" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">LFO rate</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--lfo-rate-free" data-surface-control="lfo-rate-free" aria-hidden="true">
+        <rect x="663" y="298" width="22" height="44" fill="none" pointer-events="all" data-hit-area="lfo-rate-free" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+      <g id="arturia-microfreak-panel--surface--lfo-rate-sync" data-surface-control="lfo-rate-sync" aria-hidden="true">
+        <rect x="685" y="298" width="22" height="44" fill="none" pointer-events="all" data-hit-area="lfo-rate-sync" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--env-attack" data-part="env-attack" data-kind="knob" data-surface-controls="envelope-attack" role="group" aria-roledescription="rotary control" aria-label="Attack">
+      <title>Attack</title>
+      <g aria-hidden="true">
+        <circle cx="795" cy="320" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 795 303 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="795" y="356" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Attack</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--envelope-attack" data-surface-control="envelope-attack" aria-hidden="true">
+        <rect x="773" y="298" width="44" height="44" fill="none" pointer-events="all" data-hit-area="envelope-attack" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--env-decay" data-part="env-decay" data-kind="knob" data-surface-controls="envelope-decay" role="group" aria-roledescription="rotary control" aria-label="Decay / Release">
+      <title>Decay / Release</title>
+      <g aria-hidden="true">
+        <circle cx="900" cy="320" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 900 303 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="900" y="356" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Decay / Release</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--envelope-decay" data-surface-control="envelope-decay" aria-hidden="true">
+        <rect x="878" y="298" width="44" height="44" fill="none" pointer-events="all" data-hit-area="envelope-decay" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--env-sustain" data-part="env-sustain" data-kind="knob" data-surface-controls="envelope-sustain" role="group" aria-roledescription="rotary control" aria-label="Sustain">
+      <title>Sustain</title>
+      <g aria-hidden="true">
+        <circle cx="1005" cy="320" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1005 303 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1005" y="356" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Sustain</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--envelope-sustain" data-surface-control="envelope-sustain" aria-hidden="true">
+        <rect x="983" y="298" width="44" height="44" fill="none" pointer-events="all" data-hit-area="envelope-sustain" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--env-filter" data-part="env-filter" data-kind="knob" data-surface-controls="filter-envelope-amount" role="group" aria-roledescription="rotary control" aria-label="Filter amount">
+      <title>Filter amount</title>
+      <g aria-hidden="true">
+        <circle cx="1110" cy="320" r="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 1110 303 v 12.32" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1110" y="356" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">Filter amount</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--filter-envelope-amount" data-surface-control="filter-envelope-amount" aria-hidden="true">
+        <rect x="1088" y="298" width="44" height="44" fill="none" pointer-events="all" data-hit-area="filter-envelope-amount" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--amp-mod" data-part="amp-mod" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Amp Mod">
+      <title>Amp Mod</title>
+      <g aria-hidden="true">
+        <rect x="1040" y="370" width="90" height="24" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1085" y="386" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Amp Mod</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--touch-up-a" data-part="touch-up-a" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Up / A">
+      <title>Up / A</title>
+      <g aria-hidden="true">
+        <rect x="125.0" y="405.0" width="85" height="25" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="167.5" y="421.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Up / A</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--touch-order-b" data-part="touch-order-b" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Order / B">
+      <title>Order / B</title>
+      <g aria-hidden="true">
+        <rect x="225.0" y="405.0" width="85" height="25" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="267.5" y="421.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Order / B</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--touch-random" data-part="touch-random" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Random">
+      <title>Random</title>
+      <g aria-hidden="true">
+        <rect x="325.0" y="405.0" width="85" height="25" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="367.5" y="421.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Random</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--touch-hold" data-part="touch-hold" data-kind="button" data-surface-controls="hold" role="button" aria-disabled="true" tabindex="-1" aria-label="Hold">
+      <title>Hold</title>
+      <g aria-hidden="true">
+        <rect x="25.0" y="405.0" width="85" height="25" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="67.5" y="421.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Hold</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--hold" data-surface-control="hold" aria-hidden="true">
+        <rect x="25.0" y="405.0" width="85" height="25" fill="none" pointer-events="all" data-hit-area="hold" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--touch-pattern" data-part="touch-pattern" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Pattern">
+      <title>Pattern</title>
+      <g aria-hidden="true">
+        <rect x="425.0" y="405.0" width="85" height="25" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="467.5" y="421.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Pattern</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--bend-mode" data-part="bend-mode" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Bend">
+      <title>Bend</title>
+      <g aria-hidden="true">
+        <rect x="725.0" y="405.0" width="70" height="25" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="760.0" y="421.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Bend</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--spice-mode" data-part="spice-mode" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Spice">
+      <title>Spice</title>
+      <g aria-hidden="true">
+        <rect x="525.0" y="405.0" width="70" height="25" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="560.0" y="421.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Spice</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--dice-mode" data-part="dice-mode" data-kind="button" role="button" aria-disabled="true" tabindex="-1" aria-label="Dice">
+      <title>Dice</title>
+      <g aria-hidden="true">
+        <rect x="625.0" y="405.0" width="70" height="25" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="660.0" y="421.5" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Dice</text>
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--expression-strip" data-part="expression-strip" data-kind="touch" data-surface-controls="pitch-bend spice" role="group" aria-roledescription="touch strip" aria-label="Bend / Spice / Dice">
+      <title>Bend / Spice / Dice</title>
+      <g aria-hidden="true">
+        <rect x="825.0" y="403.0" width="350" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1000" y="421.0" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">Bend / Spice / Dice</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--pitch-bend" data-surface-control="pitch-bend" aria-hidden="true">
+        <rect x="825" y="403.0" width="175" height="28" fill="none" pointer-events="all" data-hit-area="pitch-bend" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+      <g id="arturia-microfreak-panel--surface--spice" data-surface-control="spice" aria-hidden="true">
+        <rect x="1000" y="403.0" width="175" height="28" fill="none" pointer-events="all" data-hit-area="spice" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-0" data-part="key-0" data-kind="key" data-surface-controls="key-0" role="button" aria-disabled="true" tabindex="-1" aria-label="C 3">
+      <title>C 3</title>
+      <g aria-hidden="true">
+        <rect x="25" y="465" width="74.36666666666667" height="130" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="62.18333333333334" y="534" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">C</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-0" data-surface-control="key-0" aria-hidden="true">
+        <rect x="25" y="465" width="74.36666666666667" height="130" fill="none" pointer-events="all" data-hit-area="key-0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-2" data-part="key-2" data-kind="key" data-surface-controls="key-2" role="button" aria-disabled="true" tabindex="-1" aria-label="D 3">
+      <title>D 3</title>
+      <g aria-hidden="true">
+        <rect x="101.66666666666667" y="465" width="74.36666666666667" height="130" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="138.85000000000002" y="534" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">D</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-2" data-surface-control="key-2" aria-hidden="true">
+        <rect x="101.66666666666667" y="465" width="74.36666666666667" height="130" fill="none" pointer-events="all" data-hit-area="key-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-4" data-part="key-4" data-kind="key" data-surface-controls="key-4" role="button" aria-disabled="true" tabindex="-1" aria-label="E 3">
+      <title>E 3</title>
+      <g aria-hidden="true">
+        <rect x="178.33333333333334" y="465" width="74.36666666666667" height="130" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="215.51666666666668" y="534" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">E</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-4" data-surface-control="key-4" aria-hidden="true">
+        <rect x="178.33333333333334" y="465" width="74.36666666666667" height="130" fill="none" pointer-events="all" data-hit-area="key-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-5" data-part="key-5" data-kind="key" data-surface-controls="key-5" role="button" aria-disabled="true" tabindex="-1" aria-label="F 3">
+      <title>F 3</title>
+      <g aria-hidden="true">
+        <rect x="255" y="465" width="74.36666666666667" height="130" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="292.18333333333334" y="534" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">F</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-5" data-surface-control="key-5" aria-hidden="true">
+        <rect x="255" y="465" width="74.36666666666667" height="130" fill="none" pointer-events="all" data-hit-area="key-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-7" data-part="key-7" data-kind="key" data-surface-controls="key-7" role="button" aria-disabled="true" tabindex="-1" aria-label="G 3">
+      <title>G 3</title>
+      <g aria-hidden="true">
+        <rect x="331.6666666666667" y="465" width="74.36666666666667" height="130" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="368.85" y="534" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">G</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-7" data-surface-control="key-7" aria-hidden="true">
+        <rect x="331.6666666666667" y="465" width="74.36666666666667" height="130" fill="none" pointer-events="all" data-hit-area="key-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-9" data-part="key-9" data-kind="key" data-surface-controls="key-9" role="button" aria-disabled="true" tabindex="-1" aria-label="A 3">
+      <title>A 3</title>
+      <g aria-hidden="true">
+        <rect x="408.33333333333337" y="465" width="74.36666666666667" height="130" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="445.5166666666667" y="534" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">A</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-9" data-surface-control="key-9" aria-hidden="true">
+        <rect x="408.33333333333337" y="465" width="74.36666666666667" height="130" fill="none" pointer-events="all" data-hit-area="key-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-11" data-part="key-11" data-kind="key" data-surface-controls="key-11" role="button" aria-disabled="true" tabindex="-1" aria-label="B 3">
+      <title>B 3</title>
+      <g aria-hidden="true">
+        <rect x="485" y="465" width="74.36666666666667" height="130" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="522.1833333333334" y="534" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">B</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-11" data-surface-control="key-11" aria-hidden="true">
+        <rect x="485" y="465" width="74.36666666666667" height="130" fill="none" pointer-events="all" data-hit-area="key-11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-12" data-part="key-12" data-kind="key" data-surface-controls="key-12" role="button" aria-disabled="true" tabindex="-1" aria-label="C 4">
+      <title>C 4</title>
+      <g aria-hidden="true">
+        <rect x="561.6666666666667" y="465" width="74.36666666666667" height="130" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="598.8500000000001" y="534" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">C</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-12" data-surface-control="key-12" aria-hidden="true">
+        <rect x="561.6666666666667" y="465" width="74.36666666666667" height="130" fill="none" pointer-events="all" data-hit-area="key-12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-14" data-part="key-14" data-kind="key" data-surface-controls="key-14" role="button" aria-disabled="true" tabindex="-1" aria-label="D 4">
+      <title>D 4</title>
+      <g aria-hidden="true">
+        <rect x="638.3333333333334" y="465" width="74.36666666666667" height="130" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="675.5166666666667" y="534" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">D</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-14" data-surface-control="key-14" aria-hidden="true">
+        <rect x="638.3333333333334" y="465" width="74.36666666666667" height="130" fill="none" pointer-events="all" data-hit-area="key-14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-16" data-part="key-16" data-kind="key" data-surface-controls="key-16" role="button" aria-disabled="true" tabindex="-1" aria-label="E 4">
+      <title>E 4</title>
+      <g aria-hidden="true">
+        <rect x="715" y="465" width="74.36666666666667" height="130" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="752.1833333333334" y="534" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">E</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-16" data-surface-control="key-16" aria-hidden="true">
+        <rect x="715" y="465" width="74.36666666666667" height="130" fill="none" pointer-events="all" data-hit-area="key-16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-17" data-part="key-17" data-kind="key" data-surface-controls="key-17" role="button" aria-disabled="true" tabindex="-1" aria-label="F 4">
+      <title>F 4</title>
+      <g aria-hidden="true">
+        <rect x="791.6666666666667" y="465" width="74.36666666666667" height="130" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="828.8500000000001" y="534" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">F</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-17" data-surface-control="key-17" aria-hidden="true">
+        <rect x="791.6666666666667" y="465" width="74.36666666666667" height="130" fill="none" pointer-events="all" data-hit-area="key-17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-19" data-part="key-19" data-kind="key" data-surface-controls="key-19" role="button" aria-disabled="true" tabindex="-1" aria-label="G 4">
+      <title>G 4</title>
+      <g aria-hidden="true">
+        <rect x="868.3333333333334" y="465" width="74.36666666666667" height="130" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="905.5166666666667" y="534" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">G</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-19" data-surface-control="key-19" aria-hidden="true">
+        <rect x="868.3333333333334" y="465" width="74.36666666666667" height="130" fill="none" pointer-events="all" data-hit-area="key-19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-21" data-part="key-21" data-kind="key" data-surface-controls="key-21" role="button" aria-disabled="true" tabindex="-1" aria-label="A 4">
+      <title>A 4</title>
+      <g aria-hidden="true">
+        <rect x="945" y="465" width="74.36666666666667" height="130" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="982.1833333333334" y="534" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">A</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-21" data-surface-control="key-21" aria-hidden="true">
+        <rect x="945" y="465" width="74.36666666666667" height="130" fill="none" pointer-events="all" data-hit-area="key-21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-23" data-part="key-23" data-kind="key" data-surface-controls="key-23" role="button" aria-disabled="true" tabindex="-1" aria-label="B 4">
+      <title>B 4</title>
+      <g aria-hidden="true">
+        <rect x="1021.6666666666667" y="465" width="74.36666666666667" height="130" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1058.8500000000001" y="534" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">B</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-23" data-surface-control="key-23" aria-hidden="true">
+        <rect x="1021.6666666666667" y="465" width="74.36666666666667" height="130" fill="none" pointer-events="all" data-hit-area="key-23" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-24" data-part="key-24" data-kind="key" data-surface-controls="key-24" role="button" aria-disabled="true" tabindex="-1" aria-label="C 5">
+      <title>C 5</title>
+      <g aria-hidden="true">
+        <rect x="1098.3333333333335" y="465" width="74.36666666666667" height="130" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1135.5166666666669" y="534" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">C</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-24" data-surface-control="key-24" aria-hidden="true">
+        <rect x="1098.3333333333335" y="465" width="74.36666666666667" height="130" fill="none" pointer-events="all" data-hit-area="key-24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-1" data-part="key-1" data-kind="key" data-surface-controls="key-1" role="button" aria-disabled="true" tabindex="-1" aria-label="C sharp 3">
+      <title>C sharp 3</title>
+      <g aria-hidden="true">
+        <rect x="78.66666666666666" y="465" width="46" height="79.3" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="101.66666666666666" y="508.65" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">C#</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-1" data-surface-control="key-1" aria-hidden="true">
+        <rect x="78.66666666666666" y="465" width="46" height="79.3" fill="none" pointer-events="all" data-hit-area="key-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-3" data-part="key-3" data-kind="key" data-surface-controls="key-3" role="button" aria-disabled="true" tabindex="-1" aria-label="D sharp 3">
+      <title>D sharp 3</title>
+      <g aria-hidden="true">
+        <rect x="155.33333333333334" y="465" width="46" height="79.3" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="178.33333333333334" y="508.65" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">D#</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-3" data-surface-control="key-3" aria-hidden="true">
+        <rect x="155.33333333333334" y="465" width="46" height="79.3" fill="none" pointer-events="all" data-hit-area="key-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-6" data-part="key-6" data-kind="key" data-surface-controls="key-6" role="button" aria-disabled="true" tabindex="-1" aria-label="F sharp 3">
+      <title>F sharp 3</title>
+      <g aria-hidden="true">
+        <rect x="308.6666666666667" y="465" width="46" height="79.3" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="331.6666666666667" y="508.65" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">F#</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-6" data-surface-control="key-6" aria-hidden="true">
+        <rect x="308.6666666666667" y="465" width="46" height="79.3" fill="none" pointer-events="all" data-hit-area="key-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-8" data-part="key-8" data-kind="key" data-surface-controls="key-8" role="button" aria-disabled="true" tabindex="-1" aria-label="G sharp 3">
+      <title>G sharp 3</title>
+      <g aria-hidden="true">
+        <rect x="385.33333333333337" y="465" width="46" height="79.3" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="408.33333333333337" y="508.65" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">G#</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-8" data-surface-control="key-8" aria-hidden="true">
+        <rect x="385.33333333333337" y="465" width="46" height="79.3" fill="none" pointer-events="all" data-hit-area="key-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-10" data-part="key-10" data-kind="key" data-surface-controls="key-10" role="button" aria-disabled="true" tabindex="-1" aria-label="A sharp 3">
+      <title>A sharp 3</title>
+      <g aria-hidden="true">
+        <rect x="462.00000000000006" y="465" width="46" height="79.3" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="485.00000000000006" y="508.65" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">A#</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-10" data-surface-control="key-10" aria-hidden="true">
+        <rect x="462.00000000000006" y="465" width="46" height="79.3" fill="none" pointer-events="all" data-hit-area="key-10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-13" data-part="key-13" data-kind="key" data-surface-controls="key-13" role="button" aria-disabled="true" tabindex="-1" aria-label="C sharp 4">
+      <title>C sharp 4</title>
+      <g aria-hidden="true">
+        <rect x="615.3333333333334" y="465" width="46" height="79.3" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="638.3333333333334" y="508.65" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">C#</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-13" data-surface-control="key-13" aria-hidden="true">
+        <rect x="615.3333333333334" y="465" width="46" height="79.3" fill="none" pointer-events="all" data-hit-area="key-13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-15" data-part="key-15" data-kind="key" data-surface-controls="key-15" role="button" aria-disabled="true" tabindex="-1" aria-label="D sharp 4">
+      <title>D sharp 4</title>
+      <g aria-hidden="true">
+        <rect x="692" y="465" width="46" height="79.3" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="715" y="508.65" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">D#</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-15" data-surface-control="key-15" aria-hidden="true">
+        <rect x="692" y="465" width="46" height="79.3" fill="none" pointer-events="all" data-hit-area="key-15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-18" data-part="key-18" data-kind="key" data-surface-controls="key-18" role="button" aria-disabled="true" tabindex="-1" aria-label="F sharp 4">
+      <title>F sharp 4</title>
+      <g aria-hidden="true">
+        <rect x="845.3333333333334" y="465" width="46" height="79.3" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="868.3333333333334" y="508.65" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">F#</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-18" data-surface-control="key-18" aria-hidden="true">
+        <rect x="845.3333333333334" y="465" width="46" height="79.3" fill="none" pointer-events="all" data-hit-area="key-18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-20" data-part="key-20" data-kind="key" data-surface-controls="key-20" role="button" aria-disabled="true" tabindex="-1" aria-label="G sharp 4">
+      <title>G sharp 4</title>
+      <g aria-hidden="true">
+        <rect x="922" y="465" width="46" height="79.3" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="945" y="508.65" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">G#</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-20" data-surface-control="key-20" aria-hidden="true">
+        <rect x="922" y="465" width="46" height="79.3" fill="none" pointer-events="all" data-hit-area="key-20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+    <g id="arturia-microfreak-panel--key-22" data-part="key-22" data-kind="key" data-surface-controls="key-22" role="button" aria-disabled="true" tabindex="-1" aria-label="A sharp 4">
+      <title>A sharp 4</title>
+      <g aria-hidden="true">
+        <rect x="998.6666666666666" y="465" width="46" height="79.3" rx="3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="1021.6666666666666" y="508.65" text-anchor="middle" font-size="9" fill="currentColor" stroke="none">A#</text>
+      </g>
+      <g id="arturia-microfreak-panel--surface--key-22" data-surface-control="key-22" aria-hidden="true">
+        <rect x="998.6666666666666" y="465" width="46" height="79.3" fill="none" pointer-events="all" data-hit-area="key-22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0" />
+      </g>
+    </g>
+  </g>
+</svg>

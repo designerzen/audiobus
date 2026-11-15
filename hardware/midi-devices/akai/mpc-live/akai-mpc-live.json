@@ -1,0 +1,401 @@
+{
+	"$schema": "../../profile.schema.json",
+	"schemaVersion": 1,
+	"id": "akai-mpc-live",
+	"name": "Akai MPC Live",
+	"manufacturer": "Akai Professional",
+	"manufacturerUrl": "https://www.akaipro.com/",
+	"ids": ["akai-mpc-live"],
+	"portNames": ["MPC Live", "Akai MPC Live", "MPC Live MIDI 1", "MPC Live Public"],
+	"description": "First-generation MPC Live sampler and sequencer with sixteen pads and four assignable Q-Link knobs.",
+	"icon": "icon.svg",
+	"documentation": [
+		{
+			"title": "Akai MPC Live manual and MIDI reference",
+			"url": "https://www.akaipro.com/downloads-and-support/downloads/?legacy=true&product=MPC+Live"
+		}
+	],
+	"abilities": ["Velocity-sensitive pad notes", "MIDI sequence output", "Assignable Q-Link CCs"],
+	"hardwareControls": [
+		"16 velocity-sensitive pads",
+		"Four Q-Link knobs",
+		"Touchscreen",
+		"Two DIN MIDI outputs"
+	],
+	"notice": "Original MPC Live. In standalone mode, route a MIDI track to a DIN output connected to your computer MIDI interface; the USB-A ports host other devices. For USB controller operation use the supported MPC software and driver configuration. Pad notes 36-51 and Q-Link CC16-19 are virtual defaults, not a factory preset: configure MIDI Control mode output and use MIDI learn to match the project, pad bank and knob assignments. Set Q-Links to absolute CC mode.",
+	"controls": [
+		{
+			"id": "q-link-1",
+			"label": "Assignable Q-Link 1",
+			"cc": 16,
+			"widget": "slider"
+		},
+		{
+			"id": "q-link-2",
+			"label": "Assignable Q-Link 2",
+			"cc": 17,
+			"widget": "slider"
+		},
+		{
+			"id": "q-link-3",
+			"label": "Assignable Q-Link 3",
+			"cc": 18,
+			"widget": "slider"
+		},
+		{
+			"id": "q-link-4",
+			"label": "Assignable Q-Link 4",
+			"cc": 19,
+			"widget": "slider"
+		}
+	],
+	"modes": [],
+	"gui": {
+		"type": "column",
+		"gap": "0.65rem",
+		"children": [
+			{
+				"type": "status"
+			},
+			{
+				"type": "image",
+				"src": "panel.svg",
+				"alt": "Akai MPC Live overhead hardware diagram"
+			},
+			{
+				"type": "notes"
+			},
+			{
+				"type": "channel"
+			},
+			{
+				"type": "section",
+				"label": "MIDI controls",
+				"children": [
+					{
+						"type": "controls"
+					}
+				]
+			},
+			{
+				"type": "guide",
+				"label": "Hardware setup and documentation"
+			}
+		]
+	},
+	"surface": {
+		"src": "panel.svg",
+		"width": 1200,
+		"height": 620,
+		"elements": [
+			{
+				"id": "q-link-1",
+				"label": "Assignable Q-Link 1",
+				"kind": "knob",
+				"position": {
+					"x": 90.25,
+					"y": 22.258064516129032,
+					"width": 4.5,
+					"height": 8.709677419354838
+				},
+				"control": "q-link-1",
+				"learnable": true
+			},
+			{
+				"id": "q-link-2",
+				"label": "Assignable Q-Link 2",
+				"kind": "knob",
+				"position": {
+					"x": 90.25,
+					"y": 36.45161290322581,
+					"width": 4.5,
+					"height": 8.709677419354838
+				},
+				"control": "q-link-2",
+				"learnable": true
+			},
+			{
+				"id": "q-link-3",
+				"label": "Assignable Q-Link 3",
+				"kind": "knob",
+				"position": {
+					"x": 90.25,
+					"y": 50.645161290322584,
+					"width": 4.5,
+					"height": 8.709677419354838
+				},
+				"control": "q-link-3",
+				"learnable": true
+			},
+			{
+				"id": "q-link-4",
+				"label": "Assignable Q-Link 4",
+				"kind": "knob",
+				"position": {
+					"x": 90.25,
+					"y": 64.83870967741936,
+					"width": 4.5,
+					"height": 8.709677419354838
+				},
+				"control": "q-link-4",
+				"learnable": true
+			},
+			{
+				"id": "pad-1",
+				"label": "Pad 1",
+				"kind": "pad",
+				"position": {
+					"x": 2.083333333333333,
+					"y": 78.38709677419354,
+					"width": 8.75,
+					"height": 14.838709677419354
+				},
+				"message": {
+					"type": "note",
+					"number": 36
+				},
+				"learnable": true
+			},
+			{
+				"id": "pad-2",
+				"label": "Pad 2",
+				"kind": "pad",
+				"position": {
+					"x": 12.083333333333334,
+					"y": 78.38709677419354,
+					"width": 8.75,
+					"height": 14.838709677419354
+				},
+				"message": {
+					"type": "note",
+					"number": 37
+				},
+				"learnable": true
+			},
+			{
+				"id": "pad-3",
+				"label": "Pad 3",
+				"kind": "pad",
+				"position": {
+					"x": 22.083333333333332,
+					"y": 78.38709677419354,
+					"width": 8.75,
+					"height": 14.838709677419354
+				},
+				"message": {
+					"type": "note",
+					"number": 38
+				},
+				"learnable": true
+			},
+			{
+				"id": "pad-4",
+				"label": "Pad 4",
+				"kind": "pad",
+				"position": {
+					"x": 32.083333333333336,
+					"y": 78.38709677419354,
+					"width": 8.75,
+					"height": 14.838709677419354
+				},
+				"message": {
+					"type": "note",
+					"number": 39
+				},
+				"learnable": true
+			},
+			{
+				"id": "pad-5",
+				"label": "Pad 5",
+				"kind": "pad",
+				"position": {
+					"x": 2.083333333333333,
+					"y": 61.12903225806452,
+					"width": 8.75,
+					"height": 14.838709677419354
+				},
+				"message": {
+					"type": "note",
+					"number": 40
+				},
+				"learnable": true
+			},
+			{
+				"id": "pad-6",
+				"label": "Pad 6",
+				"kind": "pad",
+				"position": {
+					"x": 12.083333333333334,
+					"y": 61.12903225806452,
+					"width": 8.75,
+					"height": 14.838709677419354
+				},
+				"message": {
+					"type": "note",
+					"number": 41
+				},
+				"learnable": true
+			},
+			{
+				"id": "pad-7",
+				"label": "Pad 7",
+				"kind": "pad",
+				"position": {
+					"x": 22.083333333333332,
+					"y": 61.12903225806452,
+					"width": 8.75,
+					"height": 14.838709677419354
+				},
+				"message": {
+					"type": "note",
+					"number": 42
+				},
+				"learnable": true
+			},
+			{
+				"id": "pad-8",
+				"label": "Pad 8",
+				"kind": "pad",
+				"position": {
+					"x": 32.083333333333336,
+					"y": 61.12903225806452,
+					"width": 8.75,
+					"height": 14.838709677419354
+				},
+				"message": {
+					"type": "note",
+					"number": 43
+				},
+				"learnable": true
+			},
+			{
+				"id": "pad-9",
+				"label": "Pad 9",
+				"kind": "pad",
+				"position": {
+					"x": 2.083333333333333,
+					"y": 43.87096774193549,
+					"width": 8.75,
+					"height": 14.838709677419354
+				},
+				"message": {
+					"type": "note",
+					"number": 44
+				},
+				"learnable": true
+			},
+			{
+				"id": "pad-10",
+				"label": "Pad 10",
+				"kind": "pad",
+				"position": {
+					"x": 12.083333333333334,
+					"y": 43.87096774193549,
+					"width": 8.75,
+					"height": 14.838709677419354
+				},
+				"message": {
+					"type": "note",
+					"number": 45
+				},
+				"learnable": true
+			},
+			{
+				"id": "pad-11",
+				"label": "Pad 11",
+				"kind": "pad",
+				"position": {
+					"x": 22.083333333333332,
+					"y": 43.87096774193549,
+					"width": 8.75,
+					"height": 14.838709677419354
+				},
+				"message": {
+					"type": "note",
+					"number": 46
+				},
+				"learnable": true
+			},
+			{
+				"id": "pad-12",
+				"label": "Pad 12",
+				"kind": "pad",
+				"position": {
+					"x": 32.083333333333336,
+					"y": 43.87096774193549,
+					"width": 8.75,
+					"height": 14.838709677419354
+				},
+				"message": {
+					"type": "note",
+					"number": 47
+				},
+				"learnable": true
+			},
+			{
+				"id": "pad-13",
+				"label": "Pad 13",
+				"kind": "pad",
+				"position": {
+					"x": 2.083333333333333,
+					"y": 26.61290322580645,
+					"width": 8.75,
+					"height": 14.838709677419354
+				},
+				"message": {
+					"type": "note",
+					"number": 48
+				},
+				"learnable": true
+			},
+			{
+				"id": "pad-14",
+				"label": "Pad 14",
+				"kind": "pad",
+				"position": {
+					"x": 12.083333333333334,
+					"y": 26.61290322580645,
+					"width": 8.75,
+					"height": 14.838709677419354
+				},
+				"message": {
+					"type": "note",
+					"number": 49
+				},
+				"learnable": true
+			},
+			{
+				"id": "pad-15",
+				"label": "Pad 15",
+				"kind": "pad",
+				"position": {
+					"x": 22.083333333333332,
+					"y": 26.61290322580645,
+					"width": 8.75,
+					"height": 14.838709677419354
+				},
+				"message": {
+					"type": "note",
+					"number": 50
+				},
+				"learnable": true
+			},
+			{
+				"id": "pad-16",
+				"label": "Pad 16",
+				"kind": "pad",
+				"position": {
+					"x": 32.083333333333336,
+					"y": 26.61290322580645,
+					"width": 8.75,
+					"height": 14.838709677419354
+				},
+				"message": {
+					"type": "note",
+					"number": 51
+				},
+				"learnable": true
+			}
+		]
+	}
+}
