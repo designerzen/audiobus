@@ -1,6 +1,6 @@
 import type { IAudioCommand } from "../commands/audio-command-interface.ts"
 import { NOTE_OFF, NOTE_ON } from "../commands/commands"
-import { midiToCommand } from "./midi-command-conversion.ts"
+import { midiToCommand, commandToMidi } from "./midi-command-conversion.ts"
 import { createAudioCommand } from "../commands/audio-command-factory.ts"
 
 // UMP words are unsigned integers in protocol order, never packed MIDI byte streams.
@@ -32,11 +32,14 @@ export function umpToCommand(
 		command.channel = words[0] >>> 28 === 4 ? ((words[0] >>> 16) & 15) + 1 : 0
 	}
 	command.ump = [...words]
+	const type = words[0] >>> 28
+	if (type !== 0 && type !== 15) command.midiGroup = (words[0] >>> 24) & 15
 	command.umpOriginal = {
 		type: command.type,
 		number: command.number,
 		velocity: command.velocity,
 		value: command.value
+		,channel: command.channel
 	}
 	return command
 }
@@ -47,6 +50,20 @@ export function commandToUmp(command: IAudioCommand): number[] {
 		throw new Error("Invalid UMP packet")
 	}
 	const original = command.umpOriginal
+	const type = words[0] >>> 28
+	if (command.midiGroup !== undefined && type !== 0 && type !== 15) {
+		if (!Number.isInteger(command.midiGroup) || command.midiGroup < 0 || command.midiGroup > 15) throw new Error("Invalid UMP group")
+		words[0] = ((words[0] & 0xf0ffffff) | (command.midiGroup << 24)) >>> 0
+	}
+	if (type === 1 || type === 2) {
+		const bytes = commandToMidi(command)
+		if (bytes) words[0] = ((words[0] & 0xff000000) | (bytes[0] << 16) | ((bytes[1] ?? 0) << 8) | (bytes[2] ?? 0)) >>> 0
+		return words
+	}
+	if (type === 4 && command.channel > 0) {
+		if (!Number.isInteger(command.channel) || command.channel > 16) throw new Error("Invalid MIDI channel")
+		words[0] = ((words[0] & 0xfff0ffff) | ((command.channel - 1) << 16)) >>> 0
+	}
 	if (!original || words[0] >>> 28 !== 4) {
 		return words
 	}
@@ -145,7 +162,8 @@ export function umpToMidiBytes(words: number[]): number[] | undefined {
 		a = (first >>> 8) & 127,
 		b = first & 127
 	if ((type === 1 || type === 2) && words.length === 1) {
-		return [status, a, b]
+		return status >= 0xf8 || status === 0xf6 ? [status] :
+			status === 0xf1 || status === 0xf3 || (status >> 4) === 0xc || (status >> 4) === 0xd ? [status, a] : [status, a, b]
 	}
 	if (type !== 4 || words.length !== 2) {
 		return
