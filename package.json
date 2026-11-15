@@ -85,7 +85,7 @@
 		"fflate": "^0.8.2",
 		"kokoro-js": "^1.2.1",
 		"lz-string": "^1.5.0",
-		"midi-devices": "git+https://github.com/designerzen/midi-devices.git#396ab13f53f8a81f2c184624b472810c786f0cd6",
+		"midi-devices": "git+https://github.com/designerzen/midi-devices.git#main",
 		"netronome": "git+https://github.com/designerzen/netronome.git#5ed50c8ee60361709a3d3235ca87767c6edd05c9",
 		"pitfalls": "git+https://github.com/designerzen/pitfalls.git#d5d7828e2ba4dfe70f2dbc093efecff7b53699d6",
 		"sion": "git+https://github.com/designerzen/SiON.git#1a80e5c9452177c105b4c0eea0fdeb07b2541622",
