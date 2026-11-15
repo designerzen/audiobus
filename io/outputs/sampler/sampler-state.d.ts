@@ -26,4 +26,3 @@ export interface SamplerLayer {
 }
 export function createSamplerLayer(): SamplerLayer
 export function normaliseSamplerLayer(value: Partial<SamplerLayer>): SamplerLayer
-export function samplerVelocityGain(layer: SamplerLayer, velocity: number): number

@@ -63,18 +63,3 @@ export const normaliseSamplerLayer = (value) => {
 	layer.oneShot = !!layer.oneShot
 	return layer
 }
-
-export const samplerVelocityGain = (layer, velocity) => {
-	if (velocity < layer.velocityLow || velocity > layer.velocityHigh) {
-		return 0
-	}
-	const up =
-		layer.fadeIn > layer.velocityLow
-			? (velocity - layer.velocityLow) / (layer.fadeIn - layer.velocityLow)
-			: 1
-	const down =
-		layer.velocityHigh > layer.fadeOut
-			? (layer.velocityHigh - velocity) / (layer.velocityHigh - layer.fadeOut)
-			: 1
-	return Math.max(0, Math.min(1, up, down))
-}

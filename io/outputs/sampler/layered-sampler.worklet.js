@@ -1,4 +1,18 @@
-import { samplerVelocityGain } from "./sampler-state.js"
+// Kept in this file so the worklet has no imports and loads as-is under any bundler
+const samplerVelocityGain = (layer, velocity) => {
+	if (velocity < layer.velocityLow || velocity > layer.velocityHigh) {
+		return 0
+	}
+	const up =
+		layer.fadeIn > layer.velocityLow
+			? (velocity - layer.velocityLow) / (layer.fadeIn - layer.velocityLow)
+			: 1
+	const down =
+		layer.velocityHigh > layer.fadeOut
+			? (layer.velocityHigh - velocity) / (layer.velocityHigh - layer.fadeOut)
+			: 1
+	return Math.max(0, Math.min(1, up, down))
+}
 
 class LayeredSamplerProcessor extends AudioWorkletProcessor {
 	constructor() {

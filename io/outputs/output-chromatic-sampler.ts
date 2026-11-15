@@ -17,7 +17,6 @@ import {
 	type SamplerLayer
 } from "./sampler/sampler-state.js"
 import { setupSamplerEditor } from "./sampler/sampler-editor.js"
-import processorURL from "./sampler/layered-sampler.worklet.js?worker&url"
 import "./sampler/sampler-editor.css"
 
 interface SavedLayer extends Omit<SamplerLayer, "channels" | "sampleRate"> {
@@ -26,6 +25,8 @@ interface SavedLayer extends Omit<SamplerLayer, "channels" | "sampleRate"> {
 const MAX_SAMPLE_BYTES = 16 * 1024 * 1024
 const MAX_BANK_BYTES = 64 * 1024 * 1024
 const registrations = new WeakMap<AudioContext, Promise<void>>()
+// A plain URL rather than a bundler-specific import, so Vite and Parcel both emit the worklet as its own file.
+const processorURL = new URL("./sampler/layered-sampler.worklet.js", import.meta.url).href
 
 export default class ChromaticSampler extends EventTarget implements IAudioOutput {
 	readonly uuid = `Output-ChromaticSampler-${crypto.randomUUID()}`
