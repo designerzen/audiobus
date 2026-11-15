@@ -2,7 +2,8 @@ import { Peer, windowTransport, type CommandRegistry } from "audiobus-protocol"
 import AbstractInput from "./abstract-input"
 import { getProtocolRegistry } from "../protocol-registry"
 import { midiToCommand } from "../../midi/midi-command-conversion"
-import { NOTE_ON, NOTE_OFF } from "../../commands/commands"
+import { umpToCommand } from "../../midi/ump-codec"
+import { ProtocolMidiState, type ProtocolPacket } from "../protocol-midi-state"
 import { devicePanel } from "../device-controls"
 import { EVENT_CLICK } from "../../events/event-constants"
 
@@ -12,8 +13,7 @@ export default class InputProtocol extends AbstractInput {
 	private target?: Window
 	private origin?: string
 	private peer?: Peer
-	private held = new Map<string, { note: number; channel: number }>()
-	private sustain = new Set<number>()
+	private midiState = new ProtocolMidiState()
 	private status?: HTMLElement
 	private gui?: HTMLElement
 	private generation = 0
@@ -55,43 +55,9 @@ export default class InputProtocol extends AbstractInput {
 				(this.options.registry as CommandRegistry | undefined) ?? getProtocolRegistry(),
 			getPatch: this.options.getPatch,
 			setPatch: this.options.setPatch,
-			onMidi: (bytes) => {
-				if (this.peer !== peer) {
-					return
-				}
-				const command = midiToCommand(bytes, this.now, this.uuid)
-				if (!command || (bytes[0] === 0xf0 && !this.options.allowSysex)) {
-					return
-				}
-				const channel = command.channel
-				const key = `${channel}:${command.number}`
-				if (command.type === NOTE_ON) {
-					if (this.held.has(key)) {
-						this.release(command.number, channel)
-					}
-					this.held.set(key, { note: command.number, channel })
-				} else if (command.type === NOTE_OFF) {
-					this.held.delete(key)
-				}
-				if (bytes[0]! >> 4 === 0xb) {
-					if (bytes[1] === 64) {
-						if (bytes[2]! >= 64) {
-							this.sustain.add(channel)
-						} else {
-							this.sustain.delete(channel)
-						}
-					} else if (bytes[1] === 120 || bytes[1] === 123) {
-						for (const [heldKey, held] of this.held) {
-							if (held.channel !== channel) {
-								continue
-							}
-							this.release(held.note, channel)
-							this.held.delete(heldKey)
-						}
-					}
-				}
-				this.dispatch(command)
-			}
+			ump: true,
+			onMidi: (bytes) => { if (this.peer === peer) this.receivePacket({ format: "midi", data: Array.from(bytes) }) },
+			onUmp: (words) => { if (this.peer === peer) this.receivePacket({ format: "ump", data: words }) }
 		})
 		this.peer = peer
 		try {
@@ -113,27 +79,21 @@ export default class InputProtocol extends AbstractInput {
 			throw error
 		}
 	}
-	private release(note: number, channel: number): void {
-		const command = midiToCommand([0x80 | (channel - 1), note, 0], this.now, this.uuid)
-		if (command) {
-			this.dispatch(command)
-		}
+	private dispatchPacket(packet: ProtocolPacket): void {
+		const command = packet.format === "ump" ? umpToCommand(packet.data, this.now, this.uuid) : midiToCommand(packet.data, this.now, this.uuid)
+		if (command) this.dispatch(command)
+	}
+	private receivePacket(packet: ProtocolPacket): void {
+		const type = packet.data[0] >>> 28
+		if (!this.options.allowSysex && (packet.format === "midi" ? packet.data[0] === 0xf0 : type === 3 || type === 5)) return
+		for (const release of this.midiState.accept(packet)) this.dispatchPacket(release)
+		this.dispatchPacket(packet)
 	}
 	async disconnect(): Promise<void> {
 		this.generation++
 		this.peer?.close()
 		this.peer = undefined
-		for (const channel of this.sustain) {
-			const command = midiToCommand([0xb0 | (channel - 1), 64, 0], this.now, this.uuid)
-			if (command) {
-				this.dispatch(command)
-			}
-		}
-		for (const held of this.held.values()) {
-			this.release(held.note, held.channel)
-		}
-		this.sustain.clear()
-		this.held.clear()
+		for (const release of this.midiState.release()) this.dispatchPacket(release)
 		this.setAsDisconnected()
 		if (this.status) {
 			this.status.textContent = "Disconnected — pair an application window using attach()."

@@ -7,7 +7,7 @@ export {
 	Peer,
 	windowTransport
 } from "audiobus-protocol"
-export type { CommandDescriptor, Json, Params, Parameter } from "audiobus-protocol"
+export type { CommandDescriptor, Json, Params, Parameter, PropertyDescriptor, CapabilityBundle } from "audiobus-protocol"
 
 let registry = new CommandRegistry()
 

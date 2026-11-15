@@ -38,8 +38,8 @@ export function umpToCommand(
 		type: command.type,
 		number: command.number,
 		velocity: command.velocity,
-		value: command.value
-		,channel: command.channel
+		value: command.value,
+		channel: command.channel
 	}
 	return command
 }

@@ -28,6 +28,13 @@ export function createProtocolOutputControls(output: OutputProtocol) {
 		mode.append(choice)
 	}
 	mode.value = output.options.mode
+	const fallback = document.createElement("input")
+	fallback.type = "checkbox"
+	fallback.checked = output.options.allowMidi1Fallback === true
+	fallback.addEventListener(EVENT_CHANGE, () => {
+		output.options.allowMidi1Fallback = fallback.checked
+		changed(output)
+	}, options)
 	const status = document.createElement("p")
 	status.setAttribute("role", "status")
 	const report = (error: unknown) => {
@@ -227,6 +234,7 @@ export function createProtocolOutputControls(output: OutputProtocol) {
 	element.append(
 		field("Destination URL", url),
 		field("Protocol", mode),
+		field("Allow lossy MIDI 1 conversion for group zero", fallback),
 		open,
 		status,
 		refreshButton,
