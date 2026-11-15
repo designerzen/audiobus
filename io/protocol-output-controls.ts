@@ -1,7 +1,7 @@
 import type OutputProtocol from "./outputs/output-protocol"
 import { type CommandDescriptor, type Params, validate } from "audiobus-protocol"
 import { devicePanel, changed } from "./device-controls"
-import { EVENT_CLICK, EVENT_CHANGE, EVENT_SUBMIT } from "../events/event-constants"
+import { EVENT_CLICK, EVENT_CHANGE, EVENT_INPUT, EVENT_SUBMIT } from "../events/event-constants"
 import { createProtocolPropertyControls } from "./protocol-property-controls"
 
 export function createProtocolOutputControls(output: OutputProtocol) {
@@ -30,6 +30,12 @@ export function createProtocolOutputControls(output: OutputProtocol) {
 		mode.append(choice)
 	}
 	mode.value = output.options.mode
+	const code = document.createElement("input")
+	code.type = "text"
+	code.autocomplete = "off"
+	code.spellcheck = false
+	code.placeholder = "ABCD-EFGH"
+	code.addEventListener(EVENT_INPUT, () => output.setPairingCode(code.value), options)
 	const fallback = document.createElement("input")
 	fallback.type = "checkbox"
 	fallback.checked = output.options.allowMidi1Fallback === true
@@ -62,9 +68,11 @@ export function createProtocolOutputControls(output: OutputProtocol) {
 					throw new Error("Allow popups to open the destination")
 				}
 				output.attach(target, address.origin)
+				code.value = ""
 				output.options.url = address.href
 				changed(output)
-				status.textContent = "Paired. Press Connect when the destination is ready."
+				status.textContent =
+					"Paired. Enter the destination's pairing code if it shows one, then press Connect."
 			} catch (error) {
 				report(error)
 			}
@@ -244,6 +252,7 @@ export function createProtocolOutputControls(output: OutputProtocol) {
 		field("Protocol", mode),
 		field("Allow lossy MIDI 1 conversion for group zero", fallback),
 		open,
+		field("Pairing code shown by the destination", code),
 		status,
 		refreshButton,
 		field("Destination command", commands),

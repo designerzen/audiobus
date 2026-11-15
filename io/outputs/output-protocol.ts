@@ -9,6 +9,7 @@ import {
 	type CommandRegistry,
 	type PropertyDescriptor,
 	type CapabilityBundle,
+	type SubscriptionState,
 	TOPIC_COMMANDS_CHANGED,
 	TOPIC_PROPERTIES_CHANGED,
 	TOPIC_PROPERTIES_LIST_CHANGED
@@ -38,6 +39,7 @@ export default class OutputProtocol extends EventTarget implements IAudioOutput 
 	readonly configurationAffectsNoteRouting = false
 	readonly options: Record<string, any>
 	private transport?: Transport
+	private pairingCode?: string
 	private peer?: Peer
 	private connected = false
 	private connecting?: Promise<void>
@@ -63,13 +65,19 @@ export default class OutputProtocol extends EventTarget implements IAudioOutput 
 	hasSysexOutput(): boolean {
 		return this.options.allowSysex === true
 	}
-	attach(target: Window, origin: string): void {
-		this.attachTransport(windowTransport(target, origin))
+	/** `pairingCode` is the code shown by a destination that requires one. */
+	attach(target: Window, origin: string, options: { pairingCode?: string } = {}): void {
+		this.attachTransport(windowTransport(target, origin), options)
 	}
 	/** A custom transport must already isolate and authorize the destination. */
-	attachTransport(transport: Transport): void {
+	attachTransport(transport: Transport, options: { pairingCode?: string } = {}): void {
 		void this.disconnect()
 		this.transport = transport
+		this.setPairingCode(options.pairingCode)
+	}
+	/** Used by the next connection; codes belong to one pairing and are never saved. */
+	setPairingCode(code?: string): void {
+		this.pairingCode = code?.trim() || undefined
 	}
 	connect(): Promise<void> {
 		if (this.connected) {
@@ -84,6 +92,13 @@ export default class OutputProtocol extends EventTarget implements IAudioOutput 
 		if (!["audiobus", "webmidilink"].includes(this.options.mode)) {
 			return Promise.reject(new Error("Unknown protocol mode"))
 		}
+		if (this.pairingCode && this.options.mode !== "audiobus") {
+			return Promise.reject(
+				new Error(
+					"Pairing codes require audioBus Protocol mode; WebMidiLink cannot present one"
+				)
+			)
+		}
 		const generation = ++this.generation
 		const peer = new Peer(this.transport, {
 			identity: { name: this.options.applicationName ?? "audioBus", version: "1" },
@@ -93,6 +108,7 @@ export default class OutputProtocol extends EventTarget implements IAudioOutput 
 						getProtocolRegistry())
 					: undefined,
 			timeoutMs: this.options.timeoutMs,
+			pairingCode: this.pairingCode,
 			ump: this.options.mode === "audiobus",
 			onPatch: (patch) =>
 				this.dispatchEvent(new CustomEvent(EVENT_PROTOCOL_PATCH, { detail: patch })),
@@ -173,6 +189,10 @@ export default class OutputProtocol extends EventTarget implements IAudioOutput 
 	}
 	async subscribe(topic: string): Promise<Json> {
 		return this.requirePeer(true).subscribe(topic)
+	}
+	/** Subscribe and receive retained state captured with the subscription, when provided. */
+	async subscribeState(topic: string): Promise<SubscriptionState> {
+		return this.requirePeer(true).subscribeState(topic)
 	}
 	async unsubscribe(topic: string): Promise<Json> {
 		return this.requirePeer(true).unsubscribe(topic)

@@ -1,4 +1,11 @@
-import { Peer, windowTransport, type CommandRegistry } from "audiobus-protocol"
+import {
+	Peer,
+	windowTransport,
+	generatePairingCode,
+	formatPairingCode,
+	normalizePairingCode,
+	type CommandRegistry
+} from "audiobus-protocol"
 import AbstractInput from "./abstract-input"
 import { getProtocolRegistry } from "../protocol-registry"
 import { midiToCommand } from "../../midi/midi-command-conversion"
@@ -12,6 +19,7 @@ export default class InputProtocol extends AbstractInput {
 	readonly requiresConnectionControl = true
 	private target?: Window
 	private origin?: string
+	private requiredCode?: string
 	private peer?: Peer
 	private midiState = new ProtocolMidiState()
 	private status?: HTMLElement
@@ -32,15 +40,31 @@ export default class InputProtocol extends AbstractInput {
 	get connection(): Peer | undefined {
 		return this.peer
 	}
+	/** The code the paired application must present, formatted for display. */
+	get pairingCode(): string | undefined {
+		return this.requiredCode === undefined ? undefined : formatPairingCode(this.requiredCode)
+	}
 	constructor(options: Record<string, any> = {}) {
 		super({ now: () => performance.now() / 1000, ...options })
 	}
-	attach(target: Window, origin: string): void {
+	/**
+	 * Pass `requirePairingCode` when this application did not choose the target window, such as
+	 * `window.opener`; nothing from the peer is accepted until it presents that code.
+	 */
+	attach(target: Window, origin: string, options: { requirePairingCode?: string } = {}): void {
 		// Validate before replacing a working connection.
 		windowTransport(target, origin)
+		const code =
+			options.requirePairingCode === undefined
+				? undefined
+				: normalizePairingCode(options.requirePairingCode)
+		if (code === "") {
+			throw new Error("A pairing code must contain letters or digits")
+		}
 		void this.disconnect()
 		this.target = target
 		this.origin = origin
+		this.requiredCode = code
 	}
 	async connect(): Promise<void> {
 		if (this.isConnected) {
@@ -59,6 +83,12 @@ export default class InputProtocol extends AbstractInput {
 			getPatch: this.options.getPatch,
 			setPatch: this.options.setPatch,
 			ump: true,
+			requirePairingCode: this.requiredCode,
+			onAuthorized: () => {
+				if (this.peer === peer && this.status) {
+					this.status.textContent = "Connected. Pairing code accepted."
+				}
+			},
 			onMidi: (bytes) => {
 				if (this.peer === peer) {
 					this.receivePacket({ format: "midi", data: Array.from(bytes) })
@@ -81,7 +111,7 @@ export default class InputProtocol extends AbstractInput {
 				peer.announceReady()
 			}
 			if (this.status) {
-				this.status.textContent = "Connected"
+				this.status.textContent = this.connectedStatus()
 			}
 		} catch (error) {
 			if (generation === this.generation) {
@@ -89,6 +119,11 @@ export default class InputProtocol extends AbstractInput {
 			}
 			throw error
 		}
+	}
+	private connectedStatus(): string {
+		return this.peer && !this.peer.isAuthorized
+			? `Connected. Enter pairing code ${this.pairingCode} in the other application and connect there.`
+			: "Connected"
 	}
 	private dispatchPacket(packet: ProtocolPacket): void {
 		const command =
@@ -132,7 +167,7 @@ export default class InputProtocol extends AbstractInput {
 		this.status = document.createElement("p")
 		this.status.setAttribute("role", "status")
 		this.status.textContent = this.isConnected
-			? "Connected"
+			? this.connectedStatus()
 			: "Pair an application window and exact origin using attach(), then connect."
 		const label = document.createElement("label")
 		label.textContent = "Peer application URL"
@@ -170,9 +205,11 @@ export default class InputProtocol extends AbstractInput {
 				if (!window.opener) {
 					throw new Error("This window has no opening application")
 				}
-				this.attach(window.opener, address.origin)
-				this.status!.textContent =
-					"Paired with opening application. Press Connect in both applications."
+				// The opener chose this window, so require a code the person copies across.
+				this.attach(window.opener, address.origin, {
+					requirePairingCode: generatePairingCode()
+				})
+				this.status!.textContent = `Paired with opening application. Enter pairing code ${this.pairingCode} in its Output, then press Connect in both applications.`
 			} catch (error) {
 				this.status!.textContent = error instanceof Error ? error.message : String(error)
 			}
@@ -189,6 +226,7 @@ export default class InputProtocol extends AbstractInput {
 		void this.disconnect()
 		this.target = undefined
 		this.origin = undefined
+		this.requiredCode = undefined
 		void this.destroyGui()
 	}
 }

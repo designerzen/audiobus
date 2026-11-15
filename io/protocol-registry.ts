@@ -6,6 +6,10 @@ export {
 	ProtocolError,
 	Peer,
 	windowTransport,
+	generatePairingCode,
+	formatPairingCode,
+	normalizePairingCode,
+	MAX_PAIRING_ATTEMPTS,
 	TOPIC_COMMANDS_CHANGED,
 	TOPIC_PROPERTIES_CHANGED,
 	TOPIC_PROPERTIES_LIST_CHANGED,
@@ -18,7 +22,8 @@ export type {
 	Params,
 	Parameter,
 	PropertyDescriptor,
-	CapabilityBundle
+	CapabilityBundle,
+	SubscriptionState
 } from "audiobus-protocol"
 
 let registry = new CommandRegistry()

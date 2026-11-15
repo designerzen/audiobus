@@ -23,6 +23,7 @@ export function createProtocolPropertyControls(output: OutputProtocol) {
 	let descriptors: PropertyDescriptor[] = [],
 		editor: HTMLInputElement | HTMLSelectElement | undefined
 	let revision = 0
+	let reading: number | undefined
 	const selected = () => descriptors.find((item) => item.id === choice.value)
 	const show = (value: Json) => {
 		const property = selected()
@@ -43,6 +44,7 @@ export function createProtocolPropertyControls(output: OutputProtocol) {
 			return
 		}
 		const token = ++revision
+		reading = token
 		try {
 			const value = await output.getProperty(property.id)
 			if (
@@ -55,6 +57,10 @@ export function createProtocolPropertyControls(output: OutputProtocol) {
 		} catch (error) {
 			if (token === revision) {
 				report(error)
+			}
+		} finally {
+			if (reading === token) {
+				reading = undefined
 			}
 		}
 	}
@@ -193,8 +199,12 @@ export function createProtocolPropertyControls(output: OutputProtocol) {
 				data.id === choice.value &&
 				Object.hasOwn(data, "value")
 			) {
-				revision++
 				show(data.value)
+				// A read in flight may have captured an older value inside an asynchronous getter.
+				// Replace it with a fresh read, which observes at least this change.
+				if (reading !== undefined) {
+					void load()
+				}
 			}
 		},
 		destroy() {
