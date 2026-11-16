@@ -172,7 +172,8 @@ class UnpairedHost {
 	}
 	/** Close one session; every member releases only the notes it held for it. */
 	private end(source: MessageEventSource, session = this.sessions.get(source)): void {
-		if (!session) {
+		// A stale reference must never end the window's newer session.
+		if (!session || this.sessions.get(source) !== session) {
 			return
 		}
 		this.sessions.delete(source)
