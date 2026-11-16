@@ -1,3 +1,4 @@
+import { drawSpectrum, drawWaveform } from "./CanvasSignalRenderer.ts"
 /// <reference types="@webgpu/types" />
 import { WebGLRenderer } from "./WebGLRenderer.ts"
 import { VISUALISER_SHADER } from "./shader.ts"
@@ -316,28 +317,13 @@ export class RenderSurface {
 			ctx.strokeStyle = ctx.fillStyle = `rgba(${r * 255},${g * 255},${b * 255},${alpha})`
 			ctx.lineWidth = layer.thickness
 			if (layer.mode === "bars") {
-				for (let i = 0; i < count; i++) {
-					const level = layer.data[i] / 255
-					ctx.fillStyle = `hsl(${(i / count) * 300} 80% 65% / ${alpha})`
-					ctx.fillRect(
-						(i * width) / count,
-						height * (1 - level),
-						(width / count) * 0.85,
-						height * level
-					)
-				}
+				drawSpectrum(ctx, layer.data, width, height, {
+					bars: count,
+					gap: (width / count) * 0.15,
+					barColour: (index, total) => `hsl(${(index / total) * 300} 80% 65% / ${alpha})`
+				})
 			} else if (layer.mode === "scope") {
-				ctx.beginPath()
-				for (let i = 0; i < count; i++) {
-					const x = (i / Math.max(1, count - 1)) * width
-					const y = (layer.data[i] / 255) * height
-					if (i === 0) {
-						ctx.moveTo(x, y)
-					} else {
-						ctx.lineTo(x, y)
-					}
-				}
-				ctx.stroke()
+				drawWaveform(ctx, layer.data, width, height)
 			} else if (layer.mode === "harmongraph") {
 				let a = Math.min(layer.amplitude, Math.min(width, height) * 0.23)
 				for (let i = 0; i < count * 8; i++) {

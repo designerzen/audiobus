@@ -1,3 +1,4 @@
+import { AudioAnalysis } from "./AudioAnalysis.ts"
 import { Visualiser } from "./visualisers/Visualiser.ts"
 import { RenderSurface } from "./renderers/RenderSurface.ts"
 
@@ -16,7 +17,7 @@ export class SpectrumAnalyzer {
 	private frame?: number
 	private running = false
 	private disposed = false
-	private sources = new Set<AudioNode>()
+	private analysis: AudioAnalysis
 	private observer?: ResizeObserver
 	private logicalWidth = 256
 	private logicalHeight = 256
@@ -34,12 +35,12 @@ export class SpectrumAnalyzer {
 		if (![SpectrumAnalyzer.TYPE_FREQUENCY, SpectrumAnalyzer.TYPE_TIME_DOMAIN].includes(type)) {
 			throw new RangeError("Unknown analysis type")
 		}
-		this.analyser = audioContext.createAnalyser()
-		this.analyser.smoothingTimeConstant = 0.85
+		this.analysis = new AudioAnalysis(audioContext, fftSize)
+		this.analyser = this.analysis.analyser
 		this.setFidelity(fftSize)
 	}
 	setFidelity(fftSize: number): void {
-		this.analyser.fftSize = fftSize
+		this.analysis.setFidelity(fftSize)
 		this.frequencyData = new Uint8Array(
 			this.type === SpectrumAnalyzer.TYPE_TIME_DOMAIN
 				? fftSize
@@ -49,10 +50,7 @@ export class SpectrumAnalyzer {
 	}
 	/** Observe without creating an extra audible path to the destination. */
 	observe(source: AudioNode): void {
-		if (!this.sources.has(source)) {
-			source.connect(this.analyser)
-			this.sources.add(source)
-		}
+		this.analysis.observe(source)
 	}
 	/** Explicit pass-through routing retained for callers using the analyser in their graph. */
 	connect(outputTo: AudioNode, source?: AudioNode): void {
@@ -202,13 +200,13 @@ export class SpectrumAnalyzer {
 		try {
 			if (typeof document === "undefined" || !document.hidden) {
 				if (this.type === SpectrumAnalyzer.TYPE_FREQUENCY) {
-					this.analyser.getByteFrequencyData(this.frequencyData)
+					this.analysis.read("frequency", this.frequencyData)
 				} else {
-					this.analyser.getByteTimeDomainData(this.frequencyData)
+					this.analysis.read("time", this.frequencyData)
 				}
 				const visualisers = [...this.visualisers()]
 				if (visualisers.some((vis) => vis.dataDomain === "time")) {
-					this.analyser.getByteTimeDomainData(this.waveformData)
+					this.analysis.read("time", this.waveformData)
 				}
 				if (this.canvas) {
 					this.resize(this.logicalWidth, this.logicalHeight)
@@ -233,15 +231,7 @@ export class SpectrumAnalyzer {
 		this.stop()
 		this.disposed = true
 		this.observer?.disconnect()
-		for (const source of this.sources) {
-			try {
-				source.disconnect(this.analyser)
-			} catch {
-				/* Source may already be disconnected. */
-			}
-		}
-		this.sources.clear()
-		this.analyser.disconnect()
+		this.analysis.dispose()
 		// eslint-disable-next-line unicorn/no-useless-spread
 		for (const vis of [...this.visualisers()]) {
 			this.remove(vis)

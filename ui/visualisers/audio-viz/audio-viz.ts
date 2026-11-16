@@ -1,5 +1,11 @@
 // oxlint-disable-next-line typescript/triple-slash-reference -- Bundler asset declarations.
 /// <reference path="./assets.d.ts" />
+import { AudioAnalysis } from "../../../visualisation/AudioAnalysis.ts"
+import {
+	drawSpectrum,
+	drawWaveform
+} from "../../../visualisation/renderers/CanvasSignalRenderer.ts"
+
 import {
 	EVENT_AUDIO_VIZ_READY,
 	EVENT_BLUR,
@@ -46,13 +52,15 @@ export abstract class CanvasAudioViz extends HTMLElement {
 	private context: CanvasRenderingContext2D | null
 	private voices = new Map<string, Voice>()
 	private segments: Segment[] = []
-	private analyser?: AnalyserNode
+	private analysis?: AudioAnalysis
+	private get analyser() {
+		return this.analysis?.analyser
+	}
 	private sourceContext?: BaseAudioContext
 	private selectedContext: BaseAudioContext | null = null
 	private unobserveOutput?: () => void
 	private signalState = ""
 	private source?: AudioNode
-	private data = new Uint8Array(512)
 	private externalData?: Uint8Array
 	private resize?: ResizeObserver
 	private intersection?: IntersectionObserver
@@ -250,8 +258,7 @@ export abstract class CanvasAudioViz extends HTMLElement {
 			? "Resume visualisation"
 			: "Pause visualisation"
 		if (this.analyser && this.analyser.fftSize !== this.fftSize) {
-			this.analyser.fftSize = this.fftSize
-			this.data = new Uint8Array(this.fftSize)
+			this.analysis!.setFidelity(this.fftSize)
 		}
 		this.updateSummary()
 		this.syncLoop()
@@ -292,10 +299,8 @@ export abstract class CanvasAudioViz extends HTMLElement {
 		this.sourceContext = context
 		this.source = source
 		this.externalData = undefined
-		this.analyser = context.createAnalyser()
-		this.analyser.fftSize = this.fftSize
-		this.data = new Uint8Array(this.fftSize)
-		source.connect(this.analyser)
+		this.analysis = new AudioAnalysis(context, this.fftSize, 0.8)
+		this.analysis.observe(source)
 		this.updateSummary()
 		this.syncLoop()
 	}
@@ -306,17 +311,10 @@ export abstract class CanvasAudioViz extends HTMLElement {
 		this.detachSource()
 	}
 	private detachSource() {
-		if (this.source && this.analyser) {
-			try {
-				this.source.disconnect(this.analyser)
-			} catch {
-				/* Already detached by its owner. */
-			}
-			this.analyser.disconnect()
-		}
+		this.analysis?.dispose()
 		this.source = undefined
 		this.sourceContext = undefined
-		this.analyser = undefined
+		this.analysis = undefined
 		this.signalState = ""
 		this.removeAttribute("data-audio-playing")
 		this.updateSummary()
@@ -519,15 +517,7 @@ export abstract class CanvasAudioViz extends HTMLElement {
 		if (this.kind === "waveform" || this.kind === "spectrum") {
 			let data = this.externalData
 			if (this.analyser) {
-				if (this.kind === "waveform") {
-					this.analyser.getByteTimeDomainData(this.data)
-				} else {
-					this.analyser.getByteFrequencyData(this.data)
-				}
-				data =
-					this.kind === "spectrum"
-						? this.data.subarray(0, this.analyser.frequencyBinCount)
-						: this.data
+				data = this.analysis!.read(this.kind === "waveform" ? "time" : "frequency")
 				const playing =
 					this.sourceContext?.state !== "suspended" &&
 					this.sourceContext?.state !== "closed" &&
@@ -545,30 +535,9 @@ export abstract class CanvasAudioViz extends HTMLElement {
 				return
 			}
 			if (this.kind === "waveform") {
-				ctx.beginPath()
-				data.forEach((value, index) => {
-					const x = (index / Math.max(1, data.length - 1)) * w,
-						y = (value / 255) * h
-					if (!index) {
-						ctx.moveTo(x, y)
-					} else {
-						ctx.lineTo(x, y)
-					}
-				})
-				ctx.stroke()
+				drawWaveform(ctx, data, w, h)
 			} else {
-				const count = Math.min(64, data.length),
-					bar = w / count
-				for (let index = 0; index < count; index++) {
-					const start = Math.floor((index * data.length) / count)
-					const end = Math.floor(((index + 1) * data.length) / count)
-					let peak = 0
-					for (let bin = start; bin < end; bin++) {
-						peak = Math.max(peak, data[bin]!)
-					}
-					const value = peak / 255
-					ctx.fillRect(index * bar, h - value * h, Math.max(1, bar - 2), value * h)
-				}
+				drawSpectrum(ctx, data, w, h)
 			}
 		} else if (this.kind === "pointer") {
 			if (!this.pointer.visible) {
