@@ -1,32 +1,28 @@
 import {
 	Peer,
 	windowTransport,
+	assertPeerOrigin,
 	generatePairingCode,
 	formatPairingCode,
 	normalizePairingCode,
-	type CommandRegistry,
-	type Transport
+	type CommandRegistry
 } from "audiobus-protocol"
 import AbstractInput from "./abstract-input"
 import { getProtocolRegistry } from "../protocol-registry"
 import { LayeredRegistry, registerMidiCommands } from "../protocol-input-commands"
+import { joinUnpaired, unpairedPeers, unpairedSessionCount } from "../protocol-unpaired"
 import { midiToCommand } from "../../midi/midi-command-conversion"
 import { umpToCommand } from "../../midi/ump-codec"
 import { ProtocolMidiState, type ProtocolPacket } from "../protocol-midi-state"
 import { changed, devicePanel } from "../device-controls"
-import { EVENT_CHANGE, EVENT_CLICK, EVENT_MESSAGE } from "../../events/event-constants"
+import { EVENT_CHANGE, EVENT_CLICK } from "../../events/event-constants"
 
-/** Most windows that may control one Input without pairing at the same time. */
-export const MAX_UNPAIRED_PEERS = 8
-const PROTOCOL_MESSAGE = /^(?:control|midi|ump|link),/
-
-/** One connection's peer and the notes it holds, released when that connection ends. */
-type Session = { peer: Peer; state: ProtocolMidiState }
-type UnpairedSession = Session & { origin: string; deliver: (message: unknown) => void }
+export { MAX_UNPAIRED_PEERS } from "../protocol-unpaired"
 
 /**
  * Application control, MIDI commands and WebMidiLink MIDI from a paired application. With
- * `acceptUnpaired`, any window that sends protocol messages may control it without pairing.
+ * `acceptUnpaired`, any window that sends protocol messages may control it without pairing;
+ * those sessions are shared by every Input that accepts them, so each command executes once.
  */
 export default class InputProtocol extends AbstractInput {
 	readonly requiresConnectionControl = true
@@ -34,9 +30,10 @@ export default class InputProtocol extends AbstractInput {
 	private origin?: string
 	private requiredCode?: string
 	private peer?: Peer
-	private unpaired = new Map<MessageEventSource, UnpairedSession>()
-	private stopUnpaired?: () => void
+	private leaveUnpaired?: () => void
 	private midiState = new ProtocolMidiState()
+	/** Notes held by each unpaired session, released when that session ends. */
+	private sessionStates = new Map<number, ProtocolMidiState>()
 	private status?: HTMLElement
 	private gui?: HTMLElement
 	private generation = 0
@@ -58,7 +55,7 @@ export default class InputProtocol extends AbstractInput {
 	}
 	/** Connections from windows that sent messages without pairing. */
 	get unpairedConnections(): Peer[] {
-		return [...this.unpaired.values()].map((entry) => entry.peer)
+		return this.leaveUnpaired ? unpairedPeers() : []
 	}
 	/** The code the paired application must present, formatted for display. */
 	get pairingCode(): string | undefined {
@@ -67,15 +64,11 @@ export default class InputProtocol extends AbstractInput {
 	constructor(options: Record<string, any> = {}) {
 		super({ now: () => performance.now() / 1000, ...options })
 	}
-	/** Application commands plus MIDI commands that play into this chain, tracked per connection. */
-	private createCommands(state: ProtocolMidiState): LayeredRegistry {
-		const commands = new LayeredRegistry(
-			() => (this.options.registry as CommandRegistry | undefined) ?? getProtocolRegistry()
-		)
-		registerMidiCommands(commands, (bytes) =>
-			this.receivePacket({ format: "midi", data: bytes }, state)
-		)
-		return commands
+	private get registry(): CommandRegistry {
+		return (this.options.registry as CommandRegistry | undefined) ?? getProtocolRegistry()
+	}
+	private get identity(): { name: string; version: string } {
+		return { name: this.options.applicationName ?? "audioBus", version: "1" }
 	}
 	/**
 	 * Pass `requirePairingCode` when this application did not choose the target window, such as
@@ -83,7 +76,7 @@ export default class InputProtocol extends AbstractInput {
 	 */
 	attach(target: Window, origin: string, options: { requirePairingCode?: string } = {}): void {
 		// Validate before replacing a working connection.
-		windowTransport(target, origin)
+		assertPeerOrigin(origin)
 		const code =
 			options.requirePairingCode === undefined
 				? undefined
@@ -96,115 +89,61 @@ export default class InputProtocol extends AbstractInput {
 		this.origin = origin
 		this.requiredCode = code
 	}
-	private owns(peer: Peer): boolean {
-		return (
-			this.peer === peer || [...this.unpaired.values()].some((entry) => entry.peer === peer)
+	private createPairedPeer(target: Window, origin: string): Peer {
+		const commands = new LayeredRegistry(this.registry)
+		registerMidiCommands(commands, (bytes) =>
+			this.receivePacket({ format: "midi", data: bytes }, this.midiState)
 		)
-	}
-	private createPeer(
-		transport: Transport,
-		state: ProtocolMidiState,
-		requirePairingCode?: string
-	): Peer {
-		const peer: Peer = new Peer(transport, {
-			identity: { name: this.options.applicationName ?? "audioBus", version: "1" },
-			registry: this.createCommands(state),
+		const peer: Peer = new Peer(windowTransport(target, origin), {
+			identity: this.identity,
+			registry: commands,
 			getPatch: this.options.getPatch,
 			setPatch: this.options.setPatch,
 			ump: true,
-			requirePairingCode,
+			requirePairingCode: this.requiredCode,
 			onAuthorized: () => {
 				if (this.peer === peer && this.status) {
 					this.status.textContent = "Connected. Pairing code accepted."
 				}
 			},
-			onMidi: (bytes) => {
-				if (this.owns(peer)) {
-					this.receivePacket({ format: "midi", data: Array.from(bytes) }, state)
+			onClosed: () => {
+				if (this.peer !== peer) {
+					return
+				}
+				// The other application ended the connection: release its notes and wait.
+				void this.disconnect()
+				if (this.status) {
+					this.status.textContent =
+						"The other application closed the connection. Press Connect to pair again."
 				}
 			},
-			onUmp: (words) => {
-				if (this.owns(peer)) {
-					this.receivePacket({ format: "ump", data: words }, state)
-				}
-			}
+			onError: (error, context) => this.report(error, context),
+			onMidi: (bytes) =>
+				this.receivePacket({ format: "midi", data: Array.from(bytes) }, this.midiState),
+			onUmp: (words) => this.receivePacket({ format: "ump", data: words }, this.midiState)
 		})
 		return peer
 	}
-	/** One peer per sending window; the window's own origin is the only reply target. */
-	private listenUnpaired(): void {
-		const listener = (event: MessageEvent) => {
-			const source = event.source
-			// Opaque or missing origins cannot be replied to without broadcasting.
-			if (
-				!source ||
-				source === window ||
-				source === this.target ||
-				!event.origin ||
-				event.origin === "null" ||
-				typeof event.data !== "string" ||
-				!PROTOCOL_MESSAGE.test(event.data)
-			) {
-				return
-			}
-			let entry = this.unpaired.get(source)
-			if (entry && entry.origin !== event.origin) {
-				// The window navigated to another application: start a fresh session.
-				this.endUnpaired(source)
-				entry = undefined
-			}
-			if (!entry) {
-				// Closed windows and removed iframes free their slots before the limit applies.
-				for (const [sender, session] of this.unpaired) {
-					if ((sender as Window).closed === true) {
-						this.endUnpaired(sender, session)
-					}
-				}
-				if (this.unpaired.size >= MAX_UNPAIRED_PEERS) {
-					return
-				}
-				const receivers = new Set<(message: unknown) => void>()
-				const origin = event.origin
-				const transport: Transport = {
-					send: (message) => (source as Window).postMessage(message, origin),
-					listen: (receive) => {
-						receivers.add(receive)
-						return () => {
-							receivers.delete(receive)
-						}
-					}
-				}
-				const state = new ProtocolMidiState()
-				entry = {
-					origin,
-					state,
-					peer: this.createPeer(transport, state),
-					deliver: (message) => receivers.forEach((receive) => receive(message))
-				}
-				this.unpaired.set(source, entry)
-				this.updateStatus()
-			}
-			entry.deliver(event.data)
-		}
-		window.addEventListener(EVENT_MESSAGE, listener)
-		this.stopUnpaired = () => {
-			window.removeEventListener(EVENT_MESSAGE, listener)
-			for (const source of this.unpaired.keys()) {
-				this.endUnpaired(source)
-			}
-		}
+	private report(error: unknown, context: string): void {
+		console.warn(`audioBus Protocol input: ${context}`, error)
 	}
-	/** Close one unpaired session and release only the notes it was holding. */
-	private endUnpaired(source: MessageEventSource, session = this.unpaired.get(source)): void {
-		if (!session) {
+	private sessionState(session: number): ProtocolMidiState {
+		let state = this.sessionStates.get(session)
+		if (!state) {
+			state = new ProtocolMidiState()
+			this.sessionStates.set(session, state)
+		}
+		return state
+	}
+	private endSession(session: number): void {
+		const state = this.sessionStates.get(session)
+		if (!state) {
 			return
 		}
-		this.unpaired.delete(source)
-		session.peer.close()
-		for (const release of session.state.release()) {
+		this.sessionStates.delete(session)
+		for (const release of state.release()) {
 			this.dispatchPacket(release)
 		}
-		this.updateStatus()
 	}
 	async connect(): Promise<void> {
 		if (this.isConnected) {
@@ -220,18 +159,23 @@ export default class InputProtocol extends AbstractInput {
 		void this.disconnect()
 		const generation = ++this.generation
 		if (unpaired) {
-			this.listenUnpaired()
+			this.leaveUnpaired = joinUnpaired({
+				identity: this.identity,
+				registry: this.registry,
+				paired: () => this.target,
+				receive: (session, packet) =>
+					this.receivePacket(packet, this.sessionState(session)),
+				end: (session) => this.endSession(session),
+				changed: () => this.updateStatus(),
+				onError: (error, context) => this.report(error, context)
+			})
 		}
 		if (!this.target || !this.origin) {
 			this.setAsConnected()
 			this.updateStatus()
 			return
 		}
-		const peer = this.createPeer(
-			windowTransport(this.target, this.origin),
-			this.midiState,
-			this.requiredCode
-		)
+		const peer = this.createPairedPeer(this.target, this.origin)
 		this.peer = peer
 		try {
 			await peer.connect()
@@ -251,14 +195,15 @@ export default class InputProtocol extends AbstractInput {
 		}
 	}
 	private connectedStatus(): string {
-		const paired =
-			this.peer && !this.peer.isAuthorized
-				? `Connected. Enter pairing code ${this.pairingCode} in the other application and connect there.`
-				: this.peer
+		const paired = !this.peer
+			? ""
+			: this.peer.isLocked
+				? "Too many incorrect pairing codes. Pair the application again to get a new code."
+				: this.peer.isAuthorized
 					? "Connected"
-					: ""
-		const unpaired = this.stopUnpaired
-			? `Accepting control from any window without pairing (${this.unpaired.size} connected).`
+					: `Connected. Enter pairing code ${this.pairingCode} in the other application and connect there.`
+		const unpaired = this.leaveUnpaired
+			? `Accepting control from any window without pairing (${unpairedSessionCount()} connected).`
 			: ""
 		return [paired, unpaired].filter(Boolean).join(" ")
 	}
@@ -278,7 +223,7 @@ export default class InputProtocol extends AbstractInput {
 			this.dispatch(command)
 		}
 	}
-	private receivePacket(packet: ProtocolPacket, state = this.midiState): void {
+	private receivePacket(packet: ProtocolPacket, state: ProtocolMidiState): void {
 		const type = packet.data[0] >>> 28
 		if (
 			!this.options.allowSysex &&
@@ -295,8 +240,11 @@ export default class InputProtocol extends AbstractInput {
 		this.generation++
 		this.peer?.close()
 		this.peer = undefined
-		this.stopUnpaired?.()
-		this.stopUnpaired = undefined
+		this.leaveUnpaired?.()
+		this.leaveUnpaired = undefined
+		for (const session of this.sessionStates.keys()) {
+			this.endSession(session)
+		}
 		for (const release of this.midiState.release()) {
 			this.dispatchPacket(release)
 		}

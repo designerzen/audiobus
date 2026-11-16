@@ -9,57 +9,48 @@ import {
 } from "audiobus-protocol"
 
 /**
- * Commands owned by one peer connection, layered over the shared application registry.
- * Local commands take precedence; application commands, properties and events pass through.
+ * Commands owned by one peer connection, layered over the shared application registry fixed at
+ * construction, so calls and notifications always come from the same registry. Local commands
+ * take precedence; application commands, properties and events pass through.
  */
 export class LayeredRegistry extends CommandRegistry {
-	constructor(private readonly base: () => CommandRegistry) {
+	constructor(private readonly base: CommandRegistry) {
 		super()
 	}
-	private owns(id: string): boolean {
-		return super.list().some((command) => command.id === id)
+	has(id: string): boolean {
+		return super.has(id) || this.base.has(id)
 	}
 	list(): CommandDescriptor[] {
 		const own = super.list()
 		const ids = new Set(own.map((command) => command.id))
-		return [
-			...own,
-			...this.base()
-				.list()
-				.filter((command) => !ids.has(command.id))
-		]
+		return [...own, ...this.base.list().filter((command) => !ids.has(command.id))]
 	}
 	call(id: string, params?: unknown): Promise<Json> {
-		return this.owns(id) ? super.call(id, params) : this.base().call(id, params)
+		return super.has(id) ? super.call(id, params) : this.base.call(id, params)
 	}
 	listProperties(): PropertyDescriptor[] {
-		return this.base().listProperties()
+		return this.base.listProperties()
 	}
 	getProperty(id: string): Promise<Json> {
-		return this.base().getProperty(id)
+		return this.base.getProperty(id)
 	}
 	setProperty(id: string, value: unknown): Promise<Json> {
-		return this.base().setProperty(id, value)
+		return this.base.setProperty(id, value)
 	}
 	notifyProperty(id: string): Promise<Json> {
-		return this.base().notifyProperty(id)
+		return this.base.notifyProperty(id)
 	}
 	listBundles(): CapabilityBundle[] {
 		const own = super.listBundles()
 		const ids = new Set(own.map((bundle) => bundle.id))
-		return [
-			...own,
-			...this.base()
-				.listBundles()
-				.filter((bundle) => !ids.has(bundle.id))
-		]
+		return [...own, ...this.base.listBundles().filter((bundle) => !ids.has(bundle.id))]
 	}
 	readRetained(topic: string): { value: Json } | undefined {
-		return super.readRetained(topic) ?? this.base().readRetained(topic)
+		return super.readRetained(topic) ?? this.base.readRetained(topic)
 	}
 	observe(listener: (topic: string, data: Json) => void): () => void {
 		const own = super.observe(listener),
-			shared = this.base().observe(listener)
+			shared = this.base.observe(listener)
 		return () => {
 			own()
 			shared()

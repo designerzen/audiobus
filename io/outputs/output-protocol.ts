@@ -110,6 +110,14 @@ export default class OutputProtocol extends EventTarget implements IAudioOutput 
 			timeoutMs: this.options.timeoutMs,
 			pairingCode: this.pairingCode,
 			ump: this.options.mode === "audiobus",
+			onClosed: () => {
+				// The destination ended the connection; its notes are already released there.
+				if (this.peer === peer) {
+					void this.disconnect()
+				}
+			},
+			onError: (error, context) =>
+				console.warn(`audioBus Protocol output: ${context}`, error),
 			onPatch: (patch) =>
 				this.dispatchEvent(new CustomEvent(EVENT_PROTOCOL_PATCH, { detail: patch })),
 			onEvent: (topic, data) => {
