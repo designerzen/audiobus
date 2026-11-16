@@ -72,6 +72,14 @@ export const UI_INPUT_COMPONENTS = {
 		subtype: "pointer",
 		load: () => import("./controls/audio-switch/audio-switch.ts")
 	},
+	[INPUT_TYPES.LEAP_MOTION]: {
+		tag: "theremid-input",
+		name: "Leap Motion",
+		description:
+			"Play in the air with a Leap Motion, the camera or a pointer: theremin glides, scales, chords, arpeggios and strums over 2D and 3D surfaces",
+		subtype: "gesture",
+		load: () => import("theremid/source")
+	},
 	[INPUT_TYPES.PIANO_ROLL]: {
 		tag: "piano-roll",
 		name: "Piano Roll",

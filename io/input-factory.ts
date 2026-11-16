@@ -75,8 +75,6 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./inputs/input-ble-midi-device.ts")
 		case INPUT_TYPES.MICROPHONE_FORMANT:
 			return await import("./inputs/input-microphone-formant.ts")
-		case INPUT_TYPES.LEAP_MOTION:
-			return await import("./inputs/input-leap-motion.ts")
 		case INPUT_TYPES.ONSCREEN_KEYBOARD:
 			return await import("./inputs/input-onscreen-keyboard.ts")
 		case INPUT_TYPES.PROMPT_AI:
@@ -283,15 +281,6 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		description: "Microphone input for formant analysis",
 		isAvailable: () => typeof navigator !== "undefined" && !!navigator.mediaDevices,
 		create: (options) => createInput(INPUT_TYPES.MICROPHONE_FORMANT, options)
-	},
-	{
-		id: INPUT_TYPES.LEAP_MOTION,
-		type: INPUT_DEFINITIONS[INPUT_TYPES.LEAP_MOTION].type,
-		subtype: INPUT_DEFINITIONS[INPUT_TYPES.LEAP_MOTION].subtype,
-		name: "Leap Motion",
-		description: "Hand gesture tracking via Leap Motion device",
-		isAvailable: () => typeof window !== "undefined" && !!(window as any).Leap,
-		create: (options) => createInput(INPUT_TYPES.LEAP_MOTION, options)
 	},
 	{
 		id: INPUT_TYPES.ONSCREEN_KEYBOARD,

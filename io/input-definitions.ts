@@ -259,7 +259,8 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		type: "controller",
 		subtype: "gesture",
 		name: "Leap Motion",
-		description: "Hand gesture tracking via Leap Motion device",
+		description:
+			"Play in the air with a Leap Motion, the camera or a pointer: theremin glides, scales, chords, arpeggios and strums over 2D and 3D surfaces",
 		icon: "/icons/input-leap-motion.svg",
 		category: "Gesture"
 	},
