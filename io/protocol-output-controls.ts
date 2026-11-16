@@ -47,6 +47,18 @@ export function createProtocolOutputControls(output: OutputProtocol) {
 		},
 		options
 	)
+	const controllers = document.createElement("input")
+	controllers.type = "checkbox"
+	controllers.checked = output.options.sendToConnectedApplications === true
+	controllers.addEventListener(
+		EVENT_CHANGE,
+		() => {
+			output.options.sendToConnectedApplications = controllers.checked
+			changed(output)
+			update()
+		},
+		options
+	)
 	const status = document.createElement("p")
 	status.setAttribute("role", "status")
 	const report = (error: unknown) => {
@@ -152,7 +164,9 @@ export function createProtocolOutputControls(output: OutputProtocol) {
 		}
 		status.textContent = output.isConnected
 			? "Connected"
-			: "Pair a destination, then press Connect."
+			: output.options.sendToConnectedApplications === true
+				? "Sending to applications connected to this window. Pair a destination to send to it as well."
+				: "Pair a destination, then press Connect."
 	}
 	const refresh = async () => {
 		if (!output.isConnected || output.options.mode !== "audiobus") {
@@ -251,6 +265,7 @@ export function createProtocolOutputControls(output: OutputProtocol) {
 		field("Destination URL", url),
 		field("Protocol", mode),
 		field("Allow lossy MIDI 1 conversion for group zero", fallback),
+		field("Also send to applications connected to this window", controllers),
 		open,
 		field("Pairing code shown by the destination", code),
 		status,

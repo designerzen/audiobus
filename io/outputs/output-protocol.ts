@@ -15,6 +15,7 @@ import {
 	TOPIC_PROPERTIES_LIST_CHANGED
 } from "audiobus-protocol"
 import { getProtocolRegistry } from "../protocol-registry"
+import { unpairedPeers } from "../protocol-unpaired"
 import { commandToMidi } from "../../midi/midi-command-conversion"
 import { commandToUmp, umpToMidiBytes } from "../../midi/ump-codec"
 import { ProtocolMidiState, type ProtocolPacket } from "../protocol-midi-state"
@@ -227,18 +228,50 @@ export default class OutputProtocol extends EventTarget implements IAudioOutput 
 		const words = command.ump ? commandToUmp(command) : undefined
 		return `${words ? (words[0] >>> 24) & 15 : 0}:${command.channel || 1}:${command.number}`
 	}
-	private sendPacket(packet: ProtocolPacket): void {
-		if (!this.peer) {
-			return
+	/** Windows that opened a connection to this application, when they also receive its MIDI. */
+	private controllers(): Peer[] {
+		return this.options.sendToConnectedApplications === true ? unpairedPeers() : []
+	}
+	/** The form of a packet one peer can receive, or undefined when it cannot represent it. */
+	private packetFor(peer: Peer, packet: ProtocolPacket): ProtocolPacket | undefined {
+		if (packet.format !== "ump" || peer.supports("ump")) {
+			return packet
 		}
-		if (packet.format === "ump") {
-			this.peer.sendUmp(packet.data)
-		} else {
-			this.peer.sendMidi(packet.data)
+		// Lossy conversion is opt-in and never merges nonzero UMP groups.
+		const words = packet.data
+		const type = words[0] >>> 28
+		const group = (words[0] >>> 24) & 15
+		const kind = (words[0] >>> 20) & 15
+		const extended =
+			type === 4 &&
+			(((kind === 8 || kind === 9) && (words[0] & 255) !== 0) ||
+				(kind === 12 && (words[0] & 0xffff) !== 0))
+		const bytes =
+			(type === 1 || type === 2 || type === 4) && group === 0 && !extended
+				? umpToMidiBytes(words)
+				: undefined
+		return this.options.allowMidi1Fallback && bytes
+			? { format: "midi", data: bytes }
+			: undefined
+	}
+	private sendPacket(packet: ProtocolPacket, peers: Peer[]): void {
+		for (const peer of peers) {
+			const converted = this.packetFor(peer, packet)
+			if (converted?.format === "ump") {
+				peer.sendUmp(converted.data)
+			} else if (converted) {
+				peer.sendMidi(converted.data)
+			}
 		}
 	}
+	/** The paired destination, then any connected applications that also receive MIDI. */
+	private recipients(): Peer[] {
+		const peers = this.connected && this.peer ? [this.peer] : []
+		return [...peers, ...this.controllers().filter((peer) => !peers.includes(peer))]
+	}
 	sendCommand(command: IAudioCommand): void {
-		if (!this.connected || !this.peer) {
+		const peers = this.recipients()
+		if (!peers.length) {
 			return
 		}
 		let packet: ProtocolPacket
@@ -248,27 +281,12 @@ export default class OutputProtocol extends EventTarget implements IAudioOutput 
 			if (!this.hasSysexOutput() && (type === 3 || type === 5)) {
 				return
 			}
-			if (this.peer.supports("ump")) {
-				packet = { format: "ump", data: words }
-			} else {
-				// Lossy conversion is opt-in and never merges nonzero UMP groups.
-				const group = (words[0] >>> 24) & 15
-				const kind = (words[0] >>> 20) & 15
-				const extended =
-					type === 4 &&
-					(((kind === 8 || kind === 9) && (words[0] & 255) !== 0) ||
-						(kind === 12 && (words[0] & 0xffff) !== 0))
-				const bytes =
-					(type === 1 || type === 2 || type === 4) && group === 0 && !extended
-						? umpToMidiBytes(words)
-						: undefined
-				if (!this.options.allowMidi1Fallback || !bytes) {
-					throw new ProtocolError(
-						"unsupported_capability",
-						"Destination cannot receive this UMP packet; MIDI 1 conversion must be explicitly enabled and representable in group zero"
-					)
-				}
-				packet = { format: "midi", data: bytes }
+			packet = { format: "ump", data: words }
+			if (this.connected && this.peer && !this.packetFor(this.peer, packet)) {
+				throw new ProtocolError(
+					"unsupported_capability",
+					"Destination cannot receive this UMP packet; MIDI 1 conversion must be explicitly enabled and representable in group zero"
+				)
 			}
 		} else {
 			const bytes = commandToMidi(command)
@@ -278,9 +296,9 @@ export default class OutputProtocol extends EventTarget implements IAudioOutput 
 			packet = { format: "midi", data: bytes }
 		}
 		for (const release of this.midiState.accept(packet)) {
-			this.sendPacket(release)
+			this.sendPacket(release, peers)
 		}
-		this.sendPacket(packet)
+		this.sendPacket(packet, peers)
 	}
 	noteOn(number: number, velocity = 127, channel = 1): void {
 		this.sendCommand(musicalCommand({ type: NOTE_ON, number, velocity, channel }))
@@ -290,10 +308,9 @@ export default class OutputProtocol extends EventTarget implements IAudioOutput 
 	}
 	allNotesOff(): void {
 		const releases = this.midiState.release()
-		if (this.connected && this.peer) {
-			for (const release of releases) {
-				this.sendPacket(release)
-			}
+		const peers = this.recipients()
+		for (const release of releases) {
+			this.sendPacket(release, peers)
 		}
 	}
 	async disconnect(): Promise<void> {
