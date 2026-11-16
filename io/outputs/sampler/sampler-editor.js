@@ -12,7 +12,7 @@ import {
 	EVENT_POINTER_DOWN,
 	EVENT_POINTER_MOVE,
 	EVENT_POINTER_UP
-} from "../../../events/event-constants"
+} from "../../../events/event-constants.ts"
 const escape = (value) =>
 	String(value).replace(
 		/[&<>"']/g,
