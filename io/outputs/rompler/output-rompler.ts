@@ -221,11 +221,13 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 		}
 		const channel = Math.round(bounded(command.channel, 1, 1, 16)) - 1
 		const note = command.number
+		// Commands may name a later AudioContext time to play at; the worklet holds them until then
+		const time = command.audioTime
 		if (command.type === NOTE_OFF || (command.type === NOTE_ON && command.velocity <= 0)) {
 			if (this.sustained.has(channel)) {
 				this.released.add(`${channel}:${note}`)
 			} else {
-				this.post({ type: "off", channel, note })
+				this.post({ type: "off", channel, note, time })
 			}
 			return
 		}
@@ -241,6 +243,7 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 			this.post({
 				type: "bend",
 				channel,
+				time,
 				value:
 					((bounded(command.value, 8192, 0, 16383) - 8192) / 8192) *
 					this.options.pitchBendRange
@@ -269,7 +272,8 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 			type: "on",
 			channel,
 			note,
-			velocity: bounded(command.velocity, 100, 0, 127) / 127
+			velocity: bounded(command.velocity, 100, 0, 127) / 127,
+			time
 		})
 	}
 	private control(channel: number, controller: number, value: number): void {

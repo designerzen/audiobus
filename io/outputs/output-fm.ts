@@ -241,11 +241,12 @@ export default class OutputFM extends EventTarget implements IAudioOutput {
 		}
 		const part = Math.round(bounded(command.channel, 1, 1, PARTS)) - 1
 		const note = command.number
+		const time = this.timeOf(command)
 		if (command.type === NOTE_OFF || (command.type === NOTE_ON && command.velocity <= 0)) {
 			if (this.sustained.has(part)) {
 				this.released.add(`${part}:${note}`)
 			} else {
-				this.post({ type: "off", part, note, time: this.context.currentTime })
+				this.post({ type: "off", part, note, time })
 			}
 			return
 		}
@@ -262,7 +263,7 @@ export default class OutputFM extends EventTarget implements IAudioOutput {
 				((bounded(command.value ?? command.pitchBend, 8192, 0, 16383) - 8192) / 8192) *
 				this.settings.pitchBendRange
 			this.bends[part] = value
-			this.post({ type: "bend", part, value, time: this.context.currentTime })
+			this.post({ type: "bend", part, value, time })
 			return
 		}
 		if (
@@ -292,9 +293,13 @@ export default class OutputFM extends EventTarget implements IAudioOutput {
 			part,
 			note,
 			velocity: Math.min(1, bounded(command.velocity, 100, 0, 127) / 127),
-			time: this.context.currentTime
+			time
 		})
 		await ready
+	}
+	/** Commands may name a later AudioContext time to play at; earlier times play now. */
+	private timeOf(command: IAudioCommand): number {
+		return Math.max(this.context.currentTime, command.audioTime ?? 0)
 	}
 	private control(part: number, controller: number, value: number): void {
 		if (controller === 64) {

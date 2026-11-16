@@ -15,9 +15,22 @@ class RomplerProcessor extends AudioWorkletProcessor {
 		this.gains = new Float32Array(16).fill(1)
 		this.release = 0.3
 		this.alive = true
+		// Notes, releases and bends timed for later, in time order
+		this.events = []
 		this.port.onmessage = ({ data }) => this.receive(data)
 	}
 	receive(data) {
+		if (data.time > currentTime) {
+			let index = this.events.length
+			while (index > 0 && this.events[index - 1].time > data.time) {
+				index--
+			}
+			this.events.splice(index, 0, data)
+			return
+		}
+		this.apply(data)
+	}
+	apply(data) {
 		switch (data.type) {
 			case "sample":
 				this.samples.set(data.note, data)
@@ -57,6 +70,10 @@ class RomplerProcessor extends AudioWorkletProcessor {
 				break
 			case "panic":
 				this.waiting.clear()
+				this.events =
+					data.channel === undefined
+						? []
+						: this.events.filter((event) => event.channel !== data.channel)
 				this.voices =
 					data.channel === undefined
 						? []
@@ -64,6 +81,7 @@ class RomplerProcessor extends AudioWorkletProcessor {
 				break
 			case "destroy":
 				this.alive = false
+				this.events = []
 				this.voices = []
 				this.samples.clear()
 				break
@@ -100,6 +118,9 @@ class RomplerProcessor extends AudioWorkletProcessor {
 		right.fill(0)
 		if (!this.alive) {
 			return false
+		}
+		while (this.events.length && this.events[0].time <= currentTime) {
+			this.apply(this.events.shift())
 		}
 		if (!this.voices.length) {
 			return true
