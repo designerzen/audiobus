@@ -20,12 +20,12 @@ import { EVENT_CHANGE, EVENT_CLICK } from "../../events/event-constants"
 export { MAX_UNPAIRED_PEERS } from "../protocol-unpaired"
 
 /**
- * Application control, MIDI commands and WebMidiLink MIDI from a paired application. With
- * `acceptUnpaired`, any window that sends protocol messages may control it without pairing;
+ * Application control, MIDI commands and WebMidiLink MIDI, listening by default. With
+ * `acceptUnpaired: false`, connections require an explicitly attached application; otherwise
  * those sessions are shared by every Input that accepts them, so each command executes once.
  */
 export default class InputProtocol extends AbstractInput {
-	readonly requiresConnectionControl = true
+	readonly requiresConnectionControl = false
 	private target?: Window
 	private origin?: string
 	private requiredCode?: string
@@ -42,7 +42,7 @@ export default class InputProtocol extends AbstractInput {
 		return "audioBus Protocol"
 	}
 	get description(): string {
-		return "Control application commands and play MIDI from a paired application"
+		return "Receive application commands and MIDI from other applications"
 	}
 	hasMidiInput(): boolean {
 		return true
@@ -62,7 +62,10 @@ export default class InputProtocol extends AbstractInput {
 		return this.requiredCode === undefined ? undefined : formatPairingCode(this.requiredCode)
 	}
 	constructor(options: Record<string, any> = {}) {
-		super({ now: () => performance.now() / 1000, ...options })
+		super({ acceptUnpaired: true, now: () => performance.now() / 1000, ...options })
+		if (this.options.acceptUnpaired && this.options.autoConnect !== false) {
+			void this.connect().catch((error) => this.report(error, "connect"))
+		}
 	}
 	private get registry(): CommandRegistry {
 		return (this.options.registry as CommandRegistry | undefined) ?? getProtocolRegistry()
@@ -203,7 +206,7 @@ export default class InputProtocol extends AbstractInput {
 					? "Connected"
 					: `Connected. Enter pairing code ${this.pairingCode} in the other application and connect there.`
 		const unpaired = this.leaveUnpaired
-			? `Accepting control from any window without pairing (${unpairedSessionCount()} connected).`
+			? `Listening for connections (${unpairedSessionCount()} connected).`
 			: ""
 		return [paired, unpaired].filter(Boolean).join(" ")
 	}
@@ -211,7 +214,7 @@ export default class InputProtocol extends AbstractInput {
 		if (this.status) {
 			this.status.textContent = this.isConnected
 				? this.connectedStatus()
-				: "Pair an application window and exact origin using attach(), then connect."
+				: "Pair an application in advanced connection settings, then connect."
 		}
 	}
 	private dispatchPacket(packet: ProtocolPacket): void {
@@ -259,6 +262,10 @@ export default class InputProtocol extends AbstractInput {
 		this.status = document.createElement("p")
 		this.status.setAttribute("role", "status")
 		this.updateStatus()
+		const advanced = document.createElement("details")
+		const summary = document.createElement("summary")
+		summary.textContent = "Advanced connection settings"
+		const pairing = document.createElement("div")
 		const label = document.createElement("label")
 		label.textContent = "Peer application URL"
 		const url = document.createElement("input")
@@ -309,10 +316,20 @@ export default class InputProtocol extends AbstractInput {
 		unpaired.type = "checkbox"
 		unpaired.checked = this.options.acceptUnpaired === true
 		unpairedLabel.append(unpaired, " Accept control from any window without pairing")
+		pairing.hidden = unpaired.checked
+		const connection = document.createElement("button")
+		connection.type = "button"
+		connection.textContent = "Connect paired application"
+		connection.addEventListener(EVENT_CLICK, () => {
+			void this.connect().catch((error) => {
+				this.status!.textContent = error instanceof Error ? error.message : String(error)
+			})
+		})
 		const warning = document.createElement("small")
 		warning.textContent =
-			"Any page that can message this window, such as one that opened or embeds it, can then play notes and press any control. Turn on only for pages you trust."
+			"Applications that open or embed this window can send MIDI and application commands. Disable open connections to require pairing."
 		unpaired.addEventListener(EVENT_CHANGE, () => {
+			pairing.hidden = unpaired.checked
 			this.options.acceptUnpaired = unpaired.checked
 			changed(this)
 			// Apply the change to a running connection. Any later disconnect, connect or destroy
@@ -320,7 +337,7 @@ export default class InputProtocol extends AbstractInput {
 			const wasConnected = this.isConnected
 			void this.disconnect()
 			const generation = this.generation
-			if (wasConnected && (this.target || unpaired.checked)) {
+			if ((wasConnected || unpaired.checked) && (this.target || unpaired.checked)) {
 				queueMicrotask(() => {
 					if (generation === this.generation && !this.destroyed) {
 						this.connect().catch((error) => {
@@ -333,7 +350,9 @@ export default class InputProtocol extends AbstractInput {
 				})
 			}
 		})
-		this.gui.append(label, open, opener, unpairedLabel, warning, this.status)
+		pairing.append(label, open, opener, connection)
+		advanced.append(summary, unpairedLabel, warning, pairing)
+		this.gui.append(this.status, advanced)
 		return this.gui
 	}
 	async destroyGui(): Promise<void> {

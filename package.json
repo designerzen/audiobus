@@ -72,7 +72,7 @@
 		"types"
 	],
 	"dependencies": {
-		"audiobus-protocol": "git+https://github.com/designerzen/audiobus-protocol.git#83637433b919b7a0652787b1561a5e51fbe15801",
+		"audiobus-protocol": "git+https://github.com/designerzen/audiobus-protocol.git#main",
 		"@magenta/music": "^1.23.1",
 		"@mediapipe/tasks-vision": "1.2.3",
 		"theremid": "github:designerzen/Leap-Motion-Theremin#theremid-harmoneasy",

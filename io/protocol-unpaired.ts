@@ -1,5 +1,6 @@
 import {
 	Peer,
+	decodeMidi,
 	isInitializeRequest,
 	MAX_MESSAGE_LENGTH,
 	type CommandRegistry,
@@ -35,7 +36,7 @@ type Session = {
 	origin: string
 	peer: Peer
 	deliver: (message: unknown) => void
-	timer: ReturnType<typeof setTimeout>
+	timer?: ReturnType<typeof setTimeout>
 }
 
 /**
@@ -105,8 +106,8 @@ class UnpairedHost {
 			session = undefined
 		}
 		if (!session) {
-			// Only a connection attempt earns a slot; stray or malformed traffic does not.
-			if (!isInitializeRequest(event.data)) {
+			// Legacy WebMidiLink MIDI needs no initialization handshake.
+			if (!isInitializeRequest(event.data) && !decodeMidi(event.data)) {
 				return
 			}
 			// Closed windows and removed iframes free their slots before the limit applies.
@@ -118,11 +119,11 @@ class UnpairedHost {
 			if (this.sessions.size >= MAX_UNPAIRED_PEERS) {
 				return
 			}
-			session = this.open(source, event.origin)
+			session = this.open(source, event.origin, isInitializeRequest(event.data))
 		}
 		session.deliver(event.data)
 	}
-	private open(source: MessageEventSource, origin: string): Session {
+	private open(source: MessageEventSource, origin: string, initializing: boolean): Session {
 		const id = ++this.sequence
 		const receivers = new Set<(message: unknown) => void>()
 		const transport: Transport = {
@@ -160,11 +161,13 @@ class UnpairedHost {
 			origin,
 			peer,
 			deliver: (message) => receivers.forEach((receive) => receive(message)),
-			timer: setTimeout(() => {
-				if (!peer.isInitialized) {
-					this.end(source, session)
-				}
-			}, UNPAIRED_INITIALIZE_TIMEOUT_MS)
+			timer: initializing
+				? setTimeout(() => {
+						if (!peer.isInitialized) {
+							this.end(source, session)
+						}
+					}, UNPAIRED_INITIALIZE_TIMEOUT_MS)
+				: undefined
 		}
 		this.sessions.set(source, session)
 		this.changed()
