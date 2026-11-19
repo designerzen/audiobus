@@ -268,8 +268,7 @@ export function getRelativeKeys(key: MusicalKey): MusicalKey[] {
 export function isSecondaryDominant(chord: SuggestedChord, key: MusicalKey): boolean {
 	const target = mod12(chord.rootPc + 5)
 	return (
-		DOMINANT_TYPES.includes(chord.type) &&
-		diatonicChords(key).some((c) => c.rootPc === target)
+		DOMINANT_TYPES.includes(chord.type) && diatonicChords(key).some((c) => c.rootPc === target)
 	)
 }
 

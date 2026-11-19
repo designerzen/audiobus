@@ -18,7 +18,11 @@ describe("detectChord", () => {
 	})
 
 	it("detects sevenths and extensions folded into one octave", () => {
-		expect(detectChord([55, 59, 62, 65])).toMatchObject({ rootPc: 7, type: "dom7", label: "Gdom7" })
+		expect(detectChord([55, 59, 62, 65])).toMatchObject({
+			rootPc: 7,
+			type: "dom7",
+			label: "Gdom7"
+		})
 		expect(detectChord([60, 62, 64, 67])).toMatchObject({ rootPc: 0, type: "add9" })
 	})
 
@@ -61,7 +65,15 @@ describe("suggestions", () => {
 
 	it("groups every suggestion once and lists the full diatonic set", () => {
 		const groups = groupNextChords(detectChord([60, 64, 67])!, cMajor)
-		expect(groups.diatonic.map((c) => c.label)).toEqual(["C", "Dm", "Em", "F", "G", "Am", "Bdim"])
+		expect(groups.diatonic.map((c) => c.label)).toEqual([
+			"C",
+			"Dm",
+			"Em",
+			"F",
+			"G",
+			"Am",
+			"Bdim"
+		])
 		expect(groups.functional.some((c) => c.label === "Ddom7")).toBe(true)
 		expect(groups.chromatic.every((c) => c.group === "chromatic")).toBe(true)
 	})

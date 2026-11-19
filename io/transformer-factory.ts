@@ -125,7 +125,10 @@ import {
 import { ID_CC_STEPPER, TransformerCCStepper } from "./transformers/transformer-cc-stepper.ts"
 import { ID_MPE_ENCODER, TransformerMpeEncoder } from "./transformers/transformer-mpe-encoder.ts"
 import { ID_MPE_DECODER, TransformerMpeDecoder } from "./transformers/transformer-mpe-decoder.ts"
-import { ID_MIDI_PROTOCOL, TransformerMidiProtocol } from "./transformers/transformer-midi-protocol.ts"
+import {
+	ID_MIDI_PROTOCOL,
+	TransformerMidiProtocol
+} from "./transformers/transformer-midi-protocol.ts"
 import { ID_CHORD_BLOOM, TransformerChordBloom } from "./transformers/transformer-chord-bloom"
 import { ID_MELODY_SHADOW, TransformerMelodyShadow } from "./transformers/transformer-melody-shadow"
 import {

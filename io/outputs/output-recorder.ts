@@ -1,5 +1,9 @@
 import type { IAudioOutput } from "./output-interface"
-import { EVENT_CLICK, EVENT_RECORDER_TOGGLE, EVENT_RECORDER_REVIEW } from "../../events/event-constants"
+import {
+	EVENT_CLICK,
+	EVENT_RECORDER_TOGGLE,
+	EVENT_RECORDER_REVIEW
+} from "../../events/event-constants"
 import { getAudioRecording, type AudioRecording } from "../recording/audio-recording"
 import { RECORDING_STATE_CHANGED } from "../recording/recording-format"
 

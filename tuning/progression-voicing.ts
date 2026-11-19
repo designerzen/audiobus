@@ -13,7 +13,9 @@ export function voiceProgressionChord(
 ): number[] {
 	const low = Math.max(0, Math.min(lower, upper)),
 		high = Math.min(127, Math.max(lower, upper))
-	if (!chord.pcs.length || chord.pcs.length > 4) return []
+	if (!chord.pcs.length || chord.pcs.length > 4) {
+		return []
+	}
 	const count =
 		style === "classical"
 			? 4
@@ -32,29 +34,36 @@ export function voiceProgressionChord(
 	const required = chord.pcs.reduce((mask, pc) => mask | (1 << pc), 0)
 	for (let part = 0; part < count; part++) {
 		const next = new Map<string, Path>()
-		for (const path of paths)
+		for (const path of paths) {
 			for (const pitch of candidates) {
-				if (part === 0 && mod12(pitch) !== chord.bass) continue
+				if (part === 0 && mod12(pitch) !== chord.bass) {
+					continue
+				}
 				if (
 					part &&
 					(pitch <= path.notes[part - 1] ||
 						pitch - path.notes[part - 1] > (part === 1 ? 19 : 12))
-				)
+				) {
 					continue
+				}
 				if (style === "classical") {
-					if (pitch < SATB_RANGES[part][0] || pitch > SATB_RANGES[part][1]) continue
+					if (pitch < SATB_RANGES[part][0] || pitch > SATB_RANGES[part][1]) {
+						continue
+					}
 					if (previous.length === 4) {
 						if (
 							(part && pitch < previous[part - 1]) ||
 							(part < 3 && pitch > previous[part + 1])
-						)
+						) {
 							continue
+						}
 						if (
 							mod12(previous[part]) === mod12(chord.root - 1) &&
 							pitch !== previous[part] &&
 							pitch !== previous[part] + 1
-						)
+						) {
 							continue
+						}
 						if (
 							path.notes.some((note, j) => {
 								const before = mod12(previous[part] - previous[j]),
@@ -67,22 +76,27 @@ export function voiceProgressionChord(
 										Math.sign(note - previous[j])
 								)
 							})
-						)
+						) {
 							continue
+						}
 					}
 				}
 				const mask = path.mask | (1 << mod12(pitch))
 				const missing = chord.pcs.filter((pc) => !(mask & (1 << pc))).length
-				if (missing > count - part - 1) continue
+				if (missing > count - part - 1) {
+					continue
+				}
 				const target = previous[part] ?? [48, 55, 64, 72][part]
 				const cost =
 					path.cost +
 					Math.abs(pitch - target) +
 					(style === "close" && part ? (pitch - path.notes[0]) * 0.3 : 0)
 				const key = `${pitch}:${mask}`
-				if (!next.has(key) || next.get(key)!.cost > cost)
+				if (!next.has(key) || next.get(key)!.cost > cost) {
 					next.set(key, { notes: [...path.notes, pitch], cost, mask })
+				}
 			}
+		}
 		paths = [...next.values()].sort((a, b) => a.cost - b.cost).slice(0, 256)
 	}
 	return paths.find((path) => (path.mask & required) === required)?.notes ?? []
@@ -105,7 +119,9 @@ export function voiceTheoryPath(
 	let notes = previous
 	for (const chord of chords) {
 		notes = voiceProgressionChord(chord, notes, lower, upper, style)
-		if (!notes.length) return []
+		if (!notes.length) {
+			return []
+		}
 		result.push({ notes, label: chord.label, beats: chord.beats, root: chord.root })
 	}
 	return result

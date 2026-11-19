@@ -100,15 +100,20 @@ export abstract class ProgressionPerformer extends PerformanceTransformer {
 					if (
 						!voices.length ||
 						(this.options.hold === "keys" && voices.every((voice) => voice.released))
-					)
+					) {
 						return []
+					}
 					const route = this.routes.get(key) ?? { last: [], keys: [], turn: 0 }
 					this.routes.set(key, route)
 					const interrupted = this.cancelPhrase(route)
 					route.keys = voices
 					const result = this.gesture(voices, route)
 					route.turn++
-					for (const input of voices) if (input.released) this.release(input)
+					for (const input of voices) {
+						if (input.released) {
+							this.release(input)
+						}
+					}
 					return [...interrupted, ...result]
 				},
 				undefined,
@@ -144,7 +149,9 @@ export abstract class ProgressionPerformer extends PerformanceTransformer {
 		this.voices.add(owner)
 		route.owner = owner
 		const playCycle = (): IAudioCommand[] => {
-			if (route.owner !== owner || !this.options.enabled) return []
+			if (route.owner !== owner || !this.options.enabled) {
+				return []
+			}
 			const seconds = beatSeconds(this.timer)
 			const start = this.now
 			let offset = 0
@@ -152,14 +159,21 @@ export abstract class ProgressionPerformer extends PerformanceTransformer {
 				this.schedule(
 					start + offset,
 					() => {
-						if (route.owner !== owner) return []
+						if (route.owner !== owner) {
+							return []
+						}
 						const result: IAudioCommand[] = []
 						const retained = this.options.common
 							? owner.targets.filter((target) => step.notes.includes(target.number))
 							: []
-						for (const target of [...owner.targets])
-							if (!retained.includes(target)) result.push(this.end(owner, target))
-						for (const pitch of step.notes)
+						// end() removes from owner.targets, so iterate over a copy.
+						// oxlint-disable-next-line unicorn/no-useless-spread
+						for (const target of [...owner.targets]) {
+							if (!retained.includes(target)) {
+								result.push(this.end(owner, target))
+							}
+						}
+						for (const pitch of step.notes) {
 							if (!retained.some((target) => target.number === pitch)) {
 								result.push(
 									this.start(
@@ -173,6 +187,7 @@ export abstract class ProgressionPerformer extends PerformanceTransformer {
 									)
 								)
 							}
+						}
 						route.last = [...step.notes]
 						route.root = step.root
 						this.status = step.label
@@ -185,8 +200,12 @@ export abstract class ProgressionPerformer extends PerformanceTransformer {
 			this.schedule(
 				start + offset,
 				() => {
-					if (loop && route.keys.some((voice) => !voice.released)) return playCycle()
-					if (route.owner === owner) route.owner = undefined
+					if (loop && route.keys.some((voice) => !voice.released)) {
+						return playCycle()
+					}
+					if (route.owner === owner) {
+						route.owner = undefined
+					}
 					return this.release(owner)
 				},
 				owner
@@ -202,8 +221,9 @@ export abstract class ProgressionPerformer extends PerformanceTransformer {
 			route?.keys.includes(voice) &&
 			route.keys.every((voice) => voice.released) &&
 			this.options.hold === "keys"
-		)
+		) {
 			result.push(...this.cancelPhrase(route))
+		}
 		return result
 	}
 	protected clearState() {

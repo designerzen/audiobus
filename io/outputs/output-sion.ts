@@ -3,7 +3,13 @@ import type { SiONSession } from "sion"
 import type { SiMMLTrack } from "sion/sion"
 import type { IAudioOutput } from "./output-interface"
 import type { IAudioCommand } from "../../commands/audio-command-interface"
-import { NOTE_ON, NOTE_OFF, PITCH_BEND, CONTROL_CHANGE, PROGRAM_CHANGE } from "../../commands/commands"
+import {
+	NOTE_ON,
+	NOTE_OFF,
+	PITCH_BEND,
+	CONTROL_CHANGE,
+	PROGRAM_CHANGE
+} from "../../commands/commands"
 import { EVENT_CHANGE, EVENT_INPUT, EVENT_CONNECTION_CHANGED } from "../../events/event-constants"
 import { action, bounded, changed, devicePanel, numberControl } from "../device-controls"
 import { getAudioDestination } from "../audio-destination"

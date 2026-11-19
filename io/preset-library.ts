@@ -141,7 +141,20 @@ export function parsePresetLibrary(json: string): PresetLibrary {
 		if (setup.clock !== undefined) {
 			object(setup.clock)
 			const { bpm, swing, divisions, bars } = setup.clock
-			if (!Number.isFinite(bpm) || bpm < 10 || bpm > 303 || !Number.isFinite(swing) || swing < 0 || swing > 1 || !Number.isInteger(divisions) || divisions < 1 || divisions > 960 || !Number.isInteger(bars) || bars < 1 || bars > 32) {
+			if (
+				!Number.isFinite(bpm) ||
+				bpm < 10 ||
+				bpm > 303 ||
+				!Number.isFinite(swing) ||
+				swing < 0 ||
+				swing > 1 ||
+				!Number.isInteger(divisions) ||
+				divisions < 1 ||
+				divisions > 960 ||
+				!Number.isInteger(bars) ||
+				bars < 1 ||
+				bars > 32
+			) {
 				throw new Error("Invalid setup clock")
 			}
 		}

@@ -80,7 +80,9 @@ export function encodeWave(
 ): Blob {
 	const channels = Array.isArray(audio)
 		? audio
-		: Array.from({ length: audio.numberOfChannels }, (_, channel) => audio.getChannelData(channel))
+		: Array.from({ length: audio.numberOfChannels }, (_, channel) =>
+				audio.getChannelData(channel)
+			)
 	if (!channels.length) {
 		throw new Error("There is no audio to encode.")
 	}
@@ -91,7 +93,10 @@ export function encodeWave(
 		samples[i * 2] = left[i]
 		samples[i * 2 + 1] = right[i] ?? 0
 	}
-	return new Blob([waveHeader((samples.length * bits) / 8, sampleRate, bits), encodeSamples(samples, bits)], {
-		type: "audio/wav"
-	})
+	return new Blob(
+		[waveHeader((samples.length * bits) / 8, sampleRate, bits), encodeSamples(samples, bits)],
+		{
+			type: "audio/wav"
+		}
+	)
 }

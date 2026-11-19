@@ -152,7 +152,8 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 	[OUTPUT_TYPES.LOOP_PLAYER]: {
 		id: OUTPUT_TYPES.LOOP_PLAYER,
 		name: "Loop Player",
-		description: "Load audio loops that follow the transport tempo with granular, slice or varispeed playback",
+		description:
+			"Load audio loops that follow the transport tempo with granular, slice or varispeed playback",
 		type: "engine",
 		subtype: "instrument",
 		category: "Audio",

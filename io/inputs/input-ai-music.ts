@@ -111,7 +111,9 @@ export default class InputAIMusic extends NoteInput {
 		if (this.disposed) {
 			return
 		}
-		if (this.busy) this.cancelGeneration()
+		if (this.busy) {
+			this.cancelGeneration()
+		}
 		try {
 			const seed = this.model.engine === "rnn" ? parseAIPrimer(this.options.primer) : []
 			const chords = String(this.options.chords)
@@ -149,7 +151,9 @@ export default class InputAIMusic extends NoteInput {
 						this.stopClock()
 						this.options.notes = notes
 						this.rebuildEvents()
-						if (resume) this.startClock()
+						if (resume) {
+							this.startClock()
+						}
 						changed(this)
 						this.setStatus(
 							`${notes.length} notes ready. Use transport Play.` +

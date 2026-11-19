@@ -1,9 +1,5 @@
 import { afterEach, expect, it, vi } from "vitest"
-import {
-	RECORDING_DATA,
-	RECORDING_START,
-	RECORDING_STOP
-} from "../recording-format"
+import { RECORDING_DATA, RECORDING_START, RECORDING_STOP } from "../recording-format"
 
 afterEach(() => {
 	vi.unstubAllGlobals()

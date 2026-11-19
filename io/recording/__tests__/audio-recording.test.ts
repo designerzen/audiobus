@@ -8,10 +8,7 @@ import {
 	RECORDING_START,
 	RECORDING_STOP
 } from "../recording-format"
-import {
-	getAudioDestination,
-	setAudioDestination
-} from "../../audio-destination"
+import { getAudioDestination, setAudioDestination } from "../../audio-destination"
 import OutputMetronome from "../../outputs/output-metronome"
 import OutputRecorder from "../../outputs/output-recorder"
 import { EVENT_RECORDER_TOGGLE } from "../../../events/event-constants"

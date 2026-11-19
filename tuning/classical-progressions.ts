@@ -285,15 +285,23 @@ function parseRoman(
 	beats: number
 ): TheoryChord | undefined {
 	const parts = symbol.split("/")
-	if (!/^[b#]*[ivIV]/.test(parts[0])) return undefined
-	if (parts.length > 4) throw new Error("Applied-chord chains may have at most three targets")
+	if (!/^[b#]*[ivIV]/.test(parts[0])) {
+		return undefined
+	}
+	if (parts.length > 4) {
+		throw new Error("Applied-chord chains may have at most three targets")
+	}
 	let localRoot = tonic,
 		localMode = mode
 	for (let i = parts.length - 1; i > 0; i--) {
 		const target = /^([b#]*)([ivIV]+)$/.exec(parts[i])
-		if (!target) throw new Error(`Invalid applied-chord target: ${parts[i]}`)
+		if (!target) {
+			throw new Error(`Invalid applied-chord target: ${parts[i]}`)
+		}
 		const degree = ROMANS.indexOf(target[2].toUpperCase())
-		if (degree < 0) throw new Error(`Invalid scale degree: ${target[2]}`)
+		if (degree < 0) {
+			throw new Error(`Invalid scale degree: ${target[2]}`)
+		}
 		const alteration = [...target[1]].reduce((sum, mark) => sum + (mark === "#" ? 1 : -1), 0)
 		localRoot = mod12(
 			localRoot + (localMode === "minor" ? MINOR_DEGREES : MAJOR_DEGREES)[degree] + alteration
@@ -301,9 +309,13 @@ function parseRoman(
 		localMode = target[2] === target[2].toLowerCase() ? "minor" : "major"
 	}
 	const match = /^([b#]{0,2})([ivIV]+)([°oø+]?)(maj7|M7|7|65|43|42|64|6)?$/.exec(parts[0])
-	if (!match) return undefined
+	if (!match) {
+		return undefined
+	}
 	const degree = ROMANS.indexOf(match[2].toUpperCase())
-	if (degree < 0) throw new Error(`Invalid Roman numeral: ${symbol}`)
+	if (degree < 0) {
+		throw new Error(`Invalid Roman numeral: ${symbol}`)
+	}
 	const alteration = [...match[1]].reduce((sum, mark) => sum + (mark === "#" ? 1 : -1), 0)
 	const suffix = match[4] ?? "",
 		quality = match[3]
@@ -375,14 +387,16 @@ export function parseTheoryProgression(
 		.trim()
 		.split(/[\s,|;]+/)
 		.filter(Boolean)
-	if (!tokens.length || tokens.length > 64)
+	if (!tokens.length || tokens.length > 64) {
 		throw new Error("Enter 1–64 chords, for example I:4 vi:4 ii6:2 V7:2")
+	}
 	return tokens.map((token) => {
 		const pieces = token.split(":")
 		const symbol = pieces[0],
 			beats = pieces.length === 1 ? 1 : Number(pieces[1])
-		if (pieces.length > 2 || !Number.isFinite(beats) || beats < 0.125 || beats > 64)
+		if (pieces.length > 2 || !Number.isFinite(beats) || beats < 0.125 || beats > 64) {
 			throw new Error(`Invalid chord duration: ${token}`)
+		}
 		if (["It+6", "Fr+6", "Ger+6"].includes(symbol)) {
 			return makeTheoryChord(
 				tonic,
@@ -392,20 +406,26 @@ export function parseTheoryProgression(
 				tonic + 8
 			)
 		}
-		if (symbol === "CT°7" || symbol === "CTo7")
+		if (symbol === "CT°7" || symbol === "CTo7") {
 			return makeTheoryChord(tonic, [0, 3, 6, 9], symbol, beats)
-		if (symbol === "N" || symbol === "N6")
+		}
+		if (symbol === "N" || symbol === "N6") {
 			return {
 				...parseRoman(symbol === "N6" ? "bII6" : "bII", tonic, mode, beats)!,
 				label: symbol
 			}
+		}
 		const roman = parseRoman(symbol, tonic, mode, beats)
-		if (roman) return roman
+		if (roman) {
+			return roman
+		}
 		const chord =
 			/^([A-G])([#b]?)(maj7|m7|min7|dim7|dim|aug|sus2|sus4|m|min|7)?(?:\/([A-G])([#b]?))?$/.exec(
 				symbol
 			)
-		if (!chord) throw new Error(`Unknown chord: ${symbol}`)
+		if (!chord) {
+			throw new Error(`Unknown chord: ${symbol}`)
+		}
 		const natural: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }
 		const accidental = (mark: string) => (mark === "#" ? 1 : mark === "b" ? -1 : 0)
 		const root = natural[chord[1]] + accidental(chord[2]),
@@ -421,11 +441,13 @@ export function parseTheoryProgression(
 						: quality.startsWith("m") && !quality.startsWith("maj")
 							? [0, 3, 7]
 							: [0, 4, 7]
-		if (quality.endsWith("7"))
+		if (quality.endsWith("7")) {
 			intervals.push(quality === "dim7" ? 9 : quality === "maj7" ? 11 : 10)
+		}
 		const bass = chord[4] ? natural[chord[4]] + accidental(chord[5]) : root
-		if (!intervals.some((interval) => mod12(root + interval) === mod12(bass)))
+		if (!intervals.some((interval) => mod12(root + interval) === mod12(bass))) {
 			throw new Error("Slash bass must be a chord tone")
+		}
 		return makeTheoryChord(root, intervals, symbol, beats, bass)
 	})
 }
@@ -444,14 +466,16 @@ export function inferChord(
 	]
 	const roots =
 		preferredRoot === undefined ? [...new Set(notes.map(mod12))] : [mod12(preferredRoot)]
-	for (const quality of qualities)
+	for (const quality of qualities) {
 		for (const root of roots) {
 			if (
 				pcs.length === quality.intervals.length &&
 				quality.intervals.every((interval) => pcs.includes(mod12(root + interval)))
-			)
+			) {
 				return { root, mode: quality.mode, recognized: true }
+			}
 		}
+	}
 	return {
 		root: preferredRoot ?? (notes.length ? mod12(Math.min(...notes)) : 0),
 		mode: "major",
@@ -485,7 +509,9 @@ export function classicalBridgeRecipe(
 	const root = inferred.root,
 		targetMode = inferred.recognized && target.length > 1 ? inferred.mode : mode
 	const concept = CLASSICAL_CONCEPTS.find((concept) => concept.id === id)
-	if (!concept) throw new Error(`Unknown progression concept: ${id}`)
+	if (!concept) {
+		throw new Error(`Unknown progression concept: ${id}`)
+	}
 	let tonic = root,
 		recipeMode = targetMode,
 		text = targetMode === "minor" ? concept.minor : concept.major
@@ -502,19 +528,21 @@ export function classicalBridgeRecipe(
 				[0, 4, 7].every((interval) => pcs.includes(mod12(root + interval)))) ||
 			(pcs.length === 4 &&
 				[0, 4, 7, 10].every((interval) => pcs.includes(mod12(root + interval))))
-		if (targetMode !== "major" || !dominantDestination)
+		if (targetMode !== "major" || !dominantDestination) {
 			return {
 				chords: parseTheoryProgression("V7", root, targetMode),
 				message: `${concept.name} needs a major dominant destination; using an applied dominant instead.`
 			}
+		}
 		tonic = mod12(root - 7)
 		recipeMode = id === "phrygian-half" ? "minor" : mode
 		text = recipeMode === "minor" && concept.minor ? concept.minor : concept.major
 	} else if (id === "lament") {
 		recipeMode = "minor"
 		text = concept.minor
-		if (targetMode === "major")
+		if (targetMode === "major") {
 			message = "Minor lament preparation with a Picardy-third destination"
+		}
 	} else if (targetMode === "minor" && !concept.minor) {
 		return {
 			chords: parseTheoryProgression("iiø65 V7", root, "minor"),
@@ -533,7 +561,7 @@ export function classicalBridgeRecipe(
 				(mod12(chord.root - root) === 2 ? 2 : 0)
 			return score(b) - score(a)
 		})
-		if (candidates[0])
+		if (candidates[0]) {
 			return {
 				chords: [
 					{ ...candidates[0], label: "Shared diatonic pivot" },
@@ -541,6 +569,7 @@ export function classicalBridgeRecipe(
 				],
 				message
 			}
+		}
 		return {
 			chords: parseTheoryProgression("V7/V V7", root, targetMode),
 			message: "No shared diatonic triad; using a chain of applied dominants."
@@ -558,11 +587,12 @@ export function classicalBridgeRecipe(
 	}
 	if (id === "common-tone-modulation") {
 		const common = from.map(mod12).filter((pc) => target.some((note) => mod12(note) === pc))
-		if (!common.length)
+		if (!common.length) {
 			return {
 				chords: parseTheoryProgression("V7", root, targetMode),
 				message: "No common pitch class; using dominant preparation."
 			}
+		}
 		const dominant = parseTheoryProgression("V7", root, targetMode)
 		return {
 			chords: [makeTheoryChord(common[0], [0], "Retained common tone"), ...dominant],

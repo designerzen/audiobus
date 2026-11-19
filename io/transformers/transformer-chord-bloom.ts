@@ -53,7 +53,9 @@ export class TransformerChordBloom extends PerformanceTransformer {
 	override setConfig(key: string, value: unknown) {
 		const intervals = key === "intervals" ? parseIntervals(String(value)) : undefined
 		super.setConfig(key, value)
-		if (intervals) this.intervals = intervals
+		if (intervals) {
+			this.intervals = intervals
+		}
 	}
 	protected noteOn(voice: Voice): IAudioCommand[] {
 		const result: IAudioCommand[] = []
@@ -61,15 +63,19 @@ export class TransformerChordBloom extends PerformanceTransformer {
 		const falloff = Number(this.options.falloff) / 100
 		for (const [index, interval] of this.intervals.entries()) {
 			const pitch = voice.input.number + interval
-			if (pitch < 0 || pitch > 127) continue
+			if (pitch < 0 || pitch > 127) {
+				continue
+			}
 			const velocity = voice.input.velocity * (1 - falloff) ** index
-			if (index === 0) result.push(this.start(voice, pitch, this.now, velocity))
-			else
+			if (index === 0) {
+				result.push(this.start(voice, pitch, this.now, velocity))
+			} else {
 				this.schedule(
 					this.now + index * step,
 					() => [this.start(voice, pitch, this.now, velocity)],
 					voice
 				)
+			}
 		}
 		return result
 	}

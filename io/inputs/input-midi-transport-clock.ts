@@ -9,7 +9,14 @@ import AbstractInput from "./abstract-input"
 import InputWebMIDIDevice from "./input-webmidi-device"
 import InputMIDI2Native from "./input-midi2-native-device"
 import type InputAudioEvent from "../events/input-audio-event"
-import { MIDI_CLOCK, MIDI_START, MIDI_STOP, MIDI_CONTINUE, NOTE_ON, NOTE_OFF } from "../../commands/commands"
+import {
+	MIDI_CLOCK,
+	MIDI_START,
+	MIDI_STOP,
+	MIDI_CONTINUE,
+	NOTE_ON,
+	NOTE_OFF
+} from "../../commands/commands"
 
 export const MIDI_TRANSPORT_CLOCK_INPUT_ID = "MIDI Transport Clock"
 

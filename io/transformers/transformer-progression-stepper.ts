@@ -69,7 +69,9 @@ export class TransformerProgressionStepper extends TonalProgressionTransformer {
 		)
 	}
 	override setConfig(key: string, value: unknown) {
-		if (key === "progression") parseTheoryProgression(String(value))
+		if (key === "progression") {
+			parseTheoryProgression(String(value))
+		}
 		super.setConfig(key, value)
 	}
 	private play(voices: Voice[], route: ProgressionRoute, position: number) {
@@ -96,7 +98,9 @@ export class TransformerProgressionStepper extends TonalProgressionTransformer {
 	protected gesture(voices: Voice[], route: ProgressionRoute) {
 		const key = routeKey(voices[0].input),
 			position = this.positions.get(key) ?? 0
-		if (this.options.advance === "gesture") this.positions.set(key, position + 1)
+		if (this.options.advance === "gesture") {
+			this.positions.set(key, position + 1)
+		}
 		return this.play(voices, route, position)
 	}
 	protected other(command: IAudioCommand): IAudioCommand[] {
@@ -104,8 +108,9 @@ export class TransformerProgressionStepper extends TonalProgressionTransformer {
 			this.options.advance !== "pedal" ||
 			command.type !== CONTROL_CHANGE ||
 			command.number !== Math.round(Number(this.options.pedal))
-		)
+		) {
 			return [command]
+		}
 		const key = routeKey(command),
 			down = command.value >= 64,
 			wasDown = this.pedals.get(key) ?? false

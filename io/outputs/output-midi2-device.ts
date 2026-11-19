@@ -9,7 +9,13 @@ import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 import { centsToPitch } from "../../conversion/cents-to-pitch.ts"
 import AudioCommand from "../../commands/audio-command.ts"
 import type { IAudioOutput } from "./output-interface.ts"
-import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON, PITCH_BEND, PROGRAM_CHANGE } from "../../commands/commands"
+import {
+	CONTROL_CHANGE,
+	NOTE_OFF,
+	NOTE_ON,
+	PITCH_BEND,
+	PROGRAM_CHANGE
+} from "../../commands/commands"
 import {
 	type UMPPacket,
 	PER_NOTE_CONTROLLERS,
@@ -171,7 +177,6 @@ export default class OutputMIDI2 implements IAudioOutput {
 				}
 			}
 		)
-
 	}
 
 	/**

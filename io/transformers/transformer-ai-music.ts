@@ -180,10 +180,13 @@ export class TransformerAIMusic extends Transformer<Config> {
 			modelId,
 			captureChannel: config.captureChannel ?? (AI_MODELS[modelId]?.drums ? 10 : 0)
 		})
-		if (!Object.hasOwn(AI_MODELS, modelId)) throw new Error("Unknown AI music model")
+		if (!Object.hasOwn(AI_MODELS, modelId)) {
+			throw new Error("Unknown AI music model")
+		}
 		this.type = Object.entries(AI_TRANSFORMER_MODELS).find(([, model]) => model === modelId)![0]
-		for (const key of ["enabled", "temperature", "similarity", "level", "captureChannel"])
+		for (const key of ["enabled", "temperature", "similarity", "level", "captureChannel"]) {
 			this.setConfig(key, this.config[key])
+		}
 	}
 	override setConfig(key: string, value: unknown): void {
 		if (key === "generate") {
@@ -194,8 +197,9 @@ export class TransformerAIMusic extends Transformer<Config> {
 			this.reset()
 			return
 		}
-		if (key === "modelId" && this.config?.modelId && value !== this.config.modelId)
+		if (key === "modelId" && this.config?.modelId && value !== this.config.modelId) {
 			throw new Error("Choose a different AI transformer to change models")
+		}
 		const limits: Record<string, [number, number]> = {
 			enabled: [0, 1],
 			temperature: [0.1, 2],
@@ -213,51 +217,70 @@ export class TransformerAIMusic extends Transformer<Config> {
 					Number.isFinite(number) ? number : (DEFAULTS[key as keyof Config] as number)
 				)
 			)
-			if (["enabled", "captureChannel"].includes(key)) value = Math.round(value as number)
+			if (["enabled", "captureChannel"].includes(key)) {
+				value = Math.round(value as number)
+			}
 		}
-		if (key === "chords") value = String(value).slice(0, 1000)
+		if (key === "chords") {
+			value = String(value).slice(0, 1000)
+		}
 		if (
 			this.held &&
 			key !== "midiControlId" &&
 			key !== "available" &&
 			this.config[key] !== value
-		)
+		) {
 			this.reset()
+		}
 		super.setConfig(key, value)
 	}
 	setMusicalBeat(beat: number): void {
-		if (Number.isFinite(beat)) this.musicalBeat = beat
+		if (Number.isFinite(beat)) {
+			this.musicalBeat = beat
+		}
 	}
 	private advance(now: number, timer: Timer): void {
 		if (this.musicalBeat !== undefined) {
 			this.beat = this.musicalBeat
 			this.musicalBeat = undefined
-		} else if (this.previous !== undefined)
+		} else if (this.previous !== undefined) {
 			this.beat += Math.max(0, now - this.previous) / beatSeconds(timer)
+		}
 		this.previous = now
 		this.now = now
 	}
 	transform(commands: IAudioCommand[], timer: Timer): IAudioCommand[] {
-		if (!this.config.enabled || this.disposed) return commands
+		if (!this.config.enabled || this.disposed) {
+			return commands
+		}
 		this.advance(
 			Number.isFinite(timer.now) ? timer.now : (commands[0]?.startAt ?? this.now),
 			timer
 		)
 		for (const command of commands) {
-			if (this.config.captureChannel && command.channel !== this.config.captureChannel)
+			if (this.config.captureChannel && command.channel !== this.config.captureChannel) {
 				continue
-			if (!this.model.drums && !this.model.trio && command.channel === 10) continue
-			if (this.model.trio && ![1, 2, 10].includes(command.channel)) continue
+			}
+			if (!this.model.drums && !this.model.trio && command.channel === 10) {
+				continue
+			}
+			if (this.model.trio && ![1, 2, 10].includes(command.channel)) {
+				continue
+			}
 			const on = command.type === NOTE_ON && command.velocity > 0
 			const off =
 				command.type === NOTE_OFF || (command.type === NOTE_ON && command.velocity === 0)
-			if (!on && !off) continue
+			if (!on && !off) {
+				continue
+			}
 			const at = this.beat + ((command.startAt ?? this.now) - this.now) / beatSeconds(timer)
 			if (on && !this.busy && !this.ready && !this.failed) {
 				this.captureStart ??= at
 				this.template ??= copyCommand(command)
 				const step = Math.round((at - this.captureStart) * 4)
-				if (step < 0 || step >= this.model.steps || this.captured.length >= 512) continue
+				if (step < 0 || step >= this.model.steps || this.captured.length >= 512) {
+					continue
+				}
 				const note: Captured = {
 					pitch: command.number,
 					start: step,
@@ -283,13 +306,17 @@ export class TransformerAIMusic extends Transformer<Config> {
 					)
 					note.released = true
 				}
-				if (!held?.length) this.held.delete(key)
+				if (!held?.length) {
+					this.held.delete(key)
+				}
 			}
 		}
 		return commands
 	}
 	generate(): void {
-		if (this.disposed || this.busy || !this.config.enabled) return
+		if (this.disposed || this.busy || !this.config.enabled) {
+			return
+		}
 		if (!this.captured.length) {
 			this.status = "Play a phrase before generating a response."
 			return
@@ -302,8 +329,9 @@ export class TransformerAIMusic extends Transformer<Config> {
 			if (
 				this.model.chords &&
 				(!chords.length || chords.length > 32 || chords.some((chord) => chord.length > 24))
-			)
+			) {
 				throw new Error("Enter 1–32 chord symbols")
+			}
 			const notes = this.captured.map(({ released, ...note }) => ({
 				...note,
 				end: released ? note.end : this.model.steps
@@ -316,13 +344,18 @@ export class TransformerAIMusic extends Transformer<Config> {
 			this.busy = true
 			this.failed = false
 			worker.onmessage = ({ data }: MessageEvent<AIMusicResponse>) => {
-				if (this.worker !== worker || data.id !== this.requestId || this.disposed) return
-				if (data.kind === AI_MUSIC_STATUS) this.status = data.status
-				else if (data.kind === AI_MUSIC_ERROR) this.fail(data.error)
-				else if (data.kind === AI_MUSIC_RESULT) {
+				if (this.worker !== worker || data.id !== this.requestId || this.disposed) {
+					return
+				}
+				if (data.kind === AI_MUSIC_STATUS) {
+					this.status = data.status
+				} else if (data.kind === AI_MUSIC_ERROR) {
+					this.fail(data.error)
+				} else if (data.kind === AI_MUSIC_RESULT) {
 					try {
-						if (data.steps !== this.model.steps)
+						if (data.steps !== this.model.steps) {
 							throw new Error("Unexpected response length")
+						}
 						this.ready = validateMusicNotes(data.notes, data.steps)
 						this.events = this.ready
 							.flatMap((note) => [
@@ -341,7 +374,9 @@ export class TransformerAIMusic extends Transformer<Config> {
 				}
 			}
 			worker.onerror = () => {
-				if (this.worker === worker) this.fail("Unable to start the AI worker")
+				if (this.worker === worker) {
+					this.fail("Unable to start the AI worker")
+				}
 			}
 			worker.postMessage({
 				kind: AI_MUSIC_GENERATE,
@@ -362,22 +397,28 @@ export class TransformerAIMusic extends Transformer<Config> {
 		}
 	}
 	tick(now: number, timer: Timer): IAudioCommand[] {
-		if (this.disposed) return []
+		if (this.disposed) {
+			return []
+		}
 		this.advance(now, timer)
 		const output = this.cleanup
 			.splice(0)
 			.map((command) => ({ ...command, startAt: now, time: now }))
-		if (!this.config.enabled) return output
+		if (!this.config.enabled) {
+			return output
+		}
 		if (
 			this.captureStart !== undefined &&
 			!this.busy &&
 			!this.ready &&
 			!this.failed &&
 			this.beat >= this.captureStart + this.model.steps / 4
-		)
+		) {
 			this.generate()
-		if (!this.ready || this.responseStart === undefined || this.beat < this.responseStart)
+		}
+		if (!this.ready || this.responseStart === undefined || this.beat < this.responseStart) {
 			return output
+		}
 		const step = (this.beat - this.responseStart) * 4
 		while (this.cursor < this.events.length && this.events[this.cursor].step <= step + 1e-8) {
 			const { note, on } = this.events[this.cursor++]
@@ -400,14 +441,17 @@ export class TransformerAIMusic extends Transformer<Config> {
 				this.active.set(note, command)
 				const key = `${note.channel}:${note.pitch}`,
 					held = this.sounding.get(key)
-				if (held) held.count++
-				else {
+				if (held) {
+					held.count++
+				} else {
 					this.sounding.set(key, { count: 1, command })
 					output.push(command)
 				}
 			} else if (!on) {
 				const command = this.active.get(note)
-				if (!command) continue
+				if (!command) {
+					continue
+				}
 				this.active.delete(note)
 				const key = `${note.channel}:${note.pitch}`,
 					held = this.sounding.get(key)!

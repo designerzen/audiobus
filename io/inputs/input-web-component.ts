@@ -1,6 +1,12 @@
 import AbstractInput from "./abstract-input.ts"
 import { UI_INPUT_COMPONENTS, type UIInputId } from "../../ui/input-components.ts"
-import { NOTE_ON, NOTE_OFF, PITCH_BEND, CONTROL_CHANGE, PROGRAM_CHANGE } from "../../commands/commands.ts"
+import {
+	NOTE_ON,
+	NOTE_OFF,
+	PITCH_BEND,
+	CONTROL_CHANGE,
+	PROGRAM_CHANGE
+} from "../../commands/commands.ts"
 import {
 	EVENT_CONFIGURATION_CHANGED,
 	EVENT_INSTRUMENT_DISCONNECT,

@@ -85,10 +85,11 @@ export abstract class TonalProgressionTransformer extends ProgressionPerformer {
 	}
 	protected target(voices: Voice[]): number[] {
 		const notes = [...new Set(voices.map((voice) => voice.input.number))].sort((a, b) => a - b)
-		if (notes.length === 1 && this.options.single === "chord-root")
+		if (notes.length === 1 && this.options.single === "chord-root") {
 			return [0, this.mode() === "minor" ? 3 : 4, 7]
 				.map((interval) => notes[0] + interval)
 				.filter((pitch) => pitch <= 127)
+		}
 		return notes
 	}
 	protected voiced(chords: TheoryChord[], previous: number[]): SoundingStep[] {
@@ -120,7 +121,7 @@ export abstract class TonalProgressionTransformer extends ProgressionPerformer {
 		prepareFirst = false
 	) {
 		const target = this.target(voices)
-		if (!route.last.length && !prepareFirst)
+		if (!route.last.length && !prepareFirst) {
 			return this.perform(voices, route, [
 				{
 					notes: target,
@@ -129,6 +130,7 @@ export abstract class TonalProgressionTransformer extends ProgressionPerformer {
 					beats: Number(this.options.finalBeats)
 				}
 			])
+		}
 		if (target.length === 1 && this.options.single === "melody") {
 			const path = melodicMediation(
 				route.last,
@@ -154,16 +156,21 @@ export abstract class TonalProgressionTransformer extends ProgressionPerformer {
 			beats: Number(this.options.step)
 		}))
 		const end = this.destination(target)
-		if (this.options.arrival === "voice-led") chords.push(end)
+		if (this.options.arrival === "voice-led") {
+			chords.push(end)
+		}
 		const steps = this.voiced(chords, route.last)
-		if (chords.length && !steps.length) return this.perform(voices, route, [])
-		if (this.options.arrival === "played")
+		if (chords.length && !steps.length) {
+			return this.perform(voices, route, [])
+		}
+		if (this.options.arrival === "played") {
 			steps.push({
 				notes: target,
 				label: `${recipe.message}: destination`,
 				beats: Number(this.options.finalBeats),
 				root: end.root
 			})
+		}
 		this.status = recipe.message
 		return this.perform(voices, route, steps)
 	}

@@ -5,7 +5,10 @@ import { subscribeControls } from "../component-ui"
 import type { IPercussionOutput } from "../../timing/percussion-types.ts"
 import type { AudioClockTick } from "../../timing/audio-clock-tick.ts"
 import { NOTE_ON, MIDI_STOP, PLAYBACK_STOP } from "../../commands/commands.ts"
-import { EVENT_CONFIGURATION_CHANGED, EVENT_CONTROL_SCHEMA_CHANGED } from "../../events/event-constants.ts"
+import {
+	EVENT_CONFIGURATION_CHANGED,
+	EVENT_CONTROL_SCHEMA_CHANGED
+} from "../../events/event-constants.ts"
 import { DRUM_GROOVES } from "../../timing/drum-patterns.ts"
 import { DrumBreakPlayer } from "../../timing/drum-break-player.ts"
 import { PercussionSynth } from "../../instruments/percussion/percussion-synth.ts"

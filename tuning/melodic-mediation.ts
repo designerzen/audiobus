@@ -34,12 +34,15 @@ export function melodicMediation(
 		beats: finalBeats,
 		root: mod12(destination[0])
 	}
-	if (!source.length)
+	if (!source.length) {
 		return { steps: [final], message: "First gesture establishes the starting sound." }
+	}
 	const neighbour = (pitch: number, direction: number) => {
 		for (let distance = 1; distance <= 3; distance++) {
 			const note = pitch + distance * direction
-			if (note >= 0 && note <= 127 && scale.includes(mod12(note))) return note
+			if (note >= 0 && note <= 127 && scale.includes(mod12(note))) {
+				return note
+			}
 		}
 		return pitch
 	}
@@ -51,13 +54,17 @@ export function melodicMediation(
 	let frames: number[][] = [],
 		message = MELODIC_APPROACHES.find((approach) => approach.id === method)?.name ?? method
 	const withTop = (pitch: number) => [...destination.slice(0, -1), pitch]
-	if (method === "double-neighbour") frames = [withTop(upper), withTop(lower)]
-	else if (method === "appoggiatura") {
+	if (method === "double-neighbour") {
+		frames = [withTop(upper), withTop(lower)]
+	} else if (method === "appoggiatura") {
 		const approach = [upper, lower].find(
 			(pitch) => Math.abs(pitch - previousTop) > 2 && pitch !== goal
 		)
-		if (approach !== undefined) frames = [withTop(approach)]
-		else message = "No leaping appoggiatura fits this approach; direct arrival."
+		if (approach !== undefined) {
+			frames = [withTop(approach)]
+		} else {
+			message = "No leaping appoggiatura fits this approach; direct arrival."
+		}
 	} else if (method === "suspension" || method === "retardation") {
 		const down = method === "suspension"
 		const distance = previousTop - goal
@@ -73,17 +80,21 @@ export function melodicMediation(
 			: distance < 0 &&
 				distance >= -2 &&
 				((before === 11 && after === 0) || (before === 2 && [3, 4].includes(after)))
-		if (prepared) frames = [source, withTop(previousTop)]
-		else
+		if (prepared) {
+			frames = [source, withTop(previousTop)]
+		} else {
 			message =
 				"The previous soprano does not prepare this suspension/retardation; direct arrival."
+		}
 	} else if (method === "anticipation") {
 		frames = [[...source.slice(0, -1), goal]]
 	} else if (method === "oblique") {
 		const current = destination.map((_, i) => source[Math.min(i, source.length - 1)])
 		for (let i = 0; i < destination.length; i++) {
 			current[i] = destination[i]
-			if (i < destination.length - 1) frames.push([...current])
+			if (i < destination.length - 1) {
+				frames.push([...current])
+			}
 		}
 	} else {
 		const paths = destination.map((pitch, i) => {
@@ -95,18 +106,21 @@ export function melodicMediation(
 				direction && (pitch - note) * direction > 0;
 				note += direction
 			) {
-				if (method === "chromatic" || scale.includes(mod12(note))) notes.push(note)
+				if (method === "chromatic" || scale.includes(mod12(note))) {
+					notes.push(note)
+				}
 			}
 			return notes
 		})
 		const count = Math.max(0, ...paths.map((path) => path.length))
-		if (count <= maximum)
+		if (count <= maximum) {
 			frames = Array.from({ length: count }, (_, i) =>
 				paths.map((path, part) => path[i] ?? destination[part])
 			)
-		else
+		} else {
 			message =
 				"The stepwise connection exceeds Maximum steps; direct arrival preserves the destination."
+		}
 	}
 	frames = frames
 		.slice(0, maximum)

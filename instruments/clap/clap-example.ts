@@ -67,7 +67,10 @@ export function playMelody(clapOutput: CLAPInstrument): void {
 /**
  * Example: Create and display GUI
  */
-export async function displayCLAPGUI(clapOutput: CLAPInstrument, containerId: string): Promise<void> {
+export async function displayCLAPGUI(
+	clapOutput: CLAPInstrument,
+	containerId: string
+): Promise<void> {
 	const container = document.getElementById(containerId)
 	if (!container) {
 		console.error("Container not found:", containerId)
@@ -94,7 +97,10 @@ export async function displayCLAPGUI(clapOutput: CLAPInstrument, containerId: st
 /**
  * Example: Search and load specific patch
  */
-export async function loadPatchByName(clapOutput: CLAPInstrument, patchName: string): Promise<boolean> {
+export async function loadPatchByName(
+	clapOutput: CLAPInstrument,
+	patchName: string
+): Promise<boolean> {
 	const patches = clapRegistry.searchPatches(patchName)
 
 	if (patches.length === 0) {

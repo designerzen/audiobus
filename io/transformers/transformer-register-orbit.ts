@@ -77,9 +77,12 @@ export class TransformerRegisterOrbit extends PerformanceTransformer {
 		const target = Math.max(lower, Math.min(upper, state.target))
 		let chosen: number | undefined
 		for (let pitch = lower; pitch <= upper; pitch++) {
-			if ((pitch - voice.input.number) % 12 !== 0) continue
-			if (chosen === undefined || Math.abs(pitch - target) < Math.abs(chosen - target))
+			if ((pitch - voice.input.number) % 12 !== 0) {
+				continue
+			}
+			if (chosen === undefined || Math.abs(pitch - target) < Math.abs(chosen - target)) {
 				chosen = pitch
+			}
 		}
 		return chosen === undefined ? [] : [this.start(voice, chosen)]
 	}

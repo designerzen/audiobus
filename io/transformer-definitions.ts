@@ -329,7 +329,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 	[TRANSFORMER_TYPE.ID_MIDI_PROTOCOL]: {
 		id: TRANSFORMER_TYPE.ID_MIDI_PROTOCOL,
 		name: "MIDI Protocol",
-		description: "Send MIDI 2 or MIDI 1 packets to UMP destinations such as native MIDI 2 outputs.",
+		description:
+			"Send MIDI 2 or MIDI 1 packets to UMP destinations such as native MIDI 2 outputs.",
 		icon: "/icons/transformer-midi-protocol.svg",
 		category: "Routing",
 		type: "transformer",
@@ -533,7 +534,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 	[TRANSFORMER_TYPE.ID_ARPEGGIATOR]: {
 		id: TRANSFORMER_TYPE.ID_ARPEGGIATOR,
 		name: "Arpeggiator",
-		description: "Breaks chords into flowing sequences of individual notes, played once or repeated while held",
+		description:
+			"Breaks chords into flowing sequences of individual notes, played once or repeated while held",
 		icon: "/icons/transformer-arpeggiator.svg",
 		category: "Pattern",
 		type: "transformer",

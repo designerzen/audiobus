@@ -22,7 +22,11 @@ export { ChordPerformer } from "./chord-performer.ts"
 
 // Master recording, shared by every Recorder output
 export { AudioRecording, getAudioRecording } from "./recording/audio-recording.ts"
-export { encodeWave, RECORDING_STATE_CHANGED, type RecordingBits } from "./recording/recording-format.ts"
+export {
+	encodeWave,
+	RECORDING_STATE_CHANGED,
+	type RecordingBits
+} from "./recording/recording-format.ts"
 
 // Transformer functionality
 export { tranformerFactory, TRANSFORMER_TYPE, TRANSFORMERS } from "./transformer-factory.ts"

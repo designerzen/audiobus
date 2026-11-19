@@ -12,8 +12,9 @@ export function musicVelocity(value: unknown): number {
 
 export function musicPrimer(notes: AIMusicNote[], steps: number, model: AIModelDefinition) {
 	let prepared = validateMusicNotes(notes, steps)
-	if (prepared.some((note) => !Number.isInteger(note.start) || !Number.isInteger(note.end)))
+	if (prepared.some((note) => !Number.isInteger(note.start) || !Number.isInteger(note.end))) {
 		throw new Error("Capture notes on the sixteenth-note grid")
+	}
 	if (model.drums || model.trio) {
 		const hits = new Map<string, AIMusicNote>()
 		const melodic: AIMusicNote[] = []
@@ -23,10 +24,11 @@ export function musicPrimer(notes: AIMusicNote[], steps: number, model: AIModelD
 				continue
 			}
 			const group = DEFAULT_DRUM_PITCH_CLASSES.find((group) => group.includes(note.pitch))
-			if (!group)
+			if (!group) {
 				throw new Error(
 					`Unsupported drum pitch ${note.pitch}; use General MIDI percussion pitches`
 				)
+			}
 			const key = `${note.start}:${group[0]}`,
 				previous = hits.get(key)
 			// DrumsOneHotConverter adds class bits; duplicate hits would encode
@@ -45,28 +47,38 @@ export function musicPrimer(notes: AIMusicNote[], steps: number, model: AIModelD
 		// durations, using the last played pitch for simultaneous melodic notes.
 		const mono: AIMusicNote[] = []
 		for (const note of part) {
-			if (mono.at(-1)?.start === note.start) mono.pop()
+			if (mono.at(-1)?.start === note.start) {
+				mono.pop()
+			}
 			const previous = mono.at(-1)
-			if (previous) previous.end = Math.min(previous.end, note.start)
+			if (previous) {
+				previous.end = Math.min(previous.end, note.start)
+			}
 			mono.push({ ...note })
 		}
 		return mono
 	}
-	if (!model.drums && !model.trio) prepared = monophonic(prepared)
-	else if (model.trio)
+	if (!model.drums && !model.trio) {
+		prepared = monophonic(prepared)
+	} else if (model.trio) {
 		prepared = [
 			...monophonic(prepared.filter((note) => note.channel === 1)),
 			...monophonic(prepared.filter((note) => note.channel === 2)),
 			...prepared.filter((note) => note.channel === 10)
 		].sort((a, b) => a.start - b.start)
+	}
 	return {
 		notes: prepared.map((note) => {
 			let pitch = note.pitch
 			if (!model.drums && note.channel !== 10) {
 				const low = model.engine === "rnn" ? 48 : 21,
 					high = model.engine === "rnn" ? 83 : 108
-				while (pitch < low) pitch += 12
-				while (pitch > high) pitch -= 12
+				while (pitch < low) {
+					pitch += 12
+				}
+				while (pitch > high) {
+					pitch -= 12
+				}
 			}
 			return {
 				pitch,

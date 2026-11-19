@@ -134,7 +134,9 @@ export abstract class ChordLoopTransformer extends PerformanceTransformer {
 	}
 	private finish(key: string, loop: Loop): IAudioCommand[] {
 		loop.done = true
-		const result = [...loop.lifted].flatMap((voice) => (voice.released ? [] : this.release(voice)))
+		const result = [...loop.lifted].flatMap((voice) =>
+			voice.released ? [] : this.release(voice)
+		)
 		loop.lifted.clear()
 		if (this.loops.get(key) === loop && loop.held.every((held) => held.released)) {
 			this.loops.delete(key)

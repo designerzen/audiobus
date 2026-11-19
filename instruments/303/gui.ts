@@ -86,7 +86,9 @@ export function create303Gui(device: Synth303Controls, signal: AbortSignal): HTM
 		input.name = id
 		input.className = vertical ? "vertical" : "horizontal"
 		input.setAttribute("aria-label", config.label)
-		if (vertical) input.setAttribute("aria-orientation", "vertical")
+		if (vertical) {
+			input.setAttribute("aria-orientation", "vertical")
+		}
 		const logarithmic = id === "cutoff"
 		input.min = String(logarithmic ? 0 : config.minValue)
 		input.max = String(logarithmic ? 1 : config.maxValue)
@@ -132,7 +134,9 @@ export function create303Gui(device: Synth303Controls, signal: AbortSignal): HTM
 			track.className = "fader"
 			track.append(input)
 			label.append(track)
-		} else label.append(input)
+		} else {
+			label.append(input)
+		}
 		if (id === "waveform") {
 			const choices = document.createElement("span")
 			choices.className = "wave-labels"

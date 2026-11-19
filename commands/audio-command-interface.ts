@@ -40,7 +40,13 @@ export interface IAudioCommand {
 	ump?: number[]
 	/** Zero-based UMP group. Byte MIDI occupies group zero. */
 	midiGroup?: number
-	umpOriginal?: { type: string; number: number; velocity: number; value: number; channel?: number }
+	umpOriginal?: {
+		type: string
+		number: number
+		velocity: number
+		value: number
+		channel?: number
+	}
 	// UNOFFICIAL: From Device (uuid)
 	from: string
 	// Persistent local input identity, independent of device-supplied source labels.

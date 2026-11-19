@@ -1,4 +1,7 @@
-import { EVENT_CONFIGURATION_CHANGED, EVENT_CONTROL_SCHEMA_CHANGED } from "../../events/event-constants"
+import {
+	EVENT_CONFIGURATION_CHANGED,
+	EVENT_CONTROL_SCHEMA_CHANGED
+} from "../../events/event-constants"
 import { commandToMidi } from "../../midi/midi-command-conversion"
 import { initializeHost, WAM_MIDI_EVENT, WAM_AUTOMATION_EVENT } from "../../wam/host"
 import type {

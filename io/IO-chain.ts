@@ -1,4 +1,7 @@
-import { EVENT_CONTROL_SURFACE_NOTES, EVENT_CONFIGURATION_CHANGED } from "../events/event-constants.ts"
+import {
+	EVENT_CONTROL_SURFACE_NOTES,
+	EVENT_CONFIGURATION_CHANGED
+} from "../events/event-constants.ts"
 import type { SurfaceState } from "control-surface/types"
 import { validSurfaces } from "control-surface/model"
 import {

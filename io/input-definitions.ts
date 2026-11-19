@@ -31,7 +31,8 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 	[INPUT_TYPES.PROTOCOL]: {
 		id: INPUT_TYPES.PROTOCOL,
 		name: "audioBus Protocol",
-		description: "Receive MIDI and application commands from an explicitly paired music application",
+		description:
+			"Receive MIDI and application commands from an explicitly paired music application",
 		type: "midi",
 		subtype: "device",
 		category: "Device",

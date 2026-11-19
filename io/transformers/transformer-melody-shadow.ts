@@ -59,7 +59,9 @@ export class TransformerMelodyShadow extends PerformanceTransformer {
 		history.push(voice.input.number)
 		this.history.set(key, history.slice(-8))
 		const result = this.options.dry ? [this.start(voice)] : []
-		if (previous === undefined) return result
+		if (previous === undefined) {
+			return result
+		}
 		const pitch = previous + Number(this.options.transpose)
 		if (pitch >= 0 && pitch <= 127 && !(this.options.dry && pitch === voice.input.number)) {
 			result.push(
