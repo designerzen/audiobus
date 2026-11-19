@@ -9,25 +9,24 @@ import {
 	MIDI_STOP,
 	PLAYBACK_STOP
 } from "../../../commands/commands"
-import { EVENT_CHANGE } from "../../../events/event-constants"
 import { getAudioDestination } from "../../audio-destination"
-import { bounded, changed, devicePanel, numberControl } from "../../device-controls"
+import { bounded, changed } from "../../device-controls"
 import { musicalCommand } from "../../event-clip"
 import {
 	ROMPLER_HOST,
-	ROMPLER_FAMILIES,
+	ROMPLER_SPACINGS,
 	isSustained,
 	presetTitle,
 	sampleGrid,
 	sampleUrl
 } from "./rompler-catalogue"
+import { RomplerGui } from "./rompler-gui"
 import { RomplerLoader, type RomplerProgress } from "./rompler-loader"
 
 // A plain URL rather than a bundler-specific import, so Vite and Parcel both emit the worklet as its own file.
 const processorURL = new URL("./rompler.worklet.js", import.meta.url).href
 
 const registrations = new WeakMap<BaseAudioContext, Promise<void>>()
-const SPACINGS = [1, 2, 3, 6]
 
 /**
  * General MIDI soundfont player. Nothing downloads until the output is
@@ -63,9 +62,9 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 	private released = new Set<string>()
 	private connected = true
 	private destroyed = false
-	private gui?: HTMLElement
-	private status?: HTMLElement
-	private presetSelect?: HTMLSelectElement
+	private gui?: RomplerGui
+	// Keys of the current preset that have arrived, so a panel opened later can show them
+	private loadedNotes = new Set<number>()
 
 	constructor(options: Record<string, any> = {}) {
 		super()
@@ -79,7 +78,7 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 				typeof options.baseUrl === "string" && options.baseUrl.endsWith("/")
 					? options.baseUrl
 					: ROMPLER_HOST,
-			spacing: SPACINGS.includes(options.spacing) ? options.spacing : 3,
+			spacing: ROMPLER_SPACINGS.includes(options.spacing) ? options.spacing : 3,
 			volume: bounded(options.volume, 0.8, 0, 2),
 			release: bounded(options.release, 0.3, 0.005, 5),
 			pitchBendRange: bounded(options.pitchBendRange, 2, 0, 24)
@@ -92,6 +91,8 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 			this.context,
 			(sample) => {
 				const { channels } = sample
+				this.loadedNotes.add(sample.note)
+				this.gui?.sampleLoaded(sample.note)
 				if (this.stale) {
 					this.stale = false
 					this.node?.port.postMessage({ type: "clear" })
@@ -164,6 +165,8 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 		}
 		const { baseUrl, preset, spacing } = this.options
 		this.stale = true
+		this.loadedNotes.clear()
+		this.gui?.resetSamples(this.grid)
 		this.loader.load(
 			sampleGrid(spacing),
 			(note) => sampleUrl(baseUrl, preset, note),
@@ -185,15 +188,14 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 			return
 		}
 		this.options.preset = preset
-		if (this.presetSelect) {
-			this.presetSelect.value = String(preset)
-		}
+		this.gui?.setPreset(preset)
 		this.reload()
 		changed(this)
 	}
 	private configure(changes: Partial<Rompler["options"]>): void {
 		Object.assign(this.options, changes)
 		this.grid = sampleGrid(this.options.spacing)
+		this.gui?.setSpacing(this.options.spacing)
 		this.reload()
 		changed(this)
 	}
@@ -228,6 +230,7 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 				this.released.add(`${channel}:${note}`)
 			} else {
 				this.post({ type: "off", channel, note, time })
+				this.gui?.notePlaying(note, false)
 			}
 			return
 		}
@@ -275,6 +278,7 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 			velocity: bounded(command.velocity, 100, 0, 127) / 127,
 			time
 		})
+		this.gui?.notePlaying(note, true)
 	}
 	private control(channel: number, controller: number, value: number): void {
 		if (controller === 64) {
@@ -287,6 +291,7 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 				const [held, note] = id.split(":").map(Number)
 				if (held === channel) {
 					this.post({ type: "off", channel, note })
+					this.gui?.notePlaying(note, false)
 					this.released.delete(id)
 				}
 			}
@@ -298,6 +303,7 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 				}
 			}
 			this.post({ type: "panic", channel })
+			this.gui?.clearPlaying()
 		} else if (controller === 7 || controller === 11) {
 			;(controller === 7 ? this.volumes : this.expressions)[channel] =
 				bounded(value, 127, 0, 127) / 127
@@ -318,125 +324,57 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 		this.sustained.clear()
 		this.released.clear()
 		this.post({ type: "panic" })
+		this.gui?.clearPlaying()
 	}
 	private renderStatus(): void {
-		if (!this.status) {
+		if (!this.gui) {
 			return
 		}
 		const { loaded, failed, total } = this.progress
-		this.status.textContent = !this.node
-			? "Loads when played"
-			: loaded + failed < total
-				? `Loading ${presetTitle(this.options.preset)}: ${loaded} of ${total} samples`
-				: failed
-					? `${loaded} of ${total} samples loaded, ${failed} unavailable`
-					: `${presetTitle(this.options.preset)} ready`
-	}
-	private select(
-		panel: HTMLElement,
-		title: string,
-		value: string,
-		fill: (select: HTMLSelectElement) => void,
-		change: (value: string) => void
-	): HTMLSelectElement {
-		const label = document.createElement("label"),
-			select = document.createElement("select")
-		fill(select)
-		select.value = value
-		select.addEventListener(EVENT_CHANGE, () => change(select.value))
-		label.append(`${title} `, select)
-		panel.append(label)
-		return select
+		const busy = !!this.node && loaded + failed < total
+		this.gui.setStatus(
+			!this.node
+				? "Samples load when you play or press Play"
+				: busy
+					? `Loading ${presetTitle(this.options.preset)}: ${loaded} of ${total} samples`
+					: failed
+						? `${loaded} of ${total} samples loaded, ${failed} unavailable`
+						: `${presetTitle(this.options.preset)} ready`,
+			busy
+		)
 	}
 	async createGui(): Promise<HTMLElement> {
 		if (this.gui) {
-			return this.gui
+			return this.gui.element
 		}
-		const gui = devicePanel()
-		const option = (parent: HTMLElement, value: string | number, text: string) => {
-			const item = document.createElement("option")
-			item.value = String(value)
-			item.textContent = text
-			parent.append(item)
-		}
-		this.presetSelect = this.select(
-			gui,
-			"Instrument",
-			String(this.options.preset),
-			(select) =>
-				ROMPLER_FAMILIES.forEach((family, index) => {
-					const group = document.createElement("optgroup")
-					group.label = family
-					for (let program = index * 8; program < index * 8 + 8; program++) {
-						option(group, program, `${program + 1}. ${presetTitle(program)}`)
-					}
-					select.append(group)
-				}),
-			(value) => this.setPreset(Number(value))
-		)
-		this.select(
-			gui,
-			"Samples",
-			String(this.options.spacing),
-			(select) =>
-				SPACINGS.forEach((spacing) =>
-					option(
-						select,
-						spacing,
-						spacing === 1 ? "Every key (best, slowest)" : `Every ${spacing} keys`
-					)
-				),
-			(spacing) => this.configure({ spacing: Number(spacing) })
-		)
-		numberControl(
-			gui,
-			"Output gain",
-			this.options.volume,
-			0,
-			2,
-			(volume) => {
-				this.options.volume = volume
-				this.output.gain.value = volume
-				changed(this)
+		this.gui = new RomplerGui(
+			this.options,
+			{
+				preset: (program) => this.setPreset(program),
+				spacing: (spacing) => this.configure({ spacing }),
+				volume: (volume) => {
+					this.options.volume = volume
+					this.output.gain.value = volume
+				},
+				release: (release) => {
+					this.options.release = release
+					this.post({ type: "release", value: release })
+				},
+				pitchBendRange: (pitchBendRange) => {
+					this.options.pitchBendRange = pitchBendRange
+				},
+				commit: () => changed(this),
+				audition: (note, on) => (on ? void this.noteOn(note) : this.noteOff(note))
 			},
-			0.01
+			this.loadedNotes,
+			this.grid
 		)
-		numberControl(
-			gui,
-			"Release (s)",
-			this.options.release,
-			0.005,
-			5,
-			(release) => {
-				this.options.release = release
-				this.post({ type: "release", value: release })
-				changed(this)
-			},
-			0.01
-		)
-		numberControl(
-			gui,
-			"Pitch bend (semitones)",
-			this.options.pitchBendRange,
-			0,
-			24,
-			(pitchBendRange) => {
-				this.options.pitchBendRange = pitchBendRange
-				changed(this)
-			}
-		)
-		this.status = document.createElement("output")
-		this.status.setAttribute("aria-live", "polite")
-		gui.append(this.status)
-		this.gui = gui
 		this.renderStatus()
-		return gui
+		return this.gui.element
 	}
 	async destroyGui(): Promise<void> {
-		this.gui?.remove()
+		this.gui?.element.remove()
 		this.gui = undefined
-		this.status = undefined
-		this.presetSelect = undefined
 	}
 	destroy(): void {
 		if (this.destroyed) {

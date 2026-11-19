@@ -1,4 +1,5 @@
 import type { DeviceClassification, DeviceAttribution } from "./device-classification.ts"
+import type { DeviceRequirementId } from "./device-requirements"
 import { AI_TRANSFORMER_MODELS } from "./transformers/transformer-ai-music"
 import { AI_MODELS, MAGENTA_ATTRIBUTION } from "./inputs/ai-model-catalogue"
 /**
@@ -14,6 +15,15 @@ import { AI_MODELS, MAGENTA_ATTRIBUTION } from "./inputs/ai-model-catalogue"
 
 import { TRANSFORMER_TYPE } from "./transformer-factory"
 
+const MUTABLE_INSTRUMENTS_ATTRIBUTION: DeviceAttribution = {
+	author: "Emilie Gillet (Mutable Instruments Marbles)",
+	sourceUrl: "https://github.com/pichenettes/eurorack/tree/master/marbles",
+	license: "MIT",
+	licenseUrls: [
+		"https://github.com/pichenettes/eurorack/blob/master/marbles/random/t_generator.cc"
+	]
+}
+
 export interface TransformerDefinition extends DeviceClassification<"transformer"> {
 	attribution?: DeviceAttribution
 	id: string
@@ -21,9 +31,20 @@ export interface TransformerDefinition extends DeviceClassification<"transformer
 	description: string
 	icon: string
 	category: string
+	/** Browser features it needs; the picker disables it and names the missing ones */
+	requires?: readonly DeviceRequirementId[]
 }
 
 export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
+	[TRANSFORMER_TYPE.ID_MIDI_TRANSFORMER]: {
+		id: TRANSFORMER_TYPE.ID_MIDI_TRANSFORMER,
+		name: "MIDI Transformer",
+		description: "Transpose notes, filter MIDI message types, and inspect a rolling MIDI log.",
+		icon: "/icons/transformer-default.svg",
+		category: "MIDI",
+		type: "transformer",
+		subtype: "routing"
+	},
 	[TRANSFORMER_TYPE.ID_GROOVE]: {
 		id: TRANSFORMER_TYPE.ID_GROOVE,
 		name: "Groove",
@@ -110,7 +131,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 					category: "Variation",
 					type: "transformer",
 					subtype: "variation",
-					attribution: model.attribution
+					attribution: model.attribution,
+					requires: ["workers"]
 				}
 			]
 		})
@@ -162,6 +184,36 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		category: "Pitch",
 		type: "transformer",
 		subtype: "pitch"
+	},
+	[TRANSFORMER_TYPE.ID_RANDOM_SAMPLER]: {
+		attribution: MUTABLE_INSTRUMENTS_ATTRIBUTION,
+		id: TRANSFORMER_TYPE.ID_RANDOM_SAMPLER,
+		name: "Random Sampler",
+		description:
+			"Marbles-style random gates and in-scale pitches around held notes, looped with Déjà vu.",
+		icon: "/icons/transformer-random-sampler.svg",
+		category: "Variation",
+		type: "transformer",
+		subtype: "variation"
+	},
+	[TRANSFORMER_TYPE.ID_TOPOGRAPHIC_DRUMS]: {
+		id: TRANSFORMER_TYPE.ID_TOPOGRAPHIC_DRUMS,
+		name: "Topographic Drums",
+		description:
+			"Grids-style kick, snare and hi-hat patterns morphed across an X/Y map while a note is held.",
+		icon: "/icons/transformer-topographic-drums.svg",
+		category: "Pattern",
+		type: "transformer",
+		subtype: "pattern"
+	},
+	[TRANSFORMER_TYPE.ID_BERNOULLI_GATE]: {
+		id: TRANSFORMER_TYPE.ID_BERNOULLI_GATE,
+		name: "Bernoulli Gate",
+		description: "Branches-style coin toss that routes each note or chord to channel A or B.",
+		icon: "/icons/transformer-bernoulli-gate.svg",
+		category: "Routing",
+		type: "transformer",
+		subtype: "routing"
 	},
 	[TRANSFORMER_TYPE.ID_CHORD_TRACK]: {
 		id: TRANSFORMER_TYPE.ID_CHORD_TRACK,
@@ -254,6 +306,35 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		type: "transformer",
 		subtype: "routing"
 	},
+	[TRANSFORMER_TYPE.ID_MPE_ENCODER]: {
+		id: TRANSFORMER_TYPE.ID_MPE_ENCODER,
+		name: "Add MPE",
+		description:
+			"Encode notes as MPE, one member channel per note, from MIDI 2 per-note expression or poly aftertouch.",
+		icon: "/icons/transformer-mpe-encoder.svg",
+		category: "Routing",
+		type: "transformer",
+		subtype: "routing"
+	},
+	[TRANSFORMER_TYPE.ID_MPE_DECODER]: {
+		id: TRANSFORMER_TYPE.ID_MPE_DECODER,
+		name: "Remove MPE",
+		description:
+			"Gather MPE member channels onto one channel as MIDI 2 per-note expression or MIDI 1.",
+		icon: "/icons/transformer-mpe-decoder.svg",
+		category: "Routing",
+		type: "transformer",
+		subtype: "routing"
+	},
+	[TRANSFORMER_TYPE.ID_MIDI_PROTOCOL]: {
+		id: TRANSFORMER_TYPE.ID_MIDI_PROTOCOL,
+		name: "MIDI Protocol",
+		description: "Send MIDI 2 or MIDI 1 packets to UMP destinations such as native MIDI 2 outputs.",
+		icon: "/icons/transformer-midi-protocol.svg",
+		category: "Routing",
+		type: "transformer",
+		subtype: "routing"
+	},
 	[TRANSFORMER_TYPE.ID_CC_STEPPER]: {
 		id: TRANSFORMER_TYPE.ID_CC_STEPPER,
 		name: "CC Stepper",
@@ -272,7 +353,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		icon: "/icons/input-prompt-ai.svg",
 		category: "Harmony",
 		type: "transformer",
-		subtype: "harmony"
+		subtype: "harmony",
+		requires: ["browserAI"]
 	},
 	[TRANSFORMER_TYPE.ID_VELOCITY_SHAPER]: {
 		id: TRANSFORMER_TYPE.ID_VELOCITY_SHAPER,
@@ -445,7 +527,8 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 		icon: "/icons/transformer-magenta.svg",
 		category: "Harmony",
 		type: "transformer",
-		subtype: "harmony"
+		subtype: "harmony",
+		requires: ["workers"]
 	},
 	[TRANSFORMER_TYPE.ID_ARPEGGIATOR]: {
 		id: TRANSFORMER_TYPE.ID_ARPEGGIATOR,
@@ -470,11 +553,12 @@ export const TRANSFORMER_DEFINITIONS: Record<string, TransformerDefinition> = {
 	[TRANSFORMER_TYPE.ID_HARMONISER]: {
 		id: TRANSFORMER_TYPE.ID_HARMONISER,
 		name: "Harmoniser",
-		description: "Adds harmonic voices above the input note",
+		description:
+			"Snap incoming notes into a chosen key and scale, or filter out-of-scale notes.",
 		icon: "/icons/transformer-harmoniser.svg",
-		category: "Harmony",
+		category: "Tuning",
 		type: "transformer",
-		subtype: "harmony"
+		subtype: "pitch"
 	},
 
 	[TRANSFORMER_TYPE.ID_CHORDIFIER]: {

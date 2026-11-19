@@ -1,9 +1,9 @@
 import { UI_INPUT_COMPONENTS } from "../ui/input-components.ts"
 import { INPUT_DEFINITIONS } from "./input-definitions.ts"
-import { browserAI } from "./browser-ai"
 import { AI_MODELS } from "./inputs/ai-model-catalogue"
 import type { DeviceClassification, DeviceAttribution } from "./device-classification.ts"
 import { defineDevice } from "./device-definition"
+import { requiring, type DeviceRequirementId } from "./device-requirements"
 import {
 	MIDI_DEVICE_PROFILES,
 	ensureMidiDeviceProfile,
@@ -22,8 +22,16 @@ export interface InputFactory extends DeviceClassification {
 	name: string
 	description: string
 	isAvailable: () => boolean
+	/** Browser or host features it needs; pickers name the missing ones */
+	requires?: readonly DeviceRequirementId[]
 	create: (options?: Record<string, any>) => IAudioInput | Promise<IAudioInput>
 }
+
+/**
+ * Profiled MIDI devices connect through Web MIDI, or native MIDI in the desktop app, and
+ * offer their virtual surface without either.
+ */
+const MIDI_PROFILE_REQUIREMENTS = requiring("page")
 
 const loadSupportingLibrary = async (type: string) => {
 	if (Object.hasOwn(AI_MODELS, type)) {
@@ -89,6 +97,8 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./inputs/input-microphone-pitch.ts")
 		case INPUT_TYPES.DVS_CONTROL_VINYL:
 			return await import("./inputs/input-dvs-control-vinyl.ts")
+		case INPUT_TYPES.DEVICE_MOTION:
+			return await import("./inputs/input-device-motion.ts")
 		default:
 			throw new Error(`Unknown input type: ${type}`)
 	}
@@ -144,7 +154,7 @@ const createInput = async (type: string, options = {}): Promise<IAudioInput> => 
 export const INPUT_FACTORIES: InputFactory[] = [
 	...Object.keys(AI_MODELS).map((id) => ({
 		...INPUT_DEFINITIONS[id],
-		isAvailable: () => typeof Worker !== "undefined",
+		...requiring("workers"),
 		create: (options?: Record<string, any>) => createInput(id, options)
 	})),
 	...[
@@ -157,43 +167,34 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		INPUT_TYPES.PROTOCOL
 	].map((id) => ({
 		...INPUT_DEFINITIONS[id],
-		isAvailable: () => true,
+		...requiring(),
 		create: (options?: Record<string, any>) => createInput(id, options)
 	})),
 	{
 		...INPUT_DEFINITIONS[INPUT_TYPES.MICROPHONE_TRIGGER],
-		isAvailable: () =>
-			typeof navigator !== "undefined" &&
-			!!navigator.mediaDevices?.getUserMedia &&
-			typeof AudioContext !== "undefined",
+		...requiring("mediaDevices", "webAudio"),
 		create: (options) => createInput(INPUT_TYPES.MICROPHONE_TRIGGER, options)
 	},
 	{
 		...INPUT_DEFINITIONS[INPUT_TYPES.CAMERA_GESTURES],
-		isAvailable: () =>
-			typeof navigator !== "undefined" &&
-			!!navigator.mediaDevices?.getUserMedia &&
-			typeof Worker !== "undefined" &&
-			typeof createImageBitmap === "function" &&
-			typeof OffscreenCanvas !== "undefined",
+		...requiring("mediaDevices", "workers", "offscreenCanvas"),
 		create: (options) => createInput(INPUT_TYPES.CAMERA_GESTURES, options)
 	},
 	{
 		...INPUT_DEFINITIONS[INPUT_TYPES.OSC],
-		isAvailable: () => typeof WebSocket !== "undefined",
+		...requiring("webSocket"),
 		create: (options) => createInput(INPUT_TYPES.OSC, options)
 	},
 	...Object.keys(UI_INPUT_COMPONENTS).map(
 		(id): InputFactory => ({
 			...INPUT_DEFINITIONS[id],
-			isAvailable: () =>
-				typeof document !== "undefined" && typeof customElements !== "undefined",
+			...requiring("page", "webComponents"),
 			create: (options) => createInput(id, options)
 		})
 	),
 	{
 		...INPUT_DEFINITIONS[INPUT_TYPES.MIDI_FILE],
-		isAvailable: () => true,
+		...requiring(),
 		create: (options) => createInput(INPUT_TYPES.MIDI_FILE, options)
 	},
 	...Object.entries(MIDI_DEVICE_PROFILES).map(
@@ -203,7 +204,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 			description: profile.description,
 			type: "midi",
 			subtype: "device",
-			isAvailable: () => typeof document !== "undefined",
+			...MIDI_PROFILE_REQUIREMENTS,
 			create: (options) => createInput(id, options)
 		})
 	),
@@ -213,7 +214,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.KEYBOARD].subtype,
 		name: "Keyboard",
 		description: "QWERTY keyboard input for playing notes",
-		isAvailable: () => true,
+		...requiring(),
 		create: (options) => createInput(INPUT_TYPES.KEYBOARD, options)
 	},
 	{
@@ -222,7 +223,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.GAMEPAD].subtype,
 		name: "Gamepad",
 		description: "Game controller / joystick input",
-		isAvailable: () => typeof navigator !== "undefined" && !!navigator.getGamepads,
+		...requiring("gamepads"),
 		create: (options) => createInput(INPUT_TYPES.GAMEPAD, options)
 	},
 	{
@@ -232,7 +233,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		name: "Gamepad Music Controller",
 		description:
 			"Advanced gamepad input with multiple music modes: Chord, Melodic, Drum, Arpeggiator",
-		isAvailable: () => typeof navigator !== "undefined" && !!navigator.getGamepads,
+		...requiring("gamepads"),
 		create: (options) => createInput(INPUT_TYPES.GAMEPAD_MUSIC, options)
 	},
 	{
@@ -241,8 +242,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.WEBMIDI].subtype,
 		name: "WebMIDI Device",
 		description: "MIDI input from external devices via WebMIDI API",
-		isAvailable: () =>
-			typeof navigator !== "undefined" && !!(navigator as any).requestMIDIAccess,
+		...requiring("webMidi"),
 		create: (options) => createInput(INPUT_TYPES.WEBMIDI, options)
 	},
 	{
@@ -251,7 +251,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.NATIVE_MIDI].subtype,
 		name: "Native MIDI Device",
 		description: "MIDI input from external devices via native OS APIs (Windows/macOS/Linux)",
-		isAvailable: () => true, // Native MIDI available on all platforms
+		...requiring("nativeMidiAddon"),
 		create: (options) => createInput(INPUT_TYPES.NATIVE_MIDI, options)
 	},
 	{
@@ -261,7 +261,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		name: "MIDI 2.0 Native",
 		description:
 			"MIDI 2.0 input with per-note controllers via native OS MIDI (16-bit resolution, Windows/macOS/Linux)",
-		isAvailable: () => true, // Native MIDI available on all platforms
+		...requiring("desktopMidi"),
 		create: (options) => createInput(INPUT_TYPES.MIDI2_NATIVE, options)
 	},
 	{
@@ -270,7 +270,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.BLE_MIDI].subtype,
 		name: "BLE MIDI",
 		description: "Bluetooth MIDI input",
-		isAvailable: () => typeof navigator !== "undefined" && !!navigator.bluetooth,
+		...requiring("bluetooth"),
 		create: (options) => createInput(INPUT_TYPES.BLE_MIDI, options)
 	},
 	{
@@ -279,7 +279,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.MICROPHONE_FORMANT].subtype,
 		name: "Microphone Formant",
 		description: "Microphone input for formant analysis",
-		isAvailable: () => typeof navigator !== "undefined" && !!navigator.mediaDevices,
+		...requiring("mediaDevices", "webAudio"),
 		create: (options) => createInput(INPUT_TYPES.MICROPHONE_FORMANT, options)
 	},
 	{
@@ -288,7 +288,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.ONSCREEN_KEYBOARD].subtype,
 		name: "Onscreen Keyboard",
 		description: "Mouse-based virtual keyboard input",
-		isAvailable: () => true,
+		...requiring(),
 		create: (options) => createInput(INPUT_TYPES.ONSCREEN_KEYBOARD, options)
 	},
 	{
@@ -298,7 +298,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		name: "PromptAI Generator",
 		description:
 			"Generate melodies, bass lines, drums and chords with built-in browser AI; no API key required",
-		isAvailable: () => !!browserAI(),
+		...requiring("browserAI"),
 		create: (options) => createInput(INPUT_TYPES.PROMPT_AI, options)
 	},
 	{
@@ -308,10 +308,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		name: "PromptAI Speech",
 		description:
 			"AI-powered input with speech recognition for generating note sequences via voice",
-		isAvailable: () =>
-			!!browserAI() &&
-			typeof window !== "undefined" &&
-			(!!(window as any).SpeechRecognition || !!(window as any).webkitSpeechRecognition),
+		...requiring("browserAI", "speechRecognition"),
 		create: (options) => createInput(INPUT_TYPES.PROMPT_AI_SPEECH, options)
 	},
 	{
@@ -321,7 +318,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		name: "MIDI Transport Clock",
 		description:
 			"MIDI transport clock input for timing synchronization (24 clocks per quarter note)",
-		isAvailable: () => true, // Available on all platforms with MIDI support
+		...requiring(),
 		create: (options) => createInput(INPUT_TYPES.MIDI_TRANSPORT_CLOCK, options)
 	},
 	{
@@ -331,7 +328,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		name: "Music Mouse",
 		description:
 			"Cursor-controlled musical instrument inspired by Laurie Spiegel's classic Music Mouse",
-		isAvailable: () => true,
+		...requiring(),
 		create: (options) => createInput(INPUT_TYPES.MUSIC_MOUSE, options)
 	},
 	{
@@ -341,7 +338,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		name: "Microphone Pitch (ML)",
 		description:
 			"Polyphonic pitch detection from microphone using Spotify's Basic Pitch neural network",
-		isAvailable: () => typeof navigator !== "undefined" && !!navigator.mediaDevices,
+		...requiring("mediaDevices", "webAudio"),
 		create: (options) => createInput(INPUT_TYPES.MICROPHONE_PITCH, options)
 	},
 	{
@@ -350,9 +347,20 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		subtype: INPUT_DEFINITIONS[INPUT_TYPES.DVS_CONTROL_VINYL].subtype,
 		name: "DVS Control Vinyl",
 		description:
-			"Control vinyl pilot-tone clock - estimates relative speed and generates DVS_CLOCK ticks, DVS_START and DVS_STOP (no direction or absolute position decoding)",
-		isAvailable: () => typeof navigator !== "undefined" && !!navigator.mediaDevices,
+			"Control vinyl pilot-tone clock - estimates relative speed and generates DVS_CLOCK ticks, DVS_START and DVS_STOP; stereo input holds the clock in reverse (no absolute position decoding)",
+		...requiring("mediaDevices", "webAudio"),
 		create: (options) => createInput(INPUT_TYPES.DVS_CONTROL_VINYL, options)
+	},
+	{
+		id: INPUT_TYPES.DEVICE_MOTION,
+		type: INPUT_DEFINITIONS[INPUT_TYPES.DEVICE_MOTION].type,
+		subtype: INPUT_DEFINITIONS[INPUT_TYPES.DEVICE_MOTION].subtype,
+		name: "Device Motion",
+		description:
+			"Tilt, strike and turn a phone or tablet to play notes, chords and drums, or stream movement as MIDI CC for control surfaces",
+		// Desktops without sensors can still try it by dragging on its pad.
+		...requiring("page"),
+		create: (options) => createInput(INPUT_TYPES.DEVICE_MOTION, options)
 	}
 ]
 onMidiDeviceProfilesChanged(() => {
@@ -366,7 +374,7 @@ onMidiDeviceProfilesChanged(() => {
 			description: profile.description,
 			type: "midi",
 			subtype: "device",
-			isAvailable: () => typeof document !== "undefined",
+			...MIDI_PROFILE_REQUIREMENTS,
 			create: (options) => createInput(id, options)
 		})
 	}

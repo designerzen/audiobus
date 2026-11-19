@@ -1,0 +1,431 @@
+.rompler {
+	--rompler-body: #1b1d21;
+	--rompler-panel: #23262b;
+	--rompler-edge: #3a3f46;
+	--rompler-ink: #d9dde2;
+	--rompler-dim: #8a929b;
+	--rompler-lcd: #120d06;
+	--rompler-glow: #ffb547;
+	--rompler-glow-dim: #7a5320;
+	--rompler-hot: #fff3d6;
+	--rompler-focus: #7fe0ff;
+
+	display: grid;
+	gap: 10px;
+	min-width: 280px;
+	max-width: 420px;
+	padding: 14px;
+	border: 1px solid var(--rompler-edge);
+	border-radius: 18px;
+	background: linear-gradient(180deg, #ffffff0d, transparent 40%), var(--rompler-body);
+	box-shadow:
+		inset 0 1px 0 #ffffff1a,
+		0 8px 24px #0008;
+	color: var(--rompler-ink);
+	font:
+		12px/1.4 ui-sans-serif,
+		system-ui,
+		sans-serif;
+	text-shadow: none;
+
+	* {
+		box-sizing: border-box;
+	}
+
+	/* The app styles these globally; the panel draws its own */
+	label,
+	button,
+	input,
+	output {
+		position: static;
+		width: auto;
+		height: auto;
+		min-height: 0;
+		margin: 0;
+		font: inherit;
+		color: inherit;
+		text-shadow: none;
+		box-shadow: none;
+		transform: none;
+		animation: none;
+	}
+	label::before,
+	label::after,
+	button::before,
+	button::after {
+		display: none;
+	}
+	button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 0;
+		min-height: 30px;
+		padding: 4px 10px;
+		border: 1px solid var(--rompler-edge);
+		border-radius: 8px;
+		background: linear-gradient(180deg, #2e3238, #24272c);
+		cursor: pointer;
+		transition:
+			background 0.12s,
+			color 0.12s,
+			border-color 0.12s;
+	}
+	button:hover {
+		border-color: var(--rompler-glow-dim);
+	}
+	button[aria-pressed="true"] {
+		border-color: var(--rompler-glow);
+		background: var(--rompler-glow);
+		color: var(--rompler-lcd);
+	}
+	:is(button, input):focus-visible,
+	.rompler-list:focus-visible {
+		outline: 2px solid var(--rompler-focus);
+		outline-offset: 2px;
+	}
+
+	> header {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 8px;
+	}
+}
+
+.rompler-brand {
+	font-size: 20px;
+	font-style: italic;
+	font-weight: 800;
+	letter-spacing: -0.04em;
+}
+
+.rompler-soundfont,
+.rompler-credit,
+.rompler-count,
+.rompler-label {
+	color: var(--rompler-dim);
+	font-size: 10px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.rompler-front {
+	display: grid;
+	gap: 8px;
+	padding: 10px;
+	border-radius: 12px;
+	background: var(--rompler-panel);
+	box-shadow: inset 0 1px 3px #0009;
+}
+
+.rompler-screen {
+	display: grid;
+	gap: 4px;
+	min-height: 112px;
+	padding: 10px 12px;
+	border: 1px solid #000;
+	border-radius: 8px;
+	background:
+		repeating-linear-gradient(0deg, #ffffff05 0 1px, transparent 1px 3px),
+		radial-gradient(120% 90% at 30% 0%, #2a1a0699, transparent), var(--rompler-lcd);
+	box-shadow: inset 0 2px 8px #000c;
+	color: var(--rompler-glow);
+	font-family: ui-monospace, "Cascadia Mono", Menlo, monospace;
+
+	p,
+	ul {
+		margin: 0;
+		padding: 0;
+	}
+}
+
+.rompler-heading {
+	display: flex;
+	align-items: baseline;
+	gap: 10px;
+	min-width: 0;
+	text-shadow: 0 0 8px #ffb54788;
+}
+
+.rompler-number {
+	font-size: 22px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	opacity: 0.85;
+}
+
+.rompler-title {
+	overflow: hidden;
+	font-size: 17px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.rompler-meta {
+	color: #d89a45;
+	font-size: 10px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.rompler-about {
+	display: -webkit-box;
+	overflow: hidden;
+	color: #e7b97a;
+	font-size: 11px;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 3;
+}
+
+.rompler-uses {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	list-style: none;
+
+	li {
+		padding: 1px 6px;
+		border: 1px solid var(--rompler-glow-dim);
+		border-radius: 999px;
+		font-size: 10px;
+	}
+}
+
+/* One column per key from A0 to C8: dim markers show the keys that get a
+   sample, which glow once loaded and flash white while they play */
+.rompler-keys {
+	display: flex;
+	gap: 1px;
+	height: 34px;
+	padding: 3px;
+	border-radius: 6px;
+	background: #0b0c0e;
+	cursor: pointer;
+	touch-action: none;
+
+	span {
+		flex: 1;
+		border-radius: 0 0 2px 2px;
+		background: #c9ced4;
+		transition: background 0.2s;
+	}
+	.black {
+		margin-bottom: 12px;
+		background: #3b4047;
+	}
+	.sampled {
+		box-shadow: inset 0 -4px 0 var(--rompler-glow-dim);
+	}
+	.loaded {
+		box-shadow: inset 0 -4px 0 var(--rompler-glow);
+	}
+	.playing {
+		background: var(--rompler-hot);
+		box-shadow:
+			inset 0 -4px 0 var(--rompler-glow),
+			0 0 6px var(--rompler-glow);
+		transition: none;
+	}
+}
+
+.rompler-transport {
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	gap: 6px;
+}
+
+.rompler-play {
+	font-weight: 700;
+	letter-spacing: 0.04em;
+}
+
+.rompler-play:active {
+	border-color: var(--rompler-glow);
+	color: var(--rompler-glow);
+}
+
+.rompler-status {
+	min-height: 1.4em;
+	color: var(--rompler-dim);
+	font-size: 11px;
+}
+
+.rompler-busy .rompler-status::before {
+	content: "";
+	display: inline-block;
+	width: 6px;
+	height: 6px;
+	margin-right: 6px;
+	border-radius: 50%;
+	background: var(--rompler-glow);
+	vertical-align: middle;
+	animation: rompler-pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes rompler-pulse {
+	from {
+		opacity: 0.25;
+	}
+}
+
+.rompler-browser {
+	display: grid;
+	gap: 6px;
+}
+
+.rompler-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.rompler .rompler-search {
+	flex: 1;
+	min-width: 0;
+	min-height: 30px;
+	padding: 4px 10px;
+	border: 1px solid var(--rompler-edge);
+	border-radius: 8px;
+	background: #121417;
+	color: var(--rompler-ink);
+}
+
+.rompler-categories {
+	display: flex;
+	gap: 4px;
+	overflow-x: auto;
+	padding-bottom: 2px;
+	scrollbar-width: thin;
+
+	button {
+		flex: none;
+		min-height: 24px;
+		padding: 2px 9px;
+		border-radius: 999px;
+		font-size: 11px;
+	}
+}
+
+.rompler-list {
+	position: relative;
+	display: grid;
+	gap: 2px;
+	max-height: 196px;
+	overflow-y: auto;
+	padding: 3px;
+	border-radius: 10px;
+	background: #121417;
+	scrollbar-width: thin;
+}
+
+.rompler .rompler-item {
+	display: grid;
+	grid-template-columns: 3ch 1fr auto;
+	gap: 8px;
+	justify-content: stretch;
+	min-height: 28px;
+	padding: 3px 8px;
+	border-color: transparent;
+	background: none;
+	text-align: left;
+
+	&:hover {
+		background: #ffffff0d;
+	}
+	&[aria-pressed="true"] .rompler-tag {
+		border-color: currentColor;
+	}
+}
+
+.rompler-item-number {
+	color: var(--rompler-dim);
+	font-family: ui-monospace, monospace;
+	font-size: 11px;
+}
+
+[aria-pressed="true"] > .rompler-item-number {
+	color: inherit;
+}
+
+.rompler-item-name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.rompler-tag {
+	padding: 0 6px;
+	border: 1px solid var(--rompler-edge);
+	border-radius: 999px;
+	font-size: 9px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.rompler-controls {
+	display: grid;
+	gap: 10px;
+}
+
+.rompler-density {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px;
+
+	.rompler-label {
+		margin-right: auto;
+	}
+	button {
+		min-height: 26px;
+		padding: 2px 8px;
+		font-size: 11px;
+	}
+}
+
+.rompler-sliders {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 10px;
+}
+
+.rompler .rompler-slider {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	align-items: baseline;
+	gap: 4px;
+	padding: 0;
+	border: 0;
+	background: none;
+
+	output {
+		font-family: ui-monospace, monospace;
+		font-size: 11px;
+		font-variant-numeric: tabular-nums;
+	}
+	input {
+		grid-column: 1 / -1;
+		width: 100%;
+		min-height: 18px;
+		accent-color: var(--rompler-glow);
+	}
+}
+
+.rompler-credit {
+	letter-spacing: 0.02em;
+	text-transform: none;
+}
+
+@media (max-width: 360px) {
+	.rompler-sliders {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rompler * {
+		transition: none !important;
+		animation: none !important;
+	}
+}

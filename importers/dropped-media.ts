@@ -29,7 +29,7 @@ export function safeArchivePath(path: string): string {
 	return path
 }
 
-export async function inspectMediaArchive(bytes: Uint8Array): Promise<MediaArchive> {
+export async function readMediaArchive(bytes: Uint8Array): Promise<Record<string, Uint8Array>> {
 	if (bytes.length > MAX_MEDIA_BYTES) {
 		throw new Error("Archive exceeds the 64 MB limit")
 	}
@@ -62,6 +62,11 @@ export async function inspectMediaArchive(bytes: Uint8Array): Promise<MediaArchi
 			(error, result) => (error ? reject(error) : invalid ? reject(invalid) : resolve(result))
 		)
 	)
+	return files
+}
+
+export async function inspectMediaArchive(bytes: Uint8Array): Promise<MediaArchive> {
+	const files = await readMediaArchive(bytes)
 	const plugins: ArchivedPlugin[] = []
 	for (const [path, contents] of Object.entries(files)) {
 		if (!/(^|\/)descriptor\.json$/i.test(path)) {

@@ -149,6 +149,15 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		category: "Audio",
 		icon: "/icons/output-recorder.svg"
 	},
+	[OUTPUT_TYPES.LOOP_PLAYER]: {
+		id: OUTPUT_TYPES.LOOP_PLAYER,
+		name: "Loop Player",
+		description: "Load audio loops that follow the transport tempo with granular, slice or varispeed playback",
+		type: "engine",
+		subtype: "instrument",
+		category: "Audio",
+		icon: "/icons/output-recorder.svg"
+	},
 	[OUTPUT_TYPES.EVENT_RECORDER]: {
 		id: OUTPUT_TYPES.EVENT_RECORDER,
 		name: "Event Recorder / Looper",

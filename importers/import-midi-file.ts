@@ -6,6 +6,10 @@ import AudioCommand from "../commands/audio-command"
 export const importMIDIFile = async (file: File) => {
 	const arrayBuffer = await file.arrayBuffer()
 
+	return importMIDIBytes(arrayBuffer, file.name)
+}
+
+export function importMIDIBytes(arrayBuffer: ArrayBuffer, fileName: string) {
 	// Parse MIDI using @tonejs/midi
 	const midi = new Midi(arrayBuffer)
 
@@ -24,8 +28,9 @@ export const importMIDIFile = async (file: File) => {
 			noteOn.type = NOTE_ON
 			noteOn.number = note.midi
 			noteOn.velocity = note.velocity * 127 || 100 // @tonejs/midi uses 0-1, convert to 0-127
+			noteOn.endAt = note.time + note.duration
 			noteOn.startAt = note.time
-			noteOn.from = file.name
+			noteOn.from = fileName
 			noteOn.channel = track.channel + 1
 			noteOn.patch = track.instrument.number
 			commands.push(noteOn)
@@ -37,7 +42,7 @@ export const importMIDIFile = async (file: File) => {
 			noteOff.number = note.midi
 			noteOff.velocity = note.velocity * 127 || 100
 			noteOff.startAt = note.time + note.duration
-			noteOff.from = file.name
+			noteOff.from = fileName
 			noteOff.channel = track.channel + 1
 			noteOff.patch = track.instrument.number
 			commands.push(noteOff)
@@ -48,7 +53,7 @@ export const importMIDIFile = async (file: File) => {
 	commands.sort((a, b) => (a.startAt || 0) - (b.startAt || 0))
 
 	console.info("MIDI file loaded successfully", {
-		fileName: file.name,
+		fileName: fileName,
 		noteCount,
 		duration: midi.duration,
 		tracks: midi.tracks.length,

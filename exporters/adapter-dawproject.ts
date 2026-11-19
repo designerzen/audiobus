@@ -1,69 +1,41 @@
-import RecorderAudioEvent from "../events/audio-event-recorder.ts"
-import AudioEvent from "../models/audio-event.ts"
-import { NOTE_ON } from "../commands/commands"
+import { zipSync, strToU8 } from "fflate"
+import {
+	recordingNotes,
+	exportTempo,
+	escapeXML,
+	type NoteRecording
+} from "../formats/note-sequence"
 
-import type { Timer } from "netronome"
-
-/**
- * Create a .dawProject XML file from audio event recording
- * .dawProject is a DAWP (DAW Project) XML format for standard DAW interchange
- */
-export const createDawProjectFromAudioEventRecording = async (
-	recording: RecorderAudioEvent,
-	timer: Timer
-): Promise<Blob> => {
-	const data: AudioEvent[] = recording.exportData()
-	const BPM: number = timer.BPM
-	const duration: number = recording.duration
-
-	// Convert audio events to note objects
-	const notes = data
-		.filter((event) => event.type === NOTE_ON)
-		.map((event) => ({
-			note: event.noteNumber,
-			velocity: event.velocity ?? 100,
-			time: event.startAt,
-			duration: event.duration
-		}))
-
-	// Build notes XML
-	let notesXML = ""
-	notes.forEach((note) => {
-		notesXML += `    <Note start="${note.time}" duration="${note.duration}" pitch="${note.note}" velocity="${note.velocity}"/>\n`
-	})
-
-	// Create .dawProject XML structure
-	const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<DAWP version="1.0">
-  <Project name="${escapeXml(recording.name ?? "New Harmoneasy Project")}" tempo="${BPM}" duration="${duration}" timeSignatureNumerator="4" timeSignatureDenominator="4">
-    <Timeline>
-      <Track id="track-0" name="Piano Roll" type="MIDI">
-        <Region start="0" duration="${duration}">
-${notesXML}        </Region>
-      </Track>
-    </Timeline>
-    <Metadata>
-      <Created>${new Date().toISOString()}</Created>
-      <Source>Harmoneasy</Source>
-    </Metadata>
-  </Project>
-</DAWP>`
-
-	// Create blob with XML content
-	const blob = new Blob([xml], { type: "application/xml" })
-	return blob
-}
-
-/**
- * Escape XML special characters
- */
-const escapeXml = (str: string): string => {
-	return str
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/"/g, "&quot;")
-		.replace(/'/g, "&apos;")
+/** Standard DAWproject ZIP/XML archive containing the recorded note arrangement. */
+export async function createDawProjectFromAudioEventRecording(
+	recording: NoteRecording,
+	timer: { readonly BPM: number }
+): Promise<Blob> {
+	const bpm = exportTempo(timer),
+		notes = recordingNotes(recording)
+	const channels = [...new Set(notes.map((note) => note.channel))]
+	const tracks = channels
+		.map(
+			(channel) =>
+				`<Track id="track-${channel}" name="Channel ${channel}" contentType="notes" loaded="true"><Channel id="channel-${channel}" role="regular" audioChannels="2" destination="master"/></Track>`
+		)
+		.join("")
+	const lanes = channels
+		.map(
+			(channel) =>
+				`<Lanes track="track-${channel}"><Notes timeUnit="seconds">${notes
+					.filter((note) => note.channel === channel)
+					.map(
+						(note) =>
+							`<Note time="${note.start}" duration="${note.duration}" key="${note.number}" channel="${note.channel - 1}" vel="${note.velocity / 127}"/>`
+					)
+					.join("")}</Notes></Lanes>`
+		)
+		.join("")
+	const xml = `<?xml version="1.0" encoding="UTF-8"?><Project version="1.0"><Application name="Harmoneasy" version="1.0"/><Transport><Tempo id="tempo" unit="bpm" value="${bpm}"/></Transport><Structure>${tracks}<Track id="master-track" name="Master"><Channel id="master" role="master" audioChannels="2"/></Track></Structure><Arrangement><Lanes timeUnit="seconds">${lanes}</Lanes></Arrangement></Project>`
+	const metadata = `<?xml version="1.0" encoding="UTF-8"?><MetaData><Title>${escapeXML(recording.name)}</Title></MetaData>`
+	const bytes = zipSync({ "project.xml": strToU8(xml), "metadata.xml": strToU8(metadata) })
+	return new Blob([Uint8Array.from(bytes).buffer], { type: "application/zip" })
 }
 
 /**

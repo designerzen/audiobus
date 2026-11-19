@@ -1138,6 +1138,49 @@
 			]
 		},
 		{
+			"id": "mpe-voices",
+			"name": "MPE Voices",
+			"category": "Register & layering",
+			"description": "Give every note its own MPE member channel for per-note bend and pressure.",
+			"useCase": "Connect an MPE synth, then play with polyphonic aftertouch or a MIDI 2 controller.",
+			"steps": [
+				{
+					"type": "MPE-Encoder",
+					"config": {
+						"zone": "lower",
+						"members": 15,
+						"memberBendRange": 48
+					},
+					"summary": "Allocate member channels 2 to 16 and announce a 48 semitone note bend range."
+				}
+			]
+		},
+		{
+			"id": "mpe-to-midi-2",
+			"name": "MPE to MIDI 2",
+			"category": "Register & layering",
+			"description": "Turn an MPE controller's member channels into MIDI 2 per-note expression.",
+			"useCase": "Play an MPE controller into a native MIDI 2 output on one channel.",
+			"steps": [
+				{
+					"type": "MPE-Decoder",
+					"config": {
+						"zone": "auto",
+						"output": "midi2",
+						"channel": 1
+					},
+					"summary": "Keep per-note bend, pressure and timbre as MIDI 2 per-note messages."
+				},
+				{
+					"type": "MIDI-Protocol",
+					"config": {
+						"protocol": "midi2"
+					},
+					"summary": "Send 32-bit MIDI 2 packets to UMP destinations."
+				}
+			]
+		},
+		{
 			"id": "stepped-mod-wheel",
 			"name": "Stepped Mod Wheel",
 			"category": "Rhythm & repeats",
@@ -2218,6 +2261,69 @@
 						"finalBeats": 1
 					},
 					"summary": "Connect the chords using oblique voice movement."
+				}
+			]
+		},
+		{
+			"id": "marbles-random-melody",
+			"name": "Marbles Random Melody",
+			"category": "Arpeggios & movement",
+			"description": "Hold a note to spin a looping, in-scale random melody around it.",
+			"useCase": "Hold a note or chord, then raise Déjà vu towards 50% to lock a phrase you like.",
+			"steps": [
+				{
+					"type": "Random-Sampler",
+					"config": {
+						"model": "markov",
+						"probability": 60,
+						"spread": 45,
+						"steps": 70,
+						"range": 2,
+						"scale": "Minor pentatonic",
+						"dejaVu": 35,
+						"length": 8
+					},
+					"summary": "Random gates and pentatonic pitches with an evolving eight-step loop."
+				}
+			]
+		},
+		{
+			"id": "topographic-drum-machine",
+			"name": "Topographic Drum Machine",
+			"category": "Rhythm & repeats",
+			"description": "Hold a key to play a Grids-style beat on channel 10 and morph it with the map.",
+			"useCase": "Route channel 10 to a drum instrument, hold any note and sweep Map X, Map Y and the densities.",
+			"steps": [
+				{
+					"type": "Topographic-Drums",
+					"config": {
+						"mapX": 50,
+						"mapY": 50,
+						"kickDensity": 60,
+						"snareDensity": 55,
+						"hatDensity": 60,
+						"chaos": 10
+					},
+					"summary": "Kick, snare and hats read from the centre of the map."
+				}
+			]
+		},
+		{
+			"id": "bernoulli-call-and-response",
+			"name": "Bernoulli Call and Response",
+			"category": "Register & layering",
+			"description": "Toss a coin for every note or chord to split playing between two channels.",
+			"useCase": "Send channels 1 and 2 to different instruments and let chance pick which one answers.",
+			"steps": [
+				{
+					"type": "Bernoulli-Gate",
+					"config": {
+						"probability": 50,
+						"mode": "toss",
+						"channelA": 1,
+						"channelB": 2
+					},
+					"summary": "Each gesture goes to channel 1 or 2 with equal chance."
 				}
 			]
 		}

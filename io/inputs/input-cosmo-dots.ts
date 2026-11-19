@@ -41,7 +41,8 @@ const COLOURS = [
 	"#219c98",
 	"#397cc7",
 	"#7957c3",
-	"#bc448f"
+	"#bc448f",
+	"#a86435"
 ]
 
 export function cosmoDotConfiguration(value: any, index: number): CosmoDotConfiguration {
@@ -91,7 +92,7 @@ export default class InputCosmoDots extends AbstractInput {
 	constructor(options: Record<string, any> = {}) {
 		super(options)
 		this.options.dots = Array.from(
-			{ length: Math.round(bounded(options.dotCount ?? options.dots?.length, 8, 1, 8)) },
+			{ length: Math.round(bounded(options.dotCount ?? options.dots?.length, 8, 1, 9)) },
 			(_, i) => cosmoDotConfiguration(options.dots?.[i], i)
 		)
 		this.options.dotCount = this.options.dots.length
@@ -156,7 +157,7 @@ export default class InputCosmoDots extends AbstractInput {
 
 	setDotCount(value: number): void {
 		this.stopAll()
-		const count = Math.round(bounded(value, this.configuration.length, 1, 8))
+		const count = Math.round(bounded(value, this.configuration.length, 1, 9))
 		this.options.dots = Array.from({ length: count }, (_, i) =>
 			cosmoDotConfiguration(this.options.dots[i], i)
 		)
@@ -172,7 +173,7 @@ export default class InputCosmoDots extends AbstractInput {
 					label: "Number of Cosmo Dots",
 					widget: "number",
 					min: 1,
-					max: 8,
+					max: 9,
 					step: 1
 				}
 			]
@@ -326,7 +327,7 @@ export default class InputCosmoDots extends AbstractInput {
 			"Number of dots",
 			this.configuration.length,
 			1,
-			8,
+			9,
 			(value) => this.setDotCount(value)
 		)
 		panel.append(this.createSurfaceView().element)

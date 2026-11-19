@@ -54,9 +54,9 @@ describe("TransformerHarmoniser", () => {
 
 		const result = transformer.transform(commands, mockTimer)
 
-		expect(result.length).toBe(3)
+		expect(result.length).toBe(2)
 		expect(result[0].number).toBe(0) // C stays
-		expect(result[2].number).toBe(4) // E stays
+		expect(result[1].number).toBe(4) // E stays; C# shares the held C
 	})
 
 	it("should handle different roots", () => {
@@ -111,7 +111,7 @@ describe("TransformerHarmoniser", () => {
 		expect(result[0].number).toBeLessThanOrEqual(127)
 	})
 
-	it("should only quantise NOTE_ON commands", () => {
+	it("passes unmatched releases through", () => {
 		transformer = new TransformerHarmoniser({ root: 0, mode: IONIAN_INTERVALS })
 
 		const commands = [
@@ -124,6 +124,164 @@ describe("TransformerHarmoniser", () => {
 		// NOTE_OFF should remain unchanged
 		expect(result[0].type).toBe(Commands.NOTE_OFF)
 	})
+
+	it("releases the original mapped pitch after changing key and scale", () => {
+		expect(
+			transformer.transform([createAudioCommand(Commands.NOTE_ON, 61)], mockTimer)[0].number
+		).toBe(60)
+		transformer.setConfig("root", 2)
+		transformer.setConfig("mode", AEOLIAN_INTERVALS)
+		expect(
+			transformer.transform([createAudioCommand(Commands.NOTE_OFF, 61)], mockTimer)[0].number
+		).toBe(60)
+	})
+
+	it("keeps a shared output sounding until its final input releases", () => {
+		expect(
+			transformer.transform(
+				[
+					createAudioCommand(Commands.NOTE_ON, 60),
+					createAudioCommand(Commands.NOTE_ON, 61)
+				],
+				mockTimer
+			)
+		).toHaveLength(1)
+		expect(
+			transformer.transform([createAudioCommand(Commands.NOTE_OFF, 60)], mockTimer)
+		).toEqual([])
+		const result = transformer.transform([createAudioCommand(Commands.NOTE_OFF, 61)], mockTimer)
+		expect(result).toHaveLength(1)
+		expect(result[0].number).toBe(60)
+	})
+
+	it.each([
+		["nearest", 60],
+		["up", 62],
+		["down", 60]
+	])("maps C sharp using %s", (direction, expected) => {
+		transformer.setConfig("direction", direction)
+		const input = createAudioCommand(Commands.NOTE_ON, 61)
+		const result = transformer.transform([input], mockTimer)
+		expect(result[0].number).toBe(expected)
+		expect(input.number).toBe(61)
+		expect(result[0].raw).toHaveLength(0)
+	})
+
+	it("filters both attack and release of excluded notes", () => {
+		transformer.setConfig("direction", "filter")
+		expect(
+			transformer.transform([createAudioCommand(Commands.NOTE_ON, 61)], mockTimer)
+		).toEqual([])
+		transformer.setConfig("direction", "nearest")
+		expect(
+			transformer.transform([createAudioCommand(Commands.NOTE_OFF, 61)], mockTimer)
+		).toEqual([])
+	})
+
+	it("leaves controllers and pitch bend untouched", () => {
+		const input = [
+			createAudioCommand(Commands.CONTROL_CHANGE, 1),
+			createAudioCommand(Commands.PITCH_BEND, 61)
+		]
+		expect(transformer.transform(input, mockTimer)).toEqual(input)
+	})
+
+	it("handles zero-velocity releases and bypass changes without hanging notes", () => {
+		transformer.transform([createAudioCommand(Commands.NOTE_ON, 61)], mockTimer)
+		transformer.setConfig("enabled", false)
+		expect(
+			transformer.transform([createAudioCommand(Commands.NOTE_ON, 61, 0)], mockTimer)[0]
+				.number
+		).toBe(60)
+		expect(
+			transformer.transform([createAudioCommand(Commands.NOTE_ON, 61)], mockTimer)[0].number
+		).toBe(61)
+		transformer.setConfig("enabled", true)
+		expect(
+			transformer.transform([createAudioCommand(Commands.NOTE_OFF, 61)], mockTimer)[0].number
+		).toBe(61)
+	})
+
+	it("keeps MIDI channels independent", () => {
+		const a = createAudioCommand(Commands.NOTE_ON, 61)
+		const b = createAudioCommand(Commands.NOTE_ON, 61)
+		a.channel = 1
+		b.channel = 2
+		expect(transformer.transform([a, b], mockTimer)).toHaveLength(2)
+	})
+
+	it("includes scale notes below the tonic in the lowest octave", () => {
+		transformer.setConfig("root", 7)
+		expect(transformer.notesInScale.has(0)).toBe(true)
+		expect(
+			transformer.transform([createAudioCommand(Commands.NOTE_ON, 0)], mockTimer)[0].number
+		).toBe(0)
+	})
+
+	it("restores saved interval arrays and accepts surface string values", () => {
+		transformer.setConfig("mode", "0,3,5,7,10")
+		transformer.setConfig("root", "9")
+		const restored = new TransformerHarmoniser(JSON.parse(transformer.exportConfig()))
+		expect(restored.options.mode).toEqual([0, 3, 5, 7, 10])
+		expect(restored.options.root).toBe(9)
+	})
+
+	it("clears held notes on panic and reset", () => {
+		transformer.transform([createAudioCommand(Commands.NOTE_ON, 61)], mockTimer)
+		const result = transformer.transform(
+			[createAudioCommand(Commands.CONTROL_CHANGE, 123)],
+			mockTimer
+		)
+		expect(result.map((command) => command.type)).toEqual([
+			Commands.NOTE_OFF,
+			Commands.CONTROL_CHANGE
+		])
+		expect(
+			transformer.transform([createAudioCommand(Commands.NOTE_ON, 61)], mockTimer)
+		).toHaveLength(1)
+		transformer.reset()
+		expect(
+			transformer.transform([createAudioCommand(Commands.NOTE_ON, 61)], mockTimer)
+		).toHaveLength(1)
+	})
+
+	it("releases each sounding pitch once when transport stops", () => {
+		transformer.transform(
+			[createAudioCommand(Commands.NOTE_ON, 60), createAudioCommand(Commands.NOTE_ON, 61)],
+			mockTimer
+		)
+		expect(transformer.stop(2)).toEqual([
+			expect.objectContaining({ type: Commands.NOTE_OFF, number: 60, startAt: 2 })
+		])
+		expect(transformer.stop(3)).toEqual([])
+	})
+
+	it.each(["nearest", "up", "down", "filter"])(
+		"keeps %s results inside the chosen scale and MIDI range",
+		(direction) => {
+			for (let root = 0; root < 12; root++) {
+				const effect = new TransformerHarmoniser({ root, mode: [0, 3, 7], direction })
+				for (let note = 0; note <= 127; note++) {
+					const result = effect.transform(
+						[createAudioCommand(Commands.NOTE_ON, note)],
+						mockTimer
+					)
+					for (const command of result) {
+						expect(command.number).toBeGreaterThanOrEqual(0)
+						expect(command.number).toBeLessThanOrEqual(127)
+						expect([0, 3, 7]).toContain((((command.number - root) % 12) + 12) % 12)
+						if (direction === "up") {
+							expect(command.number).toBeGreaterThanOrEqual(note)
+						}
+						if (direction === "down") {
+							expect(command.number).toBeLessThanOrEqual(note)
+						}
+					}
+					effect.transform([createAudioCommand(Commands.NOTE_OFF, note)], mockTimer)
+				}
+			}
+		}
+	)
 })
 
 function createAudioCommand(

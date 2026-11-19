@@ -27,6 +27,13 @@ export default class InputManager extends AbstractInput {
 		return getAvailableInputFactories()
 	}
 
+	/** Every input, including those this browser cannot run */
+	async getFactories() {
+		await refreshMidiDeviceProfiles()
+		const { INPUT_FACTORIES } = await import("./input-factory")
+		return [...INPUT_FACTORIES]
+	}
+
 	#inputs: IAudioInput[] = []
 	#disabled = new Set<IAudioInput>()
 

@@ -25,3 +25,7 @@ export const DVS_STOP = "dvsStop"
 export const MIDI_CONTINUE = "midiContinue"
 export const MIDI_START = "midiStart"
 export const MIDI_STOP = "midiStop"
+
+// MIDI 2 per-note expression: number is the note, value uses MIDI 1 ranges.
+export const PER_NOTE_PITCH_BEND = "perNotePitchBend"
+export const PER_NOTE_CONTROLLER = "perNoteController"

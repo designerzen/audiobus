@@ -30,6 +30,9 @@ export const ROMPLER_PRESETS =
 	)
 
 // OpenGM24 ships the 88 piano keys
+// Sample a key in every N; the keys between are pitched from the nearest one
+export const ROMPLER_SPACINGS = [1, 2, 3, 6]
+
 export const LOWEST_NOTE = 21
 export const HIGHEST_NOTE = 108
 
@@ -71,6 +74,48 @@ const SUSTAINED = new Set([
 ])
 
 export const isSustained = (program: number): boolean => SUSTAINED.has(program)
+
+export interface RomplerInstrument {
+	program: number
+	label: string
+	category: string
+	description?: string
+	commonUses?: string[]
+	alternateNames?: string[]
+	source?: string
+	license?: string
+}
+
+export const fallbackCatalogue = (): RomplerInstrument[] =>
+	ROMPLER_PRESETS.map((_, program) => ({
+		program,
+		label: presetTitle(program),
+		category: presetFamily(program)
+	}))
+
+const catalogues = new Map<string, Promise<RomplerInstrument[]>>()
+
+/** Labels, descriptions and credits from the soundfont's index.json, or the GM names without it */
+export const loadCatalogue = (baseUrl: string): Promise<RomplerInstrument[]> => {
+	let pending = catalogues.get(baseUrl)
+	if (!pending) {
+		pending = Promise.resolve()
+			.then(() => fetch(new URL("../index.json", baseUrl).href))
+			.then((response) => (response.ok ? response.json() : Promise.reject()))
+			.then((entries: RomplerInstrument[]) =>
+				fallbackCatalogue().map((instrument) => ({
+					...instrument,
+					...entries.find((entry) => entry.program === instrument.program)
+				}))
+			)
+			.catch(() => {
+				catalogues.delete(baseUrl)
+				return fallbackCatalogue()
+			})
+		catalogues.set(baseUrl, pending)
+	}
+	return pending
+}
 
 export const sampleUrl = (baseUrl: string, program: number, note: number): string =>
 	`${baseUrl}${ROMPLER_PRESETS[program]}-mp3/${noteName(note)}.mp3`

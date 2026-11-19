@@ -1,10 +1,11 @@
 import type { IAudioCommand } from "../commands/audio-command-interface"
 import * as Commands from "../commands/commands"
-import { unzipSync } from "fflate"
+import { readMediaArchive } from "./dropped-media"
+import { importDawProjectXML } from "./import-dawproject-xml"
 
 /**
  * Import .dawProject file and convert to audio commands
- * .dawProject is a ZIP file containing JSON data
+ * Standard DAWproject ZIP/XML, with legacy JSON archive compatibility.
  * @param file The .dawProject file to import
  * @returns Commands array and note count
  */
@@ -25,36 +26,14 @@ export const importDawProjectFile = async (
 
 		let projectData: any = null
 
-		// Attempt to extract and parse project.json from the ZIP using fflate
-		try {
-			const unzipped = unzipSync(uint8Array)
-
-			// Look for project.json or similar
-			let projectFile: Uint8Array | undefined =
-				unzipped["project.json"] || unzipped["project.xml"]
-
-			// If no standard names found, get the first file
-			if (!projectFile) {
-				const firstKey = Object.keys(unzipped)[0]
-				projectFile = firstKey ? unzipped[firstKey] : undefined
-			}
-
-			if (!projectFile) {
-				throw new Error("No project data found in .dawProject file")
-			}
-
-			const text = new TextDecoder().decode(projectFile)
-			projectData = JSON.parse(text)
-		} catch (zipError) {
-			console.warn("Could not parse as ZIP with fflate:", zipError)
-			// Try treating as JSON directly (some tools export raw JSON)
-			try {
-				const text = new TextDecoder().decode(uint8Array)
-				projectData = JSON.parse(text)
-			} catch (jsonError) {
-				throw new Error("Invalid .dawProject format: " + (jsonError as Error).message)
-			}
+		const unzipped = await readMediaArchive(uint8Array)
+		if (unzipped["project.xml"]) {
+			return importDawProjectXML(new TextDecoder().decode(unzipped["project.xml"]), file.name)
 		}
+		if (!unzipped["project.json"]) {
+			throw new Error("DAWproject archive is missing project.xml")
+		}
+		projectData = JSON.parse(new TextDecoder().decode(unzipped["project.json"]))
 
 		const commands: IAudioCommand[] = []
 		let noteCount = 0

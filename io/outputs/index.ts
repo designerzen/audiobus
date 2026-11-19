@@ -11,6 +11,7 @@ export type { OutputAudioEvent } from "../events/index.ts"
 
 export { default as OutputSiON } from "./output-sion.ts"
 export { default as ChromaticSampler } from "./output-chromatic-sampler.ts"
+export { default as OutputLoopPlayer } from "./output-loop-player.ts"
 export { default as Rompler } from "./rompler/output-rompler.ts"
 export { default as OutputFM } from "./output-fm.ts"
 export { default as OutputMonotron } from "./output-monotron.ts"

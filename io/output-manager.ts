@@ -45,6 +45,12 @@ export default class OutputManager extends EventTarget implements IAudioOutput {
 		return getAvailableOutputFactories()
 	}
 
+	/** Every output, including those this browser cannot run */
+	async getFactories() {
+		const { OUTPUT_FACTORIES } = await import("./output-factory")
+		return [...OUTPUT_FACTORIES]
+	}
+
 	static ID: number = 0
 
 	#outputs: IAudioOutput[] = []

@@ -35,6 +35,7 @@ export const MIDI_TRANSPORT_CLOCK = "midi-transport-clock" as const
 export const MUSIC_MOUSE = "music-mouse" as const
 export const MICROPHONE_PITCH = "microphone-pitch" as const
 export const DVS_CONTROL_VINYL = "dvs-control-vinyl" as const
+export const DEVICE_MOTION = "device-motion" as const
 
 export type InputId =
 	| typeof SCALE_EXPLORER
@@ -67,6 +68,7 @@ export type InputId =
 	| typeof MUSIC_MOUSE
 	| typeof MICROPHONE_PITCH
 	| typeof DVS_CONTROL_VINYL
+	| typeof DEVICE_MOTION
 
 export const SVG_KEYBOARD = "svg-keyboard" as const
 export const CIRCULAR_CONTROLLER = "circular-controller" as const

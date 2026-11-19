@@ -1,6 +1,7 @@
 import type { DeviceClassification } from "../io/device-classification.ts"
 import { defineDevice } from "../io/device-definition"
 import { OUTPUT_PREVIEWS } from "../io/output-previews"
+import { requiring, type DeviceRequirementId } from "../io/device-requirements"
 /**
  * Factory interface for creating instrument UI factories
  * Bridges InstrumentFactory with the UI layer
@@ -11,8 +12,7 @@ import {
 	type InstrumentMetadata,
 	INSTRUMENT_TYPE_SCSYNTH_INSTRUMENT,
 	INSTRUMENT_CATEGORY_WAM2,
-	EXTERNAL_DATA_KEY_SCSYNTH,
-	EXTERNAL_DATA_KEY_SAMPLE_URLS
+	EXTERNAL_DATA_KEY_SCSYNTH
 } from "./instrument-factory.ts"
 
 export interface InstrumentUIFactory extends DeviceClassification<"engine"> {
@@ -22,6 +22,7 @@ export interface InstrumentUIFactory extends DeviceClassification<"engine"> {
 	category: string
 	preview?: string
 	isAvailable: () => boolean
+	requires?: readonly DeviceRequirementId[]
 	create: (
 		audioContext: BaseAudioContext | AudioContext,
 		options?: Record<string, any>
@@ -79,35 +80,14 @@ const metadataToUIFactory = (metadata: InstrumentMetadata): InstrumentUIFactory 
 		(metadata.category === INSTRUMENT_CATEGORY_WAM2
 			? OUTPUT_PREVIEWS[`output:${metadata.id}`]
 			: undefined),
-	isAvailable: () => {
-		if (
-			metadata.category === INSTRUMENT_CATEGORY_WAM2 &&
-			typeof AudioWorkletNode === "undefined"
-		) {
-			return false
-		}
-		// Check if required external data is available
-		const requiredData = metadata.requiresExternalData ?? []
-
-		for (const key of requiredData) {
-			switch (key) {
-				case EXTERNAL_DATA_KEY_SCSYNTH:
-					if (!(window as any).scsynth) {
-						return false
-					}
-					break
-				case EXTERNAL_DATA_KEY_SAMPLE_URLS:
-					// Sampler always available, sample URLs can be provided later
-					break
-			}
-		}
-
-		// Check for Web Audio API
-		return (
-			typeof (window as any).AudioContext !== "undefined" ||
-			typeof (window as any).webkitAudioContext !== "undefined"
-		)
-	},
+	// Sample URLs can be provided later, so only scsynth is required up front
+	...requiring(
+		"webAudio",
+		...(metadata.category === INSTRUMENT_CATEGORY_WAM2 ? (["audioWorklet"] as const) : []),
+		...(metadata.requiresExternalData?.includes(EXTERNAL_DATA_KEY_SCSYNTH)
+			? (["scsynth"] as const)
+			: [])
+	),
 	create: (audioContext, options) => createInstrument(audioContext, metadata.id, options)
 })
 
@@ -115,8 +95,14 @@ const metadataToUIFactory = (metadata: InstrumentMetadata): InstrumentUIFactory 
  * Get all available instrument UI factories
  */
 export function getAvailableInstrumentFactories(): InstrumentUIFactory[] {
-	const allInstruments = InstrumentFactory.getAvailableInstruments()
-	return allInstruments.map(metadataToUIFactory).filter((factory) => factory.isAvailable())
+	return getInstrumentFactories().filter((factory) => factory.isAvailable())
+}
+
+/**
+ * Get every instrument UI factory, including those this browser cannot run
+ */
+export function getInstrumentFactories(): InstrumentUIFactory[] {
+	return InstrumentFactory.getAvailableInstruments().map(metadataToUIFactory)
 }
 
 /**

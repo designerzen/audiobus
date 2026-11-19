@@ -20,8 +20,15 @@ export {
 	createMIDIMarkdownFromAudioEventRecording,
 	saveMarkdownToLocalFileSystem
 } from "./adapter-midi-markdown.ts"
-export { createMusicXMLFromAudioEventRecording } from "./adapter-musicxml.ts"
+export {
+	createMusicXMLFromAudioEventRecording,
+	createMXLFromAudioEventRecording
+} from "./adapter-musicxml.ts"
 export {
 	createVexFlowHTMLFromAudioEventRecording,
 	renderVexFlowToContainer
 } from "./adapter-vexflow.ts"
+
+export { createABCFromAudioEventRecording } from "./adapter-abc.ts"
+export { createMIDICSVFromAudioEventRecording } from "./adapter-midi-csv.ts"
+export { saveScoreToLocalFileSystem } from "./download-score.ts"

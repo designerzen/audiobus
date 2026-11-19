@@ -262,7 +262,7 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		description:
 			"Play in the air with a Leap Motion, the camera or a pointer: theremin glides, scales, chords, arpeggios and strums over 2D and 3D surfaces",
 		icon: "/icons/input-leap-motion.svg",
-		category: "Gesture"
+		category: "UI"
 	},
 
 	[INPUT_TYPES.ONSCREEN_KEYBOARD]: {
@@ -337,6 +337,16 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		description: "Control vinyl clock input for relative playback speed",
 		icon: "/icons/input-default.svg",
 		category: "Sync"
+	},
+	[INPUT_TYPES.DEVICE_MOTION]: {
+		id: INPUT_TYPES.DEVICE_MOTION,
+		type: "controller",
+		subtype: "gesture",
+		name: "Device Motion",
+		description:
+			"Tilt, strike and turn a phone or tablet to play notes and move control surfaces",
+		icon: "/icons/device-motion.svg",
+		category: "UI"
 	}
 } satisfies Record<INPUT_TYPES.InputId, InputDefinition>
 onMidiDeviceProfilesChanged(() => {

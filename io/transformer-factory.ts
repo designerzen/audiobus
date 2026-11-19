@@ -1,4 +1,5 @@
 import { IdentityTransformer } from "./transformers/transformer-identity.ts"
+import { ID_MIDI_TRANSFORMER, TransformerMidi } from "./transformers/transformer-midi"
 import { ID_ENSEMBLE, TransformerEnsemble } from "./transformers/transformer-ensemble"
 import { ID_GROOVE, TransformerGroove } from "./transformers/transformer-groove.ts"
 import {
@@ -122,6 +123,9 @@ import {
 	TransformerChannelAllocator
 } from "./transformers/transformer-channel-allocator.ts"
 import { ID_CC_STEPPER, TransformerCCStepper } from "./transformers/transformer-cc-stepper.ts"
+import { ID_MPE_ENCODER, TransformerMpeEncoder } from "./transformers/transformer-mpe-encoder.ts"
+import { ID_MPE_DECODER, TransformerMpeDecoder } from "./transformers/transformer-mpe-decoder.ts"
+import { ID_MIDI_PROTOCOL, TransformerMidiProtocol } from "./transformers/transformer-midi-protocol.ts"
 import { ID_CHORD_BLOOM, TransformerChordBloom } from "./transformers/transformer-chord-bloom"
 import { ID_MELODY_SHADOW, TransformerMelodyShadow } from "./transformers/transformer-melody-shadow"
 import {
@@ -133,9 +137,23 @@ import {
 	ID_REGISTER_ORBIT,
 	TransformerRegisterOrbit
 } from "./transformers/transformer-register-orbit"
+import {
+	ID_RANDOM_SAMPLER,
+	TransformerRandomSampler
+} from "./transformers/transformer-random-sampler.ts"
+import {
+	ID_TOPOGRAPHIC_DRUMS,
+	TransformerTopographicDrums
+} from "./transformers/transformer-topographic-drums.ts"
+import {
+	ID_BERNOULLI_GATE,
+	TransformerBernoulliGate
+} from "./transformers/transformer-bernoulli-gate.ts"
 
 export const tranformerFactory = (type: string, config: any = {}) => {
 	switch (type) {
+		case ID_MIDI_TRANSFORMER:
+			return new TransformerMidi(config)
 		case ID_ENSEMBLE:
 			return new TransformerEnsemble(config)
 		case ID_GROOVE:
@@ -168,6 +186,12 @@ export const tranformerFactory = (type: string, config: any = {}) => {
 			return new TransformerRhythmWeave(config)
 		case ID_REGISTER_ORBIT:
 			return new TransformerRegisterOrbit(config)
+		case ID_RANDOM_SAMPLER:
+			return new TransformerRandomSampler(config)
+		case ID_TOPOGRAPHIC_DRUMS:
+			return new TransformerTopographicDrums(config)
+		case ID_BERNOULLI_GATE:
+			return new TransformerBernoulliGate(config)
 		case ID_CHORD_TRACK:
 			return new TransformerChordTrack(config)
 		case ID_IMPROV_PARTNER:
@@ -222,6 +246,12 @@ export const tranformerFactory = (type: string, config: any = {}) => {
 			return new TransformerChannelAllocator(config)
 		case ID_CC_STEPPER:
 			return new TransformerCCStepper(config)
+		case ID_MPE_ENCODER:
+			return new TransformerMpeEncoder(config)
+		case ID_MPE_DECODER:
+			return new TransformerMpeDecoder(config)
+		case ID_MIDI_PROTOCOL:
+			return new TransformerMidiProtocol(config)
 		case ID_MAGENTA:
 			return new TransformerMagenta(config)
 		case ID_ARPEGGIATOR:
@@ -266,6 +296,7 @@ export const tranformerFactory = (type: string, config: any = {}) => {
 }
 
 export const TRANSFORMER_TYPE = {
+	ID_MIDI_TRANSFORMER,
 	ID_ENSEMBLE,
 	ID_GROOVE,
 	ID_PROGRESSION_STEPPER,
@@ -284,6 +315,9 @@ export const TRANSFORMER_TYPE = {
 	ID_CONTOUR_DYNAMICS,
 	ID_RHYTHM_WEAVE,
 	ID_REGISTER_ORBIT,
+	ID_RANDOM_SAMPLER,
+	ID_TOPOGRAPHIC_DRUMS,
+	ID_BERNOULLI_GATE,
 	ID_CHORD_TRACK,
 	ID_IMPROV_PARTNER,
 	ID_SCALE_EXPLORER,
@@ -311,6 +345,9 @@ export const TRANSFORMER_TYPE = {
 	ID_NOTE_ROUTER,
 	ID_CHANNEL_ALLOCATOR,
 	ID_CC_STEPPER,
+	ID_MPE_ENCODER,
+	ID_MPE_DECODER,
+	ID_MIDI_PROTOCOL,
 	ID_MAGENTA,
 	ID_ARPEGGIATOR,
 	ID_CHANNELER,

@@ -282,7 +282,7 @@ export class TransformerMIDIFilePlayer extends Transformer<Config> implements IT
 				? "Loading MIDI file…"
 				: this.loadError ||
 					(this.midiData
-						? `Loaded: ${this.config.midiFileName || select.selectedOptions[0]?.textContent || this.config.midiFileUrl}`
+						? `Loaded: ${this.config.midiFileName || (select.value && select.selectedOptions[0]?.textContent) || this.config.midiFileUrl}`
 						: "No song loaded")
 			playback.value = this.config.playbackMode
 			track.replaceChildren(option("Auto", "-1"))

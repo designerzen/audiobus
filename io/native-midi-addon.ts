@@ -8,6 +8,9 @@ export function setNativeMidiAddonLoader(loader: (() => unknown | Promise<unknow
 	loadAddon = loader
 }
 
+/** True once the host has supplied a loader. */
+export const hasNativeMidiAddon = () => Boolean(loadAddon)
+
 /** Load the addon; rejects when the host has not supplied a loader. */
 export async function loadNativeMidiAddon(): Promise<any> {
 	if (!loadAddon) {

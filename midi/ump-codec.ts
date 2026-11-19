@@ -1,7 +1,7 @@
 import type { IAudioCommand } from "../commands/audio-command-interface.ts"
-import { NOTE_OFF, NOTE_ON } from "../commands/commands"
+import { NOTE_OFF, NOTE_ON, PER_NOTE_CONTROLLER, PER_NOTE_PITCH_BEND } from "../commands/commands"
 import { midiToCommand, commandToMidi } from "./midi-command-conversion.ts"
-import { createAudioCommand } from "../commands/audio-command-factory.ts"
+import { cloneAudioCommand, createAudioCommand } from "../commands/audio-command-factory.ts"
 
 // UMP words are unsigned integers in protocol order, never packed MIDI byte streams.
 const wordCounts = [1, 1, 1, 2, 2, 4, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4]
@@ -30,6 +30,7 @@ export function umpToCommand(
 	}
 	if (!bytes) {
 		command.channel = words[0] >>> 28 === 4 ? ((words[0] >>> 16) & 15) + 1 : 0
+		decodePerNote(command, words)
 	}
 	command.ump = [...words]
 	const type = words[0] >>> 28
@@ -113,10 +114,113 @@ export function commandToUmp(command: IAudioCommand): number[] {
 		}
 	} else if (kind === 12 && command.value !== original.value) {
 		words[1] = ((words[1] & 0x00ffffff) | ((command.value & 127) << 24)) >>> 0
+	} else if (kind === 0 || kind === 1 || kind === 6) {
+		words[0] = ((words[0] & 0xffff00ff) | ((command.number & 127) << 8)) >>> 0
+		if (kind !== 6 && command.type === PER_NOTE_CONTROLLER) {
+			words[0] =
+				((words[0] & 0xff0fff00) |
+					((command.registered ? 0 : 1) << 20) |
+					((command.controller ?? words[0]) & 255)) >>>
+				0
+		}
+		if (command.value !== original.value) {
+			words[1] =
+				kind === 6
+					? scaleCentered(Math.max(0, Math.min(16383, Math.round(command.value))), 14)
+					: scaleCentered(Math.max(0, Math.min(127, Math.round(command.value))), 7)
+		}
 	}
 	return words
 }
-function scaleCentered(value: number, bits: number): number {
+
+// Per-note pitch bend (status 6) and registered/assignable per-note controllers (0/1)
+// have no MIDI 1 bytes, so expose them as per-note commands with MIDI 1 value ranges.
+function decodePerNote(command: IAudioCommand, words: number[]): void {
+	const kind = (words[0] >>> 20) & 15
+	if (words[0] >>> 28 !== 4 || words.length !== 2) {
+		return
+	}
+	if (kind === 6) {
+		command.type = command.subtype = PER_NOTE_PITCH_BEND
+		command.value = command.pitchBend = words[1] >>> 18
+	} else if (kind === 0 || kind === 1) {
+		command.type = command.subtype = PER_NOTE_CONTROLLER
+		command.controller = words[0] & 255
+		command.registered = kind === 0
+		command.value = words[1] >>> 25
+	}
+}
+
+/** MIDI 2 packets for per-note expression commands. */
+export function perNoteToUmp(command: IAudioCommand): number[] | undefined {
+	const header =
+		(0x40000000 |
+			((command.midiGroup ?? 0) << 24) |
+			((Math.max(1, Math.min(16, command.channel || 1)) - 1) << 16) |
+			((Math.max(0, Math.min(127, Math.round(command.number || 0))) & 127) << 8)) >>>
+		0
+	if (command.type === PER_NOTE_PITCH_BEND) {
+		const value = Math.round(command.value ?? command.pitchBend ?? 8192)
+		return [(header | (6 << 20)) >>> 0, scaleCentered(Math.max(0, Math.min(16383, value)), 14)]
+	}
+	if (command.type === PER_NOTE_CONTROLLER) {
+		const value = Math.max(0, Math.min(127, Math.round(command.value ?? 0)))
+		return [
+			(header | ((command.registered ? 0 : 1) << 20) | ((command.controller ?? 0) & 255)) >>>
+				0,
+			scaleCentered(value, 7)
+		]
+	}
+}
+
+/** MIDI 2 protocol packet for a channel voice or per-note command, or undefined. */
+export function commandToMidi2Ump(command: IAudioCommand): number[] | undefined {
+	if (command.ump && command.ump[0] >>> 28 === 4) {
+		return commandToUmp(command)
+	}
+	const perNote = perNoteToUmp(command)
+	if (perNote) {
+		return perNote
+	}
+	const bytes = commandToMidi(command)
+	if (!bytes || bytes[0] < 0x80 || bytes[0] >= 0xf0) {
+		return
+	}
+	const words = midiBytesToUmp(bytes)
+	words[0] = (words[0] | ((command.midiGroup ?? 0) << 24)) >>> 0
+	return words
+}
+
+/** MIDI 1 protocol (UMP type 2) packet for a channel voice command, or undefined. */
+export function commandToMidi1Ump(command: IAudioCommand): number[] | undefined {
+	const bytes = commandToMidi(command)
+	if (!bytes || bytes[0] < 0x80 || bytes[0] >= 0xf0) {
+		return
+	}
+	return [
+		(0x20000000 |
+			((command.midiGroup ?? 0) << 24) |
+			(bytes[0] << 16) |
+			((bytes[1] ?? 0) << 8) |
+			(bytes[2] ?? 0)) >>>
+			0
+	]
+}
+
+/** A copy of a command carrying its native packet, so later edits patch it like decoded UMP. */
+export function withUmp(command: IAudioCommand, words: number[]): IAudioCommand {
+	const copy = cloneAudioCommand(command)
+	copy.ump = [...words]
+	copy.umpOriginal = {
+		type: copy.type,
+		number: copy.number,
+		velocity: copy.velocity,
+		value: copy.value,
+		channel: copy.channel
+	}
+	return copy
+}
+export function scaleCentered(value: number, bits: number): number {
 	const shift = 32 - bits
 	let scaled = (value << shift) >>> 0
 	if (value <= 2 ** (bits - 1)) {

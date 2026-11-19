@@ -2,14 +2,16 @@ import type { IAudioCommand } from "../../commands/audio-command-interface.ts"
 import { NOTE_OFF, NOTE_ON } from "../../commands/commands"
 import { commandToMidi } from "../../midi/midi-command-conversion.ts"
 import { ALL_MIDI_CHANNELS } from "../../midi/midi-channels.ts"
+import { createMidiChannelFilter } from "./midi-channel-filter"
 import {
 	createMidiInputControls,
 	type MidiInputDeviceOption
 } from "../inputs/midi-input-controls.ts"
-import { commandToUmp, isUmpPacket } from "../../midi/ump-codec.ts"
+import { commandToUmp, isUmpPacket, perNoteToUmp } from "../../midi/ump-codec.ts"
 
 export class MidiOutputRouting {
 	private gui?: ReturnType<typeof createMidiInputControls>
+	private channelFilter?: ReturnType<typeof createMidiChannelFilter>
 	private notes = new Map<
 		string,
 		{ device: string; channel: number; note: number; group?: number }
@@ -64,8 +66,20 @@ export class MidiOutputRouting {
 	}
 
 	sendCommand(command: IAudioCommand): Promise<void> {
+		if (
+			command.channel > 0 &&
+			this.options.acceptedChannels &&
+			!this.options.acceptedChannels.includes(command.channel)
+		) {
+			return Promise.resolve()
+		}
 		if (command.ump && this.sendUmp) {
 			return this.sendPacket(commandToUmp(command), command.channel)
+		}
+		// Per-note expression has no MIDI 1 bytes; only UMP destinations can carry it.
+		const perNote = this.sendUmp ? perNoteToUmp(command) : undefined
+		if (perNote) {
+			return this.sendPacket(perNote, command.channel)
 		}
 		const bytes = commandToMidi(command)
 		if (!bytes) {
@@ -108,6 +122,15 @@ export class MidiOutputRouting {
 			targets = this.targets()
 		const type = packet[0] >>> 28
 		const channelVoice = type === 2 || type === 4
+		if (
+			channelVoice &&
+			this.options.acceptedChannels &&
+			!this.options.acceptedChannels.includes(
+				incomingChannel ?? ((packet[0] >>> 16) & 15) + 1
+			)
+		) {
+			return Promise.resolve()
+		}
 		const channels = channelVoice
 			? this.channels(incomingChannel ?? ((packet[0] >>> 16) & 15) + 1)
 			: [0]
@@ -197,13 +220,21 @@ export class MidiOutputRouting {
 				},
 				"output"
 			)
+			this.channelFilter = createMidiChannelFilter(this.options, () => {
+				void this.release().catch(() => {})
+				this.changed()
+			})
+			this.gui.element.append(this.channelFilter.element)
 		}
 		return this.gui.element
 	}
 	refresh(): void {
 		this.gui?.refresh()
+		this.channelFilter?.refresh()
 	}
 	async destroyGui(): Promise<void> {
+		this.channelFilter?.destroy()
+		this.channelFilter = undefined
 		this.gui?.destroy()
 		this.gui = undefined
 	}

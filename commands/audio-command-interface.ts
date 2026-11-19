@@ -23,6 +23,9 @@ export interface IAudioCommand {
 	// pitch value from MIDI is 0 -> 16383
 	value: number
 	pitchBend: number
+	// MIDI 2 per-note controller index, and whether it is registered rather than assignable.
+	controller?: number
+	registered?: boolean
 
 	time: number
 	// AudioContext time in seconds of the source event (e.g. a DVS pilot zero crossing)

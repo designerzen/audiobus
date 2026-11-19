@@ -7,8 +7,8 @@
  *
  * Ticks are musical: 24 per beat of referenceBPM x speed, so the reported
  * bpm is the track tempo. DVS_START / DVS_STOP bracket a run of ticks.
- * This pilot-tone tracker does not decode absolute timecode position or
- * determine rotation direction.
+ * With a stereo signal the quadrature between channels gives direction, and
+ * reverse play holds the clock. Absolute timecode position is not decoded.
  */
 import AbstractInput from "./abstract-input.ts"
 import { loadCaptureWorklet } from "./load-capture-worklet.ts"
@@ -40,7 +40,9 @@ const DEFAULT_OPTIONS = {
 	deviceId: undefined as string | undefined,
 	referenceBPM: REFERENCE_BPM,
 	minSignalThreshold: MIN_SIGNAL_THRESHOLD,
-	speedSmoothing: SPEED_SMOOTHING
+	speedSmoothing: SPEED_SMOOTHING,
+	// Swap forward and reverse, e.g. for swapped left/right cables
+	invertDirection: false
 }
 
 const WORKLET_PROCESSOR_CODE = `
@@ -52,6 +54,7 @@ class DvsDecoderProcessor extends AudioWorkletProcessor {
 		this._threshold = options.processorOptions?.threshold || 0.01
 		this._referenceBPM = options.processorOptions?.referenceBPM || 120
 		this._smoothing = options.processorOptions?.speedSmoothing ?? 0.85
+		this._invertDirection = Boolean(options.processorOptions?.invertDirection)
 		
 		// State
 		this._prevSample = 0
@@ -60,7 +63,10 @@ class DvsDecoderProcessor extends AudioWorkletProcessor {
 		this._lastTimestamp = currentTime
 		this._tickCounter = 0
 		this._totalPhase = 0
+		// 1 forward, -1 reverse, 0 unknown (mono or unclear quadrature)
 		this._direction = 0
+		this._directionScore = 0
+		this._secondaryPeak = 0
 		this._instantSpeed = 0
 		this._smoothedSpeed = 0
 		this._signalLevel = 0
@@ -79,11 +85,10 @@ class DvsDecoderProcessor extends AudioWorkletProcessor {
 		this._a1 = -2 * cosW0
 		this._a2 = 1 - alpha
 		
-		// Filter state
-		this._x1 = 0
-		this._x2 = 0
-		this._y1 = 0
-		this._y2 = 0
+		// Filter state per channel: Serato's right channel is the left in quadrature
+		this._primary = { x1: 0, x2: 0, y1: 0, y2: 0 }
+		this._secondary = { x1: 0, x2: 0, y1: 0, y2: 0 }
+		this._lastSecondary = 0
 		
 		// RMS calculation
 		this._rmsSum = 0
@@ -98,16 +103,31 @@ class DvsDecoderProcessor extends AudioWorkletProcessor {
 		}
 	}
 	
-	_filter(sample) {
+	_filter(sample, state) {
 		const x0 = sample
-		const y0 = (this._b0 * x0 + this._b1 * this._x1 + this._b2 * this._x2 - this._a1 * this._y1 - this._a2 * this._y2) / this._a0
+		const y0 = (this._b0 * x0 + this._b1 * state.x1 + this._b2 * state.x2 - this._a1 * state.y1 - this._a2 * state.y2) / this._a0
 		
-		this._x2 = this._x1
-		this._x1 = x0
-		this._y2 = this._y1
-		this._y1 = y0
+		state.x2 = state.x1
+		state.x1 = x0
+		state.y2 = state.y1
+		state.y1 = y0
 		
 		return y0
+	}
+	
+	// At a positive-going primary crossing the secondary sits at a peak: negative
+	// when it lags (forward, as xwax reads Serato CV02), positive when it leads (reverse)
+	_updateDirection(secondary) {
+		if (this._secondaryPeak <= 0 || Math.abs(secondary) < this._secondaryPeak * 0.5) {
+			return
+		}
+		const forward = (secondary < 0) !== this._invertDirection
+		this._directionScore += ((forward ? 1 : -1) - this._directionScore) * 0.25
+		if (this._directionScore > 0.5) {
+			this._direction = 1
+		} else if (this._directionScore < -0.5) {
+			this._direction = -1
+		}
 	}
 	
 	_updateRMS(sample) {
@@ -127,6 +147,7 @@ class DvsDecoderProcessor extends AudioWorkletProcessor {
 		if (!input || !input[0]) return true
 		
 		const channel = input[0]
+		const secondaryChannel = input[1]
 		const now = currentTime
 		
 		for (let i = 0; i < channel.length; i++) {
@@ -140,17 +161,28 @@ class DvsDecoderProcessor extends AudioWorkletProcessor {
 				this._prevSample = 0
 				this._smoothedSpeed = 0
 				this._totalPhase = 0
+				this._direction = 0
+				this._directionScore = 0
+				this._secondaryPeak = 0
 				continue
 			}
 			
 			// Apply bandpass filter
-			const filtered = this._filter(sample)
+			const filtered = this._filter(sample, this._primary)
+			if (secondaryChannel) {
+				const secondary = this._filter(secondaryChannel[i], this._secondary)
+				this._secondaryPeak = Math.max(Math.abs(secondary), this._secondaryPeak * 0.999)
+				this._lastSecondary = secondary
+			}
 			
 			// Detect zero crossings (positive-going)
 			if (this._prevSample <= 0 && filtered > 0) {
 				const fraction = -this._prevSample / (filtered - this._prevSample)
 				const crossingTime = now + (i - 1 + fraction) / this._sampleRate
 				const timeDelta = crossingTime - this._lastCrossingTime
+				if (secondaryChannel) {
+					this._updateDirection(this._lastSecondary)
+				}
 				
 				if (this._lastCrossingTime > 0 && timeDelta > 0.0001) {
 					// Calculate instantaneous frequency
@@ -160,8 +192,11 @@ class DvsDecoderProcessor extends AudioWorkletProcessor {
 					this._instantSpeed = instantFreq / this._pilotFreq
 					this._smoothedSpeed = this._smoothedSpeed * this._smoothing + this._instantSpeed * (1 - this._smoothing)
 					
-					// Accumulate ticks: 24 per beat of referenceBPM at speed 1.0
-					this._totalPhase += this._referenceBPM * 24 / (60 * this._pilotFreq)
+					// Accumulate ticks: 24 per beat of referenceBPM at speed 1.0.
+					// Reverse play holds the clock rather than winding it back.
+					if (this._direction >= 0) {
+						this._totalPhase += this._referenceBPM * 24 / (60 * this._pilotFreq)
+					}
 					
 					while (this._totalPhase >= 1) {
 						this._totalPhase -= 1
@@ -305,10 +340,10 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 			autoGainControl: false
 		}
 
+		// Stereo carries direction; a mono device still provides speed
+		audioConstraints.channelCount = { ideal: 2 }
 		if (this.options.deviceId) {
 			audioConstraints.deviceId = { exact: this.options.deviceId }
-		} else {
-			audioConstraints.channelCount = { ideal: 1 }
 		}
 
 		this.#mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -322,6 +357,7 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 				pilotFrequency: PILOT_FREQUENCY,
 				threshold: this.options.minSignalThreshold,
 				referenceBPM: this.#referenceBPM,
+				invertDirection: Boolean(this.options.invertDirection),
 				speedSmoothing: this.options.speedSmoothing
 			}
 		})
@@ -381,6 +417,10 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 			this.#stats.speed = data.speed
 			this.#stats.direction = data.direction
 			this.#stats.tickCount = data.tickCount
+			// Reverse play holds the clock: no ticks arrive, but the run continues
+			if (data.direction < 0) {
+				this.#tickTimes = []
+			}
 			const lastTick = this.#tickTimes.at(-1)
 			if (
 				this.#running &&
@@ -428,7 +468,7 @@ export default class InputDvsControlVinyl extends AbstractInput implements IAudi
 			command.value = speed * 1000
 			command.bpm = this.#stats.bpm
 			command.velocity = Math.abs(direction) * 127
-			command.text = "direction unknown"
+			command.text = direction > 0 ? "forward" : "direction unknown"
 		})
 	}
 

@@ -69,7 +69,7 @@ export function createMidiInputControls(
 		return select
 	}
 	const device = addSelect("MIDI device")
-	const channel = addSelect("MIDI channel")
+	const channel = addSelect(direction === "output" ? "Output channel" : "MIDI channel")
 	const addOption = (select: HTMLSelectElement, value: string, text: string) => {
 		const option = document.createElement("option")
 		option.value = value
@@ -79,7 +79,11 @@ export function createMidiInputControls(
 	if (direction === "output") {
 		addOption(channel, "-1", "Keep incoming channel")
 	}
-	addOption(channel, "0", "All channels")
+	addOption(
+		channel,
+		"0",
+		direction === "output" ? "Broadcast to all 16 channels" : "All channels"
+	)
 	for (let i = 1; i <= 16; i++) {
 		addOption(channel, String(i), `Channel ${i}`)
 	}

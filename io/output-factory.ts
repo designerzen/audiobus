@@ -2,6 +2,7 @@ import { OUTPUT_DEFINITIONS, type OutputDefinition } from "./output-definitions.
 import { getAudioDestination } from "./audio-destination"
 import type { DeviceClassification, DeviceAttribution } from "./device-classification.ts"
 import { defineDevice } from "./device-definition"
+import { requiring, type DeviceRequirementId } from "./device-requirements"
 import { EFFECT_REGISTRY } from "../effects/effect-registry"
 import wam2Registry, { WAM2_INSTRUMENTS, wam2OutputId } from "../wam/registry"
 /**
@@ -19,6 +20,8 @@ export interface OutputFactory extends DeviceClassification {
 	category?: string
 	attribution?: DeviceAttribution
 	isAvailable: () => boolean
+	/** Browser or host features it needs; pickers name the missing ones */
+	requires?: readonly DeviceRequirementId[]
 	create: (options?: Record<string, any>) => IAudioOutput | Promise<IAudioOutput>
 }
 
@@ -48,6 +51,8 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./outputs/output-song-tree")
 		case OUTPUT_TYPES.SAMPLE_PLAYER:
 			return await import("./outputs/output-sample-player")
+		case OUTPUT_TYPES.LOOP_PLAYER:
+			return await import("./outputs/output-loop-player")
 		case OUTPUT_TYPES.HARMONY_SAMPLER:
 			return await import("./outputs/output-harmony-sampler")
 		case OUTPUT_TYPES.EVENT_RECORDER:
@@ -208,7 +213,7 @@ const createOutput = async (type: string, options?: Record<string, any>): Promis
 export const OUTPUT_FACTORIES: OutputFactory[] = [
 	...EFFECT_REGISTRY.map((effect) => ({
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.effectOutputId(effect.id)],
-		isAvailable: () => typeof AudioContext !== "undefined",
+		...requiring("webAudio"),
 		create: (options?: Record<string, any>) => {
 			if (!options?.audioContext) {
 				throw new Error(`${effect.name} requires audioContext in options`)
@@ -218,97 +223,101 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 	})),
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.CHROMATIC_SAMPLER],
-		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		...requiring("audioWorklet"),
 		create: (options) => createOutput(OUTPUT_TYPES.CHROMATIC_SAMPLER, options)
 	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.ROMPLER],
-		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		...requiring("audioWorklet"),
 		create: (options) => createOutput(OUTPUT_TYPES.ROMPLER, options)
 	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.SYNTH_303],
-		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		...requiring("audioWorklet"),
 		create: (options) => createOutput(OUTPUT_TYPES.SYNTH_303, options)
 	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.DRUM_KIT],
-		isAvailable: () => typeof AudioContext !== "undefined",
+		...requiring("webAudio"),
 		create: (options) => createOutput(OUTPUT_TYPES.DRUM_KIT, options)
 	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.SION],
-		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		...requiring("audioWorklet"),
 		create: (options) => createOutput(OUTPUT_TYPES.SION, options)
 	},
 	...[OUTPUT_TYPES.NOTE_MONITOR, OUTPUT_TYPES.SONG_TREE, OUTPUT_TYPES.EVENT_RECORDER].map(
 		(id) => ({
 			...OUTPUT_DEFINITIONS[id],
-			isAvailable: () => true,
+			...requiring(),
 			create: (options?: Record<string, any>) => createOutput(id, options)
 		})
 	),
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.SAMPLE_PLAYER],
-		isAvailable: () => typeof AudioContext !== "undefined",
+		...requiring("webAudio"),
 		create: (options) => createOutput(OUTPUT_TYPES.SAMPLE_PLAYER, options)
 	},
 	{
+		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.LOOP_PLAYER],
+		...requiring("webAudio"),
+		create: (options) => createOutput(OUTPUT_TYPES.LOOP_PLAYER, options)
+	},
+	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.HARMONY_SAMPLER],
-		isAvailable: () => typeof AudioContext !== "undefined",
+		...requiring("webAudio"),
 		create: (options) => createOutput(OUTPUT_TYPES.HARMONY_SAMPLER, options)
 	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.OSC],
-		isAvailable: () => typeof WebSocket !== "undefined",
+		...requiring("webSocket"),
 		create: (options) => createOutput(OUTPUT_TYPES.OSC, options)
 	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.PROTOCOL],
-		isAvailable: () => typeof window !== "undefined",
+		...requiring("page"),
 		create: (options) => createOutput(OUTPUT_TYPES.PROTOCOL, options)
 	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.PERFORMANCE],
-		isAvailable: () => typeof requestAnimationFrame === "function",
+		...requiring("animationFrames"),
 		create: (options) => createOutput(OUTPUT_TYPES.PERFORMANCE, options)
 	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.RECORDER],
-		isAvailable: () => typeof AudioContext !== "undefined",
+		...requiring("webAudio"),
 		create: (options) => createOutput(OUTPUT_TYPES.RECORDER, options)
 	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.TB303],
-		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		...requiring("audioWorklet"),
 		create: (options) => createOutput(OUTPUT_TYPES.TB303, options)
 	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.DRUM_ACCOMPANIMENT],
-		isAvailable: () => typeof AudioContext !== "undefined",
+		...requiring("webAudio"),
 		create: (options) => createOutput(OUTPUT_TYPES.DRUM_ACCOMPANIMENT, options)
 	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.MOOG],
-		isAvailable: () => typeof AudioWorklet !== "undefined",
+		...requiring("audioWorklet"),
 		create: (options) => createOutput(OUTPUT_TYPES.MOOG, options)
 	},
 	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.FM],
-		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		...requiring("audioWorklet"),
 		create: (options) => createOutput(OUTPUT_TYPES.FM, options)
 	},
 	...[OUTPUT_TYPES.MONOTRON, OUTPUT_TYPES.WAVEGUIDE, OUTPUT_TYPES.MULTI_OSCILLATOR].map((id) => ({
 		...OUTPUT_DEFINITIONS[id],
-		isAvailable: () => typeof AudioContext !== "undefined",
+		...requiring("webAudio"),
 		create: (options?: Record<string, any>) => createOutput(id, options)
 	})),
 	...Object.values(OUTPUT_DEFINITIONS)
 		.filter((definition) => definition.id.startsWith(OUTPUT_TYPES.WEBCLAP_PREFIX))
 		.map((definition) => ({
 			...definition,
-			isAvailable: () =>
-				typeof AudioWorkletNode !== "undefined" && typeof WebAssembly !== "undefined",
+			...requiring("audioWorklet", "webAssembly"),
 			create: async (options?: Record<string, any>) => {
 				if (!options?.audioContext) {
 					throw new Error("WebCLAP requires audioContext in options")
@@ -332,7 +341,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		})),
 	...WAM2_INSTRUMENTS.map((plugin) => ({
 		...OUTPUT_DEFINITIONS[wam2OutputId(plugin)],
-		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		...requiring("audioWorklet"),
 		create: (options?: Record<string, any>) =>
 			createOutput(OUTPUT_TYPES.WAM2, {
 				...options,
@@ -346,7 +355,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.DESCRIBE].subtype,
 		name: "Describe",
 		description: "Describes notes, chords, extensions and inversions in musical language",
-		isAvailable: () => true,
+		...requiring(),
 		create: (options) => createOutput(OUTPUT_TYPES.DESCRIBE, options)
 	},
 	{
@@ -355,7 +364,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.CONSOLE].subtype,
 		name: "Console",
 		description: "Logs MIDI events to browser console (dev mode only)",
-		isAvailable: () => import.meta.env?.DEV,
+		...requiring("development"),
 		create: (options) => createOutput(OUTPUT_TYPES.CONSOLE, options)
 	},
 	{
@@ -364,7 +373,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.NOTATION].subtype,
 		name: "Notation",
 		description: "Displays notes on a musical staff",
-		isAvailable: () => true,
+		...requiring(),
 		create: (options) => createOutput(OUTPUT_TYPES.NOTATION, options)
 	},
 	{
@@ -373,7 +382,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.SPECTRUM_ANALYSER].subtype,
 		name: "Spectrum Analyser",
 		description: "Visualizes audio spectrum using FFT analysis with realtime waveform display",
-		isAvailable: () => true,
+		...requiring(),
 		create: (options) => createOutput(OUTPUT_TYPES.SPECTRUM_ANALYSER, options)
 	},
 	{
@@ -382,10 +391,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.SPEECH_SYNTHESIS].subtype,
 		name: "Speech Synthesis",
 		description: "Reads note names with Kokoro, with system voices as a fallback",
-		isAvailable: () =>
-			typeof window !== "undefined" &&
-			((typeof Worker !== "undefined" && typeof AudioContext !== "undefined") ||
-				!!window.speechSynthesis),
+		...requiring("speech"),
 		create: (options) => createOutput(OUTPUT_TYPES.SPEECH_SYNTHESIS, options)
 	},
 	{
@@ -394,7 +400,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.VIBRATOR].subtype,
 		name: "Vibrator",
 		description: "Triggers device vibration when a note within a range is played",
-		isAvailable: () => true, // Available on all platforms - supports mobile vibration API and gamepad vibration
+		...requiring("vibration"),
 		create: (options) => createOutput(OUTPUT_TYPES.VIBRATOR, options)
 	},
 	{
@@ -403,8 +409,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.WEBMIDI].subtype,
 		name: "WebMIDI Device",
 		description: "Sends MIDI messages to a connected WebMIDI device",
-		isAvailable: () =>
-			typeof navigator !== "undefined" && !!(navigator as any).requestMIDIAccess,
+		...requiring("webMidi"),
 		create: (options) => createOutput(OUTPUT_TYPES.WEBMIDI, options)
 	},
 	{
@@ -414,9 +419,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		name: "Native MIDI Device",
 		description:
 			"Sends MIDI messages to a connected native OS MIDI device (Windows/macOS/Linux)",
-		isAvailable: () =>
-			typeof (globalThis as any).process !== "undefined" &&
-			(globalThis as any).process.type === "renderer", // Only available in Electron
+		...requiring("nativeMidiAddon"),
 		create: (options) => createOutput(OUTPUT_TYPES.NATIVE_MIDI, options)
 	},
 	{
@@ -425,10 +428,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.BLE_MIDI].subtype,
 		name: "BLE MIDI",
 		description: "BLE MIDI",
-		isAvailable: () =>
-			typeof navigator !== "undefined" &&
-			!!navigator?.bluetooth &&
-			!!navigator?.bluetooth?.requestDevice,
+		...requiring("bluetooth"),
 		create: (options) => createOutput(OUTPUT_TYPES.BLE_MIDI, options)
 	},
 	{
@@ -437,8 +437,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.MIDI2].subtype,
 		name: "MIDI 2.0",
 		description: "MIDI 2.0 device output",
-		isAvailable: () =>
-			typeof navigator !== "undefined" && !!(navigator as any).requestMIDIAccess,
+		...requiring("webMidi"),
 		create: (options) => createOutput(OUTPUT_TYPES.MIDI2, options)
 	},
 	{
@@ -448,9 +447,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		name: "MIDI 2.0 Native",
 		description:
 			"MIDI 2.0 output with per-note controllers via native OS MIDI (16-bit resolution, Windows/macOS/Linux)",
-		isAvailable: () =>
-			typeof (globalThis as any).process !== "undefined" &&
-			(globalThis as any).process.type === "renderer", // Only available in Electron
+		...requiring("desktopMidi"),
 		create: (options) => createOutput(OUTPUT_TYPES.MIDI2_NATIVE, options)
 	},
 	{
@@ -459,7 +456,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.SUPERSONIC].subtype,
 		name: "Supersonic",
 		description: "SuperCollider-based sound synthesis engine",
-		isAvailable: () => typeof AudioWorklet !== "undefined",
+		...requiring("audioWorklet"),
 		create: (options) => createOutput(OUTPUT_TYPES.SUPERSONIC, options)
 	},
 	{
@@ -468,7 +465,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.WAM2].subtype,
 		name: "WAM2",
 		description: "Manages the WAM2 Audio Engine",
-		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		...requiring("audioWorklet"),
 		create: (options) => createOutput(OUTPUT_TYPES.WAM2, options)
 	},
 	{
@@ -477,7 +474,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.WAM].subtype,
 		name: "WAM",
 		description: OUTPUT_DEFINITIONS[OUTPUT_TYPES.WAM].description,
-		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		...requiring("audioWorklet"),
 		create: (options) => createOutput(OUTPUT_TYPES.WAM, options)
 	},
 	{
@@ -486,7 +483,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.YOSHIMI].subtype,
 		name: "Yoshimi",
 		description: "Free and open source high quality software synthesizer with 700+ presets",
-		isAvailable: () => typeof AudioWorkletNode !== "undefined",
+		...requiring("audioWorklet"),
 		create: (options) => createOutput(OUTPUT_TYPES.YOSHIMI, options)
 	},
 	{
@@ -495,9 +492,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.METRONOME].subtype,
 		name: "Metronome",
 		description: "Produces audible clicks in response to MIDI clock signals",
-		isAvailable: () =>
-			typeof AudioContext !== "undefined" ||
-			typeof (window as any).webkitAudioContext !== "undefined",
+		...requiring("webAudio"),
 		create: (options) => createOutput(OUTPUT_TYPES.METRONOME, options)
 	},
 	{
@@ -506,9 +501,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.AUDIO_CLICK].subtype,
 		name: "Audio Click",
 		description: "Plays audio click sounds from a selected asset library on every bar",
-		isAvailable: () =>
-			typeof AudioContext !== "undefined" ||
-			typeof (window as any).webkitAudioContext !== "undefined",
+		...requiring("webAudio"),
 		create: (options) => createOutput(OUTPUT_TYPES.AUDIO_CLICK, options)
 	},
 	{
@@ -517,7 +510,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		subtype: OUTPUT_DEFINITIONS[OUTPUT_TYPES.BUTTERCHURN].subtype,
 		name: "Butterchurn",
 		description: "WebGL music visualizer with animated psychedelic patterns synced to audio",
-		isAvailable: () => typeof WebGL2RenderingContext !== "undefined",
+		...requiring("webgl2", "webAudio"),
 		create: (options) => createOutput(OUTPUT_TYPES.BUTTERCHURN, options)
 	}
 ]
@@ -526,6 +519,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 export interface OutputRegistration {
 	definition: OutputDefinition
 	isAvailable?: () => boolean
+	requires?: readonly DeviceRequirementId[]
 	create: (options: {
 		audioContext?: AudioContext
 		destination?: AudioNode
@@ -542,7 +536,8 @@ const registeredOutputs = new Set<string>()
  */
 export function registerOutput({
 	definition,
-	isAvailable = () => true,
+	isAvailable,
+	requires = [],
 	create
 }: OutputRegistration) {
 	OUTPUT_DEFINITIONS[definition.id] = { ...definition }
@@ -554,7 +549,8 @@ export function registerOutput({
 		description: definition.description,
 		category: definition.category,
 		attribution: definition.attribution,
-		isAvailable,
+		requires,
+		isAvailable: isAvailable ?? requiring(...requires).isAvailable,
 		create: (options = {}) =>
 			create({
 				...options,
