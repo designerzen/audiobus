@@ -255,7 +255,7 @@ export default class OutputFM extends EventTarget implements IAudioOutput {
 			return
 		}
 		if (command.type === CONTROL_CHANGE) {
-			this.control(part, command.number, command.value)
+			this.control(part, command.number, command.value, time)
 			return
 		}
 		if (command.type === PITCH_BEND) {
@@ -301,7 +301,12 @@ export default class OutputFM extends EventTarget implements IAudioOutput {
 	private timeOf(command: IAudioCommand): number {
 		return Math.max(this.context.currentTime, command.audioTime ?? 0)
 	}
-	private control(part: number, controller: number, value: number): void {
+	private control(
+		part: number,
+		controller: number,
+		value: number,
+		time = this.context.currentTime
+	): void {
 		if (controller === 64) {
 			if (value >= 64) {
 				this.sustained.add(part)
@@ -311,7 +316,7 @@ export default class OutputFM extends EventTarget implements IAudioOutput {
 			for (const id of this.released) {
 				const [held, note] = id.split(":").map(Number)
 				if (held === part) {
-					this.post({ type: "off", part, note, time: this.context.currentTime })
+					this.post({ type: "off", part, note, time })
 					this.released.delete(id)
 				}
 			}

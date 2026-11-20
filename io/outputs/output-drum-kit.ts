@@ -112,7 +112,8 @@ export default class OutputDrumKit extends EventTarget implements IAudioOutput {
 		this.dispatchEvent(new Event(EVENT_CONFIGURATION_CHANGED))
 	}
 
-	noteOn(note: number, velocity = 100): void {
+	/** @param at AudioContext time to play at; earlier times play now */
+	noteOn(note: number, velocity = 100, at = 0): void {
 		const part = PARTS_BY_NOTE.get(note)
 		if (
 			!this.connected ||
@@ -126,7 +127,7 @@ export default class OutputDrumKit extends EventTarget implements IAudioOutput {
 		this.percussion.trigger({
 			part,
 			velocity: (Math.min(127, velocity) / 127) * (this.synth ? 1 : this.settings.volume),
-			triggerAt: this.context.currentTime,
+			triggerAt: Math.max(this.context.currentTime, at),
 			lengthScale: this.settings.decay,
 			tuningNote: 69 + 12 * Math.log2(42 / 440) + this.settings.tuning
 		})
@@ -145,7 +146,7 @@ export default class OutputDrumKit extends EventTarget implements IAudioOutput {
 			return
 		}
 		if (command.type === NOTE_ON) {
-			this.noteOn(command.number, command.velocity)
+			this.noteOn(command.number, command.velocity, command.audioTime)
 		} else if (
 			command.type === CONTROL_CHANGE &&
 			(command.number === 120 || command.number === 123)

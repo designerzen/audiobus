@@ -326,6 +326,8 @@ export default class ChromaticSampler extends EventTarget implements IAudioOutpu
 		}
 		const part = Math.round(bounded(command.channel, 1, 1, 16)) - 1
 		const key = `${part}:${command.number}`
+		// Commands may name a later AudioContext time to play at; the worklet holds them until then
+		const time = Math.max(this.context.currentTime, command.audioTime ?? 0)
 		if (command.type === NOTE_OFF || (command.type === NOTE_ON && command.velocity <= 0)) {
 			this.pending.delete(key)
 			if (this.sustained.has(part)) {
@@ -335,7 +337,7 @@ export default class ChromaticSampler extends EventTarget implements IAudioOutpu
 					type: "off",
 					part,
 					note: command.number,
-					time: this.context.currentTime
+					time
 				})
 			}
 			return
@@ -426,7 +428,7 @@ export default class ChromaticSampler extends EventTarget implements IAudioOutpu
 			part,
 			note: command.number,
 			velocity: bounded(command.velocity, 100, 0, 127) / 127,
-			time: this.context.currentTime
+			time
 		})
 	}
 	noteOn(number: number, velocity = 100): Promise<void> {

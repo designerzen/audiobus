@@ -87,3 +87,23 @@ export function recordingNotes(recording: NoteRecording): SequenceNote[] {
 			duration: end - event.startAt
 		}))
 }
+/** Separate overlapping notes into monophonic voices, retaining channel/program groups. */
+export function recordingVoices(recording: NoteRecording): SequenceNote[][] {
+	const voices: SequenceNote[][] = []
+	for (const note of recordingNotes(recording)) {
+		let voice = voices.find((candidate) => {
+			const last = candidate.at(-1)!
+			return (
+				last.channel === note.channel &&
+				last.patch === note.patch &&
+				last.start + last.duration <= note.start + 1e-9
+			)
+		})
+		if (!voice) {
+			voice = []
+			voices.push(voice)
+		}
+		voice.push(note)
+	}
+	return voices
+}

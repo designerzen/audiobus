@@ -3,13 +3,28 @@ import type { FieldConfig } from "./interface-transformer"
 import type { IAudioCommand } from "../../commands/audio-command-interface"
 import type { Timer } from "netronome"
 import { NOTE_ON, NOTE_OFF } from "../../commands/commands"
-import { EVENT_CHANGE, EVENT_CLICK, EVENT_LOAD, EVENT_ERROR } from "../../events/event-constants"
+import {
+	EVENT_CHANGE,
+	EVENT_CLICK,
+	EVENT_INPUT,
+	EVENT_LOAD,
+	EVENT_ERROR
+} from "../../events/event-constants"
 import { EnsembleSession, type EnsembleMode, type EnsembleSettings } from "../ensemble-session"
 import { loadMidi, midiSong, type MidiSong } from "../midi-song"
 import { notifyControls, notifyControlSchema } from "../component-ui"
 import type { ControlValue } from "control-surface/types"
 
 export const ID_ENSEMBLE = "Ensemble"
+export const ENSEMBLE_KEYS = "asdfghjklqwertyui".split("")
+const TIMING_FIELDS: Record<EnsembleMode, string[]> = {
+	assisted: ["activityBeats", "pauseBeats"],
+	together: ["stepBeats", "quorum", "waitSeconds"],
+	conductor: ["activityBeats"]
+}
+const TIMING_IDS = [...new Set(Object.values(TIMING_FIELDS).flat())]
+/** Song sent ahead of the clock; longer than the slowest measured gap between ticks (~90ms). */
+const LOOKAHEAD = 0.15
 export interface PlayerAssignment {
 	source: string
 	channels: number[]
@@ -56,6 +71,8 @@ export class TransformerEnsemble extends Transformer<Config> {
 	private root?: HTMLElement
 	private status?: HTMLElement
 	private playersRoot?: HTMLElement
+	private addPlayerButton?: HTMLButtonElement
+	private timingControls = new Map<string, { control: HTMLElement; output: HTMLOutputElement }>()
 	private unsubscribe?: () => void
 	private learning?: number
 	private destroyed = false
@@ -85,10 +102,11 @@ export class TransformerEnsemble extends Transformer<Config> {
 	}
 	get fields(): FieldConfig[] {
 		return [
-			{ name: "uploadSong", label: "Choose any MIDI file", type: "button" },
+			{ name: "uploadSong", label: "Upload MIDI file", group: "Song", type: "button" },
 			{
 				name: "songLibrary",
-				label: "Or choose a library song",
+				label: "Library song",
+				group: "Song",
 				type: "select",
 				values: [
 					{ name: "Choose a song…", value: "" },
@@ -98,18 +116,7 @@ export class TransformerEnsemble extends Transformer<Config> {
 					}))
 				]
 			},
-			{ name: "midiFileUrl", label: "MIDI song URL", type: "text" },
-			{
-				name: "autoInputs",
-				label: "Automatic channel controls",
-				type: "select",
-				values: [
-					{ name: "Manual assignments", value: "off" },
-					{ name: "One keyboard key per song channel", value: "keyboard" },
-					{ name: "One gamepad per song channel", value: "gamepads" }
-				],
-				help: "Creates an Input and control-surface pad for every playable channel whenever a song is loaded."
-			},
+			{ name: "midiFileUrl", label: "Song URL", group: "Song", type: "text" },
 			{
 				name: "enabled",
 				label: "Enabled",
@@ -121,17 +128,32 @@ export class TransformerEnsemble extends Transformer<Config> {
 			},
 			{
 				name: "mode",
-				label: "Performance mode",
+				label: "Mode",
+				group: "Players",
 				type: "select",
 				values: [
-					{ name: "Play along (hold or tap your part)", value: "assisted" },
+					{ name: "Play along", value: "assisted" },
 					{ name: "Together step", value: "together" },
 					{ name: "Group conductor", value: "conductor" }
-				]
+				],
+				help: "Play along: hold or tap your part to keep it playing. Together step: the song waits until enough players press. Group conductor: everyone's tapping sets the tempo."
+			},
+			{
+				name: "autoInputs",
+				label: "Player controls",
+				group: "Players",
+				type: "select",
+				values: [
+					{ name: "Assign manually", value: "off" },
+					{ name: "A keyboard key per part", value: "keyboard" },
+					{ name: "A gamepad per part", value: "gamepads" }
+				],
+				help: "Creates an Input and control-surface pad for every playable channel whenever a song is loaded."
 			},
 			{
 				name: "autoJoin",
 				label: "New inputs join automatically",
+				group: "Players",
 				type: "select",
 				values: [
 					{ name: "Off", value: 0 },
@@ -140,33 +162,49 @@ export class TransformerEnsemble extends Transformer<Config> {
 			},
 			{
 				name: "assist",
-				label: "Fill inactive parts / assist together steps",
+				label: "Fill silent parts",
+				group: "Players",
 				type: "select",
 				values: [
 					{ name: "Off", value: 0 },
 					{ name: "On", value: 1 }
 				],
-				help: "On keeps the complete arrangement playing. Off allows gaps when a player is inactive."
+				help: "On plays quieter backing for parts nobody is playing, and moves together steps on when players wait too long. Off leaves gaps."
+			},
+			{
+				name: "loop",
+				label: "Repeat song",
+				group: "Players",
+				type: "select",
+				values: [
+					{ name: "Off", value: 0 },
+					{ name: "On", value: 1 }
+				]
 			},
 			{
 				name: "activityBeats",
-				label: "Beats a part keeps playing after a press or release",
+				label: "Part keeps playing for (beats)",
+				group: "Timing",
 				type: "number",
 				min: 0.25,
 				max: 128,
-				step: 0.25
+				step: 0.25,
+				help: "How long a part carries on after a press or release."
 			},
 			{
 				name: "pauseBeats",
-				label: "Pause after everyone stops for (beats, 0 never pauses)",
+				label: "Pause after silence (beats)",
+				group: "Timing",
 				type: "number",
 				min: 0,
 				max: 128,
-				step: 1
+				step: 1,
+				help: "The song pauses once everybody has stopped for this long. 0 never pauses."
 			},
 			{
 				name: "stepBeats",
-				label: "Beats per together step",
+				label: "Step length (beats)",
+				group: "Timing",
 				type: "number",
 				min: 0.25,
 				max: 32,
@@ -174,27 +212,22 @@ export class TransformerEnsemble extends Transformer<Config> {
 			},
 			{
 				name: "quorum",
-				label: "Players needed for together step",
+				label: "Players per step",
+				group: "Timing",
 				type: "number",
 				min: 1,
-				max: Number.MAX_SAFE_INTEGER
+				max: 16,
+				help: "How many players must press before the next together step plays."
 			},
 			{
 				name: "waitSeconds",
-				label: "Together assistance delay (seconds)",
+				label: "Assist a step after (seconds)",
+				group: "Timing",
 				type: "number",
 				min: 0.1,
 				max: 60,
-				step: 0.1
-			},
-			{
-				name: "loop",
-				label: "Repeat song",
-				type: "select",
-				values: [
-					{ name: "Off", value: 0 },
-					{ name: "On", value: 1 }
-				]
+				step: 0.1,
+				help: "With Fill silent parts on, a waiting step plays by itself after this delay."
 			}
 		].map((field) => ({
 			...field,
@@ -214,7 +247,7 @@ export class TransformerEnsemble extends Transformer<Config> {
 		}
 	}
 	private settings(): EnsembleSettings {
-		return { ...this.config, players: this.config.players }
+		return { ...this.config, players: this.config.players, lookahead: LOOKAHEAD }
 	}
 	loadSongLibrary(): Promise<void> {
 		this.libraryLoading ??= fetch(`${import.meta.env?.BASE_URL ?? "/"}midi/index.json`)
@@ -528,57 +561,141 @@ export class TransformerEnsemble extends Transformer<Config> {
 		const text = this.statusText()
 		if (this.status.textContent !== text) {
 			this.status.textContent = text
+			this.status.classList.toggle("is-error", Boolean(this.error))
+		}
+	}
+	private sourceName(source: string): string {
+		if (source.startsWith("input:")) {
+			return source.slice("input:".length)
+		}
+		try {
+			const [id, from] = JSON.parse(source)
+			return String(from || id)
+		} catch {
+			return source
+		}
+	}
+	/** Shows only the timing settings the current mode uses, with their values beside them. */
+	private syncPanel(): void {
+		const visible = TIMING_FIELDS[this.config.mode]
+		for (const [id, { control, output }] of this.timingControls) {
+			control.hidden = !visible.includes(id)
+			if (document.activeElement !== control.querySelector("input")) {
+				output.textContent = String(this.config[id])
+			}
 		}
 	}
 	private renderPlayers(): void {
 		if (!this.playersRoot) {
 			return
 		}
+		const item = (className: string, ...children: (Node | string)[]) => {
+			const li = document.createElement("li")
+			li.className = className
+			li.append(...children)
+			return li
+		}
+		const automatic = this.config.autoInputs !== "off"
 		this.playersRoot.replaceChildren()
-		this.config.players.forEach((player, index) => {
-			const row = document.createElement("fieldset")
-			const title = document.createElement("legend")
-			title.textContent = `Player ${index + 1}`
-			const source = document.createElement("input")
-			source.value = player.source
-			source.setAttribute("aria-label", `Player ${index + 1} input`)
-			source.placeholder = "Press Learn, then use the input"
-			const channels = document.createElement("input")
-			channels.value = player.channels.join(", ")
-			channels.setAttribute("aria-label", `Player ${index + 1} song channels`)
-			const label = document.createElement("label")
-			label.textContent = "Song channels (comma separated)"
-			label.append(channels)
-			const update = () =>
-				this.setConfig(
-					"players",
-					this.config.players.map((p, i) =>
-						i === index
-							? {
-									source: source.value.trim(),
-									channels: channels.value.split(",").map(Number)
-								}
-							: p
-					)
+		if (this.addPlayerButton) {
+			this.addPlayerButton.hidden = automatic
+		}
+		if (automatic) {
+			// Generated Inputs own these assignments, so they are listed rather than edited.
+			const parts = this.automaticParts ?? []
+			if (!parts.length) {
+				this.playersRoot.append(
+					item("ensemble-empty", "Load a song to create a control for each part.")
 				)
-			source.addEventListener(EVENT_CHANGE, update)
-			channels.addEventListener(EVENT_CHANGE, update)
+			}
+			parts.forEach((part, index) => {
+				const trigger = document.createElement("kbd")
+				trigger.textContent =
+					this.config.autoInputs === "keyboard"
+						? (ENSEMBLE_KEYS[index]?.toUpperCase() ?? "–")
+						: `Pad ${index + 1}`
+				const name = document.createElement("span")
+				name.textContent = this.partNames([part.channel])
+				const channel = document.createElement("small")
+				channel.textContent = `Ch ${part.channel}`
+				this.playersRoot!.append(item("ensemble-part", trigger, name, channel))
+			})
+			return
+		}
+		if (!this.config.players.length) {
+			this.playersRoot.append(
+				item("ensemble-empty", "Add a player, or press any connected input to join.")
+			)
+		}
+		const channels = [
+			...new Set([
+				...(this.song?.channels ?? []),
+				...this.config.players.flatMap((player) => player.channels)
+			])
+		].sort((a, b) => a - b)
+		this.config.players.forEach((player, index) => {
+			const title = document.createElement("strong")
+			title.textContent = `Player ${index + 1}`
+			const source = document.createElement("span")
+			source.className = "ensemble-player-source"
+			source.textContent = player.source ? this.sourceName(player.source) : "No input yet"
+			source.title = player.source
 			const learn = document.createElement("button")
 			learn.type = "button"
-			learn.textContent = this.learning === index ? "Waiting for input…" : "Learn input"
+			learn.textContent = this.learning === index ? "Press an input…" : "Learn"
+			learn.setAttribute("aria-pressed", String(this.learning === index))
+			learn.setAttribute("aria-label", `Learn player ${index + 1} input`)
 			learn.addEventListener(EVENT_CLICK, () => {
 				this.learning = this.learning === index ? undefined : index
 				this.renderPlayers()
 			})
 			const remove = document.createElement("button")
 			remove.type = "button"
-			remove.textContent = "Remove player"
+			remove.className = "ensemble-player-remove"
+			remove.textContent = "×"
+			remove.setAttribute("aria-label", `Remove player ${index + 1}`)
 			remove.addEventListener(EVENT_CLICK, () => {
 				this.learning = undefined
 				this.removePlayer(index)
 			})
-			row.append(title, source, learn, label, remove)
-			this.playersRoot!.append(row)
+			const head = document.createElement("div")
+			head.className = "ensemble-player-head"
+			head.append(title, source, learn, remove)
+			const parts = document.createElement("div")
+			parts.className = "ensemble-player-parts"
+			parts.setAttribute("role", "group")
+			parts.setAttribute("aria-label", `Player ${index + 1} parts`)
+			for (const channel of channels) {
+				const box = document.createElement("input")
+				box.type = "checkbox"
+				box.value = String(channel)
+				box.checked = player.channels.includes(channel)
+				box.addEventListener(EVENT_CHANGE, () =>
+					this.setConfig(
+						"players",
+						this.config.players.map((p, i) =>
+							i === index
+								? {
+										...p,
+										channels: [
+											...parts.querySelectorAll<HTMLInputElement>(
+												"input:checked"
+											)
+										].map((input) => Number(input.value))
+									}
+								: p
+						)
+					)
+				)
+				const label = document.createElement("label")
+				label.title = `Channel ${channel}`
+				label.append(box, `${channel} · ${this.partNames([channel])}`)
+				parts.append(label)
+			}
+			if (!channels.length) {
+				parts.textContent = "Load a song to choose parts."
+			}
+			this.playersRoot!.append(item("ensemble-player", head, parts))
 		})
 	}
 	override async createGui(): Promise<HTMLElement> {
@@ -586,38 +703,90 @@ export class TransformerEnsemble extends Transformer<Config> {
 			return this.root
 		}
 		await this.loadSongLibrary()
-		const root = document.createElement("div")
-		root.className = "transformer-controls ensemble-controls"
-		root.style.display = "grid"
-		root.style.gap = "0.5rem"
-		const guidance = document.createElement("p")
-		guidance.textContent =
-			"Use one Ensemble for all players. The first press starts the song at its first bar; after that the song keeps time for everyone. Hold your key, or tap it every few beats, to keep your part playing. The song pauses when everybody stops and carries on from that bar. Inputs join on their first press; use Learn to assign them manually. Turn on assistance to hear quieter backing for parts nobody is playing."
-		this.status = document.createElement("p")
+		const element = <K extends keyof HTMLElementTagNameMap>(
+			tag: K,
+			className = "",
+			text = ""
+		) => {
+			const node = document.createElement(tag)
+			node.className = className
+			node.textContent = text
+			return node
+		}
+		const root = element("div", "ensemble-controls")
+
+		// Live status first: it is what players need while performing.
+		const header = element("div", "ensemble-header")
+		this.status = element("p", "ensemble-status")
 		this.status.setAttribute("role", "status")
-		this.playersRoot = document.createElement("div")
-		const add = document.createElement("button")
-		add.type = "button"
-		add.textContent = "Add player"
-		add.addEventListener(EVENT_CLICK, () => this.addPlayer())
-		const restart = document.createElement("button")
+		const restart = element("button", "", "Restart")
 		restart.type = "button"
-		restart.textContent = "Restart song"
 		restart.addEventListener(EVENT_CLICK, () => this.reset())
-		root.append(guidance, this.status, await super.createGui(), this.playersRoot, add, restart)
+		header.append(this.status, restart)
+
+		// Generated settings keep their MIDI-learn bindings; the players list joins their group.
+		const controls = await super.createGui()
+		const group = (name: string) =>
+			[...controls.querySelectorAll<HTMLFieldSetElement>(":scope > fieldset")].find(
+				(fieldset) => fieldset.querySelector(":scope > legend")?.textContent === name
+			)
+		this.playersRoot = element("ul", "ensemble-players")
+		this.addPlayerButton = element("button", "ensemble-add-player", "Add player")
+		this.addPlayerButton.type = "button"
+		this.addPlayerButton.addEventListener(EVENT_CLICK, () => this.addPlayer())
+		;(group("Players") ?? controls).append(this.playersRoot, this.addPlayerButton)
+
+		// Timing is rarely changed mid-performance, so it starts collapsed.
+		const timing = group("Timing")
+		if (timing) {
+			const details = element("details", "ensemble-timing")
+			timing.before(details)
+			timing.querySelector(":scope > legend")?.remove()
+			details.append(element("summary", "", "Timing"), timing)
+			for (const id of TIMING_IDS) {
+				const input = timing.querySelector<HTMLInputElement>(
+					`[data-midi-control$='${JSON.stringify(id)}]']`
+				)
+				const control = input?.closest<HTMLElement>(".component-control")
+				if (!input || !control) {
+					continue
+				}
+				const output = element("output")
+				control.firstElementChild?.append(output)
+				input.addEventListener(EVENT_INPUT, () => (output.textContent = input.value))
+				this.timingControls.set(id, { control, output })
+			}
+		}
+
+		const help = element("details", "ensemble-help")
+		const steps = element("ol")
+		for (const step of [
+			"Connect every player's Input to this one Ensemble.",
+			"The first press starts the song; it then keeps time for everyone.",
+			"Hold your key, or tap it every few beats, to keep your part playing.",
+			"When everybody stops, the song pauses and carries on from that bar."
+		]) {
+			steps.append(element("li", "", step))
+		}
+		help.append(element("summary", "", "How it works"), steps)
+
+		root.append(header, controls, help)
 		this.root = root
 		this.unsubscribe = this.subscribeControls(() => {
 			this.renderPlayers()
+			this.syncPanel()
 			this.updateStatus()
 		})
 		this.renderPlayers()
+		this.syncPanel()
 		this.updateStatus()
 		return root
 	}
 	override destroyGui(): void {
 		this.unsubscribe?.()
 		this.unsubscribe = undefined
-		this.root = this.playersRoot = this.status = undefined
+		this.root = this.playersRoot = this.status = this.addPlayerButton = undefined
+		this.timingControls.clear()
 		super.destroyGui()
 	}
 	override destroy(): void {

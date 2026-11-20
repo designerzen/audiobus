@@ -1,5 +1,5 @@
 import type IOChain from "./IO-chain"
-import { TransformerEnsemble } from "./transformers/transformer-ensemble"
+import { ENSEMBLE_KEYS, TransformerEnsemble } from "./transformers/transformer-ensemble"
 import InputChannelTrigger from "./inputs/input-channel-trigger"
 import { CHANNEL_TRIGGER } from "./inputs/input-types"
 import { defineDevice, deviceId } from "./device-definition"
@@ -11,7 +11,7 @@ import {
 import { configurationUpdate } from "./configuration-events"
 import type { SurfaceState } from "control-surface/types"
 
-export const ENSEMBLE_KEYS = "asdfghjklqwertyui".split("")
+export { ENSEMBLE_KEYS }
 
 /** Installed after endpoints are restored, so saved generated inputs are reused. */
 export function installEnsembleControls(chain: IOChain, signal: AbortSignal): void {

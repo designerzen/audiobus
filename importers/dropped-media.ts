@@ -66,7 +66,10 @@ export async function readMediaArchive(bytes: Uint8Array): Promise<Record<string
 }
 
 export async function inspectMediaArchive(bytes: Uint8Array): Promise<MediaArchive> {
-	const files = await readMediaArchive(bytes)
+	return inspectMediaFiles(await readMediaArchive(bytes))
+}
+
+export function inspectMediaFiles(files: Record<string, Uint8Array>): MediaArchive {
 	const plugins: ArchivedPlugin[] = []
 	for (const [path, contents] of Object.entries(files)) {
 		if (!/(^|\/)descriptor\.json$/i.test(path)) {

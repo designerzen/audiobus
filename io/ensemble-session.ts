@@ -19,6 +19,11 @@ export interface EnsembleSettings {
 	waitSeconds: number
 	/** Beats of silence from every player before the song pauses; 0 never pauses. */
 	pauseBeats?: number
+	/**
+	 * Seconds of song sent ahead of the clock, each command naming its exact audioTime.
+	 * Outputs that schedule then play in time however unevenly the clock ticks.
+	 */
+	lookahead?: number
 }
 
 /** Clock gaps longer than this are a stopped transport or suspended tab, not elapsed music. */
@@ -178,12 +183,14 @@ export class EnsembleSession {
 		)
 	}
 	private release(now: number): IAudioCommand[] {
-		const output = [...this.sounding.values()].map((note) =>
+		const output: IAudioCommand[] = [...this.sounding.values()].map((note) =>
 			Object.assign(new AudioCommand(), note, {
 				type: NOTE_OFF,
 				velocity: 0,
 				startAt: now,
-				time: now
+				time: now,
+				// A note sent ahead must not be released before it starts.
+				audioTime: Math.max(now, note.audioTime ?? now)
 			})
 		)
 		for (const channel of this.touchedChannels) {
@@ -246,6 +253,10 @@ export class EnsembleSession {
 		const until = this.secondsAtBeat(this.beatAt(this.position) + this.settings.activityBeats)
 		this.activeUntil.set(player, Math.max(until, this.activeUntil.get(player) ?? -Infinity))
 	}
+	/** The clock time a song moment plays at, measured from the heard position. */
+	private playAt(at: number, now: number, position = this.position): number {
+		return now + (at - position) / this.speed
+	}
 	/** Sound a newly live part's notes that are already under way, so presses feel immediate. */
 	private catchUp(channels: number[], now: number): IAudioCommand[] {
 		const output: IAudioCommand[] = []
@@ -267,7 +278,8 @@ export class EnsembleSession {
 				end > this.position + 0.05 ||
 				(this.position - event.at <= CATCH_WINDOW && end > this.position)
 			) {
-				output.push(...this.emit(event, now))
+				// Notes already sent ahead were skipped while the part was silent; keep their time.
+				output.push(...this.emit(event, now, Math.max(now, this.playAt(event.at, now))))
 			}
 		}
 		return output
@@ -342,10 +354,14 @@ export class EnsembleSession {
 		}
 		return this.channelLive(event.command.channel, event.at)
 	}
-	private emit(event: SongEvent, at: number): IAudioCommand[] {
+	/** @param playAt clock time the event sounds; later than now when sent ahead */
+	private emit(event: SongEvent, now: number, playAt = now): IAudioCommand[] {
+		// Sent on this tick, played at playAt by outputs that schedule.
+		const at = Math.min(now, playAt)
 		const command = Object.assign(new AudioCommand(), event.command, {
 			startAt: at,
-			time: at
+			time: at,
+			audioTime: playAt
 		})
 		if (command.type === NOTE_ON) {
 			if (!this.allowed(event)) {
@@ -446,12 +462,17 @@ export class EnsembleSession {
 			return output
 		}
 		while (true) {
+			// Events up to the horizon are sent now; the heard position trails at target.
+			const horizon = Math.min(
+				target + (this.settings.lookahead ?? 0) * this.speed,
+				duration,
+				this.settings.mode === "together" ? this.limit : Infinity
+			)
 			while (
 				this.cursor < this.song.events.length &&
-				this.song.events[this.cursor].at <= Math.min(target, duration) &&
+				this.song.events[this.cursor].at <= horizon &&
 				!(
 					this.settings.mode === "together" &&
-					target >= this.limit &&
 					this.song.events[this.cursor].at >= this.limit
 				)
 			) {
@@ -461,7 +482,7 @@ export class EnsembleSession {
 				if (event.command.type === NOTE_ON && late > LATE_LIMIT) {
 					continue
 				}
-				output.push(...this.emit(event, now - late))
+				output.push(...this.emit(event, now, this.playAt(event.at, now, target)))
 			}
 			if (target < duration) {
 				break
