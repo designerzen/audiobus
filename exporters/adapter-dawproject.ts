@@ -37,20 +37,3 @@ export async function createDawProjectFromAudioEventRecording(
 	const bytes = zipSync({ "project.xml": strToU8(xml), "metadata.xml": strToU8(metadata) })
 	return new Blob([Uint8Array.from(bytes).buffer], { type: "application/zip" })
 }
-
-/**
- * Save .dawProject file to local filesystem
- */
-export const saveDawProjectToLocalFileSystem = async (
-	blob: Blob,
-	filename: string = "project.dawProject"
-): Promise<void> => {
-	const url = URL.createObjectURL(blob)
-	const link = document.createElement("a")
-	link.href = url
-	link.download = filename.endsWith(".dawProject") ? filename : `${filename}.dawProject`
-	document.body.appendChild(link)
-	link.click()
-	document.body.removeChild(link)
-	URL.revokeObjectURL(url)
-}

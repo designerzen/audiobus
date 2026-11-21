@@ -1,13 +1,11 @@
 /**
  * MED File Export Adapter
- * Converts AudioEvent recording to ProTracker MED format
+ * Converts a note recording to an OctaMED module with embedded instrument samples
  */
 
-import { MEDExporter } from "../formats/med/med-exporter.ts"
-import type RecorderAudioEvent from "../events/audio-event-recorder.ts"
-import type AudioEvent from "../models/audio-event.ts"
-import type { Timer } from "netronome"
-import { NOTE_ON } from "../commands/commands"
+import type { NoteRecording } from "../formats/note-sequence.ts"
+import type { TrackerExportOptions } from "../formats/tracker/tracker-types.ts"
+import { createTrackerModule } from "./adapter-tracker.ts"
 
 /**
  * Trigger MED file download in browser
@@ -28,39 +26,29 @@ export const saveMEDToLocalFileSystem = (buffer: ArrayBuffer, fileName: string) 
 }
 
 /**
- * Convert AudioEvent recording to MED format
+ * Convert a recording to MED format
  * @param recording - Recorded audio events
  * @param timer - Timer with BPM info
+ * @param options - Captured instrument timbres; missing ones are synthesised
  * @returns MED file buffer
  */
 export const createMEDFileFromAudioEventRecording = async (
-	recording: RecorderAudioEvent,
-	timer: Timer
+	recording: NoteRecording,
+	timer: { readonly BPM: number },
+	options?: TrackerExportOptions
 ): Promise<ArrayBuffer> => {
-	const BPM = timer.BPM
-	const data: AudioEvent[] = recording.exportData()
-
-	// Convert AudioEvent to IAudioCommand format
-	const commands = data.filter((event) => event.type === NOTE_ON)
-
-	// Export using MEDExporter
-	const exporter = new MEDExporter()
-	const buffer = exporter.encode(commands, {
-		filename: recording.name,
-		tempo: BPM,
-		title: recording.name
-	})
-
-	return buffer
+	const bytes = createTrackerModule(recording, timer, "med", options)
+	return bytes.buffer
 }
 
 /**
  * Synchronous wrapper for event handler
  */
 export const createAndDownloadMEDFile = async (
-	recording: RecorderAudioEvent,
-	timer: Timer
+	recording: NoteRecording,
+	timer: { readonly BPM: number },
+	options?: TrackerExportOptions
 ): Promise<void> => {
-	const buffer = await createMEDFileFromAudioEventRecording(recording, timer)
+	const buffer = await createMEDFileFromAudioEventRecording(recording, timer, options)
 	saveMEDToLocalFileSystem(buffer, recording.name)
 }

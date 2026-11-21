@@ -1,53 +1,10 @@
-import { Midi } from "@tonejs/midi"
-import type RecorderAudioEvent from "../events/audio-event-recorder"
-import type AudioEvent from "../models/audio-event"
-import type { Timer } from "netronome"
-import { NOTE_ON } from "../commands/commands"
+import { recordingMIDI } from "./adapter-interchange"
+import type { NoteRecording } from "../formats/note-sequence"
 
-export const saveBlobToLocalFileSystem = (blob: Blob, fileName: string) => {
-	const url = URL.createObjectURL(blob)
-	const a = document.createElement("a")
-	a.href = url
-	a.download = `${fileName}.midi` // Specify the file name
-
-	// Trigger the download
-	document.body.appendChild(a)
-	a.click()
-
-	// Clean up
-	document.body.removeChild(a)
-	URL.revokeObjectURL(url)
-}
-
-/**
- *
- * @param recording
- * @param timer
- */
 export const createMIDIFileFromAudioEventRecording = async (
-	recording: RecorderAudioEvent,
-	timer: Timer
+	recording: NoteRecording,
+	timer: { readonly BPM: number }
 ): Promise<Blob> => {
-	const BPM = timer.BPM
-	const data: AudioEvent[] = recording.exportData()
-
-	const midi = new Midi()
-	const track = midi.addTrack()
-
-	midi.header.name = recording.name
-	midi.header.setTempo(BPM)
-
-	data.forEach((command) => {
-		switch (command.type) {
-			case NOTE_ON:
-				track.addNote({
-					midi: command.noteNumber,
-					time: command.startAt,
-					duration: command.duration
-				})
-				break
-		}
-	})
-
-	return new Blob([new Uint8Array(midi.toArray()).buffer], { type: "application/octet-stream" })
+	const midi = recordingMIDI(recording, timer)
+	return new Blob([Uint8Array.from(midi.toArray()).buffer], { type: "audio/midi" })
 }

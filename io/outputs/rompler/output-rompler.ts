@@ -13,25 +13,59 @@ import { getAudioDestination } from "../../audio-destination"
 import { bounded, changed } from "../../device-controls"
 import { musicalCommand } from "../../event-clip"
 import {
+	HIGHEST_NOTE,
+	LOWEST_NOTE,
 	ROMPLER_HOST,
 	ROMPLER_SPACINGS,
 	isSustained,
+	presetFamily,
 	presetTitle,
 	sampleGrid,
 	sampleUrl
 } from "./rompler-catalogue"
-import { RomplerGui } from "./rompler-gui"
-import { RomplerLoader, type RomplerProgress } from "./rompler-loader"
+import { RomplerGui, type RomplerEntry, type RomplerView } from "./rompler-gui"
+import {
+	RomplerLoader,
+	streamTask,
+	toPCM,
+	type RomplerProgress,
+	type RomplerSample,
+	type RomplerTask
+} from "./rompler-loader"
+import {
+	STREAMED_SOURCE,
+	sourceName,
+	acquireSource,
+	rememberFile,
+	type SourceLease,
+	type RomplerSource
+} from "./rompler-source"
+import { decodeDataUrl, findPreset, waveData, type SoundFontBank } from "./soundfont-file"
 
 // A plain URL rather than a bundler-specific import, so Vite and Parcel both emit the worklet as its own file.
 const processorURL = new URL("./rompler.worklet.js", import.meta.url).href
 
 const registrations = new WeakMap<BaseAudioContext, Promise<void>>()
 
+const nearestIn = (keys: number[], note: number): number => {
+	let key = keys[0]
+	for (const candidate of keys) {
+		if (Math.abs(candidate - note) < Math.abs(key - note)) {
+			key = candidate
+		}
+	}
+	return key
+}
+
+const megabytes = (bytes: number) => (bytes / 1048576).toFixed(1)
+
 /**
  * General MIDI soundfont player. Nothing downloads until the output is
  * connected or played; samples then stream in around the notes in use and
  * play the moment they land, with gaps pitched from the nearest sample.
+ * It can instead play a whole soundfont file (.sf2, .sf3 or a MIDI.js
+ * pack) from a URL or from disk, preparing only the selected preset's
+ * samples, nearest to the notes in use first.
  */
 export default class Rompler extends EventTarget implements IAudioOutput {
 	readonly uuid = `Output-Rompler-${crypto.randomUUID()}`
@@ -43,6 +77,10 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 	readonly output: GainNode
 	readonly options: {
 		preset: number
+		// Bank of the preset within a soundfont file; 128 holds drum kits
+		bank: number
+		// URL or stored file to play instead of streaming OpenGM24; empty to stream
+		soundfont: string
 		baseUrl: string
 		spacing: number
 		volume: number
@@ -50,7 +88,7 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 		pitchBendRange: number
 	}
 	private readonly context: AudioContext
-	private readonly loader: RomplerLoader
+	private readonly loader: RomplerLoader<any>
 	private node?: AudioWorkletNode
 	private starting?: Promise<AudioWorkletNode>
 	private grid: number[] = []
@@ -65,6 +103,20 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 	private gui?: RomplerGui
 	// Keys of the current preset that have arrived, so a panel opened later can show them
 	private loadedNotes = new Set<number>()
+	private sampledNotes: number[] = []
+	private source: RomplerSource = STREAMED_SOURCE
+	private sourceKey = ""
+	private opening?: { key: string; lease: SourceLease }
+	// Hold on the soundfont file being played, shared with other Romplers playing it
+	private lease?: SourceLease
+	private downloaded?: { received: number; total: number }
+	private problem?: string
+	// Waves from the current bank that the worklet already holds
+	private sentWaves = new Set<number>()
+	private freshSource = false
+	// How the current source finds the jobs behind a key and hands over their results
+	private demand: (note: number) => number[] = (note) => [this.nearest(note)]
+	private deliver: (id: number, result: any) => void = () => {}
 
 	constructor(options: Record<string, any> = {}) {
 		super()
@@ -74,6 +126,8 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 		this.context = options.audioContext
 		this.options = {
 			preset: Math.round(bounded(options.preset, 0, 0, 127)),
+			bank: Math.round(bounded(options.bank, 0, 0, 16383)),
+			soundfont: typeof options.soundfont === "string" ? options.soundfont : "",
 			baseUrl:
 				typeof options.baseUrl === "string" && options.baseUrl.endsWith("/")
 					? options.baseUrl
@@ -88,20 +142,7 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 		this.output.gain.value = this.options.volume
 		this.output.connect(options.mixer ?? getAudioDestination(this.context))
 		this.loader = new RomplerLoader(
-			this.context,
-			(sample) => {
-				const { channels } = sample
-				this.loadedNotes.add(sample.note)
-				this.gui?.sampleLoaded(sample.note)
-				if (this.stale) {
-					this.stale = false
-					this.node?.port.postMessage({ type: "clear" })
-				}
-				this.node?.port.postMessage(
-					{ type: "sample", ...sample },
-					channels.map((channel) => channel.buffer)
-				)
-			},
+			(id, result) => this.deliver(id, result),
 			(progress) => {
 				this.progress = progress
 				this.renderStatus()
@@ -163,15 +204,177 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 		if (!this.node) {
 			return
 		}
-		const { baseUrl, preset, spacing } = this.options
-		this.stale = true
+		if (this.options.soundfont !== this.sourceKey) {
+			if (this.opening?.key !== this.options.soundfont) {
+				void this.open(this.options.soundfont)
+			}
+			return
+		}
 		this.loadedNotes.clear()
-		this.gui?.resetSamples(this.grid)
+		const source = this.source
+		if (source.kind === "bank") {
+			this.reloadBank(source.bank)
+			return
+		}
+		const { baseUrl, preset, spacing } = this.options
+		let keys = this.grid
+		if (source.kind === "pack") {
+			const notes = [...source.pack.keys()]
+			const spaced = notes.filter((note) => (note - 60) % spacing === 0)
+			keys = spaced.length ? spaced : notes
+		}
+		this.stale = true
+		this.sampledNotes = keys
+		this.gui?.resetSamples(keys)
+		this.demand = (note) => [nearestIn(keys, note)]
+		this.deliver = (_, sample: RomplerSample) => {
+			this.loadedNotes.add(sample.note)
+			this.gui?.sampleLoaded(sample.note)
+			if (this.stale) {
+				this.stale = false
+				this.sentWaves.clear()
+				this.post({ type: "clear" })
+			}
+			this.node?.port.postMessage(
+				{ type: "sample", ...sample },
+				sample.channels.map((channel) => channel.buffer)
+			)
+		}
+		const task: RomplerTask<RomplerSample> =
+			source.kind === "pack"
+				? async (note, signal) => {
+						const audio = await this.context.decodeAudioData(
+							decodeDataUrl(source.pack.get(note)!)
+						)
+						signal.throwIfAborted()
+						return { note, ...toPCM(audio, false) }
+					}
+				: streamTask(
+						this.context,
+						(note) => sampleUrl(baseUrl, preset, note),
+						isSustained(preset)
+					)
 		this.loader.load(
-			sampleGrid(spacing),
-			(note) => sampleUrl(baseUrl, preset, note),
-			isSustained(preset)
+			keys.map((note) => ({ id: note, key: note })),
+			task
 		)
+	}
+	/** Sends the preset's zones at once, then its waves nearest the notes in use first */
+	private reloadBank(bank: SoundFontBank): void {
+		const preset = bank.presets[findPreset(bank, this.options.preset, this.options.bank)]
+		const regions = preset?.regions ?? []
+		this.stale = false
+		if (this.freshSource) {
+			this.freshSource = false
+			this.post({ type: "clear" })
+		}
+		this.post({ type: "regions", regions })
+		const keysOf = new Map<number, number[]>()
+		const roots = new Map<number, number[]>()
+		for (const region of regions) {
+			const keys = keysOf.get(region.wave) ?? []
+			for (
+				let note = Math.max(LOWEST_NOTE, region.low);
+				note <= Math.min(HIGHEST_NOTE, region.high);
+				note++
+			) {
+				keys.push(note)
+			}
+			keysOf.set(region.wave, keys)
+			roots.set(region.wave, [...(roots.get(region.wave) ?? []), region.root])
+		}
+		for (const id of this.sentWaves) {
+			if (!keysOf.has(id)) {
+				this.sentWaves.delete(id)
+			}
+		}
+		this.sampledNotes = [...new Set([...keysOf.values()].flat())]
+		this.gui?.resetSamples(this.sampledNotes)
+		const loaded = (id: number) => {
+			for (const note of keysOf.get(id) ?? []) {
+				this.loadedNotes.add(note)
+				this.gui?.sampleLoaded(note)
+			}
+		}
+		this.sentWaves.forEach(loaded)
+		this.demand = (note) =>
+			regions.filter(({ low, high }) => note >= low && note <= high).map(({ wave }) => wave)
+		this.deliver = (id, wave: Awaited<ReturnType<typeof waveData>>) => {
+			this.sentWaves.add(id)
+			loaded(id)
+			this.node?.port.postMessage({ type: "wave", id, ...wave }, [wave.data.buffer])
+		}
+		this.loader.load(
+			[...roots]
+				.filter(([id]) => !this.sentWaves.has(id))
+				.map(([id, list]) => ({
+					id,
+					key: list.reduce((sum, root) => sum + root, 0) / list.length
+				})),
+			async (id, signal) => {
+				const wave = await waveData(bank, id, this.context)
+				signal.throwIfAborted()
+				return wave
+			}
+		)
+	}
+	/** Downloads or reads a soundfont file, keeping the current sounds until it is ready */
+	private async open(key: string): Promise<void> {
+		this.opening?.lease.release()
+		const lease = acquireSource(key, (received, total) => {
+			if (this.opening === opening) {
+				this.downloaded = { received, total }
+				this.renderStatus()
+			}
+		})
+		const opening = { key, lease }
+		this.opening = opening
+		this.problem = undefined
+		this.downloaded = { received: 0, total: 0 }
+		this.renderStatus()
+		let source: RomplerSource | undefined
+		try {
+			source = await lease.source
+		} catch (error) {
+			lease.release()
+			if (this.opening === opening) {
+				// Carry on with the sounds already loaded rather than falling silent
+				this.problem = `Could not open ${sourceName(key)}: ${error instanceof Error ? error.message : String(error)}`
+			}
+		}
+		if (this.opening !== opening || this.destroyed) {
+			return
+		}
+		this.opening = undefined
+		this.downloaded = undefined
+		this.sourceKey = key
+		if (source) {
+			this.lease?.release()
+			this.lease = lease
+			this.source = source
+			this.freshSource = true
+			this.sentWaves.clear()
+		}
+		this.gui?.setView(this.view())
+		this.reload()
+		this.renderStatus()
+	}
+	/** Plays a soundfont file from a URL, a file from disk, or streamed OpenGM24 when empty */
+	async setSoundFont(source: string | File): Promise<void> {
+		const key = typeof source === "string" ? source.trim() : await rememberFile(source)
+		if (key === this.options.soundfont && key === this.sourceKey) {
+			return
+		}
+		this.options.soundfont = key
+		this.options.bank = 0
+		this.problem = undefined
+		if (this.node) {
+			this.reload()
+		} else {
+			// Choosing a file is explicit, so it opens now rather than on the first note
+			void this.initialize().catch(() => {})
+		}
+		changed(this)
 	}
 	private nearest(note: number): number {
 		let key = this.grid[0]
@@ -182,15 +385,79 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 		}
 		return key
 	}
-	setPreset(preset: number): void {
+	setPreset(preset: number, bank = this.options.bank): void {
 		preset = Math.round(bounded(preset, this.options.preset, 0, 127))
-		if (preset === this.options.preset) {
+		if (preset === this.options.preset && bank === this.options.bank) {
 			return
 		}
 		this.options.preset = preset
-		this.gui?.setPreset(preset)
+		this.options.bank = bank
+		this.gui?.setSelected(this.selected())
 		this.reload()
 		changed(this)
+	}
+	/** The list entry the panel highlights: a GM program, or a preset of the open file */
+	private selected(): number {
+		const { source } = this
+		return source.kind === "bank"
+			? findPreset(source.bank, this.options.preset, this.options.bank)
+			: source.kind === "pack"
+				? 0
+				: this.options.preset
+	}
+	private select(id: number): void {
+		const { source } = this
+		if (source.kind === "bank") {
+			const preset = source.bank.presets[id]
+			if (preset) {
+				this.setPreset(preset.program, preset.bank)
+			}
+		} else if (source.kind === "stream") {
+			this.setPreset(id)
+		}
+	}
+	private step(offset: number): void {
+		const { source } = this
+		const count =
+			source.kind === "bank" ? source.bank.presets.length : source.kind === "pack" ? 1 : 128
+		this.select((this.selected() + offset + count) % count)
+	}
+	private view(): RomplerView {
+		const { source } = this
+		const entries: RomplerEntry[] | undefined =
+			source.kind === "bank"
+				? source.bank.presets.map((preset, id) => ({
+						id,
+						number: String(preset.program + 1).padStart(3, "0"),
+						label: preset.name,
+						category:
+							preset.bank >= 128
+								? "Drum kits"
+								: preset.bank
+									? `Bank ${preset.bank}`
+									: presetFamily(preset.program),
+						description: `Bank ${preset.bank}, program ${preset.program + 1}, ${preset.regions.length} zones`,
+						loops: preset.regions.some(({ loop }) => loop)
+					}))
+				: source.kind === "pack"
+					? [{ id: 0, number: "001", label: source.name, category: "MIDI.js pack" }]
+					: undefined
+		return {
+			kind: source.kind,
+			name: source.kind === "bank" ? `${source.name} · ${source.bank.name}` : source.name,
+			entries,
+			selected: this.selected(),
+			sampled: this.sampledNotes,
+			loaded: this.loadedNotes
+		}
+	}
+	private entryName(): string {
+		const { source } = this
+		return source.kind === "bank"
+			? (source.bank.presets[this.selected()]?.name ?? source.name)
+			: source.kind === "pack"
+				? source.name
+				: presetTitle(this.options.preset)
 	}
 	private configure(changes: Partial<Rompler["options"]>): void {
 		Object.assign(this.options, changes)
@@ -263,7 +530,7 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 			return
 		}
 		this.released.delete(`${channel}:${note}`)
-		this.loader.request(this.nearest(note))
+		this.loader.request(note, this.demand(note))
 		const node = this.node ?? (await this.initialize())
 		if (!this.isConnected) {
 			return
@@ -304,6 +571,9 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 			}
 			this.post({ type: "panic", channel })
 			this.gui?.clearPlaying()
+		} else if (controller === 0) {
+			// Bank select applies with the next program change
+			this.options.bank = Math.round(bounded(value, 0, 0, 127)) * 128
 		} else if (controller === 7 || controller === 11) {
 			;(controller === 7 ? this.volumes : this.expressions)[channel] =
 				bounded(value, 127, 0, 127) / 127
@@ -331,16 +601,25 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 			return
 		}
 		const { loaded, failed, total } = this.progress
-		const busy = !!this.node && loaded + failed < total
+		const opening = this.downloaded
+		const name = sourceName(this.options.soundfont)
+		const busy = !!opening || (!!this.node && loaded + failed < total)
 		this.gui.setStatus(
-			!this.node
-				? "Samples load when you play or press Play"
-				: busy
-					? `Loading ${presetTitle(this.options.preset)}: ${loaded} of ${total} samples`
-					: failed
-						? `${loaded} of ${total} samples loaded, ${failed} unavailable`
-						: `${presetTitle(this.options.preset)} ready`,
-			busy
+			opening
+				? opening.total
+					? `Downloading ${name}: ${megabytes(opening.received)} of ${megabytes(opening.total)} MB`
+					: `Opening ${name}${opening.received ? `: ${megabytes(opening.received)} MB` : ""}`
+				: this.problem
+					? this.problem
+					: !this.node
+						? "Samples load when you play or press Play"
+						: busy
+							? `Loading ${this.entryName()}: ${loaded} of ${total} samples`
+							: failed
+								? `${loaded} of ${total} samples loaded, ${failed} unavailable`
+								: `${this.entryName()} ready`,
+			busy,
+			!!this.problem
 		)
 	}
 	async createGui(): Promise<HTMLElement> {
@@ -350,7 +629,9 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 		this.gui = new RomplerGui(
 			this.options,
 			{
-				preset: (program) => this.setPreset(program),
+				select: (id) => this.select(id),
+				step: (offset) => this.step(offset),
+				open: (source) => void this.setSoundFont(source),
 				spacing: (spacing) => this.configure({ spacing }),
 				volume: (volume) => {
 					this.options.volume = volume
@@ -366,8 +647,7 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 				commit: () => changed(this),
 				audition: (note, on) => (on ? void this.noteOn(note) : this.noteOff(note))
 			},
-			this.loadedNotes,
-			this.grid
+			this.view()
 		)
 		this.renderStatus()
 		return this.gui.element
@@ -383,6 +663,8 @@ export default class Rompler extends EventTarget implements IAudioOutput {
 		this.destroyed = true
 		this.connected = false
 		this.loader.cancel()
+		this.opening?.lease.release()
+		this.lease?.release()
 		this.allNotesOff()
 		this.post({ type: "destroy" })
 		this.node?.disconnect()

@@ -1,7 +1,4 @@
-import type RecorderAudioEvent from "../events/audio-event-recorder.ts"
-import type AudioEvent from "../models/audio-event.ts"
-import type { Timer } from "netronome"
-import { NOTE_ON } from "../commands/commands.ts"
+import { recordingNotes, type NoteRecording } from "../formats/note-sequence"
 
 /**
  * Generates a Markdown representation of MIDI events with timing and note information
@@ -10,15 +7,13 @@ import { NOTE_ON } from "../commands/commands.ts"
  * @returns Markdown formatted string
  */
 export const createMIDIMarkdownFromAudioEventRecording = (
-	recording: RecorderAudioEvent,
-	timer: Timer
+	recording: NoteRecording,
+	timer: { readonly BPM: number }
 ): string => {
 	const BPM = timer.BPM
-	const data: AudioEvent[] = recording.exportData()
 	const duration: number = recording.duration
 
-	// Filter only NOTE_ON events
-	const notes = data.filter((event) => event.type === NOTE_ON)
+	const notes = recordingNotes(recording)
 
 	// Build markdown
 	let markdown = `# ${recording.name}\n\n`
@@ -31,30 +26,13 @@ export const createMIDIMarkdownFromAudioEventRecording = (
 	markdown += `|------|----------|------|--------|\n`
 
 	notes.forEach((note) => {
-		const timeStr = formatTime(note.startAt)
+		const timeStr = formatTime(note.start)
 		const durationStr = formatTime(note.duration)
-		const noteName = midiNumberToNoteName(note.noteNumber)
-		markdown += `| ${timeStr} | ${durationStr} | ${noteName} | ${note.noteNumber} |\n`
+		const noteName = midiNumberToNoteName(note.number)
+		markdown += `| ${timeStr} | ${durationStr} | ${noteName} | ${note.number} |\n`
 	})
 
 	return markdown
-}
-
-/**
- * Saves markdown content to local file system as download
- */
-export const saveMarkdownToLocalFileSystem = (content: string, fileName: string) => {
-	const blob = new Blob([content], { type: "text/markdown;charset=utf-8" })
-	const url = URL.createObjectURL(blob)
-	const a = document.createElement("a")
-	a.href = url
-	a.download = `${fileName}.md`
-
-	document.body.appendChild(a)
-	a.click()
-
-	document.body.removeChild(a)
-	URL.revokeObjectURL(url)
 }
 
 /**

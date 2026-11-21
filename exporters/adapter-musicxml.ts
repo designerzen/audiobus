@@ -80,14 +80,3 @@ export async function createMXLFromAudioEventRecording(
 		type: "application/vnd.recordare.musicxml"
 	})
 }
-
-export function saveBlobToLocalFileSystem(blob: Blob, fileName: string) {
-	const url = URL.createObjectURL(blob),
-		link = document.createElement("a")
-	link.href = url
-	link.download = `${fileName}.musicxml`
-	document.body.append(link)
-	link.click()
-	link.remove()
-	URL.revokeObjectURL(url)
-}

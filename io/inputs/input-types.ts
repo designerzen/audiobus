@@ -81,3 +81,4 @@ export const NOTE_SLIDER = "note-slider" as const
 export const NOTE_DIAL = "note-dial" as const
 export const AUDIO_SWITCH = "audio-switch" as const
 export const PIANO_ROLL = "piano-roll" as const
+export const STRUM_STRINGS = "strum-strings" as const

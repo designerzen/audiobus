@@ -4,6 +4,9 @@ import { NOTE_ON, NOTE_OFF } from "../commands/commands"
 
 export type NoteRecording = Pick<RecorderAudioEvent, "events" | "duration" | "name">
 export interface SequenceNote {
+	source?: string
+	/** IO chain that played the note, which identifies its timbre */
+	chainId?: string
 	number: number
 	channel: number
 	patch: number
@@ -26,7 +29,10 @@ export const escapeXML = (value: string) =>
 /** Pair notes by source, chain, input, channel and pitch; never mutate the recorder.
  * Recording timestamps use the audio clock. Export starts at the first recorded note.
  */
-export function recordingNotes(recording: NoteRecording): SequenceNote[] {
+export function recordingNotes(
+	recording: NoteRecording,
+	options: { sources?: boolean; chains?: boolean } = {}
+): SequenceNote[] {
 	const pending = new Map<string, IAudioCommand[]>()
 	const completed: { event: IAudioCommand; end: number }[] = []
 	const events: IAudioCommand[] = recording.events
@@ -73,6 +79,8 @@ export function recordingNotes(recording: NoteRecording): SequenceNote[] {
 	return completed
 		.filter(({ event, end }) => end > event.startAt)
 		.map(({ event, end }) => ({
+			...(options.sources && event.from ? { source: event.from } : {}),
+			...(options.chains && event.chainId ? { chainId: event.chainId } : {}),
 			number: event.number,
 			channel:
 				Number.isInteger(event.channel) && event.channel >= 1 && event.channel <= 16

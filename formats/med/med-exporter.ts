@@ -1,367 +1,183 @@
 /**
- * MED Format Exporter - ProTracker MED File Generation
- * On-demand client-side export (not a real-time audio output)
- *
- * Usage:
- * const exporter = new MEDExporter()
- * const buffer = exporter.encode(audioRecording, options)
- * exporter.downloadFile(buffer, 'song.med')
+ * OctaMED MMD1 module writer
+ * Big-endian Amiga layout: 4-byte notes, up to 64 tracks, 8-bit instruments, names in the
+ * expansion data. The playback tempo is stored in BPM mode with four lines per beat.
  */
 
-import type { IAudioCommand } from "../../commands/audio-command-interface.js"
+import { ByteWriter, trackerName } from "../tracker/tracker-bytes"
+import { buildPatterns } from "../tracker/tracker-grid"
+import { resampleSample, toInt8 } from "../tracker/tracker-samples"
+import type { TrackerFormatSpec, TrackerSong } from "../tracker/tracker-types"
 
-export interface MEDExportOptions {
-	filename?: string
-	tempo?: number
-	masterVolume?: number
-	artist?: string
-	title?: string
+/** Samples are stored near this rate and tuned with the instrument's transpose */
+const MED_TARGET_RATE = 16726
+/** The rate a PAL Amiga plays period 428, which libopenmpt plays an unshifted sample at on MIDI 60 */
+const MED_BASE_RATE = 3546894.6 / 428
+const MED_REFERENCE_NOTE = 60
+/** libopenmpt clamps MED playback to this rate (about period 143), so a sample must be stored
+ * low enough that its highest note stays under it
+ */
+const MED_MAX_PLAY_RATE = 24800
+/** Note byte 1 is MIDI 0; libopenmpt reports byte n as note n + 48 + the song transpose of -48 */
+const MED_PLAY_TRANSPOSE = -48
+
+/** Note bytes run 1..127, so MIDI 0..126 are playable and 127 is octave-folded */
+export const MED_SPEC: TrackerFormatSpec = {
+	id: "med",
+	label: "OctaMED module",
+	minChannels: 4,
+	maxChannels: 64,
+	channelStep: 1,
+	maxInstruments: 63,
+	maxOrders: 256,
+	noteRange: [0, 126],
+	minTempo: 32,
+	maxTempo: 255,
+	maxSpeed: 31
 }
 
-/**
- * Pure TypeScript MED file encoder
- * Implements ProTracker MED format v4.10 for browser export
+const SONG_FLAG_VOLHEX = 0x10
+const SONG_FLAG2_BPM = 0x20
+const LINES_PER_BEAT = 4
+const SET_VOLUME = 0x0c
+const HEADER_SIZE = 52
+const SONG_SIZE = 788
+const EXPANSION_SIZE = 84
+const INSTRUMENT_NAME_SIZE = 40
+
+/** Semitone transpose for a sample. An unshifted sample plays at its stored rate on MIDI 60 and each
+ * semitone of transpose raises it one, so the transpose both picks the stored rate and keeps the base
+ * note in tune. The rate is as near MED_TARGET_RATE as the highest note it plays allows.
  */
-class MEDEncoder {
-	// Static constants
-	static readonly HEADER = "MED "
-	static readonly VERSION = 0x0410
-	static readonly DEFAULT_TEMPO = 125
-	static readonly DEFAULT_ROWS = 64
-	static readonly NUM_INSTRUMENTS = 32
+export function medTranspose(baseNote: number, highestNote: number) {
+	const wanted = 12 * Math.log2(MED_TARGET_RATE / MED_BASE_RATE) - (baseNote - MED_REFERENCE_NOTE)
+	const limit =
+		12 * Math.log2(MED_MAX_PLAY_RATE / MED_BASE_RATE) - (highestNote - MED_REFERENCE_NOTE)
+	return Math.max(-128, Math.min(127, Math.min(Math.round(wanted), Math.floor(limit))))
+}
 
-	private buffer: Uint8Array = new Uint8Array(0)
-	private bufferView: DataView | null = null
-	private position = 0
-
-	/**
-	 * Encode audio commands to MED format
-	 */
-	encode(commands: IAudioCommand[], options: MEDExportOptions = {}): ArrayBuffer {
-		this.buffer = new Uint8Array(65536) // Start with 64KB
-		this.bufferView = new DataView(this.buffer.buffer, 0, 65536)
-		this.position = 0
-
-		// Write header
-		this.writeHeader()
-
-		// Write MHDR chunk
-		this.writeMHDRChunk(options)
-
-		// Write INST chunk
-		this.writeINSTChunk()
-
-		// Write SEQU chunk (sequence structure)
-		this.writeSEQUChunk()
-
-		// Write TRKD chunk (track data from commands)
-		this.writeTRKDChunk(commands)
-
-		// Return only the portion of buffer that was written
-		return this.buffer.slice(0, this.position).buffer
-	}
-
-	private writeHeader(): void {
-		// Write "MED " identifier
-		this.writeString("MED ")
-	}
-
-	private writeMHDRChunk(options: MEDExportOptions): void {
-		this.writeChunkHeader("MHDR", 0x2c) // MHDR is 44 bytes fixed
-
-		// Version
-		this.writeUint32LE(MEDEncoder.VERSION)
-
-		// Flags (0 = standard MED)
-		this.writeUint32LE(0)
-
-		// Number of instruments
-		this.writeUint32LE(MEDEncoder.NUM_INSTRUMENTS)
-
-		// Number of samples
-		this.writeUint32LE(0)
-
-		// Number of patterns
-		this.writeUint32LE(1)
-
-		// Number of tracks
-		this.writeUint32LE(4)
-
-		// Channel mode (1 = stereo)
-		this.writeUint16LE(1)
-
-		// Master volume (0-255)
-		this.writeUint16LE(options.masterVolume || 255)
-
-		// Master tempo (default 125 BPM)
-		this.writeUint16LE(options.tempo || MEDEncoder.DEFAULT_TEMPO)
-
-		// Number of rows per pattern
-		this.writeUint8(MEDEncoder.DEFAULT_ROWS)
-
-		// Compression (0 = no compression)
-		this.writeUint8(0)
-
-		// Master pitch
-		this.writeUint32LE(0)
-
-		// Flags (optional features)
-		this.writeUint16LE(0)
-
-		// Reserved
-		this.writeUint8(0)
-		this.writeUint8(0)
-	}
-
-	private writeINSTChunk(): void {
-		const instSize = MEDEncoder.NUM_INSTRUMENTS * 32
-		this.writeChunkHeader("INST", instSize)
-
-		for (let i = 0; i < MEDEncoder.NUM_INSTRUMENTS; i++) {
-			// Sample length
-			this.writeUint32LE(0)
-
-			// Finetune (cents)
-			this.writeInt16LE(0)
-
-			// Volume (0-255)
-			this.writeUint8(64)
-
-			// Sample mode
-			this.writeUint8(0)
-
-			// Middle note (C-4 = 60)
-			this.writeUint8(60)
-
-			// Pad
-			this.writeUint8(0)
-
-			// Sample offset
-			this.writeUint32LE(0)
-
-			// Loop start
-			this.writeUint32LE(0)
-
-			// Loop length
-			this.writeUint32LE(0)
-
-			// Attribute flags
-			this.writeUint16LE(0)
-
-			// Reserved
-			this.writeUint16LE(0)
-		}
-	}
-
-	private writeSEQUChunk(): void {
-		const seqSize = 128
-		this.writeChunkHeader("SEQU", seqSize)
-
-		// Pattern sequence (simple linear sequence)
-		for (let i = 0; i < 32; i++) {
-			this.writeUint8(i === 0 ? 0 : 255) // Only pattern 0, rest empty
-		}
-
-		// Reserved
-		for (let i = 32; i < seqSize; i++) {
-			this.writeUint8(0)
-		}
-	}
-
-	private writeTRKDChunk(commands: IAudioCommand[]): void {
-		const trackData = this.encodeTrackData(commands)
-		this.writeChunkHeader("TRKD", trackData.length)
-		this.writeBytes(trackData)
-	}
-
-	private encodeTrackData(commands: IAudioCommand[]): Uint8Array {
-		const data: number[] = []
-		let currentNote = 0
-		let currentInstrument = 1
-
-		for (const command of commands) {
-			if (command.type === "NOTE_ON") {
-				// Use the note number from the command
-				const note = command.number || 0
-
-				currentNote = note
-				currentInstrument = 1
-
-				// Encode note: [note][instrument][effect]
-				data.push(note & 0x7f)
-				data.push(currentInstrument & 0x3f)
-				data.push(0) // Effect placeholder
-				data.push(0) // Effect data
-			} else if (command.type === "NOTE_OFF") {
-				// Note off (0x00)
-				data.push(0)
-				data.push(0)
-				data.push(0)
-				data.push(0)
-			} else if (command.type === "CONTROL_CHANGE") {
-				// Use value field for the control value (MIDI standard)
-				const controller = command.value || 0
-				const value = command.velocity || 0
-
-				// Map CC to MED effects
-				data.push(currentNote)
-				data.push(currentInstrument)
-				data.push(0x0f) // Effect: parameter
-				data.push((controller << 4) | (value & 0x0f))
+export function writeMED(song: TrackerSong): Uint8Array<ArrayBuffer> {
+	const { patterns, order } = buildPatterns(song, MED_SPEC, false)
+	const instrumentCount = song.instruments.length
+	const highest = song.instruments.map((instrument) => instrument.sample.baseNote)
+	for (const line of song.cells) {
+		for (const cell of line) {
+			if (cell && !cell.off) {
+				highest[cell.instrument - 1] = Math.max(highest[cell.instrument - 1], cell.note)
 			}
 		}
-
-		return new Uint8Array(data)
 	}
+	const stored = song.instruments.map((instrument, index) => {
+		const transpose = medTranspose(instrument.sample.baseNote, highest[index])
+		// The stored rate that makes the base note sound at its own pitch under that transpose
+		const rate =
+			MED_BASE_RATE *
+			2 ** ((instrument.sample.baseNote - MED_REFERENCE_NOTE + transpose) / 12)
+		return { transpose, sample: resampleSample(instrument.sample, rate, true) }
+	})
 
-	private writeChunkHeader(id: string, size: number): void {
-		this.writeString(id)
-		this.writeUint32LE(size)
-	}
-
-	private writeString(str: string): void {
-		for (let i = 0; i < str.length; i++) {
-			this.writeUint8(str.charCodeAt(i))
+	const out = new ByteWriter()
+	out.zeros(HEADER_SIZE + SONG_SIZE)
+	const blockTable = out.length
+	out.zeros(patterns.length * 4)
+	const blockOffsets = patterns.map((pattern) => {
+		const offset = out.length
+		out.u16be(song.channels)
+			.u16be(pattern.rows - 1)
+			.u32be(0)
+		for (let row = 0; row < pattern.rows; row++) {
+			const line = pattern.cells[row] ?? []
+			for (let channel = 0; channel < song.channels; channel++) {
+				const cell = line[channel]
+				if (!cell) {
+					out.u32be(0)
+				} else if (cell.off) {
+					out.u8(0).u8(0).u8(SET_VOLUME).u8(0)
+				} else {
+					out.u8(cell.note + 1)
+						.u8(cell.instrument)
+						.u8(SET_VOLUME)
+						.u8(cell.volume)
+				}
+			}
 		}
-	}
+		return offset
+	})
+	blockOffsets.forEach((offset, index) => out.patch32be(blockTable + index * 4, offset))
 
-	private writeBytes(data: Uint8Array | number[]): void {
-		for (const byte of data) {
-			this.writeUint8(byte)
+	const sampleTable = out.length
+	out.zeros(instrumentCount * 4)
+	stored.forEach(({ sample }, index) => {
+		out.patch32be(sampleTable + index * 4, out.length)
+		const pcm = toInt8(sample.data)
+		out.u32be(pcm.length + (pcm.length % 2)).u16be(0)
+		for (let i = 0; i < pcm.length; i++) {
+			out.u8(pcm[i])
 		}
-	}
+		out.align(2)
+	})
 
-	private writeUint8(value: number): void {
-		if (this.bufferView) {
-			this.bufferView.setUint8(this.position, value & 0xff)
-		} else {
-			// Fallback: write directly to Uint8Array
-			this.buffer[this.position] = value & 0xff
-		}
-		this.position++
+	out.align(4)
+	const expansion = out.length
+	out.zeros(EXPANSION_SIZE)
+	const instrumentInfo = out.length
+	for (const instrument of song.instruments) {
+		out.text(trackerName(instrument.name, INSTRUMENT_NAME_SIZE - 1), INSTRUMENT_NAME_SIZE)
 	}
+	const songName = out.length
+	const title = trackerName(song.title, 63)
+	out.text(title, title.length + 1)
+	out.align(4)
 
-	private writeInt16LE(value: number): void {
-		if (this.bufferView) {
-			this.bufferView.setInt16(this.position, value, true)
-		} else {
-			// Fallback: write directly to Uint8Array
-			this.buffer[this.position] = value & 0xff
-			this.buffer[this.position + 1] = (value >>> 8) & 0xff
-		}
-		this.position += 2
-	}
+	// Expansion data: instrument names and the song name
+	const exp = new ByteWriter()
+	exp.u32be(0).u32be(0).u16be(0).u16be(0)
+	exp.u32be(0).u32be(0)
+	exp.u32be(instrumentInfo).u16be(instrumentCount).u16be(INSTRUMENT_NAME_SIZE)
+	exp.u32be(0).u32be(0).zeros(4).u32be(0)
+	exp.u32be(songName).u32be(title.length + 1)
+	exp.u32be(0).u32be(0).u32be(0).u32be(0).zeros(12).u32be(0)
+	out.patchBytes(expansion, exp.toUint8Array())
 
-	private writeUint16LE(value: number): void {
-		if (this.bufferView) {
-			this.bufferView.setUint16(this.position, value & 0xffff, true)
-		} else {
-			// Fallback: write directly to Uint8Array
-			this.buffer[this.position] = value & 0xff
-			this.buffer[this.position + 1] = (value >>> 8) & 0xff
-		}
-		this.position += 2
-	}
+	// File header, then the song structure
+	const head = new ByteWriter()
+	head.text("MMD1", 4).u32be(out.length).u32be(HEADER_SIZE)
+	head.u16be(0).u16be(0)
+	head.u32be(blockTable).u32be(0)
+	head.u32be(sampleTable).u32be(0).u32be(expansion).u32be(0)
+	head.u16be(0).u16be(0).u16be(0).u16be(0).u16be(0).u8(0).u8(0)
+	out.patchBytes(0, head.toUint8Array())
 
-	private writeUint32LE(value: number): void {
-		if (this.bufferView) {
-			this.bufferView.setUint32(this.position, value >>> 0, true)
-		} else {
-			// Fallback: write directly to Uint8Array
-			this.buffer[this.position] = value & 0xff
-			this.buffer[this.position + 1] = (value >>> 8) & 0xff
-			this.buffer[this.position + 2] = (value >>> 16) & 0xff
-			this.buffer[this.position + 3] = (value >>> 24) & 0xff
+	const songHead = new ByteWriter()
+	for (let index = 0; index < 63; index++) {
+		const entry = stored[index]
+		if (!entry) {
+			songHead.u16be(0).u16be(1).u8(0).u8(0).u8(0).u8(0)
+			continue
 		}
-		this.position += 4
+		const { sample, transpose } = entry
+		const looped = sample.loopStart !== undefined && sample.loopLength !== undefined
+		songHead.u16be(looped ? Math.floor(sample.loopStart! / 2) : 0)
+		songHead.u16be(looped ? Math.max(2, Math.floor(sample.loopLength! / 2)) : 1)
+		songHead
+			.u8(0)
+			.u8(0)
+			.u8(64)
+			.u8(transpose & 0xff)
 	}
+	songHead.u16be(patterns.length).u16be(order.length)
+	for (let i = 0; i < 256; i++) {
+		songHead.u8(order[i] ?? 0)
+	}
+	songHead
+		.u16be(song.tempo)
+		.u8(MED_PLAY_TRANSPOSE & 0xff)
+		.u8(SONG_FLAG_VOLHEX)
+	songHead.u8(SONG_FLAG2_BPM | (LINES_PER_BEAT - 1)).u8(song.speed)
+	for (let track = 0; track < 16; track++) {
+		songHead.u8(64)
+	}
+	songHead.u8(64).u8(instrumentCount)
+	out.patchBytes(HEADER_SIZE, songHead.toUint8Array())
+	return out.toUint8Array()
 }
-
-/**
- * MEDExporter - On-demand file export (not a real-time audio output)
- *
- * Triggered only by user action (export button click)
- */
-export class MEDExporter {
-	private encoder = new MEDEncoder()
-
-	/**
-	 * Encode audio commands to MED binary format (returns raw buffer, no download)
-	 */
-	encode(commands: IAudioCommand[], options: MEDExportOptions = {}): ArrayBuffer {
-		return this.encoder.encode(commands, options)
-	}
-
-	/**
-	 * Export audio commands to MED format and trigger download
-	 */
-	async export(
-		commands: IAudioCommand[],
-		filename: string = "export.med",
-		options: MEDExportOptions = {}
-	): Promise<boolean> {
-		try {
-			const buffer = this.encoder.encode(commands, options)
-			this.downloadFile(buffer, filename)
-			return true
-		} catch (error) {
-			console.error("MED export error:", error)
-			return false
-		}
-	}
-
-	/**
-	 * Export with metadata (title and artist)
-	 */
-	async exportWithMetadata(
-		commands: IAudioCommand[],
-		filename: string,
-		title: string,
-		artist: string,
-		options: MEDExportOptions = {}
-	): Promise<boolean> {
-		return this.export(commands, filename, {
-			...options,
-			title,
-			artist
-		})
-	}
-
-	/**
-	 * Get format capabilities and constraints
-	 */
-	getCapabilities(): Record<string, any> {
-		return {
-			medVersion: "4.10",
-			maxInstruments: 32,
-			maxPatterns: 128,
-			maxTracks: 16,
-			patternLines: 64,
-			isClientSide: true,
-			supportsMetadata: true,
-			description: "ProTracker MED Format"
-		}
-	}
-
-	/**
-	 * Trigger browser file download
-	 */
-	private downloadFile(buffer: ArrayBuffer, filename: string): void {
-		const blob = new Blob([buffer], { type: "application/octet-stream" })
-		const url = URL.createObjectURL(blob)
-
-		const link = document.createElement("a")
-		link.href = url
-		link.download = filename
-		link.style.display = "none"
-
-		document.body.appendChild(link)
-		link.click()
-		document.body.removeChild(link)
-
-		// Clean up the object URL
-		URL.revokeObjectURL(url)
-	}
-}
-
-export default MEDExporter

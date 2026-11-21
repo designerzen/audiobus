@@ -406,21 +406,6 @@ export const createVexFlowHTMLFromAudioEventRecording = async (
 }
 
 /**
- * Download blob as file
- */
-export const saveBlobToLocalFileSystem = (blob: Blob, fileName: string) => {
-	const url = URL.createObjectURL(blob)
-	const a = document.createElement("a")
-	a.href = url
-	a.download = `${fileName}.html`
-
-	document.body.appendChild(a)
-	a.click()
-	document.body.removeChild(a)
-	URL.revokeObjectURL(url)
-}
-
-/**
  * Escape special HTML characters
  */
 function escapeHtml(str: string): string {

@@ -19,23 +19,24 @@ export const INTERCHANGE_EXPORT_FORMATS = [
 	{ id: "ustx", label: "OpenUtau note project", extension: "ustx" },
 	{ id: "ufdata", label: "UtaFormatix data", extension: "ufdata" },
 	{ id: "lmms", label: "LMMS note project", extension: "mmp" },
-	{ id: "lmms-compressed", label: "Compressed LMMS note project", extension: "mmpz" }
+	{ id: "lmms-compressed", label: "Compressed LMMS note project", extension: "mmpz" },
+	{ id: "reaper", label: "REAPER MIDI project", extension: "rpp" }
 ] as const
 export type InterchangeExportId = (typeof INTERCHANGE_EXPORT_FORMATS)[number]["id"]
 
-function recordingMIDI(recording: NoteRecording, timer: { readonly BPM: number }) {
+export function recordingMIDI(recording: NoteRecording, timer: { readonly BPM: number }) {
 	const midi = new Midi()
 	midi.header.name = recording.name
 	midi.header.setTempo(exportTempo(timer))
 	const tracks = new Map<string, ReturnType<Midi["addTrack"]>>()
-	for (const note of recordingNotes(recording)) {
+	for (const note of recordingNotes(recording, { sources: true })) {
 		const key = `${note.channel}:${note.patch}`
 		let track = tracks.get(key)
 		if (!track) {
 			track = midi.addTrack()
 			track.channel = note.channel - 1
 			track.instrument.number = note.patch
-			track.name = `${recording.name} ${note.channel}`
+			track.name = `${note.source ?? recording.name} ${note.channel}`
 			tracks.set(key, track)
 		}
 		track.addNote({
@@ -286,6 +287,16 @@ export async function exportInterchangeRecording(
 	format: InterchangeExportId
 ): Promise<Blob> {
 	switch (format) {
+		case "reaper":
+			return new Blob(
+				[
+					(await import("./adapter-reaper")).createReaperFromAudioEventRecording(
+						recording,
+						timer
+					)
+				],
+				{ type: "text/plain;charset=utf-8" }
+			)
 		case "svp":
 		case "ustx":
 		case "ufdata":

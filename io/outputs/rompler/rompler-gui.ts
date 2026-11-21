@@ -1,12 +1,16 @@
 import {
 	EVENT_CHANGE,
 	EVENT_CLICK,
+	EVENT_DRAG_LEAVE,
+	EVENT_DRAG_OVER,
+	EVENT_DROP,
 	EVENT_INPUT,
 	EVENT_KEY_DOWN,
 	EVENT_KEY_UP,
 	EVENT_POINTER_CANCEL,
 	EVENT_POINTER_DOWN,
-	EVENT_POINTER_UP
+	EVENT_POINTER_UP,
+	EVENT_SUBMIT
 } from "../../../events/event-constants"
 import {
 	HIGHEST_NOTE,
@@ -18,10 +22,13 @@ import {
 	noteName,
 	type RomplerInstrument
 } from "./rompler-catalogue"
+import { SOUNDFONT_EXTENSIONS, storedFile } from "./rompler-source"
+import { ROMPLER_SOUNDFONTS, formatSize, soundFontEntry } from "./rompler-soundfonts"
 import "./rompler-gui.css"
 
 export interface RomplerSettings {
 	preset: number
+	soundfont: string
 	baseUrl: string
 	spacing: number
 	volume: number
@@ -31,7 +38,10 @@ export interface RomplerSettings {
 
 /** What the panel asks of its Rompler; sliders apply while dragging and commit once released */
 export interface RomplerActions {
-	preset(program: number): void
+	select(id: number): void
+	step(offset: number): void
+	// A URL or file to play, or an empty string to stream OpenGM24
+	open(source: string | File): void
 	spacing(spacing: number): void
 	volume(volume: number): void
 	release(seconds: number): void
@@ -55,16 +65,49 @@ const element = <K extends keyof HTMLElementTagNameMap>(
 	return node
 }
 
+/** One choice in the instrument list: a General MIDI program or a preset of a soundfont file */
+export interface RomplerEntry {
+	id: number
+	number: string
+	label: string
+	category: string
+	description?: string
+	commonUses?: string[]
+	alternateNames?: string[]
+	source?: string
+	license?: string
+	loops?: boolean
+}
+
+/** What the Rompler is playing from, for the panel to show */
+export interface RomplerView {
+	kind: "stream" | "bank" | "pack"
+	name: string
+	// Omitted while streaming, where the panel lists the OpenGM24 catalogue
+	entries?: RomplerEntry[]
+	selected: number
+	sampled: number[]
+	loaded: Iterable<number>
+}
+
 const pad = (program: number) => String(program + 1).padStart(3, "0")
 
-const matches = (instrument: RomplerInstrument, query: string) =>
+const fromCatalogue = (instruments: RomplerInstrument[]): RomplerEntry[] =>
+	instruments.map((instrument) => ({
+		...instrument,
+		id: instrument.program,
+		number: pad(instrument.program),
+		loops: isSustained(instrument.program)
+	}))
+
+const matches = (entry: RomplerEntry, query: string) =>
 	!query ||
 	[
-		pad(instrument.program),
-		instrument.label,
-		instrument.category,
-		...(instrument.alternateNames ?? []),
-		...(instrument.commonUses ?? [])
+		entry.number,
+		entry.label,
+		entry.category,
+		...(entry.alternateNames ?? []),
+		...(entry.commonUses ?? [])
 	].some((text) => text.toLowerCase().includes(query))
 
 /**
@@ -74,7 +117,9 @@ const matches = (instrument: RomplerInstrument, query: string) =>
  */
 export class RomplerGui {
 	readonly element = element("section", "rompler nodrag nopan nowheel")
-	private instruments = fallbackCatalogue()
+	private catalogue = fromCatalogue(fallbackCatalogue())
+	private entries = this.catalogue
+	private view: RomplerView
 	private category = ""
 	private query = ""
 	private readonly screen = element("div", "rompler-screen")
@@ -84,6 +129,11 @@ export class RomplerGui {
 	private readonly about = element("p", "rompler-about")
 	private readonly uses = element("ul", "rompler-uses")
 	private readonly status = element("output", "rompler-status")
+	private readonly soundfont = element("span", "rompler-soundfont")
+	private readonly current = element("button", "rompler-current")
+	private readonly library = element("div", "rompler-library")
+	private readonly cards = new Map<string, HTMLButtonElement>()
+	private readonly density = element("div", "rompler-density")
 	private readonly credit = element("small", "rompler-credit")
 	private readonly categories = element("div", "rompler-categories")
 	private readonly list = element("div", "rompler-list")
@@ -96,34 +146,164 @@ export class RomplerGui {
 	constructor(
 		private readonly settings: RomplerSettings,
 		private readonly actions: RomplerActions,
-		loaded: Iterable<number>,
-		grid: number[]
+		view: RomplerView
 	) {
+		this.view = view
 		this.status.setAttribute("aria-live", "polite")
 		this.element.setAttribute("aria-label", "Rompler")
 		this.element.append(
 			this.header(),
+			this.sources(),
 			this.front(),
 			this.browser(),
 			this.controls(),
 			this.credit
 		)
-		this.resetSamples(grid)
-		for (const note of loaded) {
-			this.sampleLoaded(note)
-		}
-		this.render()
+		this.dropTarget()
+		this.setView(view)
 		void loadCatalogue(settings.baseUrl).then((instruments) => {
-			this.instruments = instruments
-			this.render()
+			this.catalogue = fromCatalogue(instruments)
+			if (!this.view.entries) {
+				this.entries = this.catalogue
+				this.render()
+			}
 		})
 	}
 
 	private header(): HTMLElement {
 		const header = element("header")
 		const brand = element("strong", "rompler-brand", "Rompler")
-		header.append(brand, element("span", "rompler-soundfont", "OpenGM24 · General MIDI"))
+		header.append(brand, this.soundfont)
 		return header
+	}
+
+	/** Pick a soundfont from the collection, or open a .sf2, .sf3 or MIDI.js file from disk or a URL */
+	private sources(): HTMLElement {
+		const button = (text: string, className = "") => {
+			const item = element("button", className, text)
+			item.type = "button"
+			return item
+		}
+		const picker = element("input")
+		picker.type = "file"
+		picker.accept = SOUNDFONT_EXTENSIONS
+		picker.hidden = true
+		picker.addEventListener(EVENT_CHANGE, () => {
+			const file = picker.files?.[0]
+			if (file) {
+				this.actions.open(file)
+				this.showLibrary(false)
+			}
+			picker.value = ""
+		})
+		const file = button("Open file…")
+		file.title =
+			"SoundFont 2 or 3 (.sf2, .sf3) or a MIDI.js pack (.js, .json); you can also drop one here"
+		file.addEventListener(EVENT_CLICK, () => picker.click())
+
+		const form = element("form", "rompler-url")
+		const url = element("input")
+		url.type = "url"
+		url.required = true
+		url.placeholder = "https://example.com/soundfont.sf2"
+		url.setAttribute("aria-label", "Soundfont URL")
+		const load = button("Load")
+		load.type = "submit"
+		form.hidden = true
+		form.append(url, load)
+		form.addEventListener(EVENT_SUBMIT, (event) => {
+			event.preventDefault()
+			this.actions.open(url.value)
+			form.hidden = true
+			link.setAttribute("aria-expanded", "false")
+			this.showLibrary(false)
+		})
+		const link = button("From URL")
+		link.setAttribute("aria-expanded", "false")
+		link.addEventListener(EVENT_CLICK, () => {
+			form.hidden = !form.hidden
+			link.setAttribute("aria-expanded", String(!form.hidden))
+			if (!form.hidden) {
+				url.value = this.settings.soundfont.startsWith("http")
+					? this.settings.soundfont
+					: ""
+				url.focus()
+			}
+		})
+
+		const cards = element("div", "rompler-cards")
+		cards.setAttribute("role", "group")
+		cards.setAttribute("aria-label", "Soundfonts")
+		for (const soundfont of ROMPLER_SOUNDFONTS) {
+			const card = button("", "rompler-card")
+			const detail = [
+				soundfont.format,
+				soundfont.size ? formatSize(soundfont.size) : "",
+				soundfont.license
+			]
+				.filter(Boolean)
+				.join(" · ")
+			card.title = `${soundfont.name} by ${soundfont.author}`
+			card.append(
+				element("strong", "", soundfont.name),
+				element("span", "rompler-card-detail", detail),
+				element("span", "rompler-card-about", soundfont.description)
+			)
+			card.addEventListener(EVENT_CLICK, () => {
+				this.actions.open(soundfont.url)
+				this.showLibrary(false)
+			})
+			this.cards.set(soundfont.url, card)
+			cards.append(card)
+		}
+		const files = element("div", "rompler-files")
+		files.append(file, link, picker)
+		this.library.hidden = true
+		this.library.append(cards, files, form)
+
+		this.current.type = "button"
+		this.current.setAttribute("aria-expanded", "false")
+		this.current.addEventListener(EVENT_CLICK, () => this.showLibrary(this.library.hidden))
+		const wrapper = element("div", "rompler-source")
+		wrapper.append(this.current, this.library)
+		return wrapper
+	}
+
+	private showLibrary(open: boolean): void {
+		this.library.hidden = !open
+		this.current.setAttribute("aria-expanded", String(open))
+		if (open) {
+			// Marks soundfonts already kept in this browser, which open without downloading
+			for (const [url, card] of this.cards) {
+				if (url) {
+					void storedFile(url).then((file) => card.classList.toggle("saved", !!file))
+				}
+			}
+		}
+	}
+
+	private dropTarget(): void {
+		const dragging = (event: DragEvent) => !!event.dataTransfer?.types.includes("Files")
+		this.element.addEventListener(EVENT_DRAG_OVER, (event) => {
+			if (dragging(event)) {
+				event.preventDefault()
+				this.element.classList.add("rompler-dropping")
+			}
+		})
+		this.element.addEventListener(EVENT_DRAG_LEAVE, (event) => {
+			if (!this.element.contains(event.relatedTarget as Node)) {
+				this.element.classList.remove("rompler-dropping")
+			}
+		})
+		this.element.addEventListener(EVENT_DROP, (event) => {
+			const file = event.dataTransfer?.files[0]
+			this.element.classList.remove("rompler-dropping")
+			if (file) {
+				event.preventDefault()
+				event.stopPropagation()
+				this.actions.open(file)
+			}
+		})
 	}
 
 	private front(): HTMLElement {
@@ -131,9 +311,7 @@ export class RomplerGui {
 			const button = element("button", "rompler-step", text)
 			button.type = "button"
 			button.setAttribute("aria-label", label)
-			button.addEventListener(EVENT_CLICK, () =>
-				this.actions.preset((this.settings.preset + offset + 128) % 128)
-			)
+			button.addEventListener(EVENT_CLICK, () => this.actions.step(offset))
 			return button
 		}
 		const play = element("button", "rompler-play", "▶ Play")
@@ -236,7 +414,7 @@ export class RomplerGui {
 
 	private controls(): HTMLElement {
 		const controls = element("div", "rompler-controls")
-		const density = element("div", "rompler-density")
+		const density = this.density
 		density.setAttribute("role", "group")
 		density.setAttribute("aria-label", "Sample density")
 		density.append(element("span", "rompler-label", "Samples"))
@@ -314,9 +492,37 @@ export class RomplerGui {
 		return label
 	}
 
-	/** Rebuilds the category chips and instrument list from the catalogue */
+	/** Shows a new source: its name, its list of instruments and the keys it samples */
+	setView(view: RomplerView): void {
+		this.view = view
+		this.entries = view.entries ?? this.catalogue
+		this.soundfont.textContent = view.kind === "stream" ? "OpenGM24 · General MIDI" : view.name
+		const known = soundFontEntry(view.kind === "stream" ? "" : this.settings.soundfont)
+		const label = element("span", "rompler-current-name", known?.name ?? view.name)
+		this.current.replaceChildren(
+			element("span", "rompler-label", "Soundfont"),
+			label,
+			element(
+				"span",
+				"rompler-current-detail",
+				known?.format ?? (view.kind === "pack" ? "MIDI.js" : "File")
+			)
+		)
+		for (const [url, card] of this.cards) {
+			card.setAttribute("aria-pressed", String(!!known && url === known.url))
+		}
+		// Banks bring their own zones, so sample density only applies to note-by-note sources
+		this.density.hidden = view.kind === "bank"
+		this.resetSamples(view.sampled)
+		for (const note of view.loaded) {
+			this.sampleLoaded(note)
+		}
+		this.render()
+	}
+
+	/** Rebuilds the category chips and instrument list */
 	private render(): void {
-		const categories = [...new Set(this.instruments.map(({ category }) => category))]
+		const categories = [...new Set(this.entries.map(({ category }) => category))]
 		if (!categories.includes(this.category)) {
 			this.category = ""
 		}
@@ -337,60 +543,64 @@ export class RomplerGui {
 		)
 		this.items.clear()
 		this.list.replaceChildren(
-			...this.instruments.map((instrument) => {
+			...this.entries.map((entry) => {
 				const item = element("button", "rompler-item")
 				item.type = "button"
-				item.title = instrument.description ?? instrument.label
+				item.title = entry.description ?? entry.label
 				item.append(
-					element("span", "rompler-item-number", pad(instrument.program)),
-					element("span", "rompler-item-name", instrument.label)
+					element("span", "rompler-item-number", entry.number),
+					element("span", "rompler-item-name", entry.label)
 				)
-				if (isSustained(instrument.program)) {
+				if (entry.loops) {
 					item.append(element("span", "rompler-tag", "loops"))
 				}
-				item.addEventListener(EVENT_CLICK, () => this.actions.preset(instrument.program))
-				this.items.set(instrument.program, item)
+				item.addEventListener(EVENT_CLICK, () => this.actions.select(entry.id))
+				this.items.set(entry.id, item)
 				return item
 			})
 		)
 		this.filter()
-		this.setPreset(this.settings.preset)
+		this.setSelected(this.view.selected)
 		this.setSpacing(this.settings.spacing)
 	}
 
 	private filter(): void {
 		let shown = 0
-		for (const instrument of this.instruments) {
-			const item = this.items.get(instrument.program)!
+		for (const entry of this.entries) {
+			const item = this.items.get(entry.id)!
 			item.hidden =
-				(!!this.category && instrument.category !== this.category) ||
-				!matches(instrument, this.query)
+				(!!this.category && entry.category !== this.category) || !matches(entry, this.query)
 			shown += Number(!item.hidden)
 		}
-		this.count.textContent = `${shown} of ${this.instruments.length}`
+		this.count.textContent = `${shown} of ${this.entries.length}`
 	}
 
-	setPreset(program: number): void {
-		const instrument = this.instruments[program]
-		this.number.textContent = pad(program)
-		this.title.textContent = instrument.label
+	setSelected(id: number): void {
+		this.view.selected = id
+		const entry = this.entries.find((candidate) => candidate.id === id) ?? this.entries[0]
+		if (!entry) {
+			return
+		}
+		this.number.textContent = entry.number
+		this.title.textContent = entry.label
 		this.meta.textContent = [
-			instrument.category,
-			isSustained(program) ? "Sustains and loops" : "One-shot",
-			instrument.license
+			entry.category,
+			entry.loops ? "Sustains and loops" : "One-shot",
+			entry.license
 		]
 			.filter(Boolean)
 			.join(" · ")
-		this.about.textContent = instrument.description ?? ""
+		this.about.textContent = entry.description ?? ""
 		this.uses.replaceChildren(
-			...(instrument.commonUses ?? []).slice(0, 4).map((use) => element("li", "", use))
+			...(entry.commonUses ?? []).slice(0, 4).map((use) => element("li", "", use))
 		)
-		this.credit.textContent = instrument.source ? `${instrument.source}. ${CREDIT}` : CREDIT
+		const credit = this.view.kind === "stream" ? CREDIT : this.view.name
+		this.credit.textContent = entry.source ? `${entry.source}. ${credit}` : credit
 		for (const [index, item] of this.items) {
-			item.setAttribute("aria-pressed", String(index === program))
+			item.setAttribute("aria-pressed", String(index === entry.id))
 		}
 		// Scroll only the list: scrollIntoView would also pan the graph around the panel
-		const item = this.items.get(program)
+		const item = this.items.get(entry.id)
 		if (item && !item.hidden) {
 			const { offsetTop: top, offsetHeight: height } = item
 			const { scrollTop, clientHeight } = this.list
@@ -408,9 +618,10 @@ export class RomplerGui {
 		}
 	}
 
-	setStatus(text: string, busy: boolean): void {
+	setStatus(text: string, busy: boolean, problem = false): void {
 		this.status.textContent = text
 		this.element.classList.toggle("rompler-busy", busy)
+		this.element.classList.toggle("rompler-problem", problem)
 	}
 
 	/** Marks the keys that will get their own sample for the new preset */

@@ -11,6 +11,7 @@ import {
 	EVENT_ERROR
 } from "../../events/event-constants"
 import { EnsembleSession, type EnsembleMode, type EnsembleSettings } from "../ensemble-session"
+import type { EnsemblePartRole } from "../ensemble-performance"
 import { loadMidi, midiSong, type MidiSong } from "../midi-song"
 import { notifyControls, notifyControlSchema } from "../component-ui"
 import type { ControlValue } from "control-surface/types"
@@ -18,6 +19,7 @@ import type { ControlValue } from "control-surface/types"
 export const ID_ENSEMBLE = "Ensemble"
 export const ENSEMBLE_KEYS = "asdfghjklqwertyui".split("")
 const TIMING_FIELDS: Record<EnsembleMode, string[]> = {
+	perform: ["recoveryBars", "chordWindowMs", "pauseBeats"],
 	assisted: ["activityBeats", "pauseBeats"],
 	together: ["stepBeats", "quorum", "waitSeconds"],
 	conductor: ["activityBeats"]
@@ -36,6 +38,9 @@ interface Config {
 	players: PlayerAssignment[]
 	autoJoin: boolean
 	autoInputs: "off" | "keyboard" | "gamepads"
+	partRoles: Record<number, EnsemblePartRole>
+	recoveryBars: number
+	chordWindowMs: number
 	activityBeats: number
 	assist: boolean
 	loop: boolean
@@ -47,7 +52,10 @@ interface Config {
 const DEFAULTS: Config = {
 	midiFileUrl: "",
 	midiFileName: "",
-	mode: "assisted",
+	mode: "perform",
+	partRoles: {},
+	recoveryBars: 2,
+	chordWindowMs: 20,
 	players: [],
 	autoJoin: true,
 	autoInputs: "off",
@@ -82,7 +90,7 @@ export class TransformerEnsemble extends Transformer<Config> {
 		return "Ensemble"
 	}
 	get description() {
-		return "Perform one MIDI song together: each player holds or taps their key to bring their part in, always in time with everybody else."
+		return "Play a song together: tap each note or chord, while rhythmic parts loop on the shared beat."
 	}
 	get automaticParts(): { channel: number; label: string }[] | undefined {
 		if (this.loading || this.error) {
@@ -132,11 +140,11 @@ export class TransformerEnsemble extends Transformer<Config> {
 				group: "Players",
 				type: "select",
 				values: [
-					{ name: "Play along", value: "assisted" },
+					{ name: "Notes and grooves", value: "perform" },
 					{ name: "Together step", value: "together" },
 					{ name: "Group conductor", value: "conductor" }
 				],
-				help: "Play along: hold or tap your part to keep it playing. Together step: the song waits until enough players press. Group conductor: everyone's tapping sets the tempo."
+				help: "Notes and grooves: each tap plays one note or chord; drums loop until stopped. Together step: wait for players. Group conductor: tapping sets tempo."
 			},
 			{
 				name: "autoInputs",
@@ -169,7 +177,7 @@ export class TransformerEnsemble extends Transformer<Config> {
 					{ name: "Off", value: 0 },
 					{ name: "On", value: 1 }
 				],
-				help: "On plays quieter backing for parts nobody is playing, and moves together steps on when players wait too long. Off leaves gaps."
+				help: "In Notes and grooves, only unassigned parts receive quiet backing; assigned notes always need a tap. Other modes can fill silent parts or advance waiting steps."
 			},
 			{
 				name: "loop",
@@ -180,6 +188,26 @@ export class TransformerEnsemble extends Transformer<Config> {
 					{ name: "Off", value: 0 },
 					{ name: "On", value: 1 }
 				]
+			},
+			{
+				name: "chordWindowMs",
+				label: "Chord grouping (ms)",
+				group: "Timing",
+				type: "number",
+				min: 0,
+				max: 50,
+				step: 1,
+				help: "Treat slightly staggered chord tones as one tap, preserving their timing. 0 requires exact simultaneity; fast and repeated notes remain separate."
+			},
+			{
+				name: "recoveryBars",
+				label: "Rejoin when behind (bars)",
+				group: "Timing",
+				type: "number",
+				min: 1,
+				max: 16,
+				step: 1,
+				help: "Keep missed notes until this many bars behind, then rejoin a nearby section entry or the current bar on the next tap."
 			},
 			{
 				name: "activityBeats",
@@ -239,6 +267,9 @@ export class TransformerEnsemble extends Transformer<Config> {
 		super({
 			...DEFAULTS,
 			...config,
+			// Upgrade saved Play along links, whose activity gate caused phrase playback.
+			mode: config.mode === "assisted" ? "perform" : (config.mode ?? "perform"),
+			partRoles: { ...config.partRoles },
 			players: structuredClone(config.players ?? [])
 		})
 		this.session = new EnsembleSession(this.settings())
@@ -364,7 +395,17 @@ export class TransformerEnsemble extends Transformer<Config> {
 		if (["enabled", "loop", "assist", "autoJoin"].includes(key)) {
 			value = Boolean(Number(value))
 		}
-		if (["activityBeats", "stepBeats", "quorum", "waitSeconds", "pauseBeats"].includes(key)) {
+		if (
+			[
+				"activityBeats",
+				"stepBeats",
+				"quorum",
+				"waitSeconds",
+				"pauseBeats",
+				"recoveryBars",
+				"chordWindowMs"
+			].includes(key)
+		) {
 			const field = this.fields.find((f) => f.name === key)!
 			const number = Number(value)
 			value = Math.max(
@@ -376,15 +417,30 @@ export class TransformerEnsemble extends Transformer<Config> {
 						: Number(DEFAULTS[key as keyof Config])
 				)
 			)
-			if (key === "quorum") {
+			if (key === "quorum" || key === "recoveryBars") {
 				value = Math.floor(Number(value))
 			}
 		}
-		if (key === "mode" && !["assisted", "together", "conductor"].includes(String(value))) {
-			value = "assisted"
+		if (key === "mode" && value === "assisted") value = "perform"
+		if (
+			key === "mode" &&
+			!["perform", "assisted", "together", "conductor"].includes(String(value))
+		) {
+			value = "perform"
 		}
 		if (key === "autoInputs" && !["off", "keyboard", "gamepads"].includes(String(value))) {
 			value = "off"
+		}
+		if (key === "partRoles") {
+			value = Object.fromEntries(
+				Object.entries(value && typeof value === "object" ? value : {}).filter(
+					([channel, role]) =>
+						Number.isInteger(Number(channel)) &&
+						Number(channel) >= 1 &&
+						Number(channel) <= 16 &&
+						["auto", "notes", "groove"].includes(String(role))
+				)
+			)
 		}
 		if (key === "players") {
 			if (!Array.isArray(value)) {
@@ -397,7 +453,7 @@ export class TransformerEnsemble extends Transformer<Config> {
 				)
 			}))
 		}
-		super.setConfig(key, value)
+		Object.assign(this.config, { [key]: value })
 		if (!this.session) {
 			return
 		}
@@ -408,6 +464,7 @@ export class TransformerEnsemble extends Transformer<Config> {
 		} else if (key in DEFAULTS) {
 			this.session.configure(this.settings())
 		}
+		notifyControls(this)
 	}
 	async loadMIDIFile(url: string): Promise<void> {
 		const revision = ++this.revision
@@ -548,12 +605,41 @@ export class TransformerEnsemble extends Transformer<Config> {
 		return [
 			title,
 			live.length ? `Playing: ${this.partNames(live)}` : "Nobody is playing",
-			waiting.length ? `Next bar: ${this.partNames(waiting)}` : ""
+			waiting.length ? `Coming up: ${this.partNames(waiting)}` : ""
 		]
 			.filter(Boolean)
 			.join(" · ")
 	}
+	private partStatuses = new Map<number, HTMLElement[]>()
+	private partCues = new Map<number, HTMLElement[]>()
 	private updateStatus(): void {
+		for (const [channel, nodes] of this.partCues) {
+			const feedback = this.session.partFeedback(channel)
+			for (const node of nodes) {
+				if (node.textContent !== feedback.message) node.textContent = feedback.message
+				if (node.dataset.phase !== feedback.phase) node.dataset.phase = feedback.phase
+				if (node.dataset.accepted !== String(feedback.accepted)) {
+					node.dataset.accepted = String(feedback.accepted)
+					if (
+						feedback.accepted &&
+						typeof node.animate === "function" &&
+						!(
+							typeof matchMedia === "function" &&
+							matchMedia("(prefers-reduced-motion: reduce)").matches
+						)
+					) {
+						node.animate([{ opacity: 0.4 }, { opacity: 1 }], { duration: 150 })
+					}
+				}
+				// Quantize the visual pulse to eight steps per beat, avoiding full-rate DOM writes.
+				const pulse = this.session.state.running ? Math.floor((feedback.beat % 1) * 8) : -1
+				if (node.dataset.pulse !== String(pulse)) node.dataset.pulse = String(pulse)
+			}
+		}
+		for (const [channel, nodes] of this.partStatuses) {
+			const text = this.config.mode === "perform" ? this.session.partState(channel) : ""
+			for (const node of nodes) if (node.textContent !== text) node.textContent = text
+		}
 		if (!this.status) {
 			return
 		}
@@ -585,6 +671,54 @@ export class TransformerEnsemble extends Transformer<Config> {
 			}
 		}
 	}
+	private partControls(channel: number): HTMLElement {
+		const root = document.createElement("span")
+		root.className = "ensemble-part-behaviour"
+		const select = document.createElement("select")
+		select.setAttribute("aria-label", `Channel ${channel} behaviour`)
+		for (const [value, label] of [
+			["auto", `Auto (${channel === 10 ? "groove" : "notes"})`],
+			["notes", "Notes: tap each onset"],
+			["groove", "Groove: tap to loop"]
+		]) {
+			const option = document.createElement("option")
+			option.value = value
+			option.textContent = label
+			select.append(option)
+		}
+		select.value = this.config.partRoles[channel] ?? "auto"
+		select.addEventListener(EVENT_CHANGE, () =>
+			this.setConfig("partRoles", { ...this.config.partRoles, [channel]: select.value })
+		)
+		const stop = document.createElement("button")
+		stop.type = "button"
+		stop.textContent = "Stop groove"
+		stop.setAttribute("aria-label", `Stop channel ${channel} groove at next bar`)
+		stop.hidden = this.session.partRole(channel) !== "groove"
+		stop.addEventListener(EVENT_CLICK, () => {
+			this.session.stopGroove(channel)
+			this.updateStatus()
+		})
+		const rejoin = document.createElement("button")
+		rejoin.type = "button"
+		rejoin.textContent = "Rejoin song"
+		rejoin.setAttribute("aria-label", `Rejoin channel ${channel} at the current section`)
+		rejoin.hidden = this.session.partRole(channel) !== "notes"
+		rejoin.addEventListener(EVENT_CLICK, () => {
+			this.session.rejoinPart(channel)
+			this.updateStatus()
+		})
+		const cue = document.createElement("span")
+		cue.className = "ensemble-part-cue"
+		cue.setAttribute("aria-label", `Channel ${channel} playing guide`)
+		this.partCues.set(channel, [...(this.partCues.get(channel) ?? []), cue])
+		const status = document.createElement("small")
+		status.className = "ensemble-part-status"
+		this.partStatuses.set(channel, [...(this.partStatuses.get(channel) ?? []), status])
+		root.append(select, stop, rejoin, cue, status)
+		root.hidden = this.config.mode !== "perform"
+		return root
+	}
 	private renderPlayers(): void {
 		if (!this.playersRoot) {
 			return
@@ -597,6 +731,8 @@ export class TransformerEnsemble extends Transformer<Config> {
 		}
 		const automatic = this.config.autoInputs !== "off"
 		this.playersRoot.replaceChildren()
+		this.partStatuses.clear()
+		this.partCues.clear()
 		if (this.addPlayerButton) {
 			this.addPlayerButton.hidden = automatic
 		}
@@ -618,8 +754,11 @@ export class TransformerEnsemble extends Transformer<Config> {
 				name.textContent = this.partNames([part.channel])
 				const channel = document.createElement("small")
 				channel.textContent = `Ch ${part.channel}`
-				this.playersRoot!.append(item("ensemble-part", trigger, name, channel))
+				this.playersRoot!.append(
+					item("ensemble-part", trigger, name, channel, this.partControls(part.channel))
+				)
 			})
+			this.updateStatus()
 			return
 		}
 		if (!this.config.players.length) {
@@ -690,13 +829,14 @@ export class TransformerEnsemble extends Transformer<Config> {
 				const label = document.createElement("label")
 				label.title = `Channel ${channel}`
 				label.append(box, `${channel} · ${this.partNames([channel])}`)
-				parts.append(label)
+				parts.append(label, this.partControls(channel))
 			}
 			if (!channels.length) {
 				parts.textContent = "Load a song to choose parts."
 			}
 			this.playersRoot!.append(item("ensemble-player", head, parts))
 		})
+		this.updateStatus()
 	}
 	override async createGui(): Promise<HTMLElement> {
 		if (this.root) {
@@ -763,8 +903,11 @@ export class TransformerEnsemble extends Transformer<Config> {
 		for (const step of [
 			"Connect every player's Input to this one Ensemble.",
 			"The first press starts the song; it then keeps time for everyone.",
-			"Hold your key, or tap it every few beats, to keep your part playing.",
-			"When everybody stops, the song pauses and carries on from that bar."
+			"Notes: tap once for each note or chord. Holding never plays a phrase.",
+			"Grooves: tap to start a bar-aligned loop; tap again to accent. Use Stop groove to finish at a bar boundary.",
+			"Missed notes stay in order. After the recovery window, your next tap rejoins a section or bar. Rejoin song skips ahead without playing notes.",
+			"Accepted means your tap is queued. Follow the countdown for long rests; Playing means your note has started.",
+			"With no groove running, the song pauses after inactivity. A new tap resumes it."
 		]) {
 			steps.append(element("li", "", step))
 		}
@@ -787,6 +930,8 @@ export class TransformerEnsemble extends Transformer<Config> {
 		this.unsubscribe = undefined
 		this.root = this.playersRoot = this.status = this.addPlayerButton = undefined
 		this.timingControls.clear()
+		this.partStatuses.clear()
+		this.partCues.clear()
 		super.destroyGui()
 	}
 	override destroy(): void {

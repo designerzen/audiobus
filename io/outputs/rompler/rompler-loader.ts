@@ -24,26 +24,33 @@ const CROSSFADE_SECONDS = 0.08
 const SEARCH_SECONDS = 0.01
 const MATCH_FRAMES = 64
 
+/** A unit of loading, placed on the keyboard so the nearest to demand go first */
+export interface RomplerJob {
+	id: number
+	key: number
+}
+
+export type RomplerTask<T> = (id: number, signal: AbortSignal) => Promise<T>
+
 /**
- * Fetches and decodes one sample per grid key, nearest-to-demand first.
- * Notes that are played jump the queue and the starting point drifts
- * towards the most played register, so useful keys arrive first.
- * Calling load() again or cancel() aborts every in-flight request.
+ * Runs one task per job, nearest-to-demand first: streamed notes, waves
+ * from a soundfont file or notes from a MIDI.js pack. Jobs that are played
+ * jump the queue and the starting point drifts towards the most played
+ * register, so useful sounds arrive first. Calling load() again or cancel()
+ * aborts every task in flight and drops their results.
  */
-export class RomplerLoader {
-	private pending = new Set<number>()
+export class RomplerLoader<T> {
+	private pending = new Map<number, number>()
 	private urgent = new Set<number>()
 	private active = 0
 	private centre = 60
 	private generation = 0
 	private controller?: AbortController
-	private url: (note: number) => string = () => ""
-	private loop = false
+	private task: RomplerTask<T> = () => Promise.reject()
 	private progress: RomplerProgress = { loaded: 0, failed: 0, total: 0 }
 
 	constructor(
-		private readonly context: BaseAudioContext,
-		private readonly onSample: (sample: RomplerSample) => void,
+		private readonly onResult: (id: number, result: T) => void,
 		private readonly onProgress: (progress: RomplerProgress) => void = () => {},
 		private readonly concurrency = 6
 	) {}
@@ -52,21 +59,24 @@ export class RomplerLoader {
 		return !this.pending.size && !this.active
 	}
 
-	load(grid: number[], url: (note: number) => string, loop = false): void {
+	load(jobs: RomplerJob[], task: RomplerTask<T>): void {
 		this.cancel()
-		this.url = url
-		this.loop = loop
-		this.pending = new Set(grid)
-		this.progress = { loaded: 0, failed: 0, total: grid.length }
+		this.task = task
+		this.pending = new Map(jobs.map(({ id, key }) => [id, key]))
+		this.progress = { loaded: 0, failed: 0, total: jobs.length }
 		this.onProgress({ ...this.progress })
 		this.pump()
 	}
 
-	/** Prioritise a key the player needs right now, including before load() */
-	request(note: number): void {
-		this.centre = this.progress.loaded ? this.centre + (note - this.centre) * 0.25 : note
-		this.urgent.add(note)
-		if (this.pending.has(note)) {
+	/** Prioritise jobs the player needs right now for a key, including before load() */
+	request(key: number, ids: Iterable<number>): void {
+		this.centre = this.progress.loaded ? this.centre + (key - this.centre) * 0.25 : key
+		let waiting = false
+		for (const id of ids) {
+			this.urgent.add(id)
+			waiting ||= this.pending.has(id)
+		}
+		if (waiting) {
 			this.pump()
 		}
 	}
@@ -80,16 +90,18 @@ export class RomplerLoader {
 	}
 
 	private next(): number | undefined {
-		for (const note of this.urgent) {
-			this.urgent.delete(note)
-			if (this.pending.has(note)) {
-				return note
+		for (const id of this.urgent) {
+			this.urgent.delete(id)
+			if (this.pending.has(id)) {
+				return id
 			}
 		}
 		let best: number | undefined
-		for (const note of this.pending) {
-			if (best === undefined || Math.abs(note - this.centre) < Math.abs(best - this.centre)) {
-				best = note
+		let distance = Infinity
+		for (const [id, key] of this.pending) {
+			if (Math.abs(key - this.centre) < distance) {
+				distance = Math.abs(key - this.centre)
+				best = id
 			}
 		}
 		return best
@@ -97,27 +109,22 @@ export class RomplerLoader {
 
 	private pump(): void {
 		while (this.active < this.concurrency) {
-			const note = this.next()
-			if (note === undefined) {
+			const id = this.next()
+			if (id === undefined) {
 				return
 			}
-			this.pending.delete(note)
+			this.pending.delete(id)
 			this.active++
-			void this.fetch(note, this.generation, this.controller!.signal)
+			void this.run(id, this.generation, this.controller!.signal)
 		}
 	}
 
-	private async fetch(note: number, generation: number, signal: AbortSignal): Promise<void> {
-		let sample: RomplerSample | undefined
+	private async run(id: number, generation: number, signal: AbortSignal): Promise<void> {
+		let result: T | undefined
+		let ok = false
 		try {
-			const response = await fetch(this.url(note), { signal })
-			if (!response.ok) {
-				throw Error(`HTTP ${response.status}`)
-			}
-			const audio = await this.context.decodeAudioData(await response.arrayBuffer())
-			if (generation === this.generation) {
-				sample = { note, ...toPCM(audio, this.loop) }
-			}
+			result = await this.task(id, signal)
+			ok = true
 		} catch {
 			if (generation === this.generation) {
 				this.progress.failed++
@@ -127,21 +134,38 @@ export class RomplerLoader {
 			return
 		}
 		this.active--
-		if (sample) {
+		if (ok) {
 			this.progress.loaded++
-			this.onSample(sample)
+			this.onResult(id, result!)
 		}
 		this.onProgress({ ...this.progress })
 		this.pump()
 	}
 }
 
+/** Fetches and decodes one streamed note, ready for the worklet */
+export const streamTask =
+	(
+		context: BaseAudioContext,
+		url: (note: number) => string,
+		loop: boolean
+	): RomplerTask<RomplerSample> =>
+	async (note, signal) => {
+		const response = await fetch(url(note), { signal })
+		if (!response.ok) {
+			throw Error(`HTTP ${response.status}`)
+		}
+		const audio = await context.decodeAudioData(await response.arrayBuffer())
+		signal.throwIfAborted()
+		return { note, ...toPCM(audio, loop) }
+	}
+
 /**
  * Trim, fade and quantise; identical stereo channels collapse to mono.
  * Looped samples end at the loop with an equal-power crossfade baked in,
  * so the worklet only has to jump back while the note sounds.
  */
-const toPCM = (audio: AudioBuffer, loop: boolean): Omit<RomplerSample, "note"> => {
+export const toPCM = (audio: AudioBuffer, loop: boolean): Omit<RomplerSample, "note"> => {
 	const rate = audio.sampleRate
 	const length = Math.min(audio.length, Math.round(MAX_SECONDS * rate))
 	const sources = Array.from({ length: Math.min(2, audio.numberOfChannels) }, (_, ch) =>

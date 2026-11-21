@@ -3,7 +3,9 @@ import { NOTE_ON, NOTE_OFF, CONTROL_CHANGE, PITCH_BEND, PROGRAM_CHANGE } from ".
 import type { IAudioCommand } from "../commands/audio-command-interface"
 import type { MidiSong, SongEvent } from "./midi-song"
 
-export type EnsembleMode = "assisted" | "together" | "conductor"
+import { EnsemblePerformance, type EnsemblePartRole } from "./ensemble-performance"
+
+export type EnsembleMode = "perform" | "assisted" | "together" | "conductor"
 export interface EnsemblePlayer {
 	source: string
 	channels: number[]
@@ -11,6 +13,10 @@ export interface EnsemblePlayer {
 export interface EnsembleSettings {
 	mode: EnsembleMode
 	players: EnsemblePlayer[]
+	partRoles?: Record<number, EnsemblePartRole>
+	recoveryBars?: number
+	/** Merge slightly staggered chord tones; 0 retains exact score onsets. */
+	chordWindowMs?: number
 	activityBeats: number
 	assist: boolean
 	loop: boolean
@@ -35,6 +41,7 @@ const CATCH_WINDOW = 0.15
 
 /** One authoritative local performance, independent of DOM, devices and room transport. */
 export class EnsembleSession {
+	private performance = new EnsemblePerformance(() => this.settings)
 	private song?: MidiSong
 	private ends = new Map<string, number>()
 	private start = 0
@@ -61,6 +68,7 @@ export class EnsembleSession {
 	constructor(public settings: EnsembleSettings) {}
 
 	get state() {
+		if (this.settings.mode === "perform") return this.performance.state
 		return {
 			running: this.running,
 			paused: this.paused,
@@ -73,6 +81,7 @@ export class EnsembleSession {
 	}
 	/** Channels currently playing for a player, and channels with notes in the next bar. */
 	parts(): { live: number[]; upcoming: number[] } {
+		if (this.settings.mode === "perform") return this.performance.parts()
 		if (!this.song) {
 			return { live: [], upcoming: [] }
 		}
@@ -92,7 +101,23 @@ export class EnsembleSession {
 		}
 		return { live, upcoming: [...upcoming].sort((a, b) => a - b) }
 	}
+	partRole(channel: number): "notes" | "groove" {
+		return this.performance.role(channel)
+	}
+	partState(channel: number): string {
+		return this.performance.partState(channel)
+	}
+	partFeedback(channel: number) {
+		return this.performance.partFeedback(channel)
+	}
+	rejoinPart(channel: number): void {
+		this.performance.rejoinPart(channel)
+	}
+	stopGroove(channel: number): void {
+		this.performance.stopGroove(channel)
+	}
 	setSong(song?: MidiSong): void {
+		this.performance.setSong(song)
 		this.reset()
 		this.song = song
 		this.ends.clear()
@@ -142,6 +167,7 @@ export class EnsembleSession {
 			this.held = remapSet(this.held)
 		}
 		this.settings = settings
+		this.performance.configure()
 	}
 	private secondsAtBeat(beat: number): number {
 		return this.song!.midi.header.ticksToSeconds(beat * this.song!.midi.header.ppq)
@@ -219,6 +245,7 @@ export class EnsembleSession {
 		return output
 	}
 	reset(): void {
+		this.performance.reset()
 		this.cleanup.push(...this.release(this.lastNow ?? 0))
 		this.cursor = this.position = this.limit = this.stepBeat = 0
 		this.lastNow = this.waitingSince = undefined
@@ -287,6 +314,8 @@ export class EnsembleSession {
 
 	/** Holding or tapping keeps a player's parts playing at the shared song position. */
 	press(player: number, now: number): IAudioCommand[] {
+		if (this.settings.mode === "perform")
+			return [...this.advance(now), ...this.performance.press(player, now)]
 		const output = this.advance(now)
 		const assigned = this.settings.players[player]
 		if (!this.song || this.ended || !assigned) {
@@ -336,6 +365,7 @@ export class EnsembleSession {
 	}
 	/** Letting go keeps the part playing for its activity window, so taps and holds both work. */
 	releasePress(player: number, now: number): IAudioCommand[] {
+		if (this.settings.mode === "perform") return this.performance.releasePress(player, now)
 		const output = this.advance(now)
 		if (this.held.delete(player) && this.running) {
 			this.activity(player)
@@ -416,12 +446,26 @@ export class EnsembleSession {
 		return output
 	}
 	advance(now: number): IAudioCommand[] {
+		if (!Number.isFinite(now)) return []
+		const performanceOutput = this.performance.advance(now)
+		if (this.settings.mode === "perform")
+			return [
+				...this.cleanup.splice(0).map((c) =>
+					Object.assign(c, {
+						startAt: now,
+						time: now,
+						audioTime: Math.max(now, c.audioTime ?? now)
+					})
+				),
+				...performanceOutput
+			]
 		if (!Number.isFinite(now)) {
 			return []
 		}
-		const output = this.cleanup
-			.splice(0)
-			.map((c) => Object.assign(c, { startAt: now, time: now }))
+		const output = [
+			...performanceOutput,
+			...this.cleanup.splice(0).map((c) => Object.assign(c, { startAt: now, time: now }))
+		]
 		if (!this.song || !this.running) {
 			return output
 		}

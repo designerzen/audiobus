@@ -33,6 +33,13 @@ export const FILE_IMPORT_FORMATS = [
 	},
 	{ id: "musicxml", label: "MusicXML", kind: "notes", extensions: ["musicxml", "xml"] },
 	{ id: "mxl", label: "Compressed MusicXML", kind: "notes", extensions: ["mxl"] },
+	{
+		id: "musescore",
+		label: "MuseScore 3/4 written notes",
+		kind: "notes",
+		extensions: ["mscx", "mscz"]
+	},
+	{ id: "reaper", label: "REAPER embedded MIDI", kind: "notes", extensions: ["rpp"] },
 	{ id: "dawproject", label: "DAWproject", kind: "notes", extensions: ["dawproject"] },
 	{ id: "tracker", label: "Tracker module", kind: "notes", extensions: TRACKER_EXTENSIONS },
 	{ id: "abc", label: "ABC notation", kind: "notes", extensions: ["abc"] },
@@ -76,6 +83,12 @@ export const FILE_IMPORT_FORMATS = [
 		label: "MIDI / WAM2 bundle",
 		kind: "bundle",
 		extensions: ["zip", "wam", "wam2"]
+	},
+	{
+		id: "soundfont",
+		label: "SoundFont or MIDI.js soundfont",
+		kind: "soundfont",
+		extensions: ["sf2", "sf3"]
 	}
 ] as const
 export type ImportFormat = (typeof FILE_IMPORT_FORMATS)[number]
@@ -90,15 +103,28 @@ export const IMPORT_FILE_ACCEPT = FILE_IMPORT_FORMATS.flatMap((format) =>
 const byId = (id: ImportFormatId): ImportFormat =>
 	FILE_IMPORT_FORMATS.find((format) => format.id === id)!
 const decoder = new TextDecoder()
+const MAX_SOUNDFONT_BYTES = 1024 * 1024 * 1024
+// MIDI.js packs are scripts or JSON mapping note names to base64 audio
+const MIDI_JS_PACK = /MIDI\.Soundfont\b|^\{\s*"[A-G][#b]?-?\d"\s*:\s*"data:audio\//
 
 /** Detect content before falling back to suffixes; ZIP containers are inspected, never executed. */
 export async function detectImportFile(file: File): Promise<DetectedImportFile> {
-	if (!file.size || file.size > MAX_MEDIA_BYTES) {
+	if (!file.size) {
 		throw new Error("Choose a nonempty file up to 64 MB")
 	}
 	const bytes = new Uint8Array(await file.slice(0, 4096).arrayBuffer())
 	const at = (offset: number, size: number) =>
 		decoder.decode(bytes.subarray(offset, offset + size))
+	// Soundfonts are read in place by the Rompler, so they may be larger than other media
+	if (at(0, 4) === "RIFF" && at(8, 4) === "sfbk") {
+		if (file.size > MAX_SOUNDFONT_BYTES) {
+			throw new Error("Choose a soundfont up to 1 GB")
+		}
+		return { format: byId("soundfont") }
+	}
+	if (file.size > MAX_MEDIA_BYTES) {
+		throw new Error("Choose a nonempty file up to 64 MB")
+	}
 	const extension = file.name.toLowerCase().split(".").pop() ?? ""
 	const suffix = FILE_IMPORT_FORMATS.find((format) =>
 		format.extensions.some((suffix) => file.name.toLowerCase().endsWith(`.${suffix}`))
@@ -115,7 +141,12 @@ export async function detectImportFile(file: File): Promise<DetectedImportFile> 
 		at(0, 4) === "IMPM" ||
 		/^MMD[0-3]$/.test(at(0, 4)) ||
 		at(44, 4) === "SCRM" ||
-		/^(M\.K\.|M!K!|FLT4|[1-9]CHN|[0-9]{2}CH)$/.test(at(1080, 4))
+		/^(M\.K\.|M!K!|FLT[48]|[1-9]CHN|[0-9]{2}CH)$/.test(at(1080, 4)) ||
+		["DBM0", "DMDL", "PTMF", "PSM ", "MT20", "IM10", "XPKF"].includes(at(0, 4)) ||
+		(["PSM", "FAR", "GDM"].includes(at(0, 3)) && bytes[3] === 0xfe) ||
+		["MTM", "MO3", "AMF"].includes(at(0, 3)) ||
+		["OKTASONG", "ziRCONia"].includes(at(0, 8)) ||
+		(at(0, 4) === "RIFF" && at(8, 4) === "DSMF")
 	) {
 		return found("tracker")
 	}
@@ -136,7 +167,15 @@ export async function detectImportFile(file: File): Promise<DetectedImportFile> 
 		const archive = await readMediaArchive(new Uint8Array(await file.arrayBuffer()))
 		const paths = Object.keys(archive)
 		let id: ImportFormatId = "bundle"
-		if (archive["META-INF/container.xml"]) {
+		if (
+			paths.some(
+				(path) =>
+					/\.mscx$/i.test(path) &&
+					/<museScore[\s>]/.test(decoder.decode(archive[path].subarray(0, 4096)))
+			)
+		) {
+			id = "musescore"
+		} else if (archive["META-INF/container.xml"]) {
 			id = "mxl"
 		} else if (archive["project.xml"] || archive["project.json"]) {
 			id = "dawproject"
@@ -156,12 +195,21 @@ export async function detectImportFile(file: File): Promise<DetectedImportFile> 
 		.decode(bytes)
 		.replace(/^\uFEFF/, "")
 		.trimStart()
+	if (/^<REAPER_PROJECT\b/.test(text)) {
+		return found("reaper")
+	}
+	if (/<museScore[\s>]/.test(text)) {
+		return found("musescore")
+	}
 	if (bytes.length >= 6 && bytes[4] === 0x78 && ((bytes[4] << 8) + bytes[5]) % 31 === 0) {
 		const { decodeLMMSContainer } = await import("../formats/lmms-container")
 		const xml = decodeLMMSContainer(new Uint8Array(await file.arrayBuffer()))
 		if (/<(?:lmms|multimedia)-project[\s/>]/.test(xml)) {
 			return found("lmms-compressed")
 		}
+	}
+	if (MIDI_JS_PACK.test(text)) {
+		return found("soundfont")
 	}
 	if (text.startsWith("{")) {
 		let data
@@ -252,6 +300,10 @@ export async function detectImportFile(file: File): Promise<DetectedImportFile> 
 	if (suffix) {
 		return { format: suffix }
 	}
+	// Traditional Amiga filenames often put the format before the title (mod.song).
+	if (TRACKER_EXTENSIONS.some((prefix) => file.name.toLowerCase().startsWith(`${prefix}.`))) {
+		return found("tracker")
+	}
 	if (file.type.startsWith("audio/")) {
 		return found("audio")
 	}
@@ -268,6 +320,10 @@ export async function importMusicalFile(
 	switch (id) {
 		case "midi":
 			return importMIDIFile(file)
+		case "musescore":
+			return (await import("./import-musescore")).importMuseScoreFile(file)
+		case "reaper":
+			return (await import("./import-reaper")).importReaperFile(file)
 		case "svp":
 			return (await import("./import-vocal-project")).importSVPFile(file)
 		case "ustx":

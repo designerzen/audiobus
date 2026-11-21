@@ -429,3 +429,166 @@
 		animation: none !important;
 	}
 }
+.rompler-source {
+	display: grid;
+	gap: 6px;
+}
+
+.rompler .rompler-current {
+	display: grid;
+	grid-template-columns: auto 1fr auto auto;
+	align-items: center;
+	gap: 8px;
+	min-height: 34px;
+	padding: 4px 10px;
+	text-align: left;
+
+	&::after {
+		content: "▾";
+		display: block;
+		color: var(--rompler-dim);
+		transition: transform 0.15s;
+	}
+	&[aria-expanded="true"]::after {
+		transform: rotate(180deg);
+	}
+}
+
+.rompler-current-name {
+	overflow: hidden;
+	font-weight: 700;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.rompler-current-detail {
+	padding: 0 6px;
+	border: 1px solid var(--rompler-glow-dim);
+	border-radius: 999px;
+	color: var(--rompler-glow);
+	font-size: 9px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.rompler-library {
+	display: grid;
+	gap: 6px;
+	padding: 6px;
+	border-radius: 12px;
+	background: var(--rompler-panel);
+	box-shadow: inset 0 1px 3px #0009;
+
+	&[hidden] {
+		display: none;
+	}
+}
+
+.rompler-cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+	/* Cards reset min-height, so rows would otherwise squeeze to fit the scroll height */
+	grid-auto-rows: max-content;
+	gap: 4px;
+	max-height: 240px;
+	overflow-y: auto;
+	scrollbar-width: thin;
+}
+
+.rompler .rompler-card {
+	position: relative;
+	display: grid;
+	align-content: start;
+	justify-content: stretch;
+	gap: 2px;
+	padding: 7px 9px;
+	background: #121417;
+	text-align: left;
+
+	strong {
+		font-size: 12px;
+	}
+	&.saved::after {
+		content: "saved";
+		display: block;
+		position: absolute;
+		top: 7px;
+		right: 8px;
+		color: var(--rompler-dim);
+		font-size: 9px;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+	&[aria-pressed="true"] {
+		border-color: var(--rompler-glow);
+		background: #2a1d0b;
+		color: var(--rompler-ink);
+	}
+}
+
+.rompler-card-detail {
+	color: var(--rompler-glow);
+	font-size: 10px;
+}
+
+.rompler-card-about {
+	display: -webkit-box;
+	overflow: hidden;
+	color: var(--rompler-dim);
+	font-size: 10px;
+	line-height: 1.35;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 3;
+}
+
+.rompler-files {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 4px;
+
+	button {
+		min-height: 26px;
+		font-size: 11px;
+	}
+}
+
+.rompler-url {
+	display: flex;
+	gap: 4px;
+
+	&[hidden] {
+		display: none;
+	}
+	input {
+		flex: 1;
+		min-width: 0;
+		min-height: 28px;
+		padding: 4px 10px;
+		border: 1px solid var(--rompler-edge);
+		border-radius: 8px;
+		background: #121417;
+		color: var(--rompler-ink);
+	}
+}
+
+.rompler .rompler-density[hidden] {
+	display: none;
+}
+
+.rompler-problem .rompler-status {
+	color: #ff8a7a;
+}
+
+.rompler.rompler-dropping {
+	border-color: var(--rompler-glow);
+	box-shadow:
+		0 0 0 2px var(--rompler-glow),
+		0 8px 24px #0008;
+}
+
+.rompler-soundfont {
+	overflow: hidden;
+	max-width: 65%;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}

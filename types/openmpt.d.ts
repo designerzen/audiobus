@@ -3,6 +3,9 @@ declare module "chiptune3/libopenmpt.worklet.js" {
 		HEAPU8: Uint8Array
 		_malloc(size: number): number
 		_free(pointer: number): void
+		UTF8ToString(pointer: number): string
+		_openmpt_get_supported_extensions(): number
+		_openmpt_free_string(pointer: number): void
 		_openmpt_module_create_from_memory(
 			data: number,
 			size: number,

@@ -1,8 +1,8 @@
-export function saveScoreToLocalFileSystem(blob: Blob, fileName: string, extension: string): void {
+export function saveExportToLocalFileSystem(blob: Blob, fileName: string, extension: string): void {
 	const url = URL.createObjectURL(blob),
 		link = document.createElement("a")
 	link.href = url
-	link.download = fileName.toLowerCase().endsWith(`.${extension}`)
+	link.download = fileName.toLowerCase().endsWith(`.${extension.toLowerCase()}`)
 		? fileName
 		: `${fileName}.${extension}`
 	document.body.append(link)
@@ -13,3 +13,4 @@ export function saveScoreToLocalFileSystem(blob: Blob, fileName: string, extensi
 		URL.revokeObjectURL(url)
 	}
 }
+export const saveScoreToLocalFileSystem = saveExportToLocalFileSystem

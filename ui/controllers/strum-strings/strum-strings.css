@@ -1,0 +1,119 @@
+:host {
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+	min-width: var(--min-width, 120px);
+	min-height: var(--min-height, 64px);
+	color: var(--color, #f7f5ef);
+	background: var(--background-color, var(--background, #10131d));
+	border-radius: var(--border-radius, 12px);
+	overflow: hidden;
+	font: var(
+		--font,
+		var(--font-size, 0.85rem) / var(--line-height, 1.3)
+			var(--font-family, system-ui, sans-serif)
+	);
+}
+:host([hidden]) {
+	display: none;
+}
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+.toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--gap, 0.5rem 0.9rem);
+	padding: var(--padding, 0.4rem 0.6rem);
+	border-bottom: 1px solid color-mix(in oklab, currentColor 18%, transparent);
+}
+label {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	white-space: nowrap;
+}
+select,
+input {
+	min-height: 32px;
+	color: inherit;
+	background: transparent;
+	border: 1px solid color-mix(in oklab, currentColor 45%, transparent);
+	border-radius: 6px;
+	font: inherit;
+	padding: 0.15rem 0.35rem;
+}
+select option {
+	color: #111;
+}
+input[type="number"] {
+	width: 3.6rem;
+}
+input[type="range"] {
+	width: 6rem;
+	padding: 0;
+	border: 0;
+	accent-color: var(--accent-color, #6ff0c8);
+}
+.strings {
+	position: relative;
+	/* Fills a sized host; an unsized host gets a comfortable default height. */
+	flex: 1 1 var(--strings-height, 160px);
+	min-height: 48px;
+}
+canvas {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	display: block;
+	touch-action: none;
+	cursor: grab;
+}
+:host([disabled]) canvas {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+.keys {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	pointer-events: none;
+}
+.keys button {
+	flex: 1 1 0;
+	min-width: 0;
+	margin: 0;
+	padding: 0;
+	opacity: 0;
+	border: 0;
+	background: none;
+	pointer-events: none;
+}
+.keys button:focus-visible {
+	opacity: 1;
+	outline: 2px solid var(--focus-color, #fff);
+	outline-offset: -4px;
+	border-radius: 6px;
+}
+:host([data-axis="horizontal"]) .keys {
+	flex-direction: column;
+}
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+/* Small surface panels give all their room to the strings. */
+:host([data-compact]) .toolbar,
+:host([controls="none"]) .toolbar {
+	display: none;
+}

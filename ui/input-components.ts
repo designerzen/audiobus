@@ -86,6 +86,14 @@ export const UI_INPUT_COMPONENTS = {
 		description: "Play notes using the Photosynth piano roll",
 		subtype: "pads",
 		load: () => import("./sequencers/piano-roll/piano-roll.ts")
+	},
+	[INPUT_TYPES.STRUM_STRINGS]: {
+		tag: "strum-strings",
+		name: "Strum Strings",
+		description:
+			"Strum, pluck and mute colourful physically simulated strings; resizes to fit control surfaces",
+		subtype: "pointer",
+		load: () => import("./controllers/strum-strings/strum-strings.ts")
 	}
 } as const
 
