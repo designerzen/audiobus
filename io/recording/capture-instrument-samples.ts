@@ -1,7 +1,12 @@
 import AudioCommand from "../../commands/audio-command"
 import { NOTE_ON, NOTE_OFF } from "../../commands/commands"
 import type { SequenceNote } from "../../formats/note-sequence"
-import { trackerInstrumentKey, type TrackerSample } from "../../formats/tracker/tracker-types"
+import { CHANNEL_DRUMS, drumVoiceOf } from "../../formats/tracker/tracker-drums"
+import {
+	trackerInstrumentKey,
+	type TrackerSample,
+	type TrackerSampleSet
+} from "../../formats/tracker/tracker-types"
 import type { IAudioOutput } from "../outputs/output-interface"
 import {
 	RECORDING_PROCESSOR,
@@ -14,6 +19,20 @@ const workletURL = new URL("./recording.worklet.js", import.meta.url).href
 const loadedWorklets = new WeakMap<AudioContext, Promise<void>>()
 const SILENCE_THRESHOLD = 0.001
 const MAX_SECONDS = 2
+/** Seconds the whole capture may take unless the caller says otherwise */
+export const CAPTURE_BUDGET_SECONDS = 12
+/** A pitched instrument that plays further than this many semitones apart is sampled in zones */
+const ZONE_SPAN = 14
+const MAX_ZONES = 3
+/** Drum voices sampled per drum chain; the rest are synthesised */
+const MAX_DRUM_VOICES = 12
+const DEFAULT_HOLD = 0.8
+const DEFAULT_RELEASE = 0.6
+/** Hold and release never shrink below these when the budget is tight */
+const MIN_HOLD = 0.15
+const MIN_RELEASE = 0.15
+/** Drums are one-shots: a short hold, then the ring-out gets the time */
+const DRUM_HOLD = 0.3
 
 export interface CaptureTrackerSamplesOptions {
 	audioContext: AudioContext
@@ -24,7 +43,24 @@ export interface CaptureTrackerSamplesOptions {
 	signal?: AbortSignal
 	holdSeconds?: number
 	releaseSeconds?: number
+	/** Total seconds the capture may take, default 12. Holds and releases shrink when there are
+	 * many captures, and the extra zones and drum voices are dropped first when even the shortest
+	 * would not fit.
+	 */
+	budgetSeconds?: number
 	onProgress?: (done: number, total: number) => void
+}
+
+/** One note to play through an instrument and record */
+export interface TrackerCaptureJob {
+	key: string
+	/** The median pitch and velocity of the notes the capture stands for */
+	note: SequenceNote
+	drums: boolean
+	/** The keys a drum voice answers to */
+	keys: number[]
+	/** 0 for the capture an instrument cannot do without; higher ranks are dropped first */
+	rank: number
 }
 
 /** Group by the same identity used by tracker exporters, retaining input order. */
@@ -51,6 +87,99 @@ export function representativeTrackerNote(notes: readonly SequenceNote[]): Seque
 	const velocities = notes.map((note) => note.velocity).sort((a, b) => a - b)
 	const middle = Math.floor((notes.length - 1) / 2)
 	return { ...notes[0], number: pitches[middle], velocity: velocities[middle] }
+}
+
+/** The captures each instrument key needs, in the order they are recorded.
+ * A channel 10 instrument records each distinct drum voice it plays, the most played first and no more
+ * than a dozen. A pitched instrument records one note, or up to three zones (the low, middle and high
+ * median pitches) when its notes span more than 14 semitones.
+ */
+export function planTrackerCaptures(notes: readonly SequenceNote[]): TrackerCaptureJob[][] {
+	return [...groupTrackerNotes(notes)].map(([key, group]) => {
+		if (group[0].channel === CHANNEL_DRUMS) {
+			const voices = new Map<string, SequenceNote[]>()
+			for (const note of group) {
+				const id = drumVoiceOf(note.number).id
+				voices.set(id, [...(voices.get(id) ?? []), note])
+			}
+			return [...voices.values()]
+				.sort((a, b) => b.length - a.length)
+				.slice(0, MAX_DRUM_VOICES)
+				.map((voice, rank) => ({
+					key,
+					note: representativeTrackerNote(voice),
+					drums: true,
+					keys: [...new Set(voice.map((note) => note.number))].sort((a, b) => a - b),
+					rank
+				}))
+		}
+		const sorted = [...group].sort((a, b) => a.number - b.number)
+		const span = sorted[sorted.length - 1].number - sorted[0].number
+		const zones = span > ZONE_SPAN ? Math.min(MAX_ZONES, Math.ceil(span / ZONE_SPAN)) : 1
+		const reps = new Map<number, SequenceNote>()
+		for (let zone = 0; zone < zones; zone++) {
+			const members = sorted.slice(
+				Math.floor((zone * sorted.length) / zones),
+				Math.floor(((zone + 1) * sorted.length) / zones)
+			)
+			if (members.length) {
+				const rep = representativeTrackerNote(members)
+				reps.set(rep.number, rep)
+			}
+		}
+		const middle = Math.floor((reps.size - 1) / 2)
+		return [...reps.values()].map((note, index) => ({
+			key,
+			note,
+			drums: false,
+			keys: [],
+			// The middle zone first, then the low and high ones
+			rank:
+				index === middle
+					? 0
+					: 1 + 2 * (Math.abs(index - middle) - 1) + (index > middle ? 1 : 0)
+		}))
+	})
+}
+
+/** Choose the captures that fit the budget and how long to hold and release each.
+ * Every instrument keeps its rank 0 capture; the others are taken in rank order while their minimum
+ * time fits. The rest of the budget is shared out by shrinking the holds and releases of all.
+ */
+export function scheduleTrackerCaptures(
+	plans: readonly TrackerCaptureJob[][],
+	budget: number,
+	hold: number,
+	release: number
+): {
+	plans: TrackerCaptureJob[][]
+	timing: (job: TrackerCaptureJob) => { hold: number; release: number }
+} {
+	const all = plans.flat()
+	const required = all.filter((job) => !job.rank)
+	const room = Math.max(required.length, Math.floor(budget / (MIN_HOLD + MIN_RELEASE)))
+	const optional = all
+		.filter((job) => job.rank)
+		.sort((a, b) => a.rank - b.rank)
+		.slice(0, room - required.length)
+	const kept = new Set<TrackerCaptureJob>([...required, ...optional])
+	const chosen = plans.map((jobs) => jobs.filter((job) => kept.has(job)))
+	const nominal = (job: TrackerCaptureJob) => {
+		const held = job.drums ? Math.min(hold, DRUM_HOLD) : hold
+		return { hold: held, release: Math.min(release, MAX_SECONDS - held) }
+	}
+	const total = [...kept].reduce((sum, job) => sum + nominal(job).hold + nominal(job).release, 0)
+	const scale = total > budget ? budget / total : 1
+	return {
+		plans: chosen,
+		timing: (job) => {
+			const { hold: held, release: released } = nominal(job)
+			return {
+				hold: Math.min(held, Math.max(MIN_HOLD, held * scale)),
+				release: Math.min(released, Math.max(MIN_RELEASE, released * scale))
+			}
+		}
+	}
 }
 
 function silenceBounds(samples: Float32Array, threshold: number): [number, number] {
@@ -112,7 +241,13 @@ function rms(samples: Float32Array, start: number, end: number): number {
 	return Math.sqrt(sum / Math.max(1, end - start))
 }
 
-/** Inspect only the held sound, before note-off. Loop endpoints are rising crossings. */
+/** A loop is at least this long, so that it still sounds like the instrument and not a buzz */
+const MIN_LOOP_SECONDS = 0.04
+
+/** Inspect only the held sound, before note-off. Loop endpoints are rising crossings.
+ * The loop that ends soonest wins, so the stored sample is a short attack and a short loop rather
+ * than the whole held note.
+ */
 export function findSustainLoop(
 	samples: Float32Array,
 	sampleRate: number,
@@ -127,26 +262,31 @@ export function findSustainLoop(
 	if (late < SILENCE_THRESHOLD * 4 || late < early * 0.55) {
 		return undefined
 	}
-	const starts: number[] = []
-	const ends: number[] = []
+	const crossings: number[] = []
 	for (let i = Math.floor(samples.length * 0.35); i < samples.length * 0.95; i++) {
 		if (samples[i - 1] <= 0 && samples[i] > 0) {
-			if (i < samples.length * 0.55) {
-				starts.push(i)
-			} else if (i > samples.length * 0.7) {
-				ends.push(i)
-			}
+			crossings.push(i)
 		}
 	}
+	const shortest = Math.max(2 * period, MIN_LOOP_SECONDS * sampleRate)
 	let best: { loopStart: number; loopLength: number } | undefined
-	let bestMismatch = Infinity
+	let bestEnd = Infinity
 	const window = Math.max(1, Math.min(32, Math.floor(period / 8)))
-	for (const start of starts) {
-		for (const end of ends) {
+	for (const start of crossings) {
+		if (start >= samples.length * 0.55 || start >= bestEnd) {
+			break
+		}
+		for (const end of crossings) {
 			const length = end - start
+			if (length < shortest) {
+				continue
+			}
+			if (end >= bestEnd) {
+				break
+			}
 			const periods = Math.round(length / period)
 			// Integer sample positions can differ from an exact whole period by one frame.
-			if (periods < 2 || Math.abs(length - periods * period) > 1) {
+			if (Math.abs(length - periods * period) > 1) {
 				continue
 			}
 			let mismatch = 0
@@ -154,9 +294,10 @@ export function findSustainLoop(
 				mismatch += (samples[start + i] - samples[end + i]) ** 2
 			}
 			mismatch = Math.sqrt(mismatch / (window * 2 + 1))
-			if (mismatch < late * 0.1 && mismatch < bestMismatch) {
-				bestMismatch = mismatch
+			if (mismatch < late * 0.1) {
+				bestEnd = end
 				best = { loopStart: start, loopLength: length }
+				break
 			}
 		}
 	}
@@ -221,11 +362,12 @@ async function prepareCapture(context: AudioContext): Promise<void> {
 async function captureInstrument(
 	options: CaptureTrackerSamplesOptions,
 	outputs: IAudioOutput[],
-	note: SequenceNote
-): Promise<TrackerSample> {
+	job: TrackerCaptureJob,
+	timing: { hold: number; release: number }
+): Promise<{ sample: TrackerSample; peak: number }> {
 	const { audioContext: context, signal } = options
-	const hold = seconds(options.holdSeconds, 0.8)
-	const release = Math.min(seconds(options.releaseSeconds, 0.6), MAX_SECONDS - hold)
+	const { note } = job
+	const { hold, release } = timing
 	const controller = new AbortController()
 	const abort = () => controller.abort()
 	const tap = new AudioWorkletNode(context, RECORDING_PROCESSOR, {
@@ -349,23 +491,27 @@ async function captureInstrument(
 		}
 		const [leading] = silenceBounds(raw, SILENCE_THRESHOLD)
 		const data = trimSilence(raw)
-		const loop = findSustainLoop(
-			data.subarray(0, Math.max(0, heldFrames - leading)),
-			context.sampleRate,
-			note.number
-		)
-		const suffix = ` ${note.patch}`
-		const name =
-			outputs[0].name
-				.normalize("NFKD")
-				.replace(/[^\x20-\x7e]/g, "")
-				.slice(0, 22 - suffix.length) + suffix
+		// A drum hit rings out once; only a held pitched sound has a sustain to loop
+		const loop = job.drums
+			? undefined
+			: findSustainLoop(
+					data.subarray(0, Math.max(0, heldFrames - leading)),
+					context.sampleRate,
+					note.number
+				)
+		const suffix = job.drums ? ` ${note.number}` : ` ${note.patch}`
+		const label = job.drums
+			? drumVoiceOf(note.number).name
+			: outputs[0].name.normalize("NFKD").replace(/[^\x20-\x7e]/g, "")
 		return {
-			name,
-			data: normalisePeak(data),
-			sampleRate: context.sampleRate,
-			baseNote: note.number,
-			...loop
+			sample: {
+				name: label.slice(0, 22 - suffix.length) + suffix,
+				data: normalisePeak(data),
+				sampleRate: context.sampleRate,
+				baseNote: note.number,
+				...loop
+			},
+			peak: peak(data)
 		}
 	} catch (error) {
 		throw processorError ?? error
@@ -398,46 +544,79 @@ async function captureInstrument(
 
 export async function captureTrackerSamples(
 	options: CaptureTrackerSamplesOptions
-): Promise<Map<string, TrackerSample>> {
+): Promise<Map<string, TrackerSample | TrackerSampleSet>> {
 	const { audioContext: context, signal } = options
 	checkAbort(signal)
-	const groups = groupTrackerNotes(options.notes)
-	const samples = new Map<string, TrackerSample>()
-	if (!groups.size) {
+	const samples = new Map<string, TrackerSample | TrackerSampleSet>()
+	const budget = Number.isFinite(options.budgetSeconds)
+		? Math.max(0, options.budgetSeconds!)
+		: CAPTURE_BUDGET_SECONDS
+	const schedule = scheduleTrackerCaptures(
+		planTrackerCaptures(options.notes),
+		budget,
+		seconds(options.holdSeconds, DEFAULT_HOLD),
+		seconds(options.releaseSeconds, DEFAULT_RELEASE)
+	)
+	const total = schedule.plans.reduce((sum, jobs) => sum + jobs.length, 0)
+	if (!total) {
 		return samples
 	}
 	const restore = options.mute?.()
 	try {
 		let ready: Promise<void> | undefined
 		let done = 0
-		for (const [key, notes] of groups) {
-			checkAbort(signal)
-			try {
-				const note = representativeTrackerNote(notes)
-				const outputs =
-					options.getChain(note.chainId!)?.outputs.filter((output) => {
-						const node = output.output
-						// Context identity also excludes Web MIDI and hardware output objects.
-						return (
-							output.hasAudioOutput?.() &&
-							node &&
-							"context" in node &&
-							node.context === context &&
-							typeof node.connect === "function" &&
-							typeof node.disconnect === "function"
+		for (const jobs of schedule.plans) {
+			const captured: { job: TrackerCaptureJob; sample: TrackerSample; peak: number }[] = []
+			for (const job of jobs) {
+				checkAbort(signal)
+				try {
+					const outputs =
+						options.getChain(job.note.chainId!)?.outputs.filter((output) => {
+							const node = output.output
+							// Context identity also excludes Web MIDI and hardware output objects.
+							return (
+								output.hasAudioOutput?.() &&
+								node &&
+								"context" in node &&
+								node.context === context &&
+								typeof node.connect === "function" &&
+								typeof node.disconnect === "function"
+							)
+						}) ?? []
+					if (!outputs.length) {
+						throw new Error(
+							"No connected audio output is available for this instrument"
 						)
-					}) ?? []
-				if (!outputs.length) {
-					throw new Error("No connected audio output is available for this instrument")
+					}
+					await abortable((ready ??= prepareCapture(context)), signal)
+					checkAbort(signal)
+					captured.push({
+						job,
+						...(await captureInstrument(options, outputs, job, schedule.timing(job)))
+					})
+				} catch (error) {
+					checkAbort(signal)
+					console.warn("Tracker sample omitted", job.key, error)
 				}
-				await abortable((ready ??= prepareCapture(context)), signal)
-				checkAbort(signal)
-				samples.set(key, await captureInstrument(options, outputs, note))
-			} catch (error) {
-				checkAbort(signal)
-				console.warn("Tracker sample omitted", key, error)
+				options.onProgress?.(++done, total)
 			}
-			options.onProgress?.(++done, groups.size)
+			if (captured.length === 1 && !captured[0].job.drums) {
+				samples.set(captured[0].job.key, captured[0].sample)
+			} else if (captured.length) {
+				// Samples of one instrument keep their loudness relative to each other
+				const loudest = Math.max(...captured.map(({ peak }) => peak))
+				const keymap = new Map<number, number>()
+				captured.forEach(({ job }, index) =>
+					job.keys.forEach((key) => keymap.set(key, index))
+				)
+				samples.set(captured[0].job.key, {
+					samples: captured.map(({ sample, peak }) => ({
+						...sample,
+						volume: loudest > 0 ? peak / loudest : 1
+					})),
+					...(keymap.size ? { keymap } : {})
+				})
+			}
 		}
 		checkAbort(signal)
 		return samples

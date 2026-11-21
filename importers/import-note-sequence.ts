@@ -1,3 +1,4 @@
+import { songFromCommands } from "../formats/song-source"
 import AudioCommand from "../commands/audio-command"
 import { NOTE_ON, NOTE_OFF } from "../commands/commands"
 import { MAX_MEDIA_BYTES } from "./dropped-media"
@@ -115,5 +116,33 @@ export async function importNoteSequenceFile(file: File) {
 	commands.sort(
 		(a, b) => a.startAt - b.startAt || (a.type === NOTE_OFF ? -1 : b.type === NOTE_OFF ? 1 : 0)
 	)
-	return { commands, noteCount }
+	const key = (data.keySignatures ?? data.key_signatures)?.[0]
+	const song = songFromCommands(
+		commands,
+		data.sequenceMetadata?.title ?? data.sequence_metadata?.title ?? file.name,
+		{
+			tempos: (data.tempos ?? []).map((t: any) => ({ time: t.time ?? 0, bpm: t.qpm })),
+			meters: (data.timeSignatures ?? data.time_signatures ?? []).map((m: any) => ({
+				time: m.time ?? 0,
+				numerator: m.numerator,
+				denominator: m.denominator
+			})),
+			key: key
+				? {
+						fifths: [0, -5, 2, -3, 4, -1, 6, 1, -4, 3, -2, 5][
+							(key.key + (key.mode === 1 || key.mode === "MINOR" ? 3 : 0)) % 12
+						],
+						mode: key.mode === 1 || key.mode === "MINOR" ? "minor" : "major"
+					}
+				: undefined
+		}
+	)
+	for (const track of song.tracks) {
+		const instrument = Number(track.source?.split("instrument-").at(-1))
+		track.name =
+			(data.instrumentInfos ?? data.instrument_infos ?? []).find(
+				(i: any) => i.instrument === instrument
+			)?.name ?? track.name
+	}
+	return { commands, noteCount, song }
 }

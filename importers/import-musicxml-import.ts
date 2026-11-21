@@ -1,3 +1,4 @@
+import { importedSong, type SongSource } from "../formats/song-source"
 import AudioCommand from "../commands/audio-command"
 import { NOTE_ON, NOTE_OFF } from "../commands/commands"
 import { readMediaArchive, safeArchivePath, MAX_MEDIA_BYTES } from "./dropped-media"
@@ -40,7 +41,12 @@ export async function importMusicXMLFile(file: File) {
 		velocity: number
 		channel: number
 		patch: number
+		track: number
 	}[] = []
+	const tracks: SongSource["tracks"] = []
+	const meters = new Map<number, { numerator: number; denominator: number }>()
+	let key: SongSource["key"]
+	const pending = new Map<string, (typeof notes)[number]>()
 	const tempos = new Map<number, number>([[0, 120]])
 	const pitches: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }
 	const parts = [...doc.documentElement.children].filter((el) => el.localName === "part")
@@ -62,6 +68,12 @@ export async function importMusicXMLFile(file: File) {
 		) {
 			throw new Error("Invalid MusicXML MIDI instrument")
 		}
+		tracks.push({
+			name: definition?.querySelector("part-name")?.textContent ?? `Track ${index + 1}`,
+			channel,
+			patch,
+			notes: []
+		})
 		let divisions = 1
 		let measureStart = 0
 		let velocity = 100
@@ -71,6 +83,21 @@ export async function importMusicXMLFile(file: File) {
 				chordStart = measureStart
 			for (const el of measure.children) {
 				if (el.localName === "attributes") {
+					const time = el.querySelector("time")
+					if (time?.querySelector("beats"))
+						meters.set(cursor, {
+							numerator: Number(time.querySelector("beats")!.textContent),
+							denominator: Number(time.querySelector("beat-type")!.textContent)
+						})
+					const fifths = el.querySelector("key > fifths")
+					if (fifths && !key)
+						key = {
+							fifths: Number(fifths.textContent),
+							mode:
+								el.querySelector("key > mode")?.textContent === "minor"
+									? "minor"
+									: "major"
+						}
 					divisions = Number(el.querySelector("divisions")?.textContent ?? divisions)
 					if (!(divisions > 0)) {
 						throw new Error("Invalid MusicXML divisions")
@@ -136,7 +163,7 @@ export async function importMusicXMLFile(file: File) {
 				if (!Number.isInteger(number) || number < 0 || number > 127) {
 					throw new Error("Unsupported MusicXML pitch")
 				}
-				notes.push({
+				const note = {
 					number,
 					start,
 					end: start + duration,
@@ -150,8 +177,18 @@ export async function importMusicXMLFile(file: File) {
 							)
 						: velocity,
 					channel,
-					patch
-				})
+					patch,
+					track: index
+				}
+				const tieKey = `${index}:${el.querySelector("voice")?.textContent ?? "1"}:${number}`
+				const previous = pending.get(tieKey)
+				const incoming = el.querySelector('tie[type="stop"]')
+				const target =
+					incoming && previous && Math.abs(previous.end - start) < 1e-8 ? previous : note
+				if (target === note) notes.push(note)
+				else target.end = note.end
+				if (el.querySelector('tie[type="start"]')) pending.set(tieKey, target)
+				else pending.delete(tieKey)
 			}
 			measureStart = end
 		}
@@ -192,7 +229,23 @@ export async function importMusicXMLFile(file: File) {
 	if (!notes.length) {
 		throw new Error("The MusicXML score contains no importable notes")
 	}
-	return { commands, noteCount: notes.length }
+	for (const note of notes)
+		tracks[note.track].notes.push({
+			number: note.number,
+			channel: note.channel,
+			patch: note.patch,
+			velocity: note.velocity,
+			start: seconds(note.start),
+			duration: seconds(note.end) - seconds(note.start)
+		})
+	const song = importedSong({
+		name: doc.querySelector("work-title")?.textContent ?? file.name,
+		tempos: changes.map(([beat, bpm]) => ({ time: seconds(beat), bpm })),
+		meters: [...meters].map(([beat, meter]) => ({ time: seconds(beat), ...meter })),
+		key,
+		tracks
+	})
+	return { commands, noteCount: notes.length, song }
 }
 
 export function parseXML(text: string): XMLDocument {

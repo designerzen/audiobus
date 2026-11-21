@@ -1,6 +1,7 @@
 import { checkMusicFile, commandsFromNotes } from "../formats/imported-notes"
 import { projectTick, projectTimeAxis, parseMusicJSON } from "../formats/project-time"
 import type { SequenceNote } from "../formats/note-sequence"
+import { importedSong, meterTimes, type SongSource } from "../formats/song-source"
 
 const list = (value: unknown): any[] => {
 	if (!Array.isArray(value) || value.length > 100000) {
@@ -14,6 +15,45 @@ const channel = (index: number) => {
 	}
 	return index < 9 ? index + 1 : index + 2
 }
+/** Song metadata from project tempo lists, bar-indexed meters and track names.
+ * Metadata is optional, so malformed entries are skipped rather than failing the import.
+ */
+function projectSong(
+	result: ReturnType<typeof commandsFromNotes>,
+	time: (tick: number) => number,
+	tempos: { position: unknown; bpm: unknown }[],
+	meters: { bar: unknown; numerator: unknown; denominator: unknown }[],
+	names: unknown[],
+	title: unknown
+): SongSource {
+	const song = result.song
+	try {
+		song.tempos = tempos
+			.filter((tempo) => Number.isSafeInteger(tempo?.position) && Number(tempo.bpm) > 0)
+			.map((tempo) => ({ time: time(tempo.position as number), bpm: Number(tempo.bpm) }))
+		song.meters = meterTimes(
+			song,
+			meters.map((meter) => ({
+				bar: Number(meter?.bar),
+				numerator: Number(meter?.numerator),
+				denominator: Number(meter?.denominator)
+			}))
+		)
+	} catch {
+		song.meters = []
+	}
+	if (typeof title === "string" && title.trim()) {
+		song.name = title.trim().slice(0, 4096)
+	}
+	for (const track of song.tracks) {
+		const index = track.channel < 10 ? track.channel - 1 : track.channel - 2
+		if (typeof names[index] === "string" && (names[index] as string).trim()) {
+			track.name = (names[index] as string).slice(0, 4096)
+		}
+	}
+	return importedSong(song)
+}
+
 function addNote(
 	notes: SequenceNote[],
 	pitch: number,
@@ -44,10 +84,11 @@ export async function importUFDataFile(file: File) {
 		throw new Error("Expected UtaFormatix data version 1")
 	}
 	const project = data.project
-	const time = projectTimeAxis(
-		480,
-		list(project.tempos).map((tempo) => ({ position: tempo?.tickPosition, bpm: tempo?.bpm }))
-	)
+	const tempos = list(project.tempos).map((tempo) => ({
+		position: tempo?.tickPosition,
+		bpm: tempo?.bpm
+	}))
+	const time = projectTimeAxis(480, tempos)
 	const notes: SequenceNote[] = []
 	for (const [index, track] of list(project.tracks).entries()) {
 		for (const note of list(track?.notes)) {
@@ -61,7 +102,21 @@ export async function importUFDataFile(file: File) {
 			)
 		}
 	}
-	return commandsFromNotes(notes, file.name)
+	const result = commandsFromNotes(notes, file.name)
+	return {
+		...result,
+		song: projectSong(
+			result,
+			time,
+			tempos,
+			list(project.timeSignatures ?? []).map((meter) => ({
+				...meter,
+				bar: meter?.measurePosition
+			})),
+			list(project.tracks).map((track) => track?.name),
+			project.name
+		)
+	}
 }
 
 export async function importUSTXFile(file: File) {
@@ -71,10 +126,9 @@ export async function importUSTXFile(file: File) {
 	if (!data?.ustx_version || !Array.isArray(data.voice_parts)) {
 		throw new Error("Expected an OpenUtau USTX project")
 	}
-	const time = projectTimeAxis(
-		data.resolution ?? 480,
-		list(data.tempos ?? [{ position: 0, bpm: data.bpm ?? 120 }])
-	)
+	const tempos = list(data.tempos ?? [{ position: 0, bpm: data.bpm ?? 120 }]),
+		resolution = data.resolution ?? 480
+	const time = projectTimeAxis(resolution, tempos)
 	const notes: SequenceNote[] = []
 	for (const part of data.voice_parts) {
 		const offset = projectTick(part?.position)
@@ -89,7 +143,22 @@ export async function importUSTXFile(file: File) {
 			)
 		}
 	}
-	return commandsFromNotes(notes, file.name)
+	const result = commandsFromNotes(notes, file.name)
+	return {
+		...result,
+		song: projectSong(
+			result,
+			time,
+			tempos,
+			list(data.time_signatures ?? []).map((meter) => ({
+				bar: meter?.bar_position,
+				numerator: meter?.beat_per_bar,
+				denominator: meter?.beat_unit
+			})),
+			list(data.tracks ?? []).map((track) => track?.track_name),
+			data.name
+		)
+	}
 }
 
 export async function importSVPFile(file: File) {
@@ -98,7 +167,8 @@ export async function importSVPFile(file: File) {
 	if (!data?.time || !Array.isArray(data.tracks)) {
 		throw new Error("Expected a Synthesizer V project")
 	}
-	const time = projectTimeAxis(705600000, list(data.time.tempo ?? []))
+	const tempos = list(data.time.tempo ?? [])
+	const time = projectTimeAxis(705600000, tempos)
 	const library = new Map<string, any>()
 	for (const group of list(data.library ?? [])) {
 		if (typeof group?.uuid !== "string" || library.has(group.uuid)) {
@@ -139,5 +209,16 @@ export async function importSVPFile(file: File) {
 			}
 		}
 	}
-	return commandsFromNotes(notes, file.name)
+	const result = commandsFromNotes(notes, file.name)
+	return {
+		...result,
+		song: projectSong(
+			result,
+			time,
+			tempos,
+			list(data.time.meter ?? []).map((meter) => ({ ...meter, bar: meter?.index })),
+			list(data.tracks).map((track) => track?.name),
+			data.renderConfig?.filename
+		)
+	}
 }

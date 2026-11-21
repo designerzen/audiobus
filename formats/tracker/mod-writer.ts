@@ -19,6 +19,10 @@ export const MOD_SPEC: TrackerFormatSpec = {
 	maxChannels: 32,
 	channelStep: 2,
 	maxInstruments: 31,
+	keymaps: false,
+	envelopes: false,
+	maxInstrumentSamples: 1,
+	maxSamples: 31,
 	maxOrders: 128,
 	noteRange: [MOD_LOW_NOTE, MOD_LOW_NOTE + 35],
 	minTempo: 32,
@@ -33,6 +37,11 @@ const PERIODS = [
 ]
 /** Playback rate for the first period (856) on a PAL Amiga: 3546895 Hz / period, as libopenmpt does */
 const MOD_BASE_RATE = 3546894.6 / 856
+/** Finetune is a signed nibble in eighths of a semitone. Every sample is tuned to its lowest value, one
+ * semitone down, which slows playback and so lets the stored sample carry 5.6% fewer frames for the
+ * same sound; the cell notes and so the note numbers read back are unchanged.
+ */
+const MOD_FINETUNE = -8
 const MAX_SAMPLE_BYTES = 131070
 const DEFAULT_SPEED = 6
 const DEFAULT_TEMPO = 125
@@ -63,10 +72,12 @@ export function writeMOD(source: TrackerSong): Uint8Array<ArrayBuffer> {
 	const channels = song.channels
 	const { patterns, order } = buildPatterns(song, MOD_SPEC, true)
 
-	const stored = song.instruments.map((instrument) => {
-		const rate = MOD_BASE_RATE * 2 ** ((instrument.sample.baseNote - MOD_LOW_NOTE) / 12)
-		// Pitch comes from the period alone, so the rate is held exactly and the loop is rounded instead
-		const resampled = evenLoop(resampleSample(instrument.sample, rate, true))
+	const stored = song.instruments.map(({ samples }) => {
+		const { sample } = samples[0]
+		// Pitch comes from the period and finetune alone, so the stored rate is the rate the base note plays at
+		const rate = MOD_BASE_RATE * 2 ** ((sample.baseNote - MOD_LOW_NOTE + MOD_FINETUNE / 8) / 12)
+		// The rate is held exactly and the loop is rounded instead
+		const resampled = evenLoop(resampleSample(sample, rate, true))
 		return resampled.data.length > MAX_SAMPLE_BYTES
 			? {
 					...resampled,
@@ -90,7 +101,7 @@ export function writeMOD(source: TrackerSong): Uint8Array<ArrayBuffer> {
 		const looped = sample.loopStart !== undefined && sample.loopLength !== undefined
 		out.text(trackerName(instrument.name, 22), 22)
 		out.u16be(length / 2)
-			.u8(0)
+			.u8(MOD_FINETUNE & 0x0f)
 			.u8(64)
 		out.u16be(looped ? sample.loopStart! / 2 : 0).u16be(looped ? sample.loopLength! / 2 : 1)
 	}

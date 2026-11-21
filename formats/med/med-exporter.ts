@@ -6,10 +6,15 @@
 
 import { ByteWriter, trackerName } from "../tracker/tracker-bytes"
 import { buildPatterns } from "../tracker/tracker-grid"
-import { resampleSample, toInt8 } from "../tracker/tracker-samples"
+import {
+	MIN_STORAGE_RATE,
+	chooseStorageRate,
+	resampleSample,
+	toInt8
+} from "../tracker/tracker-samples"
 import type { TrackerFormatSpec, TrackerSong } from "../tracker/tracker-types"
 
-/** Samples are stored near this rate and tuned with the instrument's transpose */
+/** Samples are stored at no more than this rate and tuned with the instrument's transpose */
 const MED_TARGET_RATE = 16726
 /** The rate a PAL Amiga plays period 428, which libopenmpt plays an unshifted sample at on MIDI 60 */
 const MED_BASE_RATE = 3546894.6 / 428
@@ -29,6 +34,10 @@ export const MED_SPEC: TrackerFormatSpec = {
 	maxChannels: 64,
 	channelStep: 1,
 	maxInstruments: 63,
+	keymaps: false,
+	envelopes: false,
+	maxInstrumentSamples: 1,
+	maxSamples: 63,
 	maxOrders: 256,
 	noteRange: [0, 126],
 	minTempo: 32,
@@ -47,10 +56,10 @@ const INSTRUMENT_NAME_SIZE = 40
 
 /** Semitone transpose for a sample. An unshifted sample plays at its stored rate on MIDI 60 and each
  * semitone of transpose raises it one, so the transpose both picks the stored rate and keeps the base
- * note in tune. The rate is as near MED_TARGET_RATE as the highest note it plays allows.
+ * note in tune. The rate is the nearest to `targetRate` that the highest note it plays allows.
  */
-export function medTranspose(baseNote: number, highestNote: number) {
-	const wanted = 12 * Math.log2(MED_TARGET_RATE / MED_BASE_RATE) - (baseNote - MED_REFERENCE_NOTE)
+export function medTranspose(baseNote: number, highestNote: number, targetRate = MED_TARGET_RATE) {
+	const wanted = 12 * Math.log2(targetRate / MED_BASE_RATE) - (baseNote - MED_REFERENCE_NOTE)
 	const limit =
 		12 * Math.log2(MED_MAX_PLAY_RATE / MED_BASE_RATE) - (highestNote - MED_REFERENCE_NOTE)
 	return Math.max(-128, Math.min(127, Math.min(Math.round(wanted), Math.floor(limit))))
@@ -59,21 +68,16 @@ export function medTranspose(baseNote: number, highestNote: number) {
 export function writeMED(song: TrackerSong): Uint8Array<ArrayBuffer> {
 	const { patterns, order } = buildPatterns(song, MED_SPEC, false)
 	const instrumentCount = song.instruments.length
-	const highest = song.instruments.map((instrument) => instrument.sample.baseNote)
-	for (const line of song.cells) {
-		for (const cell of line) {
-			if (cell && !cell.off) {
-				highest[cell.instrument - 1] = Math.max(highest[cell.instrument - 1], cell.note)
-			}
-		}
-	}
-	const stored = song.instruments.map((instrument, index) => {
-		const transpose = medTranspose(instrument.sample.baseNote, highest[index])
+	const stored = song.instruments.map(({ samples }) => {
+		const { sample, lowest, highest } = samples[0]
+		const wanted = chooseStorageRate(sample, lowest, {
+			minRate: MIN_STORAGE_RATE,
+			maxRate: MED_TARGET_RATE
+		})
+		const transpose = medTranspose(sample.baseNote, highest, wanted)
 		// The stored rate that makes the base note sound at its own pitch under that transpose
-		const rate =
-			MED_BASE_RATE *
-			2 ** ((instrument.sample.baseNote - MED_REFERENCE_NOTE + transpose) / 12)
-		return { transpose, sample: resampleSample(instrument.sample, rate, true) }
+		const rate = MED_BASE_RATE * 2 ** ((sample.baseNote - MED_REFERENCE_NOTE + transpose) / 12)
+		return { transpose, sample: resampleSample(sample, rate, true) }
 	})
 
 	const out = new ByteWriter()

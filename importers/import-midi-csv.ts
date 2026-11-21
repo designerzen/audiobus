@@ -1,3 +1,4 @@
+import { songFromCommands } from "../formats/song-source"
 import AudioCommand from "../commands/audio-command"
 import { NOTE_ON, NOTE_OFF, CONTROL_CHANGE, PROGRAM_CHANGE, PITCH_BEND } from "../commands/commands"
 import { MAX_MEDIA_BYTES } from "./dropped-media"
@@ -179,5 +180,31 @@ export async function importMIDICSVFile(file: File) {
 	if (!noteCount) {
 		throw new Error("MIDI CSV contains no importable notes")
 	}
-	return { commands, noteCount }
+	const signature = records.find((r) => r.type === "key_signature")
+	const song = songFromCommands(
+		commands,
+		records.find((r) => r.type === "title_t" && r.track === 1)?.row[3] ?? file.name,
+		{
+			tempos: changes.map((t) => ({ time: t.seconds, bpm: 60000000 / t.micros })),
+			meters: records
+				.filter((r) => r.type === "time_signature")
+				.map((r) => ({
+					time: seconds(r.tick),
+					numerator: integer(r.row[3], 1, 64),
+					denominator: 2 ** integer(r.row[4], 0, 6)
+				})),
+			key: signature
+				? {
+						fifths: integer(signature.row[3], -7, 7),
+						mode: signature.row[4]?.toLowerCase() === "minor" ? "minor" : "major"
+					}
+				: undefined
+		}
+	)
+	for (const track of song.tracks) {
+		const index = Number(track.source?.split("track-").at(-1))
+		track.name =
+			records.find((r) => r.type === "title_t" && r.track === index)?.row[3] ?? track.name
+	}
+	return { commands, noteCount, song }
 }

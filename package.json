@@ -85,7 +85,7 @@
 		"chiptune3": "0.8.10",
 		"coi-serviceworker": "0.1.7",
 		"control-surface": "git+https://github.com/designerzen/audiobus-control-surface.git#main",
-		"fflate": "^0.8.2",
+		"fflate": "^0.8.3",
 		"kokoro-js": "^1.2.1",
 		"lz-string": "^1.5.0",
 		"midi-devices": "git+https://github.com/designerzen/midi-devices.git#main",
@@ -97,13 +97,13 @@
 		"supersonic-scsynth-bundle": "^0.64.0",
 		"theremid": "github:designerzen/Leap-Motion-Theremin#theremid-harmoneasy",
 		"tone": "^15.1.22",
-		"vexflow": "^5.0.0",
+		"vexflow": "^5.6.0",
 		"webmidi": "^3.3.1",
 		"yaml": "2.8.2"
 	},
 	"devDependencies": {
 		"@webgpu/types": "^0.1.74",
 		"typescript": "~5.9.3",
-		"vitest": "^4.1.11"
+		"vitest": "^4.1.12"
 	}
 }

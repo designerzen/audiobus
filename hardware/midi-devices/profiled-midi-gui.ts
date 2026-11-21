@@ -284,6 +284,14 @@ export function createProfiledMidiGui(
 		visibility.push({ element: row, ids: [control.id] })
 		return row
 	}
+	const imageNodes = (node: MidiGuiNode): MidiGuiNode[] =>
+		node.type === "image" ? [node] : (node.children ?? []).flatMap(imageNodes)
+	// A GUI may illustrate itself with a different image than `surface.src` (for example
+	// an unlabelled panel beside a labelled interface); the surface then replaces the first.
+	const surfaceImage = profile.surface
+		? (imageNodes(profile.gui).find((node) => node.src === profile.surface!.src) ??
+			imageNodes(profile.gui)[0])
+		: undefined
 	const render = (node: MidiGuiNode): HTMLElement => {
 		const host = document.createElement(node.type === "section" ? "fieldset" : "div")
 		host.dataset.guiType = node.type
@@ -318,7 +326,10 @@ export function createProfiledMidiGui(
 				host.textContent = node.text ?? ""
 				break
 			case "image": {
-				if (profile.surface && node.src === profile.surface.src) {
+				if (
+					profile.surface &&
+					(node === surfaceImage || node.src === profile.surface.src)
+				) {
 					const surface = createMidiDeviceSurface(profile, options, send, changed)
 					surfaces.push(surface)
 					host.append(surface.element)

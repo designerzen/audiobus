@@ -1,8 +1,9 @@
+import { normalizeSong, recordingFromSong, type SongSource } from "../formats/song-source"
 import type { NoteRecording } from "../formats/note-sequence"
 import { INTERCHANGE_EXPORT_FORMATS } from "./adapter-interchange"
 import { TRACKER_EXPORT_FORMATS, type TrackerSampleMap } from "../formats/tracker/tracker-types"
 
-export interface ExportFormat {
+interface RecordingExportFormat {
 	readonly id: string
 	readonly label: string
 	readonly extension: string
@@ -16,7 +17,7 @@ export interface ExportFormat {
 	) => Promise<Blob>
 }
 
-export const EXPORT_FORMATS: readonly ExportFormat[] = [
+const RECORDING_EXPORT_FORMATS: readonly RecordingExportFormat[] = [
 	{
 		id: "midi",
 		label: "MIDI file",
@@ -194,7 +195,7 @@ export const EXPORT_FORMATS: readonly ExportFormat[] = [
 			)
 	},
 	...INTERCHANGE_EXPORT_FORMATS.map(
-		(format): ExportFormat => ({
+		(format): RecordingExportFormat => ({
 			...format,
 			mime:
 				(
@@ -226,7 +227,7 @@ export const EXPORT_FORMATS: readonly ExportFormat[] = [
 		})
 	),
 	...([false, true] as const).map(
-		(compressed): ExportFormat => ({
+		(compressed): RecordingExportFormat => ({
 			id: compressed ? "mscz" : "mscx",
 			label: compressed ? "Compressed MuseScore 4 score" : "MuseScore 4 score",
 			extension: compressed ? "mscz" : "mscx",
@@ -242,7 +243,7 @@ export const EXPORT_FORMATS: readonly ExportFormat[] = [
 		})
 	),
 	...TRACKER_EXPORT_FORMATS.map(
-		(format): ExportFormat => ({
+		(format): RecordingExportFormat => ({
 			...format,
 			mime: "application/octet-stream",
 			kind: "tracker",
@@ -266,6 +267,23 @@ export const EXPORT_FORMATS: readonly ExportFormat[] = [
 		})
 	)
 ]
+
+export interface ExportOptions {
+	samples?: TrackerSampleMap
+}
+/** Every format exports a song: the recording through songFromRecording, or a loaded song.
+ * Song-aware exporters read its metadata; the others use its notes at the first tempo.
+ */
+export interface ExportFormat extends Omit<RecordingExportFormat, "export"> {
+	readonly export: (song: SongSource, options?: ExportOptions) => Promise<Blob>
+}
+export const EXPORT_FORMATS: readonly ExportFormat[] = RECORDING_EXPORT_FORMATS.map((format) => ({
+	...format,
+	export: async (source, options) => {
+		const song = normalizeSong(source)
+		return format.export(recordingFromSong(song), { BPM: song.tempos[0].bpm }, options)
+	}
+}))
 
 export const getExportFormat = (id: string): ExportFormat | undefined =>
 	EXPORT_FORMATS.find((format) => format.id === id)

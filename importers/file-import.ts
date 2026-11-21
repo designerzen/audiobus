@@ -1,3 +1,4 @@
+import { songFromCommands, type SongSource } from "../formats/song-source"
 import { MAX_MEDIA_BYTES, readMediaArchive } from "./dropped-media"
 import { TRACKER_EXTENSIONS, importTrackerFile } from "./import-tracker-file"
 import { importMIDIFile } from "./import-midi-file"
@@ -312,10 +313,10 @@ export async function detectImportFile(file: File): Promise<DetectedImportFile> 
 	)
 }
 
-export async function importMusicalFile(
+async function readMusicalFile(
 	file: File,
 	id?: ImportFormatId
-): Promise<{ commands: IAudioCommand[]; noteCount: number }> {
+): Promise<{ commands: IAudioCommand[]; noteCount: number; song?: SongSource }> {
 	id ??= (await detectImportFile(file)).format.id
 	switch (id) {
 		case "midi":
@@ -377,4 +378,9 @@ export async function importMusicalFile(
 				"This file contains audio or an instrument bundle, rather than note data"
 			)
 	}
+}
+/** Playable commands and the song they came from, with the file's metadata where it has any */
+export async function importMusicalFile(file: File, id?: ImportFormatId) {
+	const result = await readMusicalFile(file, id)
+	return { ...result, song: result.song ?? songFromCommands(result.commands, file.name) }
 }

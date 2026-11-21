@@ -1,3 +1,4 @@
+import { songFromCommands, type SongMetadata } from "./song-source"
 import AudioCommand from "../commands/audio-command"
 import { NOTE_ON, NOTE_OFF } from "../commands/commands"
 import type { SequenceNote } from "./note-sequence"
@@ -10,7 +11,7 @@ export function checkMusicFile(file: File) {
 }
 
 /** Validate interchange data before creating playable commands. Times are seconds. */
-export function commandsFromNotes(notes: SequenceNote[], name: string) {
+export function commandsFromNotes(notes: SequenceNote[], name: string, meta: SongMetadata = {}) {
 	if (!notes.length || notes.length > 100000) {
 		throw new Error("Expected between 1 and 100,000 notes")
 	}
@@ -60,5 +61,9 @@ export function commandsFromNotes(notes: SequenceNote[], name: string) {
 	commands.sort(
 		(a, b) => a.startAt - b.startAt || (a.type === NOTE_OFF ? -1 : b.type === NOTE_OFF ? 1 : 0)
 	)
-	return { commands, noteCount: commands.length / 2 }
+	return {
+		commands,
+		noteCount: commands.length / 2,
+		song: songFromCommands(commands, name, meta)
+	}
 }

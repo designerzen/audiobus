@@ -2,7 +2,13 @@
 
 import { ByteWriter, trackerName } from "./tracker-bytes"
 import { buildPatterns } from "./tracker-grid"
-import { MAX_STORAGE_RATE, MIN_STORAGE_RATE, resampleSample, toInt8 } from "./tracker-samples"
+import {
+	MAX_STORAGE_RATE,
+	MIN_STORAGE_RATE,
+	chooseStorageRate,
+	resampleSample,
+	toInt8
+} from "./tracker-samples"
 import type { TrackerFormatSpec, TrackerSong } from "./tracker-types"
 
 /** S3M note bytes are octave * 16 + semitone, and C-4 (0x40) is MIDI 60 as libopenmpt reports it.
@@ -16,6 +22,10 @@ export const S3M_SPEC: TrackerFormatSpec = {
 	maxChannels: 32,
 	channelStep: 1,
 	maxInstruments: 99,
+	keymaps: false,
+	envelopes: false,
+	maxInstrumentSamples: 1,
+	maxSamples: 99,
 	maxOrders: 255,
 	noteRange: [S3M_NOTE_OFFSET, S3M_NOTE_OFFSET + 95],
 	minTempo: 33,
@@ -39,12 +49,13 @@ export function writeS3M(song: TrackerSong): Uint8Array<ArrayBuffer> {
 	const tableEnd = 96 + orderCount + (instrumentCount + patterns.length) * 2 + 32
 	const instrumentsAt = Math.ceil(tableEnd / 16) * 16
 
-	const stored = song.instruments.map((instrument) => {
-		const rate = Math.max(
-			MIN_STORAGE_RATE,
-			Math.min(MAX_STORAGE_RATE, instrument.sample.sampleRate)
-		)
-		return resampleSample(instrument.sample, rate)
+	const stored = song.instruments.map(({ samples }) => {
+		const { sample, lowest } = samples[0]
+		const rate = chooseStorageRate(sample, lowest, {
+			minRate: MIN_STORAGE_RATE,
+			maxRate: MAX_STORAGE_RATE
+		})
+		return resampleSample(sample, rate)
 	})
 	const patternBytes = patterns.map((pattern) => {
 		const packed = new ByteWriter()
@@ -114,7 +125,9 @@ export function writeS3M(song: TrackerSong): Uint8Array<ArrayBuffer> {
 		const sample = stored[index]
 		const looped = sample.loopStart !== undefined && sample.loopLength !== undefined
 		// The sample plays at c2Speed Hz on C-5, so a base note B needs rate * 2^((60 - B) / 12)
-		const c2Speed = Math.round(sample.rate * 2 ** ((C5_NOTE - instrument.sample.baseNote) / 12))
+		const c2Speed = Math.round(
+			sample.rate * 2 ** ((C5_NOTE - instrument.samples[0].sample.baseNote) / 12)
+		)
 		const paragraph = sampleOffsets[index] / 16
 		out.u8(1)
 		out.text(trackerName(`inst${index + 1}.smp`, 12), 12)

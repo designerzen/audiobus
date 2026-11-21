@@ -1,4 +1,5 @@
-import { exportTempo, recordingNotes, type NoteRecording } from "../formats/note-sequence"
+import { songFromRecording, songNotes, type SongSource } from "../formats/song-source"
+import { type NoteRecording } from "../formats/note-sequence"
 import { MED_SPEC, writeMED } from "../formats/med/med-exporter"
 import { buildTrackerSong } from "../formats/tracker/tracker-grid"
 import { IT_SPEC, writeIT } from "../formats/tracker/it-writer"
@@ -42,13 +43,24 @@ export function createTrackerModule(
 	format: TrackerExportId,
 	options: TrackerExportOptions = {}
 ): Uint8Array<ArrayBuffer> {
+	return createTrackerModuleFromSong(
+		recording.song ?? songFromRecording(recording, timer),
+		format,
+		options
+	)
+}
+export function createTrackerModuleFromSong(
+	source: SongSource,
+	format: TrackerExportId,
+	options: TrackerExportOptions = {}
+): Uint8Array<ArrayBuffer> {
 	const writer = WRITERS[format]
 	if (!writer) {
 		throw new Error(`Unknown tracker format: ${format}`)
 	}
-	const bpm = exportTempo(timer)
-	const notes = recordingNotes(recording, { chains: true })
-	const song = buildTrackerSong(notes, bpm, writer.spec, recording.name, options.samples)
+	const bpm = source.tempos[0].bpm
+	const notes = songNotes(source)
+	const song = buildTrackerSong(notes, bpm, writer.spec, source.name, options.samples)
 	return writer.write(song)
 }
 
@@ -60,6 +72,15 @@ export async function exportTrackerRecording(
 	options: TrackerExportOptions = {}
 ): Promise<Blob> {
 	return new Blob([createTrackerModule(recording, timer, format, options)], {
+		type: "application/octet-stream"
+	})
+}
+export async function exportTrackerSong(
+	song: SongSource,
+	format: TrackerExportId,
+	options: TrackerExportOptions = {}
+): Promise<Blob> {
+	return new Blob([createTrackerModuleFromSong(song, format, options)], {
 		type: "application/octet-stream"
 	})
 }

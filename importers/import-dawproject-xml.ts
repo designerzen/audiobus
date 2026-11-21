@@ -1,3 +1,10 @@
+import {
+	importedSong,
+	songFromCommands,
+	songTimeAxis,
+	type SongSource
+} from "../formats/song-source"
+import { projectTimeAxis } from "../formats/project-time"
 import AudioCommand from "../commands/audio-command"
 import { NOTE_ON, NOTE_OFF } from "../commands/commands"
 import { parseXML } from "./import-musicxml-import"
@@ -8,8 +15,8 @@ export function importDawProjectXML(text: string, name: string) {
 	if (doc.documentElement.localName !== "Project") {
 		throw new Error("Expected a DAWproject Project document")
 	}
-	if (doc.querySelector("TempoAutomation RealPoint")) {
-		throw new Error("DAWproject tempo automation is not supported")
+	if (doc.querySelector('TempoAutomation RealPoint[interpolation="linear"]')) {
+		throw new Error("DAWproject linear tempo ramps are not supported")
 	}
 	const bpm = Number(doc.querySelector("Transport > Tempo")?.getAttribute("value") ?? 120)
 	if (!(bpm > 0) || !Number.isFinite(bpm)) {
@@ -22,15 +29,51 @@ export function importDawProjectXML(text: string, name: string) {
 		}
 		return value
 	}
-	const scale = (unit: string) => {
-		if (unit === "beats") {
-			return 60 / bpm
-		}
-		if (unit === "seconds") {
-			return 1
-		}
+	const automation = doc.querySelector("TempoAutomation")
+	const points = [...(automation?.querySelectorAll("RealPoint") ?? [])]
+	const beatTime = projectTimeAxis(960000, [
+		{ position: 0, bpm },
+		...points.map((p) => ({
+			position: Math.round(numeric(p, "time") * 960000),
+			bpm: numeric(p, "value")
+		}))
+	])
+	const tempos = [
+		{ time: 0, bpm },
+		...points.map((p) => ({
+			time:
+				automation?.getAttribute("timeUnit") === "seconds"
+					? numeric(p, "time")
+					: beatTime(Math.round(numeric(p, "time") * 960000)),
+			bpm: numeric(p, "value")
+		}))
+	]
+	const initialMeter = doc.querySelector("Transport > TimeSignature")
+	const meta = songFromCommands([], name, { tempos })
+	const axis = songTimeAxis(meta)
+	const meterPoints = [...doc.querySelectorAll("TimeSignatureAutomation TimeSignaturePoint")]
+	meta.meters = [
+		{
+			time: 0,
+			numerator: initialMeter ? numeric(initialMeter, "numerator", 4) : 4,
+			denominator: initialMeter ? numeric(initialMeter, "denominator", 4) : 4
+		},
+		...meterPoints.map((p) => ({
+			time:
+				p.parentElement?.getAttribute("timeUnit") === "seconds"
+					? numeric(p, "time")
+					: axis.seconds(numeric(p, "time")),
+			numerator: numeric(p, "numerator"),
+			denominator: numeric(p, "denominator")
+		}))
+	]
+	const durationAt = (value: number, unit: string, origin: number) => {
+		if (unit === "seconds") return value
+		if (unit === "beats")
+			return axis.seconds(axis.beats(Math.max(0, origin)) + value) - Math.max(0, origin)
 		throw new Error(`Unsupported DAWproject time unit: ${unit}`)
 	}
+	const trackNotes = new Map<string, SongSource["tracks"][number]>()
 	const ids = new Map([...doc.querySelectorAll("[id]")].map((el) => [el.getAttribute("id")!, el]))
 	const commands: AudioCommand[] = []
 	let noteCount = 0,
@@ -41,17 +84,19 @@ export function importDawProjectXML(text: string, name: string) {
 		offset: number,
 		min: number,
 		max: number,
-		depth: number
+		depth: number,
+		trackId = ""
 	) => {
 		if (++visits > 100000 || depth > 64) {
 			throw new Error("DAWproject arrangement is too complex or contains cyclic references")
 		}
+		trackId = el.getAttribute("track") ?? trackId
 		unit = el.getAttribute("timeUnit") ?? unit
 		if (el.localName === "Note") {
-			const start = Math.max(min, offset + numeric(el, "time") * scale(unit))
+			const start = Math.max(min, offset + durationAt(numeric(el, "time"), unit, offset))
 			const end = Math.min(
 				max,
-				offset + (numeric(el, "time") + numeric(el, "duration")) * scale(unit)
+				offset + durationAt(numeric(el, "time") + numeric(el, "duration"), unit, offset)
 			)
 			if (end <= start) {
 				return
@@ -90,6 +135,26 @@ export function importDawProjectXML(text: string, name: string) {
 					from: name
 				})
 			)
+			const id = `${trackId}:${channel}`
+			let track = trackNotes.get(id)
+			if (!track)
+				trackNotes.set(
+					id,
+					(track = {
+						name: ids.get(trackId)?.getAttribute("name") ?? `Channel ${channel}`,
+						channel,
+						patch: 0,
+						notes: []
+					})
+				)
+			track.notes.push({
+				number,
+				channel,
+				patch: 0,
+				velocity: Math.round(velocity * 127),
+				start,
+				duration: end - start
+			})
 			noteCount++
 			return
 		}
@@ -97,9 +162,9 @@ export function importDawProjectXML(text: string, name: string) {
 			if (el.getAttribute("enable") === "false") {
 				return
 			}
-			const start = offset + numeric(el, "time") * scale(unit)
+			const start = offset + durationAt(numeric(el, "time"), unit, offset)
 			const duration = el.hasAttribute("duration")
-				? numeric(el, "duration") * scale(unit)
+				? durationAt(numeric(el, "duration"), unit, start)
 				: Infinity
 			const lower = Math.max(min, start),
 				upper = Math.min(max, start + duration)
@@ -115,7 +180,7 @@ export function importDawProjectXML(text: string, name: string) {
 				el.getAttribute("contentTimeUnit") ??
 				content.getAttribute("contentTimeUnit") ??
 				unit
-			const factor = scale(contentUnit)
+			const factor = durationAt(1, contentUnit, start)
 			const playStart = numeric(el, "playStart") * factor
 			const playStop = el.hasAttribute("playStop")
 				? numeric(el, "playStop") * factor
@@ -144,7 +209,8 @@ export function importDawProjectXML(text: string, name: string) {
 						target - source,
 						Math.max(lower, target),
 						limit,
-						depth + 1
+						depth + 1,
+						trackId
 					)
 				}
 				if (!loop) {
@@ -160,7 +226,7 @@ export function importDawProjectXML(text: string, name: string) {
 		}
 		for (const child of el.children) {
 			if (["Lanes", "Clips", "Clip", "Notes", "Note", "Timeline"].includes(child.localName)) {
-				visit(child, unit, offset, min, max, depth + 1)
+				visit(child, unit, offset, min, max, depth + 1, trackId)
 			}
 		}
 	}
@@ -173,5 +239,9 @@ export function importDawProjectXML(text: string, name: string) {
 		throw new Error("DAWproject arrangement contains no importable notes")
 	}
 	commands.sort((a, b) => a.startAt - b.startAt || (a.type === NOTE_OFF ? -1 : 1))
-	return { commands, noteCount }
+	return {
+		commands,
+		noteCount,
+		song: importedSong({ ...meta, tracks: [...trackNotes.values()] })
+	}
 }

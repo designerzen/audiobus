@@ -1,3 +1,5 @@
+import { songFromCommands } from "../formats/song-source"
+import { keySignature } from "../formats/song-midi"
 import AudioCommand from "../commands/audio-command"
 import { NOTE_ON, NOTE_OFF } from "../commands/commands"
 import { MAX_MEDIA_BYTES } from "./dropped-media"
@@ -77,5 +79,27 @@ export async function importABCFile(file: File) {
 	if (!noteCount) {
 		throw new Error("The ABC tune contains no importable notes")
 	}
-	return { commands, noteCount }
+	// Header metadata is optional; unusual meters and modes fall back to the defaults.
+	const meter = /^M:\s*(?:(\d+)\/(\d+)|(C\|?))/m.exec(text)
+	const [numerator, denominator] = meter?.[3]
+		? meter[3] === "C"
+			? [4, 4]
+			: [2, 2]
+		: [Number(meter?.[1]), Number(meter?.[2])]
+	const key = /^K:\s*([A-G][#b]?)\s*(maj(?:or)?|min(?:or)?|m)?(?![a-z])/im.exec(text)
+	const minor = /^m(?:in)?/i.test(key?.[2] ?? "") && !/^maj/i.test(key?.[2] ?? "")
+	const song = songFromCommands(commands, /^T:\s*(.+)/m.exec(text)?.[1].trim() || file.name, {
+		tempos: [{ time: 0, bpm: audio.tempo }],
+		meters:
+			Number.isInteger(numerator) &&
+			numerator >= 1 &&
+			numerator <= 64 &&
+			[1, 2, 4, 8, 16, 32, 64].includes(denominator)
+				? [{ time: 0, numerator, denominator }]
+				: [],
+		key: key
+			? keySignature(key[1][0].toUpperCase() + key[1].slice(1), minor ? "minor" : "major")
+			: undefined
+	})
+	return { commands, noteCount, song }
 }

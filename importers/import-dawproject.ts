@@ -1,3 +1,4 @@
+import { songFromCommands, type SongSource } from "../formats/song-source"
 import type { IAudioCommand } from "../commands/audio-command-interface"
 import * as Commands from "../commands/commands"
 import { readMediaArchive } from "./dropped-media"
@@ -11,7 +12,7 @@ import { importDawProjectXML } from "./import-dawproject-xml"
  */
 export const importDawProjectFile = async (
 	file: File
-): Promise<{ commands: IAudioCommand[]; noteCount: number }> => {
+): Promise<{ commands: IAudioCommand[]; noteCount: number; song?: SongSource }> => {
 	try {
 		// .dawProject files are ZIP archives
 		const arrayBuffer = await file.arrayBuffer()
@@ -28,7 +29,18 @@ export const importDawProjectFile = async (
 
 		const unzipped = await readMediaArchive(uint8Array)
 		if (unzipped["project.xml"]) {
-			return importDawProjectXML(new TextDecoder().decode(unzipped["project.xml"]), file.name)
+			const result = importDawProjectXML(
+				new TextDecoder().decode(unzipped["project.xml"]),
+				file.name
+			)
+			if (unzipped["metadata.xml"]) {
+				const doc = new DOMParser().parseFromString(
+					new TextDecoder().decode(unzipped["metadata.xml"]),
+					"application/xml"
+				)
+				result.song.name = doc.querySelector("Title")?.textContent ?? file.name
+			}
+			return result
 		}
 		if (!unzipped["project.json"]) {
 			throw new Error("DAWproject archive is missing project.xml")
@@ -122,7 +134,11 @@ export const importDawProjectFile = async (
 			bpm
 		})
 
-		return { commands, noteCount }
+		return {
+			commands,
+			noteCount,
+			song: songFromCommands(commands, file.name, { tempos: [{ time: 0, bpm }] })
+		}
 	} catch (error) {
 		console.error("Error importing .dawProject file:", error)
 		throw error

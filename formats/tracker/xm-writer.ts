@@ -1,15 +1,22 @@
 /** FastTracker 2 extended module (.xm) writer: 16-bit delta-coded samples, volume envelopes with key-off */
 
 import { ByteWriter, trackerName } from "./tracker-bytes"
-import { buildPatterns, tickSeconds } from "./tracker-grid"
+import { buildPatterns, releaseTicks } from "./tracker-grid"
+import { sampleIndexTable } from "./tracker-instruments"
 import {
 	MAX_STORAGE_RATE,
 	MIN_STORAGE_RATE,
+	chooseStorageRate,
 	rateSemitones,
 	resampleSample,
 	toInt16
 } from "./tracker-samples"
-import type { TrackerFormatSpec, TrackerInstrument, TrackerSong } from "./tracker-types"
+import type {
+	TrackerFormatSpec,
+	TrackerInstrument,
+	TrackerSample,
+	TrackerSong
+} from "./tracker-types"
 
 /** Note bytes 1..96 are C-0 to B-7, and FastTracker's C-4 (byte 49) is MIDI 60, so MIDI 12..107 are
  * playable and the rest are octave-folded. libopenmpt reports byte n as note n + 12, so the notes
@@ -23,6 +30,10 @@ export const XM_SPEC: TrackerFormatSpec = {
 	maxChannels: 32,
 	channelStep: 2,
 	maxInstruments: 128,
+	keymaps: true,
+	envelopes: true,
+	maxInstrumentSamples: 16,
+	maxSamples: 128 * 16,
 	maxOrders: 256,
 	noteRange: [XM_NOTE_OFFSET + 1, XM_NOTE_OFFSET + 96],
 	minTempo: 32,
@@ -36,8 +47,8 @@ const KEY_OFF = 97
 /** XM plays note byte n at 8363 Hz * 2^((n - 49 + relativeNote + finetune/128) / 12), and byte n is
  * MIDI n + 11, so a sample with base note B needs relativeNote + finetune/128 = 60 - B + 12 * log2(rate / 8363)
  */
-function sampleTuning(instrument: TrackerInstrument, rate: number) {
-	const total = 60 - instrument.sample.baseNote + rateSemitones(rate, XM_BASE_RATE)
+function sampleTuning(sample: TrackerSample, rate: number) {
+	const total = 60 - sample.baseNote + rateSemitones(rate, XM_BASE_RATE)
 	let relativeNote = Math.round(total)
 	let finetune = Math.round((total - relativeNote) * 128)
 	if (finetune > 127) {
@@ -48,28 +59,28 @@ function sampleTuning(instrument: TrackerInstrument, rate: number) {
 }
 
 function writeInstrument(out: ByteWriter, instrument: TrackerInstrument, song: TrackerSong) {
-	const rate = Math.max(
-		MIN_STORAGE_RATE,
-		Math.min(MAX_STORAGE_RATE, instrument.sample.sampleRate)
-	)
-	const stored = resampleSample(instrument.sample, rate)
-	const pcm = toInt16(stored.data)
-	const { relativeNote, finetune } = sampleTuning(instrument, stored.rate)
-	const releaseTicks = Math.max(
-		2,
-		Math.min(200, Math.round(instrument.release / tickSeconds(song.tempo)))
-	)
+	const stored = instrument.samples.map(({ sample, lowest }) => {
+		const rate = chooseStorageRate(sample, lowest, {
+			minRate: MIN_STORAGE_RATE,
+			maxRate: MAX_STORAGE_RATE
+		})
+		return { sample, stored: resampleSample(sample, rate) }
+	})
+	const release = releaseTicks(instrument.release, song.tempo)
 	// Fade out over roughly twice the envelope release; FT2 caps the value at 0xFFF
-	const fadeout = Math.max(1, Math.min(0xfff, Math.round(32768 / (releaseTicks * 2))))
+	const fadeout = Math.max(1, Math.min(0xfff, Math.round(32768 / (release * 2))))
 
 	out.u32le(263)
 	out.text(trackerName(instrument.name, 22), 22)
-	out.u8(0).u16le(1).u32le(40)
-	out.zeros(96) // every note plays sample 0
+	out.u8(0).u16le(stored.length).u32le(40)
+	// Each note plays the sample the keymap gives it; XM note byte n+1 is index n
+	for (const index of sampleIndexTable(instrument, [XM_NOTE_OFFSET + 1, XM_NOTE_OFFSET + 96])) {
+		out.u8(index)
+	}
 	// Volume envelope: hold full volume at point 0 until key-off, then fall to silence
 	const points = [
 		[0, 64],
-		[releaseTicks, 0]
+		[release, 0]
 	]
 	for (let i = 0; i < 12; i++) {
 		out.u16le(points[i]?.[0] ?? 0).u16le(points[i]?.[1] ?? 0)
@@ -83,21 +94,27 @@ function writeInstrument(out: ByteWriter, instrument: TrackerInstrument, song: T
 	out.u16le(fadeout)
 	out.zeros(22)
 
-	const looped = stored.loopStart !== undefined && stored.loopLength !== undefined
-	out.u32le(pcm.length * 2)
-	out.u32le(looped ? stored.loopStart! * 2 : 0)
-	out.u32le(looped ? stored.loopLength! * 2 : 0)
-	out.u8(64)
-	out.u8(finetune & 0xff)
-	out.u8((looped ? 1 : 0) | 0x10) // forward loop, 16-bit
-	out.u8(128)
-	out.u8(relativeNote & 0xff)
-	out.u8(0)
-	out.text(trackerName(instrument.name, 22), 22)
-	let previous = 0
-	for (let i = 0; i < pcm.length; i++) {
-		out.u16le(pcm[i] - previous)
-		previous = pcm[i]
+	const pcms = stored.map(({ stored: data }) => toInt16(data.data))
+	stored.forEach(({ sample, stored: data }, index) => {
+		const looped = data.loopStart !== undefined && data.loopLength !== undefined
+		const { relativeNote, finetune } = sampleTuning(sample, data.rate)
+		out.u32le(pcms[index].length * 2)
+		out.u32le(looped ? data.loopStart! * 2 : 0)
+		out.u32le(looped ? data.loopLength! * 2 : 0)
+		out.u8(64)
+		out.u8(finetune & 0xff)
+		out.u8((looped ? 1 : 0) | 0x10) // forward loop, 16-bit
+		out.u8(128)
+		out.u8(relativeNote & 0xff)
+		out.u8(0)
+		out.text(trackerName(sample.name, 22), 22)
+	})
+	for (const pcm of pcms) {
+		let previous = 0
+		for (let i = 0; i < pcm.length; i++) {
+			out.u16le(pcm[i] - previous)
+			previous = pcm[i]
+		}
 	}
 }
 

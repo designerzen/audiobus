@@ -118,6 +118,25 @@ export async function importTrackerFile(
 			throw new Error(`Invalid or unsupported tracker file: ${file.name}`)
 		}
 		m._openmpt_module_set_repeat_count(song, 0)
+		// The default fade-out renders the restart row after the song ends; stop at the end instead.
+		const control = (key: string, value: string) => {
+			const text = (value: string) => {
+				const bytes = new TextEncoder().encode(value),
+					pointer = m._malloc(bytes.length + 1)
+				m.HEAPU8.set(bytes, pointer)
+				m.HEAPU8[pointer + bytes.length] = 0
+				return pointer
+			}
+			const keyPointer = text(key),
+				valuePointer = text(value)
+			try {
+				m._openmpt_module_ctl_set_text(song, keyPointer, valuePointer)
+			} finally {
+				m._free(keyPointer)
+				m._free(valuePointer)
+			}
+		}
+		control("play.at_end", "stop")
 		const duration = m._openmpt_module_get_duration_seconds(song)
 		if (!Number.isFinite(duration) || duration <= 0 || duration > 1800) {
 			throw new Error("Tracker imports must have a finite duration of at most 30 minutes")
@@ -153,7 +172,8 @@ export async function importTrackerFile(
 		output = m._malloc(8 * 4)
 		let position = ""
 		let frames = 0
-		const maxFrames = Math.ceil(duration * 8000)
+		// Whole samples per tick make rendering drift slightly from the reported duration.
+		const maxFrames = Math.ceil((duration * 1.05 + 1) * 8000)
 		while (frames < maxFrames) {
 			const read = m._openmpt_module_read_float_mono(song, 8000, 8, output)
 			if (!read) {
@@ -162,7 +182,9 @@ export async function importTrackerFile(
 			const pattern = m._openmpt_module_get_current_pattern(song)
 			const row = m._openmpt_module_get_current_row(song)
 			const next = `${m._openmpt_module_get_current_order(song)}:${pattern}:${row}`
-			if (next !== position && frames + read < maxFrames) {
+			// A short read reaches the song end, where the engine reports the unplayed restart row.
+			// Jumps and repeats occur within full reads, so they are still followed.
+			if (next !== position && read === 8) {
 				position = next
 				const time = frames / 8000
 				for (let channel = 0; channel < channels; channel++) {
@@ -213,7 +235,7 @@ export async function importTrackerFile(
 		}
 
 		for (const channel of active.keys()) {
-			stop(channel, Math.min(duration, frames / 8000))
+			stop(channel, frames / 8000)
 		}
 		if (!noteCount) {
 			throw new Error("The tracker file contains no importable notes")

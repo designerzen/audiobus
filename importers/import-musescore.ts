@@ -1,3 +1,4 @@
+import { importedSong, type SongSource } from "../formats/song-source"
 import { checkMusicFile, commandsFromNotes } from "../formats/imported-notes"
 import { projectTimeAxis } from "../formats/project-time"
 import { readMediaArchive, safeArchivePath } from "./dropped-media"
@@ -88,7 +89,7 @@ export async function importMuseScoreFile(file: File) {
 	if (!staves.length || staves.length > 128) {
 		throw new Error("Expected 1–128 MuseScore staves")
 	}
-	const definitions = new Map<string, { channel: number; patch: number }>()
+	const definitions = new Map<string, { channel: number; patch: number; source: string }>()
 	let melodic = 0
 	for (const part of children(score, "Part")) {
 		const instrument = child(part, "Instrument"),
@@ -104,14 +105,27 @@ export async function importMuseScoreFile(file: File) {
 			instrument?.querySelector("Channel program")?.getAttribute("value") ?? 0
 		)
 		for (const staff of children(part, "Staff")) {
-			definitions.set(staff.getAttribute("id") ?? "", { channel, patch })
+			definitions.set(staff.getAttribute("id") ?? "", {
+				channel,
+				patch,
+				source:
+					child(part, "trackName")?.textContent ??
+					instrument?.querySelector("longName")?.textContent ??
+					`Channel ${channel}`
+			})
 		}
 	}
+	const meters: { beat: number; numerator: number; denominator: number }[] = []
 	let meter = 4,
 		measureStart = 0
 	const timeline = children(staves[0], "Measure").map((measure) => {
 		const signature = measure.querySelector("TimeSig")
 		if (signature) {
+			meters.push({
+				beat: measureStart,
+				numerator: value(signature, "sigN"),
+				denominator: value(signature, "sigD")
+			})
 			meter = (value(signature, "sigN") / value(signature, "sigD")) * 4
 			if (!(meter > 0 && meter <= 64)) {
 				throw new Error("Invalid MuseScore time signature")
@@ -323,12 +337,51 @@ export async function importMuseScoreFile(file: File) {
 		960000,
 		[...tempos].map(([position, bpm]) => ({ position, bpm }))
 	)
-	return commandsFromNotes(
+	const result = commandsFromNotes(
 		notes.map((note) => {
 			const start = seconds(Math.round(note.start * 960000)),
 				end = seconds(Math.round((note.start + note.duration) * 960000))
 			return { ...note, start, duration: end - start }
 		}),
-		file.name
+		file.name,
+		{
+			tempos: [...tempos].map(([tick, bpm]) => ({ time: seconds(tick), bpm })),
+			meters: meters.map((m) => ({
+				time: seconds(Math.round(m.beat * 960000)),
+				numerator: m.numerator,
+				denominator: m.denominator
+			}))
+		}
 	)
+	const keyElement = score.querySelector("KeySig")
+	const song = result.song
+	song.name = score.querySelector('metaTag[name="workTitle"]')?.textContent ?? file.name
+	if (keyElement)
+		song.key = {
+			fifths: value(keyElement, "accidental", 0),
+			mode: child(keyElement, "mode")?.textContent === "minor" ? "minor" : "major"
+		}
+	const groups = new Map<string, SongSource["tracks"][number]>()
+	for (const note of notes) {
+		const id = JSON.stringify([note.source, note.channel, note.patch])
+		let track = groups.get(id)
+		if (!track)
+			groups.set(
+				id,
+				(track = {
+					name: note.source ?? `Channel ${note.channel}`,
+					channel: note.channel,
+					patch: note.patch,
+					notes: []
+				})
+			)
+		const start = seconds(Math.round(note.start * 960000))
+		track.notes.push({
+			...note,
+			start,
+			duration: seconds(Math.round((note.start + note.duration) * 960000)) - start
+		})
+	}
+	song.tracks = [...groups.values()]
+	return { ...result, song: importedSong(song) }
 }

@@ -1,4 +1,5 @@
-import { Midi } from "@tonejs/midi"
+import { midiBytes, songMIDI } from "../formats/song-midi"
+import { songFromRecording, recordingFromSong, type SongSource } from "../formats/song-source"
 import {
 	recordingNotes,
 	recordingVoices,
@@ -25,28 +26,7 @@ export const INTERCHANGE_EXPORT_FORMATS = [
 export type InterchangeExportId = (typeof INTERCHANGE_EXPORT_FORMATS)[number]["id"]
 
 export function recordingMIDI(recording: NoteRecording, timer: { readonly BPM: number }) {
-	const midi = new Midi()
-	midi.header.name = recording.name
-	midi.header.setTempo(exportTempo(timer))
-	const tracks = new Map<string, ReturnType<Midi["addTrack"]>>()
-	for (const note of recordingNotes(recording, { sources: true })) {
-		const key = `${note.channel}:${note.patch}`
-		let track = tracks.get(key)
-		if (!track) {
-			track = midi.addTrack()
-			track.channel = note.channel - 1
-			track.instrument.number = note.patch
-			track.name = `${note.source ?? recording.name} ${note.channel}`
-			tracks.set(key, track)
-		}
-		track.addNote({
-			midi: note.number,
-			time: note.start,
-			duration: note.duration,
-			velocity: note.velocity / 127
-		})
-	}
-	return midi
+	return songMIDI(recording.song ?? songFromRecording(recording, timer))
 }
 
 export function createToneJSONFromAudioEventRecording(
@@ -174,7 +154,7 @@ export function createRMIDFromAudioEventRecording(
 	recording: NoteRecording,
 	timer: { readonly BPM: number }
 ): Uint8Array<ArrayBuffer> {
-	const midi = recordingMIDI(recording, timer).toArray()
+	const midi = midiBytes(recordingMIDI(recording, timer))
 	const bytes = new Uint8Array(20 + midi.length + (midi.length % 2)),
 		view = new DataView(bytes.buffer)
 	bytes.set(new TextEncoder().encode("RIFF"))
@@ -338,4 +318,10 @@ export async function exportInterchangeRecording(
 				{ type: "text/plain;charset=utf-8" }
 			)
 	}
+}
+export function exportInterchangeSong(
+	song: SongSource,
+	format: InterchangeExportId
+): Promise<Blob> {
+	return exportInterchangeRecording(recordingFromSong(song), { BPM: song.tempos[0].bpm }, format)
 }

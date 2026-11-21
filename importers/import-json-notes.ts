@@ -1,3 +1,5 @@
+import { Midi } from "@tonejs/midi"
+import { songFromMIDI } from "../formats/song-midi"
 import { checkMusicFile, commandsFromNotes } from "../formats/imported-notes"
 import type { SequenceNote } from "../formats/note-sequence"
 
@@ -33,7 +35,15 @@ export async function importToneJSONFile(file: File) {
 			})
 		}
 	}
-	return commandsFromNotes(notes, file.name)
+	const result = commandsFromNotes(notes, file.name)
+	// Tone.js reads the header's tempo map, meters, key and track names; hand-written JSON may omit them.
+	try {
+		const midi = new Midi()
+		midi.fromJSON(data)
+		return { ...result, song: songFromMIDI(midi, file.name) }
+	} catch {
+		return result
+	}
 }
 
 /** JAMS note_midi / note_hz annotations. Other annotation namespaces are ignored. */

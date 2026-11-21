@@ -4,24 +4,30 @@
  */
 
 import type { SequenceNote } from "../note-sequence"
-import { prepareSample } from "./tracker-samples"
-import { synthesiseTrackerSample } from "./tracker-timbres"
-import {
-	trackerInstrumentKey,
-	type TrackerCell,
-	type TrackerFormatSpec,
-	type TrackerInstrument,
-	type TrackerSampleMap,
-	type TrackerSong
+import { CHANNEL_DRUMS } from "./tracker-drums"
+import { foldNote, planInstruments } from "./tracker-instruments"
+import { framesPlayed, sampleSignature, trimToPlayed } from "./tracker-samples"
+import type {
+	TrackerCell,
+	TrackerFormatSpec,
+	TrackerInstrument,
+	TrackerSample,
+	TrackerSampleMap,
+	TrackerSong
 } from "./tracker-types"
+
+export { CHANNEL_DRUMS, foldNote }
 
 export const PATTERN_ROWS = 64
 export const ROWS_PER_BEAT = 4
 const DEFAULT_SPEED = 6
-export const CHANNEL_DRUMS = 10
 
 /** Seconds one tick lasts at a tracker tempo (the ProTracker / FastTracker / Impulse formula) */
 export const tickSeconds = (tempo: number) => 2.5 / tempo
+
+/** Ticks the volume envelope of an XM or IT instrument takes to fall to silence after note-off */
+export const releaseTicks = (release: number, tempo: number) =>
+	Math.max(2, Math.min(200, Math.round(release / tickSeconds(tempo))))
 
 /** Speed and tempo that keep four rows per beat at `bpm`.
  * Tempo equals the BPM at speed 6; when that is outside the format's tempo range, or would round
@@ -53,25 +59,70 @@ export function trackerTiming(
 	}
 }
 
-/** Octave-fold a MIDI note into a format's playable range, keeping its pitch class */
-export function foldNote(note: number, [low, high]: readonly [number, number]) {
-	let folded = note
-	while (folded > high) {
-		folded -= 12
-	}
-	while (folded < low) {
-		folded += 12
-	}
-	return folded
-}
-
 interface Allocation {
 	startRow: number
 	endRow: number
 	instrument: number
+	sample: number
 	note: number
 	volume: number
 	channel: number
+}
+
+/** Store each one-shot only as far as the notes that play it read into it.
+ * A note sounds from its row to the row where it ends; where the format releases through an envelope
+ * and the grid writes a note end, the release runs on after that. Notes above a sample's base note
+ * read it faster. Instruments that share a sample, however differently they are set up, share the
+ * longest of their reads.
+ */
+function trimInstruments(
+	instruments: readonly TrackerInstrument[],
+	allocations: readonly Allocation[],
+	cells: readonly (TrackerCell | undefined)[][],
+	spec: Pick<TrackerFormatSpec, "envelopes">,
+	song: Pick<TrackerSong, "tempo" | "speed">
+): TrackerInstrument[] {
+	const rowSeconds = song.speed * tickSeconds(song.tempo)
+	const signatures = new Map<TrackerSample, string>()
+	const signatureOf = (sample: TrackerSample) => {
+		let signature = signatures.get(sample)
+		if (signature === undefined) {
+			signature = sampleSignature(sample)
+			signatures.set(sample, signature)
+		}
+		return signature
+	}
+	const needed = new Map<string, number>()
+	for (const allocation of allocations) {
+		const instrument = instruments[allocation.instrument - 1]
+		const { sample } = instrument.samples[allocation.sample]
+		const released = spec.envelopes && cells[allocation.endRow][allocation.channel]?.off
+		const seconds =
+			(allocation.endRow - allocation.startRow) * rowSeconds +
+			(released ? releaseTicks(instrument.release, song.tempo) * tickSeconds(song.tempo) : 0)
+		const signature = signatureOf(sample)
+		needed.set(
+			signature,
+			Math.max(needed.get(signature) ?? 0, framesPlayed(sample, allocation.note, seconds))
+		)
+	}
+	const trimmed = new Map<string, TrackerSample>()
+	return instruments.map((instrument) => ({
+		...instrument,
+		samples: instrument.samples.map((entry) => {
+			const signature = signatureOf(entry.sample)
+			const frames = needed.get(signature)
+			if (frames === undefined) {
+				return entry
+			}
+			let shared = trimmed.get(signature)
+			if (!shared) {
+				shared = trimToPlayed(entry.sample, frames)
+				trimmed.set(signature, shared)
+			}
+			return { ...entry, sample: { ...entry.sample, data: shared.data } }
+		})
+	}))
 }
 
 /** Build the instruments, channels and cells for a recording */
@@ -85,46 +136,30 @@ export function buildTrackerSong(
 	const { speed, tempo } = trackerTiming(bpm, spec)
 	const rowSeconds = speed * tickSeconds(tempo)
 
-	const instruments: TrackerInstrument[] = []
-	const instrumentIds = new Map<string, number>()
-	const instrumentFor = (note: SequenceNote, cellNote: number) => {
-		const key = trackerInstrumentKey(note)
-		const supplied = samples?.get(key)
-		// Without a captured timbre each drum key gets its own synthesised sound, played at its key
-		const fixedPitch = note.channel === CHANNEL_DRUMS && !supplied
-		const id = fixedPitch ? `${key}|${note.number}` : key
-		const existing = instrumentIds.get(id)
-		if (existing !== undefined) {
-			return existing
-		}
-		const source =
-			supplied ??
-			synthesiseTrackerSample({
-				channel: note.channel,
-				patch: note.patch,
-				number: note.number
-			})
-		const prepared = prepareSample(fixedPitch ? { ...source, baseNote: cellNote } : source)
-		instruments.push({
-			name: source.name,
-			sample: prepared.sample,
-			gain: prepared.gain,
-			release: fixedPitch ? 0.12 : prepared.sample.loopLength === undefined ? 0.35 : 0.18
-		})
-		instrumentIds.set(id, instruments.length)
-		return instruments.length
+	let plan = planInstruments(notes, spec, samples, true)
+	const distinctSamples = (instruments: typeof plan.instruments) =>
+		new Set(
+			instruments.flatMap(({ samples: entries }) =>
+				entries.map(({ sample }) => sampleSignature(sample))
+			)
+		).size
+	const overLimit = () =>
+		plan.instruments.length > spec.maxInstruments ||
+		distinctSamples(plan.instruments) > spec.maxSamples
+	if (overLimit() && plan.multiSample) {
+		// Zones are a luxury: fall back to one sample per chain when they do not fit
+		plan = planInstruments(notes, spec, samples, false)
 	}
-
-	const allocations: Allocation[] = notes.map((note) => {
+	const allocations: Allocation[] = notes.map((note, index) => {
 		const startRow = Math.max(0, Math.round(note.start / rowSeconds))
 		const endRow = Math.max(startRow + 1, Math.round((note.start + note.duration) / rowSeconds))
-		const cellNote = foldNote(note.number, spec.noteRange)
-		const instrument = instrumentFor(note, cellNote)
-		const gain = instruments[instrument - 1].gain
+		const { instrument, sample, note: cellNote } = plan.cells[index]
+		const gain = plan.instruments[instrument - 1].gain
 		return {
 			startRow,
 			endRow,
 			instrument,
+			sample,
 			note: cellNote,
 			volume: Math.max(1, Math.min(64, Math.round((note.velocity / 127) * 64 * gain))),
 			channel: -1
@@ -133,9 +168,15 @@ export function buildTrackerSong(
 	if (!allocations.length) {
 		throw new Error("Record some notes before exporting a tracker module")
 	}
-	if (instruments.length > spec.maxInstruments) {
+	if (plan.instruments.length > spec.maxInstruments) {
 		throw new Error(
-			`This recording uses ${instruments.length} instruments but a ${spec.label} holds at most ${spec.maxInstruments}`
+			`This recording uses ${plan.instruments.length} instruments but a ${spec.label} holds at most ${spec.maxInstruments}`
+		)
+	}
+	const sampleCount = distinctSamples(plan.instruments)
+	if (sampleCount > spec.maxSamples) {
+		throw new Error(
+			`This recording uses ${sampleCount} samples but a ${spec.label} holds at most ${spec.maxSamples}`
 		)
 	}
 
@@ -193,6 +234,10 @@ export function buildTrackerSong(
 	for (const a of allocations) {
 		cells[a.endRow][a.channel] ??= { off: true }
 	}
+	const instruments = trimInstruments(plan.instruments, allocations, cells, spec, {
+		speed,
+		tempo
+	})
 	return { title, channels, rows, speed, tempo, instruments, cells }
 }
 

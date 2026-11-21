@@ -65,10 +65,78 @@ export interface MidiGuiNode {
 	children?: MidiGuiNode[]
 }
 
+// Mirrors the `kind` enum of the midi-devices profile schema.
+export const MIDI_SURFACE_KINDS = [
+	"key",
+	"pad",
+	"button",
+	"knob",
+	"fader",
+	"switch",
+	"switch3",
+	"input",
+	"output",
+	"bidirectional",
+	"power",
+	"screen",
+	"round-button",
+	"jack",
+	"wheel",
+	"joystick",
+	"xy",
+	"touch",
+	"strip",
+	"horizontal-strip",
+	"speaker",
+	"matrix",
+	"lightpad",
+	"slot"
+] as const
+export type MidiSurfaceKind = (typeof MIDI_SURFACE_KINDS)[number]
+
+// How the renderer treats each physical kind: a continuous control is dragged,
+// a trigger is pressed, and a display region carries no MIDI unless bound.
+export type MidiSurfaceBehaviour = "continuous" | "trigger" | "display"
+const SURFACE_BEHAVIOURS: Record<MidiSurfaceKind, MidiSurfaceBehaviour> = {
+	key: "trigger",
+	pad: "trigger",
+	button: "trigger",
+	switch: "trigger",
+	switch3: "trigger",
+	"round-button": "trigger",
+	power: "trigger",
+	matrix: "trigger",
+	lightpad: "trigger",
+	knob: "continuous",
+	fader: "continuous",
+	wheel: "continuous",
+	strip: "continuous",
+	"horizontal-strip": "continuous",
+	touch: "continuous",
+	joystick: "continuous",
+	xy: "continuous",
+	screen: "display",
+	input: "display",
+	output: "display",
+	bidirectional: "display",
+	jack: "display",
+	slot: "display",
+	speaker: "display"
+}
+export const isMidiSurfaceKind = (kind: unknown): kind is MidiSurfaceKind =>
+	typeof kind === "string" && Object.hasOwn(SURFACE_BEHAVIOURS, kind)
+export const surfaceBehaviour = (
+	item: Pick<MidiSurfaceElement, "kind" | "control" | "message">
+): MidiSurfaceBehaviour => {
+	const behaviour = SURFACE_BEHAVIOURS[item.kind]
+	// A display kind that does carry a binding is playable as a plain trigger.
+	return behaviour === "display" && (item.control || item.message) ? "trigger" : behaviour
+}
+
 export interface MidiSurfaceElement {
 	id: string
 	label: string
-	kind: "key" | "pad" | "button" | "knob" | "fader"
+	kind: MidiSurfaceKind
 	position: { x: number; y: number; width: number; height: number }
 	control?: string
 	message?: MidiProfileMessage
@@ -400,6 +468,7 @@ export function parseMidiDeviceProfile(
 			"Invalid hardware surface"
 		)
 		const ids = new Set<string>()
+		const elements: MidiSurfaceElement[] = []
 		for (const item of surface.elements) {
 			requireValue(
 				item &&
@@ -407,9 +476,17 @@ export function parseMidiDeviceProfile(
 					!!item.id &&
 					!ids.has(item.id) &&
 					typeof item.label === "string" &&
-					["key", "pad", "button", "knob", "fader"].includes(item.kind),
+					typeof item.kind === "string",
 				"Invalid surface element"
 			)
+			// A kind from a newer profile format drops only that element, not the device.
+			if (!isMidiSurfaceKind(item.kind)) {
+				console.warn(
+					`MIDI device ${id}: skipping surface element ${item.id} of unknown kind "${item.kind}"`
+				)
+				continue
+			}
+			elements.push(item)
 			ids.add(item.id)
 			requireValue(
 				item.position &&
@@ -441,7 +518,7 @@ export function parseMidiDeviceProfile(
 				"Invalid surface key style"
 			)
 		}
-		profile.surface = { ...surface, src: resolveAsset(surface.src) }
+		profile.surface = { ...surface, elements, src: resolveAsset(surface.src) }
 	}
 	return profile
 }

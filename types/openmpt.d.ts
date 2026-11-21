@@ -15,6 +15,8 @@ declare module "chiptune3/libopenmpt.worklet.js" {
 		): number
 		_openmpt_module_destroy(module: number): void
 		_openmpt_module_set_repeat_count(module: number, repeats: number): void
+		/** Returns 1 on success; key and value are NUL-terminated UTF-8 pointers */
+		_openmpt_module_ctl_set_text(module: number, key: number, value: number): number
 		_openmpt_module_get_duration_seconds(module: number): number
 		_openmpt_module_get_num_channels(module: number): number
 		_openmpt_module_get_current_order(module: number): number

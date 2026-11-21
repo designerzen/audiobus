@@ -1,9 +1,23 @@
 /** Impulse Tracker module (.it) writer: instrument mode, 16-bit samples, volume envelopes with note-off */
 
 import { ByteWriter, trackerName } from "./tracker-bytes"
-import { buildPatterns, tickSeconds } from "./tracker-grid"
-import { MAX_STORAGE_RATE, MIN_STORAGE_RATE, resampleSample, toInt16 } from "./tracker-samples"
-import type { TrackerFormatSpec, TrackerInstrument, TrackerSong } from "./tracker-types"
+import { buildPatterns, releaseTicks } from "./tracker-grid"
+import { sampleIndexTable } from "./tracker-instruments"
+import {
+	MAX_STORAGE_RATE,
+	MIN_STORAGE_RATE,
+	chooseStorageRate,
+	resampleSample,
+	sampleSignature,
+	toInt16,
+	type StoredSample
+} from "./tracker-samples"
+import type {
+	TrackerFormatSpec,
+	TrackerInstrument,
+	TrackerSample,
+	TrackerSong
+} from "./tracker-types"
 
 /** IT notes run C-0 to B-9 (0..119); the top MIDI octave folds down */
 export const IT_SPEC: TrackerFormatSpec = {
@@ -13,6 +27,10 @@ export const IT_SPEC: TrackerFormatSpec = {
 	maxChannels: 64,
 	channelStep: 1,
 	maxInstruments: 99,
+	keymaps: true,
+	envelopes: true,
+	maxInstrumentSamples: 99,
+	maxSamples: 99,
 	maxOrders: 255,
 	noteRange: [0, 119],
 	minTempo: 32,
@@ -55,18 +73,22 @@ function envelope(out: ByteWriter, points: readonly [number, number][], flags: n
 	out.u8(0)
 }
 
+/** A sample as stored once in the file, however many instruments use it */
+interface StoredEntry {
+	sample: TrackerSample
+	stored: StoredSample
+}
+
 function writeInstrument(
 	out: ByteWriter,
 	instrument: TrackerInstrument,
 	index: number,
-	song: TrackerSong
+	song: TrackerSong,
+	sampleNumbers: readonly number[]
 ) {
-	const releaseTicks = Math.max(
-		2,
-		Math.min(200, Math.round(instrument.release / tickSeconds(song.tempo)))
-	)
+	const release = releaseTicks(instrument.release, song.tempo)
 	// IT fades 1024 steps at fadeout * 32 per tick; aim for about twice the envelope release
-	const fadeout = Math.max(1, Math.min(256, Math.round(16 / releaseTicks)))
+	const fadeout = Math.max(1, Math.min(256, Math.round(16 / release)))
 	const start = out.length
 	out.text("IMPI", 4)
 	out.text(trackerName(`inst${index + 1}.its`, 12), 12)
@@ -80,14 +102,15 @@ function writeInstrument(
 	out.u16le(0x0214).u8(1).u8(0)
 	out.text(trackerName(instrument.name, 26), 26)
 	out.u8(0).u8(0).u8(0).u8(0).u16le(0xffff) // no filter, no MIDI channel or program
-	for (let note = 0; note < 120; note++) {
-		out.u8(note).u8(index + 1)
-	}
+	// Each note plays the sample the keymap gives it, untransposed
+	sampleIndexTable(instrument, [0, 119]).forEach((sample, note) => {
+		out.u8(note).u8(sampleNumbers[sample])
+	})
 	envelope(
 		out,
 		[
 			[0, 64],
-			[releaseTicks, 0]
+			[release, 0]
 		],
 		0b101 // envelope on, sustain loop on
 	)
@@ -99,14 +122,42 @@ function writeInstrument(
 export function writeIT(song: TrackerSong): Uint8Array<ArrayBuffer> {
 	const { patterns, order } = buildPatterns(song, IT_SPEC, false)
 	const instrumentCount = song.instruments.length
+
+	// Identical samples are stored once and shared between the instruments that use them
+	const unique: StoredEntry[] = []
+	const bySignature = new Map<string, number>()
+	const sampleNumbers = song.instruments.map((instrument) =>
+		instrument.samples.map((entry) => {
+			const rate = chooseStorageRate(entry.sample, entry.lowest, {
+				minRate: MIN_STORAGE_RATE,
+				maxRate: MAX_STORAGE_RATE
+			})
+			const stored = resampleSample(entry.sample, rate)
+			const signature = sampleSignature({
+				...entry.sample,
+				data: stored.data,
+				sampleRate: stored.rate,
+				loopStart: stored.loopStart,
+				loopLength: stored.loopLength
+			})
+			let number = bySignature.get(signature)
+			if (number === undefined) {
+				unique.push({ sample: entry.sample, stored })
+				number = unique.length
+				bySignature.set(signature, number)
+			}
+			return number
+		})
+	)
+	const sampleCount = unique.length
 	const orderCount = order.length + 1
-	const headerSize = 0xc0 + orderCount + (instrumentCount * 2 + patterns.length) * 4
+	const headerSize = 0xc0 + orderCount + (instrumentCount + sampleCount + patterns.length) * 4
 
 	const out = new ByteWriter()
 	out.text("IMPM", 4)
 	out.text(trackerName(song.title, 26), 26)
 	out.u8(4).u8(16)
-	out.u16le(orderCount).u16le(instrumentCount).u16le(instrumentCount).u16le(patterns.length)
+	out.u16le(orderCount).u16le(instrumentCount).u16le(sampleCount).u16le(patterns.length)
 	out.u16le(0x0214).u16le(0x0214)
 	out.u16le(0b1101) // stereo, instruments, linear slides
 	out.u16le(0)
@@ -127,7 +178,7 @@ export function writeIT(song: TrackerSong): Uint8Array<ArrayBuffer> {
 	const instrumentTable = out.length
 	out.zeros(instrumentCount * 4)
 	const sampleTable = out.length
-	out.zeros(instrumentCount * 4)
+	out.zeros(sampleCount * 4)
 	const patternTable = out.length
 	out.zeros(patterns.length * 4)
 	if (out.length !== headerSize) {
@@ -136,18 +187,11 @@ export function writeIT(song: TrackerSong): Uint8Array<ArrayBuffer> {
 
 	song.instruments.forEach((instrument, index) => {
 		out.patch32le(instrumentTable + index * 4, out.length)
-		writeInstrument(out, instrument, index, song)
+		writeInstrument(out, instrument, index, song, sampleNumbers[index])
 	})
 
-	const stored = song.instruments.map((instrument) => {
-		const rate = Math.max(
-			MIN_STORAGE_RATE,
-			Math.min(MAX_STORAGE_RATE, instrument.sample.sampleRate)
-		)
-		return resampleSample(instrument.sample, rate)
-	})
 	const sampleHeaders = out.length
-	out.zeros(instrumentCount * IT_SAMPLE_SIZE)
+	out.zeros(sampleCount * IT_SAMPLE_SIZE)
 
 	patterns.forEach((pattern, index) => {
 		out.patch32le(patternTable + index * 4, out.length)
@@ -155,21 +199,20 @@ export function writeIT(song: TrackerSong): Uint8Array<ArrayBuffer> {
 		out.u16le(packed.length).u16le(pattern.rows).u32le(0).bytes(packed)
 	})
 
-	song.instruments.forEach((instrument, index) => {
-		const sample = stored[index]
+	unique.forEach(({ sample: source, stored: sample }, index) => {
 		const pcm = toInt16(sample.data)
 		const looped = sample.loopStart !== undefined && sample.loopLength !== undefined
 		const header = sampleHeaders + index * IT_SAMPLE_SIZE
 		out.patch32le(sampleTable + index * 4, header)
 		// The sample plays at c5Speed Hz on C-5, so a base note B needs c5Speed = rate * 2^((60 - B) / 12)
-		const c5Speed = Math.round(sample.rate * 2 ** ((C5_NOTE - instrument.sample.baseNote) / 12))
+		const c5Speed = Math.round(sample.rate * 2 ** ((C5_NOTE - source.baseNote) / 12))
 		const head = new ByteWriter()
 		head.text("IMPS", 4)
 		head.text(trackerName(`inst${index + 1}.its`, 12), 12)
 		head.u8(0).u8(64)
 		head.u8(0b01 | 0b10 | (looped ? 0b10000 : 0)) // present, 16-bit, loop
 		head.u8(64)
-		head.text(trackerName(instrument.name, 26), 26)
+		head.text(trackerName(source.name, 26), 26)
 		head.u8(1).u8(0x80 | 32) // signed samples, default pan ignored
 		head.u32le(pcm.length)
 		head.u32le(looped ? sample.loopStart! : 0)

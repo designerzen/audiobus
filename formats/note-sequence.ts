@@ -1,8 +1,12 @@
+import { songNotes, songVoices, type SongSource } from "./song-source"
 import type RecorderAudioEvent from "../events/audio-event-recorder"
 import type { IAudioCommand } from "../commands/audio-command-interface"
 import { NOTE_ON, NOTE_OFF } from "../commands/commands"
 
-export type NoteRecording = Pick<RecorderAudioEvent, "events" | "duration" | "name">
+export type NoteRecording = Pick<RecorderAudioEvent, "duration" | "name"> & {
+	events: IAudioCommand[]
+	song?: SongSource
+}
 export interface SequenceNote {
 	source?: string
 	/** IO chain that played the note, which identifies its timbre */
@@ -33,6 +37,14 @@ export function recordingNotes(
 	recording: NoteRecording,
 	options: { sources?: boolean; chains?: boolean } = {}
 ): SequenceNote[] {
+	// A song keeps its own times, including any leading silence.
+	if (recording.song) {
+		return songNotes(recording.song).map(({ source, chainId, ...note }) => ({
+			...(options.sources && source ? { source } : {}),
+			...(options.chains && chainId ? { chainId } : {}),
+			...note
+		}))
+	}
 	const pending = new Map<string, IAudioCommand[]>()
 	const completed: { event: IAudioCommand; end: number }[] = []
 	const events: IAudioCommand[] = recording.events
@@ -97,6 +109,9 @@ export function recordingNotes(
 }
 /** Separate overlapping notes into monophonic voices, retaining channel/program groups. */
 export function recordingVoices(recording: NoteRecording): SequenceNote[][] {
+	if (recording.song) {
+		return songVoices(recording.song)
+	}
 	const voices: SequenceNote[][] = []
 	for (const note of recordingNotes(recording)) {
 		let voice = voices.find((candidate) => {

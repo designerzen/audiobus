@@ -4,8 +4,9 @@
  */
 
 import type { NoteRecording } from "../formats/note-sequence.ts"
+import type { SongSource } from "../formats/song-source.ts"
 import type { TrackerExportOptions } from "../formats/tracker/tracker-types.ts"
-import { createTrackerModule } from "./adapter-tracker.ts"
+import { createTrackerModule, createTrackerModuleFromSong } from "./adapter-tracker.ts"
 
 /**
  * Trigger MED file download in browser
@@ -51,4 +52,12 @@ export const createAndDownloadMEDFile = async (
 ): Promise<void> => {
 	const buffer = await createMEDFileFromAudioEventRecording(recording, timer, options)
 	saveMEDToLocalFileSystem(buffer, recording.name)
+}
+
+/** MED module from a song, using its first tempo */
+export async function createMEDFileFromSong(
+	song: SongSource,
+	options?: TrackerExportOptions
+): Promise<ArrayBuffer> {
+	return createTrackerModuleFromSong(song, "med", options).buffer
 }

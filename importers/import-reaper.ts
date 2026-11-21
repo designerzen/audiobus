@@ -1,3 +1,4 @@
+import { songFromCommands } from "../formats/song-source"
 import { checkMusicFile, commandsFromNotes } from "../formats/imported-notes"
 import {
 	parseReaperProject,
@@ -257,5 +258,27 @@ export async function importReaperFile(file: File) {
 	commands.sort(
 		(a, b) => a.startAt - b.startAt || (a.velocity === 0 ? -1 : b.velocity === 0 ? 1 : 0)
 	)
-	return { commands, noteCount }
+	const initial = reaperField(project, "TEMPO")
+	const points = reaperChunks(project, "TEMPOENVEX").flatMap((e) => reaperLines(e, "PT"))
+	const song = songFromCommands(commands, file.name, {
+		tempos: [
+			{ time: 0, bpm: reaperNumber(initial[0], 120) },
+			...points.map((p) => ({ time: reaperNumber(p[1]), bpm: reaperNumber(p[2]) }))
+		],
+		meters: [
+			{
+				time: 0,
+				numerator: reaperNumber(initial[1], 4),
+				denominator: reaperNumber(initial[2], 4)
+			},
+			...points
+				.filter((p) => Number(p[4]) > 0)
+				.map((p) => ({
+					time: reaperNumber(p[1]),
+					numerator: Number(p[4]) & 65535,
+					denominator: Number(p[4]) >>> 16
+				}))
+		]
+	})
+	return { commands, noteCount, song }
 }

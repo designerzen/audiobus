@@ -23,6 +23,7 @@ import {
 import {
 	controlMessage,
 	controlRange,
+	surfaceBehaviour,
 	type MidiDeviceProfile,
 	type MidiProfileMessage,
 	type MidiSurfaceElement
@@ -47,6 +48,9 @@ export function validSurfaceBinding(value: unknown): value is MidiProfileMessage
 		(Number.isInteger(message.number) && message.number! >= 0 && message.number! <= 127)
 	)
 }
+
+const round = new Set<MidiSurfaceElement["kind"]>(["knob", "round-button", "joystick"])
+const momentary = new Set<MidiSurfaceElement["kind"]>(["key", "pad", "matrix", "lightpad"])
 
 export function createMidiDeviceSurface(
 	profile: MidiDeviceProfile,
@@ -85,6 +89,9 @@ export function createMidiDeviceSurface(
 	const select = document.createElement("select")
 	select.setAttribute("aria-label", "Hardware control to map")
 	for (const item of surface.elements) {
+		if (surfaceBehaviour(item) === "display") {
+			continue
+		}
 		const option = document.createElement("option")
 		option.value = item.id
 		option.textContent = item.label
@@ -143,12 +150,16 @@ export function createMidiDeviceSurface(
 			? controlRange(definitions.get(item.control)!)
 			: { min: 0, max: mapping(item)?.type === "pitchBend" ? 16383 : 127, step: 1 }
 	const update = (item: MidiSurfaceElement, value: number) => {
+		const behaviour = surfaceBehaviour(item)
+		if (behaviour === "display") {
+			return
+		}
 		const view = visuals.get(item.id)!
 		view.value = value
 		const { min, max } = range(item)
 		const active = value > min
 		view.group.dataset.active = String(active)
-		if (item.kind === "knob" || item.kind === "fader") {
+		if (behaviour === "continuous") {
 			view.group.setAttribute("aria-valuenow", String(value))
 		} else {
 			view.group.setAttribute("aria-pressed", String(active))
@@ -268,32 +279,45 @@ export function createMidiDeviceSurface(
 			y = (item.position.y * surface.height) / 100
 		const width = (item.position.width * surface.width) / 100,
 			height = (item.position.height * surface.height) / 100
+		const behaviour = surfaceBehaviour(item)
 		group.dataset.surfaceControl = item.id
+		group.dataset.surfaceKind = item.kind
 		group.dataset.midiIgnore = ""
-		group.setAttribute("tabindex", "0")
-		group.setAttribute(
-			"role",
-			item.kind === "knob" || item.kind === "fader" ? "slider" : "button"
-		)
 		group.setAttribute("aria-label", item.label)
-		group.setAttribute("aria-valuemin", String(range(item).min))
-		group.setAttribute("aria-valuemax", String(range(item).max))
 		title.textContent = `${item.label}${item.learnable ? " · configurable mapping" : ""}`
 		for (const [name, value] of Object.entries({
 			x,
 			y,
 			width,
 			height,
-			rx: item.kind === "knob" ? Math.min(width, height) / 2 : 3
+			rx: round.has(item.kind) ? Math.min(width, height) / 2 : 3
 		})) {
 			shape.setAttribute(name, String(value))
 		}
 		group.append(title, shape)
 		canvas.append(group)
 		visuals.set(item.id, { group, shape, value: 0, notes: new Set() })
+		if (behaviour === "display") {
+			// Ports, screens and other unbound hardware: a labelled outline with no MIDI.
+			group.setAttribute("role", "img")
+			for (const [name, value] of Object.entries({
+				fill: "none",
+				stroke: "#9dc4e8",
+				"stroke-width": "1",
+				"stroke-dasharray": "4 3",
+				"stroke-opacity": "0.5"
+			})) {
+				shape.setAttribute(name, value)
+			}
+			continue
+		}
+		group.setAttribute("tabindex", "0")
+		group.setAttribute("role", behaviour === "continuous" ? "slider" : "button")
+		group.setAttribute("aria-valuemin", String(range(item).min))
+		group.setAttribute("aria-valuemax", String(range(item).max))
 		update(item, 0)
 		let pointer: number | undefined
-		const continuous = item.kind === "knob" || item.kind === "fader"
+		const continuous = behaviour === "continuous"
 		const move = (event: PointerEvent) => {
 			if (event.pointerId !== pointer || !continuous) {
 				return
@@ -302,8 +326,13 @@ export function createMidiDeviceSurface(
 			if (!box.height) {
 				return
 			}
-			const position = ((event.clientY - box.top) / box.height) * surface.height
 			const { min, max } = range(item)
+			if (item.kind === "horizontal-strip") {
+				const position = ((event.clientX - box.left) / box.width) * surface.width
+				send(item, min + ((position - x) / width) * (max - min))
+				return
+			}
+			const position = ((event.clientY - box.top) / box.height) * surface.height
 			send(item, min + (1 - (position - y) / height) * (max - min))
 		}
 		const press = (pressure = 1) => {
@@ -326,10 +355,7 @@ export function createMidiDeviceSurface(
 				send(
 					item,
 					Math.max(1, Math.round(range(item).max * pressure)),
-					item.kind === "key" ||
-						item.kind === "pad" ||
-						message?.type === "note" ||
-						!!control?.momentary
+					momentary.has(item.kind) || message?.type === "note" || !!control?.momentary
 				)
 			}
 		}

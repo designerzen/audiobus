@@ -1,3 +1,4 @@
+import { songFromMIDI } from "../formats/song-midi"
 import { Midi } from "@tonejs/midi"
 import type { IAudioCommand } from "../commands/audio-command-interface"
 import { NOTE_OFF, NOTE_ON } from "../commands/commands"
@@ -62,6 +63,7 @@ export function importMIDIBytes(arrayBuffer: ArrayBuffer, fileName: string) {
 
 	return {
 		commands,
-		noteCount
+		noteCount,
+		song: songFromMIDI(midi, fileName)
 	}
 }
