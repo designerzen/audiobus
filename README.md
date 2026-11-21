@@ -176,89 +176,37 @@ The [AI model catalogue](io/inputs/ai-model-catalogue.ts), [speech input guide](
 
 ## MIDI hardware profiles and catalog
 
-All MIDI hardware profiles and their artwork live under [`hardware/midi-devices/`](hardware/midi-devices/), grouped by manufacturer and model. MIDI protocol, BLE and UMP utilities remain in `midi/`; computer-keyboard and gamepad support remain in their own `hardware/` directories.
+Hardware profiles, manufacturer metadata, MIDI mappings, panel diagrams and icons are maintained in the separate [midi-devices repository](https://github.com/designerzen/midi-devices). See its [README](https://github.com/designerzen/midi-devices#readme) for the catalogue, supported hardware, API, asset hosting and contribution instructions.
 
-```text
-hardware/midi-devices/
-  device-files.js
-  device-profile-schema.ts
-  device-profiles.ts
-  profile.schema.json
-  korg/
-    volca-keys/
-      korg-volca-keys.json
-      panel.svg
-      icon.svg
-  roland/
-    ju-06/
-      roland-ju-06.json
-      panel.svg
-      icon.svg
-```
+AudioBus keeps its profile loading, matching and live-control integration in [`hardware/midi-devices/`](hardware/midi-devices/). MIDI protocol, BLE and UMP utilities remain in `midi/`; computer-keyboard and gamepad support remain in their own `hardware/` directories.
 
-The registry currently contains 47 profiles. Folder organisation does not change persistent device IDs, port aliases or saved-workspace identities.
-
-| Manufacturer | Models / profiles |
-| --- | --- |
-| Akai | MPC Live (first generation), MPK Mini MK3 |
-| Arcana Instruments | Strum |
-| Arturia | KeyStep, MicroFreak, DrumBrute Impact, MiniLab 3 |
-| Cyclone Analogic | TT-303 |
-| Digit Music | CMPSR |
-| Keith McMillen Instruments | K-Mix audio control, control surface and expander profiles |
-| Korg | Minilogue; Volca Bass, Beats, Keys, Kick, Nubass, FM, FM2, Sample, Sample2 and Drum |
-| Novation | Circuit (first generation), Launchkey Mini MK3 |
-| Roland | A-49, TB-3, S-1; Boutique A-01, JP-08, JU-06, JX-03, VP-03, TB-03, TR-09, SE-02, SH-01A, D-05, TR-08, JU-06A, TR-06, JD-08, JX-08, JUPITER-08 and n/vision |
-| Teenage Engineering | OP-1 |
-| Yamaha | Reface CS |
-
-Volca Mix and Modular have no native MIDI and are excluded from the MIDI registry. FM/FM2, Sample/Sample2, JU-06/JU-06A, JP-08/JUPITER-08 and TB-3/TB-03 retain distinct profiles. Passive Boutique docks and keyboard accessories do not receive separate MIDI profiles. Each profile links its manufacturer documentation and describes MIDI modes, setup and mapping limitations.
-
-### Discovery, hosting and connection status
-
-[`device-files.js`](hardware/midi-devices/device-files.js) discovers `manufacturer/model/<device-id>.json` files, validates matching IDs and publishes an `index.json` containing `{ id, path }` entries. Vite development middleware serves the registry; builds copy the manufacturer/model folders, schema and index under `midi-devices/`. Registry implementation source is excluded from those deployed assets. Electron uses the same store through the `midi-device://registry/` protocol, with user-provided profiles taking precedence over bundled profiles.
-
-A Vite host includes the asset plugin:
+A Vite host serves the registry using the dependency's asset plugin:
 
 ```typescript
-import { midiDeviceFilesPlugin } from 'audiobus/hardware/midi-devices/device-files.js'
+import { midiDeviceFilesPlugin } from 'midi-devices'
 
 export default {
   plugins: [midiDeviceFilesPlugin()]
 }
 ```
 
-Browser integrations load the served index before looking up profiles:
+Browser integrations refresh the registry and load the matched profile before using it:
 
 ```typescript
 import {
   refreshMidiDeviceProfiles,
   matchMidiDeviceProfile,
-  MIDI_DEVICE_PROFILES
+  ensureMidiDeviceProfile
 } from 'audiobus/hardware/midi-devices/device-profiles'
 
 await refreshMidiDeviceProfiles()
 const id = matchMidiDeviceProfile({ name: 'JU-06' })
-const profile = id ? MIDI_DEVICE_PROFILES[id] : undefined
+const profile = id ? await ensureMidiDeviceProfile(id) : undefined
 ```
 
-Matching uses exact, case-insensitive IDs and explicit port-name aliases; it does not guess from substrings. Profile factories and previews update when the registry loads. The shared Web MIDI connection flow handles device arrival, removal and reconnection, with port claims preventing duplicate profile ownership.
+The shared Web MIDI connection flow handles arrival, removal and reconnection, with port claims preventing duplicate profile ownership. Electron loads profiles through `midi-device://registry/`, with user-provided profiles taking precedence over bundled profiles.
 
-HarmonEasy's [standalone MIDI catalog](../../app/harmoneasy/public/midi-devices.html) is served at `midi-devices.html`. It reads the live index and shows every available profile's panel SVG, icon, description, capabilities, controls, setup notes and documentation. The **Detect connected devices** button requests Web MIDI access, highlights matching input/output ports and updates on connection changes. Unmatched ports remain visible. HTTPS or localhost and a Web MIDI-capable browser are required for detection.
-
-DIN-only hardware normally appears under its MIDI interface's name, so it cannot be identified automatically by model: select its profile manually. Most original Volcas only receive MIDI and cannot report panel movements or their presence through MIDI output. Connection highlighting reports matched host ports, not proof that a particular instrument is attached to a DIN socket.
-
-### Wireframe panels and MIDI controls
-
-The newly added personal devices, Arcana Strum, TB-3, all supported Volcas and Boutique instruments use structured overhead wireframes for both `panel.svg` and `icon.svg`. Geometry uses `fill="none"` and `stroke="currentColor"`; named sections organise schematic control positions. These are interaction schematics rather than dimensionally accurate product drawings.
-
-Physical controls have stable, device-and-asset-prefixed SVG IDs, `data-part` names, titles and accessible labels. Root title/description references and appropriate ARIA groups describe the diagram. Standalone button artwork is disabled until a host supplies interaction. MIDI-bound regions use `data-surface-control` to connect to the profile's surface elements; percentage hit areas match the SVG geometry. Unmapped switches and buttons still have addressable elements for future bindings.
-
-[`midi-device-surface.ts`](hardware/midi-devices/midi-device-surface.ts) and [`profiled-midi-gui.ts`](hardware/midi-devices/profiled-midi-gui.ts) provide live controls, MIDI learning and note/CC/message bindings. Profile GUI controls generate commands into an IOChain; route that chain to a MIDI output to control external hardware. A drawing's addressable control does not imply the hardware transmits or receives a corresponding MIDI message.
-
-Mappings follow each instrument's documented implementation, including multi-channel Volca Sample/Drum parts and model-specific cutoff controllers. Hardware-only controls remain unmapped; configuration-dependent or virtual defaults are explained in each profile's notice. New profiles reference the shared schema using `../../profile.schema.json`; keep artwork paths relative to their model folder.
-
-The host integration suite covers registry discovery, nested build assets, exact matching, generation separation, MIDI mappings, wireframe IDs/ARIA, aligned hit regions, catalog rendering, connection changes and previews. Automated checks validate software behaviour; they do not establish physical-device compatibility without hardware testing.
+[`midi-device-surface.ts`](hardware/midi-devices/midi-device-surface.ts) and [`profiled-midi-gui.ts`](hardware/midi-devices/profiled-midi-gui.ts) provide live controls, MIDI learning and note/CC/message bindings. Profile GUI controls generate commands into an IOChain; route that chain to a MIDI output to control external hardware. For profile fields, schematic conventions and mapping limits, see the [midi-devices README](https://github.com/designerzen/midi-devices#readme).
 
 ## Transformers
 
@@ -440,7 +388,7 @@ Historical licensing metadata varies: the archive manifest declares MIT and the 
 | `instruments/`, `synthesis/`, `wam/` | Engines, oscillators/noise, plugin hosts/registries and engine assets. |
 | `effects/` | Shared effect interface, metadata/registry, processors and DSP helpers. |
 | `midi/` | MIDI/BLE/UMP codecs, shared access and native bridge utilities. |
-| `hardware/midi-devices/` | Manufacturer/model MIDI profiles, wireframes, registry discovery, previews and live surfaces. |
+| `hardware/midi-devices/` | Integration with the external `midi-devices` registry: profile loading, matching, previews and live surfaces. |
 | `hardware/keyboard/`, `hardware/gamepad/` | Computer keyboard and gamepad integration. |
 | `timing/`, `tuning/`, `conversion/` | Scheduling/percussion, musical theory and unit/pitch conversion. |
 | `storage/`, `formats/`, `importers/`, `exporters/` | OPFS command storage, format implementations and adapters. |
