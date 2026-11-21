@@ -18,6 +18,7 @@ import {
 	selectedMidiDevice
 } from "./midi-input-controls.ts"
 import type { IAudioInput } from "./input-interface.ts"
+import { midiEchoGuard, usesMidiEchoGuard } from "../../midi/midi-echo-guard.ts"
 
 export const WEBMIDI_INPUT_ID = "WebMIDI"
 
@@ -195,6 +196,12 @@ export default class InputWebMIDIDevice extends AbstractInput implements IAudioI
 		}
 		const data = event.message?.data ?? event.data
 		if (data) {
+			if (
+				usesMidiEchoGuard(this.options) &&
+				!midiEchoGuard.acceptInput([device.id, device.name], data)
+			) {
+				return
+			}
 			const command = midiToCommand(data, this.now, device.id)
 			if (!command || !acceptsMidiInput(this.options, device.id, command.channel)) {
 				return

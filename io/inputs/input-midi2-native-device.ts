@@ -20,6 +20,7 @@ import {
 	type NativeMidiDevice
 } from "../../midi/native-midi-bridge.ts"
 import { umpToMidiBytes, umpToCommand } from "../../midi/ump-codec.ts"
+import { midiEchoGuard, usesMidiEchoGuard } from "../../midi/midi-echo-guard.ts"
 import { isMidiProfilePortClaimed } from "../../hardware/midi-devices/device-profiles"
 
 export const MIDI2_NATIVE_INPUT_ID = "MIDI 2.0 Native"
@@ -188,6 +189,11 @@ export default class InputMIDI2Native extends AbstractInput implements IAudioInp
 		}
 		if (!this.options.profileId && isMidiProfilePortClaimed("midi2-native", String(device))) {
 			this.#release(device)
+			return
+		}
+		// Native port numbers differ between inputs and outputs, so only names identify the device
+		const name = this.#devices.find((input) => input.index === device)?.name
+		if (usesMidiEchoGuard(this.options) && !midiEchoGuard.acceptInputPacket([name], words)) {
 			return
 		}
 		const bytes = umpToMidiBytes(words)

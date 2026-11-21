@@ -11,7 +11,7 @@ import {
 	type MidiProfileTransport
 } from "./device-profiles"
 import { sharedWebMidi, type WebMidiDeviceChange } from "../../midi/shared-webmidi"
-import { getNativeMidiBridge } from "../../midi/native-midi-bridge"
+import { getNativeMidiBridge, hasNativeMidiBridge } from "../../midi/native-midi-bridge"
 import {
 	EVENT_DEVICE_LIST_CHANGED,
 	EVENT_CHAINS_UPDATED,
@@ -81,9 +81,7 @@ export async function startKnownMidiInputs(
 	let rescan = false
 	let web = false
 	let releaseWeb: (() => void) | undefined
-	const native = (globalThis as any).window?.electronAPI?.midi2
-		? getNativeMidiBridge()
-		: undefined
+	const native = hasNativeMidiBridge() ? getNativeMidiBridge() : undefined
 	const observed = new Map<string, { input: any; routingId: string; connected: boolean }>()
 	const detached = new Map<string, DetachedInput[]>()
 	const removed = new Map<string, Set<object>>()

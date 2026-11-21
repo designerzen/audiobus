@@ -1,6 +1,7 @@
 import { EVENT_CONFIGURATION_CHANGED } from "../../events/event-constants.ts"
 import { midiToCommand } from "../../midi/midi-command-conversion.ts"
 import { BleMidiDecoder } from "../../midi/midi-ble/ble-midi-decoder.ts"
+import { midiEchoGuard, usesMidiEchoGuard } from "../../midi/midi-echo-guard.ts"
 /**
  * This is a BLE MIDI Device adapter
  * that takes BLE MIDI events and converts them
@@ -180,6 +181,15 @@ export default class InputBLEMIDIDevice extends AbstractInput implements IAudioI
 	 */
 	onBLEMIDIDataReceived(value: DataView): void {
 		for (const bytes of this.#decoder.decode(value)) {
+			if (
+				usesMidiEchoGuard(this.options) &&
+				!midiEchoGuard.acceptInput(
+					[this.#bluetoothDevice?.id, this.#bluetoothDevice?.name],
+					bytes
+				)
+			) {
+				continue
+			}
 			const command = midiToCommand(bytes, this.now, this.#bluetoothDevice?.id ?? this.name)
 			if (
 				!command ||

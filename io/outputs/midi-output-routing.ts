@@ -8,6 +8,9 @@ import {
 	type MidiInputDeviceOption
 } from "../inputs/midi-input-controls.ts"
 import { commandToUmp, isUmpPacket, perNoteToUmp } from "../../midi/ump-codec.ts"
+import { midiEchoGuard, usesMidiEchoGuard } from "../../midi/midi-echo-guard.ts"
+
+const deviceNames = (device: MidiInputDeviceOption) => [device.portName, device.name, device.id]
 
 export class MidiOutputRouting {
 	private gui?: ReturnType<typeof createMidiInputControls>
@@ -88,12 +91,16 @@ export class MidiOutputRouting {
 		const targets = this.targets()
 		// System and realtime messages have no channel; send them only once per device.
 		const channels = bytes[0] < 0xf0 ? this.channels(command.channel) : [0]
+		const guarded = usesMidiEchoGuard(this.options)
 		return this.enqueue(async () => {
 			for (const device of targets) {
 				for (const channel of channels) {
 					const data = channel
 						? [(bytes[0] & 0xf0) | (channel - 1), ...bytes.slice(1)]
 						: [...bytes]
+					if (guarded && !this.allow(device, data)) {
+						continue
+					}
 					await this.send(device.id, data)
 					const key = `${device.id}:0:${channel}:${data[1]}`
 					if (data[0] >> 4 === 9 && data[2] > 0) {
@@ -134,12 +141,16 @@ export class MidiOutputRouting {
 		const channels = channelVoice
 			? this.channels(incomingChannel ?? ((packet[0] >>> 16) & 15) + 1)
 			: [0]
+		const guarded = usesMidiEchoGuard(this.options)
 		return this.enqueue(async () => {
 			for (const device of targets) {
 				for (const channel of channels) {
 					const data = [...packet]
 					if (channelVoice) {
 						data[0] = ((data[0] & 0xfff0ffff) | ((channel - 1) << 16)) >>> 0
+					}
+					if (guarded && !this.allow(device, data, true)) {
+						continue
 					}
 					await this.sendUmp!(device.id, data)
 					if (!channelVoice) {
@@ -166,6 +177,13 @@ export class MidiOutputRouting {
 				}
 			}
 		})
+	}
+
+	/** Never sends a device what it just played, so a device that plays through this output cannot loop */
+	private allow(device: MidiInputDeviceOption, data: number[], ump = false): boolean {
+		return ump
+			? midiEchoGuard.allowOutputPacket(deviceNames(device), data)
+			: midiEchoGuard.allowOutput(deviceNames(device), data)
 	}
 
 	release(): Promise<void> {
