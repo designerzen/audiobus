@@ -240,11 +240,16 @@ export class TransformerHarmoniser extends Transformer<Config> {
 	override async createGui(): Promise<HTMLElement> {
 		const element = await super.createGui()
 		if (!this.summary) {
+			element.classList.add("harmoniser-controls")
+			// These three self-labelled controls read more clearly without separate
+			// group headings. Keep their bindings and listeners while changing the layout.
+			for (const group of element.querySelectorAll("fieldset")) {
+				group.replaceWith(...group.querySelectorAll(":scope > .component-control"))
+			}
 			this.summary = document.createElement("section")
+			this.summary.className = "harmoniser-summary"
 			this.summary.setAttribute("aria-label", "Selected scale")
 			this.summary.setAttribute("aria-live", "polite")
-			this.summary.style.cssText =
-				"padding:12px;border:1px solid currentColor;border-radius:8px;margin-bottom:12px;line-height:1.6"
 			element.prepend(this.summary)
 			const update = () => {
 				const title = document.createElement("strong")

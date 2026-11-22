@@ -26,8 +26,9 @@ const svgElement = <K extends keyof SVGElementTagNameMap>(
 	attributes: Record<string, string | number>
 ) => {
 	const element = document.createElementNS(SVG_NS, tag)
-	for (const [name, value] of Object.entries(attributes))
-		{element.setAttribute(name, String(value))}
+	for (const [name, value] of Object.entries(attributes)) {
+		element.setAttribute(name, String(value))
+	}
 	return element
 }
 
@@ -48,7 +49,9 @@ export class GamepadVisualizerComponent {
 	constructor(private onInput: (command: string, value: number) => void = () => {}) {}
 
 	public createContainer(): HTMLElement {
-		if (this.#container) {return this.#container}
+		if (this.#container) {
+			return this.#container
+		}
 		const container = document.createElement("div")
 		container.className = "gamepad-visualizer-container nodrag nopan nowheel"
 		this.#container = container
@@ -60,7 +63,9 @@ export class GamepadVisualizerComponent {
 	}
 
 	public createGamepadSVG(): void {
-		if (!this.#container || this.#svg) {return}
+		if (!this.#container || this.#svg) {
+			return
+		}
 		const svg = svgElement("svg", {
 			viewBox: "0 0 600 360",
 			class: "gamepad-visualizer",
@@ -71,7 +76,7 @@ export class GamepadVisualizerComponent {
 		svg.appendChild(
 			svgElement("path", {
 				class: "gamepad-body",
-				d: "M150 75 Q100 66 78 112 L32 278 Q20 333 60 338 Q87 340 125 279 L170 245 Q300 278 430 245 L475 279 Q513 340 540 338 Q580 333 568 278 L522 112 Q500 66 450 75 Q300 104 150 75Z"
+				d: "M150 75 Q100 66 78 112 L32 278 Q20 333 60 338 Q87 340 125 319 L170 323 Q300 345 430 323 L475 319 Q513 340 540 338 Q580 333 568 278 L522 112 Q500 66 450 75 Q300 104 150 75Z"
 			})
 		)
 		const button = (
@@ -149,9 +154,13 @@ export class GamepadVisualizerComponent {
 	}
 
 	private control(target: EventTarget | null): Control | undefined {
-		if (!(target instanceof Element)) {return}
+		if (!(target instanceof Element)) {
+			return
+		}
 		const element = target.closest<SVGElement>("[data-command], [data-stick]")
-		if (!element || !this.#svg?.contains(element)) {return}
+		if (!element || !this.#svg?.contains(element)) {
+			return
+		}
 		return {
 			element,
 			button: element.dataset.command,
@@ -165,18 +174,25 @@ export class GamepadVisualizerComponent {
 			EVENT_POINTER_DOWN,
 			(event) => {
 				const control = this.control(event.target)
-				if (event.button !== 0 || !control) {return}
+				if (event.button !== 0 || !control) {
+					return
+				}
 				event.preventDefault()
 				event.stopPropagation()
 				if (
 					control.side &&
 					[...this.#pointers.values()].some(({ side }) => side === control.side)
-				)
-					{return}
+				) {
+					return
+				}
 				this.#pointers.set(event.pointerId, control)
 				svg.setPointerCapture?.(event.pointerId)
-				if (control.button) {this.press(control.button, `pointer:${event.pointerId}`, true)}
-				if (control.side) {this.moveStick(control.side, event)}
+				if (control.button) {
+					this.press(control.button, `pointer:${event.pointerId}`, true)
+				}
+				if (control.side) {
+					this.moveStick(control.side, event)
+				}
 			},
 			options
 		)
@@ -184,9 +200,13 @@ export class GamepadVisualizerComponent {
 			EVENT_POINTER_MOVE,
 			(event) => {
 				const control = this.#pointers.get(event.pointerId)
-				if (!control) {return}
+				if (!control) {
+					return
+				}
 				event.preventDefault()
-				if (control.side) {this.moveStick(control.side, event)}
+				if (control.side) {
+					this.moveStick(control.side, event)
+				}
 			},
 			{ ...options, passive: false }
 		)
@@ -198,10 +218,14 @@ export class GamepadVisualizerComponent {
 			EVENT_KEY_DOWN,
 			(event) => {
 				const control = this.control(event.target)
-				if (!control?.button || ![" ", "Enter"].includes(event.key)) {return}
+				if (!control?.button || ![" ", "Enter"].includes(event.key)) {
+					return
+				}
 				event.preventDefault()
 				event.stopPropagation()
-				if (event.repeat) {return}
+				if (event.repeat) {
+					return
+				}
 				this.#keys.set(event.key, control)
 				this.press(control.button, `key:${event.key}`, true)
 			},
@@ -211,7 +235,9 @@ export class GamepadVisualizerComponent {
 			EVENT_KEY_UP,
 			(event) => {
 				const control = this.#keys.get(event.key)
-				if (!control?.button) {return}
+				if (!control?.button) {
+					return
+				}
 				this.#keys.delete(event.key)
 				this.press(control.button, `key:${event.key}`, false)
 			},
@@ -234,7 +260,9 @@ export class GamepadVisualizerComponent {
 		document.addEventListener(
 			EVENT_VISIBILITY_CHANGE,
 			() => {
-				if (document.hidden) {this.releaseAll()}
+				if (document.hidden) {
+					this.releaseAll()
+				}
 			},
 			options
 		)
@@ -243,27 +271,45 @@ export class GamepadVisualizerComponent {
 	private press(button: string, owner: string, active: boolean): void {
 		const owners = this.#pressed.get(button) ?? new Set<string>()
 		const wasActive = owners.size > 0
-		if (active) {owners.add(owner)}
-		else {owners.delete(owner)}
-		if (owners.size) {this.#pressed.set(button, owners)}
-		else {this.#pressed.delete(button)}
+		if (active) {
+			owners.add(owner)
+		} else {
+			owners.delete(owner)
+		}
+		if (owners.size) {
+			this.#pressed.set(button, owners)
+		} else {
+			this.#pressed.delete(button)
+		}
 		this.renderButton(button)
-		if (wasActive !== owners.size > 0) {this.onInput(button, owners.size ? 1 : 0)}
+		if (wasActive !== owners.size > 0) {
+			this.onInput(button, owners.size ? 1 : 0)
+		}
 	}
 
 	private releasePointer(id: number): void {
 		const control = this.#pointers.get(id)
-		if (!control) {return}
+		if (!control) {
+			return
+		}
 		this.#pointers.delete(id)
-		if (control.button) {this.press(control.button, `pointer:${id}`, false)}
-		if (control.side) {this.setVirtualStick(control.side, 0, 0)}
-		if (this.#svg?.hasPointerCapture?.(id)) {this.#svg.releasePointerCapture(id)}
+		if (control.button) {
+			this.press(control.button, `pointer:${id}`, false)
+		}
+		if (control.side) {
+			this.setVirtualStick(control.side, 0, 0)
+		}
+		if (this.#svg?.hasPointerCapture?.(id)) {
+			this.#svg.releasePointerCapture(id)
+		}
 	}
 
 	private moveStick(side: Side, event: PointerEvent): void {
 		const bounds = this.#svg!.getBoundingClientRect()
 		const scale = Math.min(bounds.width / 600, bounds.height / 360)
-		if (!scale) {return}
+		if (!scale) {
+			return
+		}
 		const x =
 			((event.clientX - bounds.left - (bounds.width - 600 * scale) / 2) / scale -
 				STICKS[side].x) /
@@ -281,15 +327,21 @@ export class GamepadVisualizerComponent {
 		this.#virtualSticks[side] = [x, y]
 		this.renderStick(side)
 		;[x, y].forEach((value, axis) => {
-			if (previous[axis] !== value) {this.onInput(STICKS[side].commands[axis], value)}
+			if (previous[axis] !== value) {
+				this.onInput(STICKS[side].commands[axis], value)
+			}
 		})
 	}
 
 	public releaseAll(): void {
-		for (const id of this.#pointers.keys()) {this.releasePointer(id)}
+		for (const id of this.#pointers.keys()) {
+			this.releasePointer(id)
+		}
 		this.#keys.clear()
 		for (const [button, owners] of this.#pressed) {
-			for (const owner of owners) {this.press(button, owner, false)}
+			for (const owner of owners) {
+				this.press(button, owner, false)
+			}
 		}
 	}
 
@@ -298,11 +350,17 @@ export class GamepadVisualizerComponent {
 		const element = this.#buttons.get(button)
 		element?.classList.toggle("active", active)
 		element?.setAttribute("aria-pressed", String(active))
+		if (button === COMMANDS.LEFT_SHOULDER || button === COMMANDS.RIGHT_SHOULDER) {
+			this.renderStick(button === COMMANDS.LEFT_SHOULDER ? "left" : "right")
+		}
 	}
 
 	public updateButtonVisual(button: string, active: boolean): void {
-		if (active) {this.#hardwareButtons.add(button)}
-		else {this.#hardwareButtons.delete(button)}
+		if (active) {
+			this.#hardwareButtons.add(button)
+		} else {
+			this.#hardwareButtons.delete(button)
+		}
 		this.renderButton(button)
 	}
 
@@ -310,8 +368,12 @@ export class GamepadVisualizerComponent {
 		const dragging = [...this.#pointers.values()].some((control) => control.side === side)
 		const [x, y] = dragging ? this.#virtualSticks[side] : this.#hardwareSticks[side]
 		const knob = this.#sticks.get(side)
+		const click = side === "left" ? COMMANDS.LEFT_SHOULDER : COMMANDS.RIGHT_SHOULDER
 		knob?.setAttribute("transform", `translate(${x * 22} ${y * 22})`)
-		knob?.classList.toggle("active", Math.hypot(x, y) > 0.1)
+		knob?.classList.toggle(
+			"active",
+			Math.hypot(x, y) > 0.1 || this.#hardwareButtons.has(click) || this.#pressed.has(click)
+		)
 	}
 
 	public updateStickPosition(side: Side, x: number, y: number): void {

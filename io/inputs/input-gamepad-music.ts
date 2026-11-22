@@ -469,7 +469,9 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 
 			const alreadyHeld = [...this.state.heldNotes.values()].includes(noteNumber)
 			this.state.heldNotes.set(`${chordKey}_${index}`, noteNumber)
-			if (!alreadyHeld) {this.dispatch(command)}
+			if (!alreadyHeld) {
+				this.dispatch(command)
+			}
 		})
 	}
 
@@ -493,7 +495,9 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 
 		const alreadyHeld = [...this.state.heldNotes.values()].includes(noteNumber)
 		this.state.heldNotes.set(`melodic_${owner}`, noteNumber)
-		if (!alreadyHeld) {this.dispatch(command)}
+		if (!alreadyHeld) {
+			this.dispatch(command)
+		}
 	}
 
 	private stopMelodicNote(owner: number | string) {
@@ -502,9 +506,13 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 
 	private releaseNote(key: string) {
 		const number = this.state.heldNotes.get(key)
-		if (number === undefined) {return}
+		if (number === undefined) {
+			return
+		}
 		this.state.heldNotes.delete(key)
-		if ([...this.state.heldNotes.values()].includes(number)) {return}
+		if ([...this.state.heldNotes.values()].includes(number)) {
+			return
+		}
 		const command = new AudioCommand()
 		command.number = number
 		command.type = NOTE_OFF
@@ -516,7 +524,9 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 	}
 
 	private releaseHeldNotes() {
-		for (const key of this.state.heldNotes.keys()) {this.releaseNote(key)}
+		for (const key of this.state.heldNotes.keys()) {
+			this.releaseNote(key)
+		}
 	}
 
 	private playDrumPad(noteNumber: number, name: string | null, velocity: number) {

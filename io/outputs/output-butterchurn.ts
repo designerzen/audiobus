@@ -1,4 +1,12 @@
-import { EVENT_RESIZE } from "../../events/event-constants.ts"
+import {
+	EVENT_RESIZE,
+	EVENT_POINTER_DOWN,
+	EVENT_POINTER_MOVE,
+	EVENT_POINTER_UP,
+	EVENT_POINTER_CANCEL,
+	EVENT_POINTER_LEAVE,
+	EVENT_LOST_POINTER_CAPTURE
+} from "../../events/event-constants.ts"
 import type { IAudioOutput } from "./output-interface.ts"
 import "./output-butterchurn.css"
 
@@ -18,6 +26,13 @@ export default class OutputButterchurn implements IAudioOutput {
 	#presets: any = null
 	#activeNotes: Set<number> = new Set()
 	#presetChangeTimer: NodeJS.Timeout | null = null
+	#interactionEvents: AbortController | null = null
+	#pointer: { id: number; x: number; y: number; time: number; distance: number } | null = null
+	#lastTap: { x: number; y: number; time: number } | null = null
+	#position = { x: 0, y: 0 }
+	#pulse = 0
+	#swipe = { x: 0, y: 0 }
+	#lastFrameTime = 0
 
 	get uuid(): string {
 		return this.#uuid
@@ -64,6 +79,9 @@ export default class OutputButterchurn implements IAudioOutput {
 		this.#canvas.width = 404
 		this.#canvas.height = 256
 		this.#canvas.className = "audiobus-butterchurn"
+		this.#canvas.title =
+			"Move to steer · press to pulse · double tap/click for a new preset · swipe to push"
+		this.#bindInteractions()
 
 		// Lazy load butterchurn library
 		await this.#loadButterchurn()
@@ -85,6 +103,14 @@ export default class OutputButterchurn implements IAudioOutput {
 	}
 
 	async destroyGui(): Promise<void> {
+		this.#interactionEvents?.abort()
+		this.#interactionEvents = null
+		this.#pointer = null
+		this.#lastTap = null
+		this.#position = { x: 0, y: 0 }
+		this.#swipe = { x: 0, y: 0 }
+		this.#pulse = 0
+		this.#lastFrameTime = 0
 		this.#resizeObserver?.disconnect()
 		this.#resizeObserver = null
 		this.#stopVisualization()
@@ -92,6 +118,8 @@ export default class OutputButterchurn implements IAudioOutput {
 			this.#canvas.remove()
 			this.#canvas = null
 		}
+		this.#visualizer?.disconnectAudio(this.#analyser)
+		this.#visualizer = null
 		if (this.#presetChangeTimer) {
 			clearInterval(this.#presetChangeTimer)
 			this.#presetChangeTimer = null
@@ -135,7 +163,7 @@ export default class OutputButterchurn implements IAudioOutput {
 				this.#presets = Object.values(getPresets())
 				if (this.#presets && this.#presets.length > 0) {
 					const randomIndex = Math.floor(Math.random() * this.#presets.length)
-					this.#visualizer.loadPreset(this.#presets[randomIndex], 0.5)
+					this.#loadInteractivePreset(this.#presets[randomIndex], 0.5)
 				}
 			}
 		} catch (error) {
@@ -171,7 +199,165 @@ export default class OutputButterchurn implements IAudioOutput {
 		const randomIndex = Math.floor(Math.random() * this.#presets.length)
 
 		// Load preset with smooth transition (2 second blend)
-		this.#visualizer.loadPreset(this.#presets[randomIndex], 2.0)
+		this.#loadInteractivePreset(this.#presets[randomIndex], 2.0)
+	}
+
+	#loadInteractivePreset(preset: any, blendTime: number): void {
+		// Match Butterchurn's string-equation compilation, keeping the shared presets untouched.
+		const compile = (equations: any, key: string) =>
+			equations[key] || new Function("a", `${equations[`${key}_str`] || ""}; return a;`)
+		const frame = compile(preset, "frame_eqs")
+		this.#visualizer.loadPreset(
+			{
+				...preset,
+				init_eqs: compile(preset, "init_eqs"),
+				pixel_eqs:
+					preset.pixel_eqs || (preset.pixel_eqs_str ? compile(preset, "pixel_eqs") : ""),
+				frame_eqs: (variables: Record<string, number>) => {
+					const result = frame(variables)
+					result.rot += this.#position.x * 0.025
+					result.zoom *= 1 + this.#position.y * 0.025 + this.#pulse * 0.035
+					result.warp += this.#pulse * 1.5
+					result.dx += this.#swipe.x * 0.025
+					result.dy += this.#swipe.y * 0.025
+					return result
+				},
+				shapes: preset.shapes.map((shape: any) => ({
+					...shape,
+					init_eqs: compile(shape, "init_eqs"),
+					frame_eqs: compile(shape, "frame_eqs")
+				})),
+				waves: preset.waves.map((wave: any) => ({
+					...wave,
+					init_eqs: compile(wave, "init_eqs"),
+					frame_eqs: compile(wave, "frame_eqs"),
+					point_eqs: compile(wave, "point_eqs")
+				}))
+			},
+			blendTime
+		)
+	}
+
+	#updatePosition(event: PointerEvent): void {
+		const rect = this.#canvas!.getBoundingClientRect()
+		if (rect.width <= 0 || rect.height <= 0) {
+			return
+		}
+		this.#position.x = Math.max(
+			-1,
+			Math.min(1, ((event.clientX - rect.left) / rect.width) * 2 - 1)
+		)
+		this.#position.y = Math.max(
+			-1,
+			Math.min(1, 1 - ((event.clientY - rect.top) / rect.height) * 2)
+		)
+	}
+
+	#bindInteractions(): void {
+		const canvas = this.#canvas!
+		this.#interactionEvents = new AbortController()
+		const options = { signal: this.#interactionEvents.signal }
+		canvas.addEventListener(
+			EVENT_POINTER_DOWN,
+			(event) => {
+				if (this.#pointer || !event.isPrimary || event.button !== 0) {
+					return
+				}
+				event.stopPropagation()
+				this.#updatePosition(event)
+				this.#pointer = {
+					id: event.pointerId,
+					x: event.clientX,
+					y: event.clientY,
+					time: performance.now(),
+					distance: 0
+				}
+				this.#pulse = 1
+				canvas.setPointerCapture(event.pointerId)
+			},
+			options
+		)
+		canvas.addEventListener(
+			EVENT_POINTER_MOVE,
+			(event) => {
+				if (!event.isPrimary || (this.#pointer && this.#pointer.id !== event.pointerId)) {
+					return
+				}
+				this.#updatePosition(event)
+				if (this.#pointer) {
+					this.#pointer.distance = Math.max(
+						this.#pointer.distance,
+						Math.hypot(event.clientX - this.#pointer.x, event.clientY - this.#pointer.y)
+					)
+				}
+			},
+			options
+		)
+		canvas.addEventListener(
+			EVENT_POINTER_UP,
+			(event) => {
+				const pointer = this.#pointer
+				if (!pointer || pointer.id !== event.pointerId) {
+					return
+				}
+				const now = performance.now()
+				const dx = event.clientX - pointer.x
+				const dy = event.clientY - pointer.y
+				const distance = Math.max(pointer.distance, Math.hypot(dx, dy))
+				if (distance < 12 && now - pointer.time < 350) {
+					if (
+						this.#lastTap &&
+						now - this.#lastTap.time < 350 &&
+						Math.hypot(
+							event.clientX - this.#lastTap.x,
+							event.clientY - this.#lastTap.y
+						) < 24
+					) {
+						this.#changePreset()
+						this.#lastTap = null
+					} else {
+						this.#lastTap = { x: event.clientX, y: event.clientY, time: now }
+					}
+				} else {
+					this.#lastTap = null
+					if (distance >= 40 && now - pointer.time < 700) {
+						const rect = canvas.getBoundingClientRect()
+						this.#swipe = {
+							x: Math.max(-1, Math.min(1, dx / Math.max(1, rect.width))),
+							y: Math.max(-1, Math.min(1, -dy / Math.max(1, rect.height)))
+						}
+						this.#pulse = 1
+					}
+				}
+				this.#pointer = null
+				if (canvas.hasPointerCapture(event.pointerId)) {
+					canvas.releasePointerCapture(event.pointerId)
+				}
+				if (event.pointerType !== "mouse") {
+					this.#position = { x: 0, y: 0 }
+				}
+			},
+			options
+		)
+		const cancel = (event: PointerEvent) => {
+			if (this.#pointer?.id !== event.pointerId) {
+				return
+			}
+			this.#pointer = null
+			this.#lastTap = null
+			this.#position = { x: 0, y: 0 }
+		}
+		canvas.addEventListener(EVENT_POINTER_CANCEL, cancel, options)
+		canvas.addEventListener(EVENT_LOST_POINTER_CAPTURE, cancel, options)
+		canvas.addEventListener(
+			EVENT_POINTER_LEAVE,
+			() => {
+				if (!this.#pointer) {
+					this.#position = { x: 0, y: 0 }
+				}
+			},
+			options
+		)
 	}
 
 	#startVisualization(): void {
@@ -190,6 +376,12 @@ export default class OutputButterchurn implements IAudioOutput {
 		}
 
 		try {
+			const now = performance.now()
+			const decay = Math.exp(-Math.max(0, now - (this.#lastFrameTime || now)) / 300)
+			this.#lastFrameTime = now
+			this.#pulse = this.#pointer ? 1 : this.#pulse * decay
+			this.#swipe.x *= decay
+			this.#swipe.y *= decay
 			this.#visualizer.render()
 		} catch (error) {
 			console.error("Error rendering Butterchurn:", error)

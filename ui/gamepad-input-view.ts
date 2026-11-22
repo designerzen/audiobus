@@ -15,8 +15,11 @@ export default class GamepadInputView {
 	) {
 		this.visualizer = new GamepadVisualizerComponent((command, value) => {
 			const start = this.pressedAt.get(command) ?? performance.now()
-			if (value) {this.pressedAt.set(command, start)}
-			else {this.pressedAt.delete(command)}
+			if (value) {
+				this.pressedAt.set(command, start)
+			} else {
+				this.pressedAt.delete(command)
+			}
 			onInput(command, value, this.virtualPad, value ? -1 : performance.now() - start)
 		})
 		this.element = this.visualizer.createContainer()
@@ -31,7 +34,9 @@ export default class GamepadInputView {
 				(this.gamepadIndex == null || pad.index === Number(this.gamepadIndex))
 		)
 		for (const command of Object.values(COMMANDS)) {
-			if (command.includes("stick")) {continue}
+			if (command.includes("stick")) {
+				continue
+			}
 			this.visualizer.updateButtonVisual(
 				command,
 				pads.some((pad) => Boolean(pad[command as keyof GamePad]))
