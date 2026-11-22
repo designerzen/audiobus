@@ -121,10 +121,15 @@ export const addKeyboardDownEvents = (
 			// Performance surfaces opt non-text controls into musical keys. Text entry
 			// and dialogs always retain their normal editing behaviour.
 			const performance = !!target?.closest("[data-keyboard-notes]")
+			const onInteractive = !!target?.closest(
+				"button, a[href], summary, [role='tab'], [role='menuitem']"
+			)
 			if (
+				document.documentElement.dataset.shortcuts === "off" ||
 				target?.closest(
 					"textarea, [contenteditable]:not([contenteditable='false']), dialog"
 				) ||
+				(onInteractive && (!performance || event.key === " " || event.key === "Enter")) ||
 				(target?.closest("input, select") &&
 					(!performance ||
 						!target.matches(

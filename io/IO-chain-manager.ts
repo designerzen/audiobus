@@ -141,6 +141,18 @@ export class IOChainManager extends EventTarget {
 			for (const output of chain.outputs) {
 				output.setHarmony?.(this.harmony)
 			}
+			const follows = chain.transformers.some(
+				(transformer) => transformer instanceof TransformerChordTrack
+			)
+			const context = {
+				harmony: this.harmony,
+				progression: follows ? this.#musicTools.progression : undefined,
+				outputs: chain.outputs.map((output) => output.name),
+				drumPads: chain.outputs.find((output) => output.drumPads?.length)?.drumPads
+			}
+			for (const input of chain.inputs) {
+				input.setMusicalContext?.(context)
+			}
 		}
 	}
 	updateMusicalBeat(beat: number): void {
@@ -159,6 +171,9 @@ export class IOChainManager extends EventTarget {
 			const follows = chain.transformers.some(
 				(transformer) => transformer instanceof TransformerChordTrack
 			)
+			for (const input of chain.inputs) {
+				input.setMusicalBeat?.(beat)
+			}
 			for (const transformer of chain.transformers) {
 				transformer.setMusicalBeat?.(beat)
 				if (transformer instanceof TransformerImprovPartner) {

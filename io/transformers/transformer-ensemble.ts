@@ -11,7 +11,11 @@ import {
 	EVENT_ERROR
 } from "../../events/event-constants"
 import { EnsembleSession, type EnsembleMode, type EnsembleSettings } from "../ensemble-session"
-import type { EnsemblePartRole } from "../ensemble-performance"
+import type {
+	EnsembleGrooveRegion,
+	EnsemblePartRole,
+	EnsembleTelemetry
+} from "../ensemble-performance"
 import { loadMidi, midiSong, type MidiSong } from "../midi-song"
 import { notifyControls, notifyControlSchema } from "../component-ui"
 import type { ControlValue } from "control-surface/types"
@@ -39,8 +43,16 @@ interface Config {
 	autoJoin: boolean
 	autoInputs: "off" | "keyboard" | "gamepads"
 	partRoles: Record<number, EnsemblePartRole>
+	grooveRegions: EnsembleGrooveRegion[]
+	legatoGroove: boolean
+	anticipationBeats: number
+	pairCompanionParts: boolean
 	recoveryBars: number
 	chordWindowMs: number
+	tempoAdaptation: number
+	leadPlayer?: number
+	holdArticulation: boolean
+	velocityInfluence: number
 	activityBeats: number
 	assist: boolean
 	loop: boolean
@@ -54,8 +66,16 @@ const DEFAULTS: Config = {
 	midiFileName: "",
 	mode: "perform",
 	partRoles: {},
+	grooveRegions: [],
+	legatoGroove: true,
+	anticipationBeats: 8,
+	pairCompanionParts: false,
 	recoveryBars: 2,
 	chordWindowMs: 20,
+	tempoAdaptation: 0,
+	leadPlayer: undefined,
+	holdArticulation: false,
+	velocityInfluence: 0,
 	players: [],
 	autoJoin: true,
 	autoInputs: "off",
@@ -84,6 +104,7 @@ export class TransformerEnsemble extends Transformer<Config> {
 	private unsubscribe?: () => void
 	private learning?: number
 	private destroyed = false
+	private feedbackListeners = new Set<() => void>()
 	private library: { name: string; url: string }[] = []
 	private libraryLoading?: Promise<void>
 	get name() {
@@ -370,6 +391,19 @@ export class TransformerEnsemble extends Transformer<Config> {
 	get performanceState() {
 		return this.session.state
 	}
+	get telemetry(): EnsembleTelemetry {
+		return this.session.telemetry()
+	}
+	partFeedback(channel: number) {
+		return this.session.partFeedback(channel)
+	}
+	partState(channel: number): string {
+		return this.config.mode === "perform" ? this.session.partState(channel) : ""
+	}
+	subscribeFeedback(listener: () => void): () => void {
+		this.feedbackListeners.add(listener)
+		return () => this.feedbackListeners.delete(listener)
+	}
 	private source(command: IAudioCommand): string {
 		return command.inputId
 			? JSON.stringify([command.inputId, command.from])
@@ -392,8 +426,50 @@ export class TransformerEnsemble extends Transformer<Config> {
 		)
 	}
 	override setConfig(key: string, value: unknown): void {
-		if (["enabled", "loop", "assist", "autoJoin"].includes(key)) {
-			value = Boolean(Number(value))
+		if (
+			[
+				"enabled",
+				"loop",
+				"assist",
+				"autoJoin",
+				"holdArticulation",
+				"legatoGroove",
+				"pairCompanionParts"
+			].includes(key)
+		) {
+			value = Boolean(Number(value) || value === true)
+		}
+		if (key === "anticipationBeats") {
+			const number = Number(value)
+			value = Number.isFinite(number) && number >= 0 ? Math.min(64, number) : 8
+		}
+		if (["tempoAdaptation", "velocityInfluence"].includes(key)) {
+			const number = Number(value)
+			value = Number.isFinite(number) ? Math.max(0, Math.min(1, number)) : 0
+		}
+		if (key === "leadPlayer") {
+			const number = Number(value)
+			value = Number.isInteger(number) && number >= 0 ? number : undefined
+		}
+		if (key === "grooveRegions") {
+			value = Array.isArray(value)
+				? value
+						.filter(
+							(r) =>
+								r &&
+								Number.isInteger(Number(r.fromBar)) &&
+								Number(r.fromBar) >= 1 &&
+								["loop", "break", "fill"].includes(String(r.kind))
+						)
+						.map((r) => ({
+							fromBar: Number(r.fromBar),
+							...(Number.isInteger(Number(r.toBar)) &&
+							Number(r.toBar) >= Number(r.fromBar)
+								? { toBar: Number(r.toBar) }
+								: {}),
+							kind: r.kind as EnsembleGrooveRegion["kind"]
+						}))
+				: []
 		}
 		if (
 			[
@@ -553,7 +629,7 @@ export class TransformerEnsemble extends Transformer<Config> {
 				this.renderPlayers()
 			}
 			if (player >= 0) {
-				output.push(...this.session.press(player, now))
+				output.push(...this.session.press(player, now, command.velocity))
 			}
 		}
 		this.updateStatus()
@@ -600,11 +676,14 @@ export class TransformerEnsemble extends Transformer<Config> {
 		if (!state.running) {
 			return `${title} · ${state.paused ? "Paused — press any part to carry on" : "Press any part to start the song"}`
 		}
-		const { live, upcoming } = this.session.parts()
-		const waiting = upcoming.filter((channel) => !live.includes(channel))
+		const { live, upcoming, assisted = [] } = this.session.parts()
+		const waiting = upcoming.filter(
+			(channel) => !live.includes(channel) && !assisted.includes(channel)
+		)
 		return [
 			title,
 			live.length ? `Playing: ${this.partNames(live)}` : "Nobody is playing",
+			assisted.length ? `Backing: ${this.partNames(assisted)}` : "",
 			waiting.length ? `Coming up: ${this.partNames(waiting)}` : ""
 		]
 			.filter(Boolean)
@@ -618,6 +697,10 @@ export class TransformerEnsemble extends Transformer<Config> {
 			for (const node of nodes) {
 				if (node.textContent !== feedback.message) node.textContent = feedback.message
 				if (node.dataset.phase !== feedback.phase) node.dataset.phase = feedback.phase
+				const tile = node.closest<HTMLElement>(".ensemble-part")
+				if (tile && tile.dataset.phase !== feedback.phase) {
+					tile.dataset.phase = feedback.phase
+				}
 				if (node.dataset.accepted !== String(feedback.accepted)) {
 					node.dataset.accepted = String(feedback.accepted)
 					if (
@@ -634,11 +717,26 @@ export class TransformerEnsemble extends Transformer<Config> {
 				// Quantize the visual pulse to eight steps per beat, avoiding full-rate DOM writes.
 				const pulse = this.session.state.running ? Math.floor((feedback.beat % 1) * 8) : -1
 				if (node.dataset.pulse !== String(pulse)) node.dataset.pulse = String(pulse)
+				const approachPercent = String(Math.round((feedback.approach ?? 0) * 100))
+				if (node.dataset.approach !== approachPercent) {
+					node.dataset.approach = approachPercent
+					node.style.setProperty(
+						"--ensemble-approach",
+						(feedback.approach ?? 0).toFixed(2)
+					)
+					tile?.style.setProperty(
+						"--ensemble-approach",
+						(feedback.approach ?? 0).toFixed(2)
+					)
+				}
 			}
 		}
 		for (const [channel, nodes] of this.partStatuses) {
 			const text = this.config.mode === "perform" ? this.session.partState(channel) : ""
 			for (const node of nodes) if (node.textContent !== text) node.textContent = text
+		}
+		for (const listener of this.feedbackListeners) {
+			listener()
 		}
 		if (!this.status) {
 			return

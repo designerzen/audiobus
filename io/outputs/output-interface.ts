@@ -26,6 +26,8 @@ export interface IAudioOutput extends ComponentUi {
 	onClockTick?(tick: Readonly<AudioClockTick>): void
 	stopClock?(): void
 	setHarmony?(state: import("../harmony").HarmonicState): void
+	/** Named percussion notes, so generators write for this kit rather than guess. */
+	readonly drumPads?: readonly import("../ai-fugue").DrumPad[]
 	recordChainPerformance?(measurement: Readonly<ChainPerformanceMeasurement>): void
 	recordTimerPerformance?(measurement: Readonly<TimerPerformanceMeasurement>): void
 

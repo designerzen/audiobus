@@ -102,6 +102,7 @@ export default class InputCosmoDots extends AbstractInput {
 				EVENT_KEY_DOWN,
 				(event) => {
 					if (
+						document.documentElement.dataset.shortcuts === "off" ||
 						event.repeat ||
 						event.isComposing ||
 						event.ctrlKey ||
@@ -116,7 +117,9 @@ export default class InputCosmoDots extends AbstractInput {
 								(target) =>
 									target instanceof HTMLElement &&
 									(target.isContentEditable ||
-										target.matches("input, textarea, select, [role=textbox]"))
+										target.matches(
+											"input, textarea, select, button, a[href], summary, [role=textbox], [role=tab], [role=menuitem]"
+										))
 							)
 					) {
 						return
@@ -290,6 +293,7 @@ export default class InputCosmoDots extends AbstractInput {
 	}
 	createSurfaceView(): { element: HTMLElement; destroy(): void } {
 		const grid = document.createElement("div")
+		grid.setAttribute("role", "group")
 		grid.setAttribute("aria-label", "Cosmo Dots")
 		grid.style.cssText =
 			"display:grid;grid-template-columns:repeat(auto-fit,minmax(72px,100px));justify-content:center;gap:16px;padding:12px;width:100%;box-sizing:border-box;max-width:1000px;margin:auto"

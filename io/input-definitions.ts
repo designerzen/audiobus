@@ -143,6 +143,9 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 				id,
 				name: component.name,
 				description: component.description,
+				...("attribution" in component && component.attribution
+					? { attribution: component.attribution }
+					: {}),
 				type: "controller",
 				subtype: component.subtype,
 				category: "UI",

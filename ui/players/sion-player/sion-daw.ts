@@ -31,15 +31,15 @@ export class SiONDAW {
             <label class="field grow">Feeling<select data-compose="mood">${moodPresets.map((mood) => `<option value="${mood.id}">${mood.emoji} ${mood.name}</option>`).join("")}</select></label>
           </div>
           <div class="toolbar">
-            <button type="button" class="primary" data-action="compose">✨ Make &amp; play</button>
-            <button type="button" data-action="play">▶ Play song</button>
-            <button type="button" data-action="stop">■ Stop</button>
+            <button type="button" class="primary" data-action="compose"><span aria-hidden="true">✨</span> Make &amp; play</button>
+            <button type="button" data-action="play"><span aria-hidden="true">▶</span> Play song</button>
+            <button type="button" data-action="stop"><span aria-hidden="true">■</span> Stop</button>
           </div>
           <p class="hint" data-song-description>Start with Make &amp; play, or play your current arrangement.</p>
-          <div class="toolbar" aria-label="Song variations">
-            <button type="button" data-action="melody" data-variation disabled>🎲 New melody</button>
-            <button type="button" data-action="harmony" data-variation disabled>🎲 New harmony</button>
-            <button type="button" data-action="sounds" data-variation disabled>🎲 New sounds</button>
+          <div class="toolbar" role="group" aria-label="Song variations">
+            <button type="button" data-action="melody" data-variation disabled><span aria-hidden="true">🎲</span> New melody</button>
+            <button type="button" data-action="harmony" data-variation disabled><span aria-hidden="true">🎲</span> New harmony</button>
+            <button type="button" data-action="sounds" data-variation disabled><span aria-hidden="true">🎲</span> New sounds</button>
           </div>
           <p class="hint">Variations keep your style, key and tempo. New harmony adapts the melody and bass too. Press Play song to hear an edit.</p>
           <div class="toolbar">
@@ -375,11 +375,11 @@ export class SiONDAW {
                 <label class="field grow">Instrument<select data-field="instrument">${instruments.map((item, i) => `<option value="${i}">${item.name}</option>`).join("")}</select></label>
                 <label><input data-field="mute" type="checkbox"> Mute</label>
                 <label><input data-field="solo" type="checkbox"> Solo</label>
-                <button type="button" data-action="remove" ${this.project.tracks.length === 1 ? "disabled" : ""}>Remove</button>
+                <button type="button" data-action="remove" aria-label="Remove track ${index + 1}" ${this.project.tracks.length === 1 ? "disabled" : ""}>Remove</button>
               </div>
               <div class="toolbar">
-                <label>Level <input data-field="volume" type="range" min="0" max="100"> <output data-value="volume"></output>%</label>
-                <label>Pan <input data-field="pan" type="range" min="-64" max="64"> <output data-value="pan"></output></label>
+                <label for="track-vol-${index}">Level <input id="track-vol-${index}" data-field="volume" type="range" min="0" max="100"> <output data-value="volume" for="track-vol-${index}"></output>%</label>
+                <label for="track-pan-${index}">Pan <input id="track-pan-${index}" data-field="pan" type="range" min="-64" max="64"> <output data-value="pan" for="track-pan-${index}"></output></label>
               </div>
               <label class="field">MML part<textarea data-field="mml" spellcheck="false" maxlength="16000"></textarea></label>`
 			for (const field of ["name", "instrument", "volume", "pan", "mml"] as const) {

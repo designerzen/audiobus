@@ -534,7 +534,7 @@ export default class OutputSongTree implements IAudioOutput {
 				const canvas = document.createElement("canvas")
 				canvas.style.cssText =
 					"display:block;width:100%;height:420px;border-radius:12px;background:#060e13"
-				canvas.setAttribute("role", "img")
+				canvas.setAttribute("role", "application")
 				canvas.setAttribute(
 					"aria-label",
 					"Song tree: each note is a branch that arcs from the trunk and grows upwards, ending in a leaf. Drag or use arrow keys to pan. Use branch controls to inspect any note."

@@ -3,7 +3,12 @@ import { NOTE_ON, NOTE_OFF, CONTROL_CHANGE, PITCH_BEND, PROGRAM_CHANGE } from ".
 import type { IAudioCommand } from "../commands/audio-command-interface"
 import type { MidiSong, SongEvent } from "./midi-song"
 
-import { EnsemblePerformance, type EnsemblePartRole } from "./ensemble-performance"
+import {
+	EnsemblePerformance,
+	type EnsembleGrooveRegion,
+	type EnsemblePartRole,
+	type EnsembleTelemetry
+} from "./ensemble-performance"
 
 export type EnsembleMode = "perform" | "assisted" | "together" | "conductor"
 export interface EnsemblePlayer {
@@ -17,6 +22,22 @@ export interface EnsembleSettings {
 	recoveryBars?: number
 	/** Merge slightly staggered chord tones; 0 retains exact score onsets. */
 	chordWindowMs?: number
+	/** Maximum beats ahead that a tap queues a score entry; taps earlier during a long rest voice immediate comping. */
+	anticipationBeats?: number
+	/** Automatically pair unison/octave-doubled companion tracks when their own player is inactive. */
+	pairCompanionParts?: boolean
+	/** Authored loop, fill, and break regions (1-based bar numbers). */
+	grooveRegions?: EnsembleGrooveRegion[]
+	/** Launch mid-bar grooves immediately at the current beat phase rather than waiting for the next bar. */
+	legatoGroove?: boolean
+	/** Gentle score-aware group tempo adaptation gain (0..1; 0 keeps fixed clock). */
+	tempoAdaptation?: number
+	/** Optional timing leader player index for asymmetric tempo following. */
+	leadPlayer?: number
+	/** When true, key release shapes the active note's duration without triggering later notes. */
+	holdArticulation?: boolean
+	/** How strongly input velocity shapes onset dynamics (0..1; 0 retains score dynamics). */
+	velocityInfluence?: number
 	activityBeats: number
 	assist: boolean
 	loop: boolean
@@ -79,15 +100,22 @@ export class EnsembleSession {
 			lastNow: this.lastNow
 		}
 	}
-	/** Channels currently playing for a player, and channels with notes in the next bar. */
-	parts(): { live: number[]; upcoming: number[] } {
+	/** Channels currently playing for a player, channels with notes in the next bar, and assisted backing channels. */
+	parts(): { live: number[]; upcoming: number[]; assisted?: number[] } {
 		if (this.settings.mode === "perform") return this.performance.parts()
 		if (!this.song) {
-			return { live: [], upcoming: [] }
+			return { live: [], upcoming: [], assisted: [] }
 		}
 		const live = this.song.channels.filter((channel) =>
 			this.channelLive(channel, this.position)
 		)
+		const assisted = this.settings.assist
+			? this.song.channels.filter(
+					(channel) =>
+						!live.includes(channel) &&
+						[...this.sounding.values()].some((c) => c.channel === channel)
+				)
+			: []
 		const horizon = this.secondsAtBeat(this.beatAt(this.position) + this.beatsPerBar())
 		const upcoming = new Set<number>()
 		for (let i = this.cursor; i < this.song.events.length; i++) {
@@ -99,7 +127,13 @@ export class EnsembleSession {
 				upcoming.add(event.command.channel)
 			}
 		}
-		return { live, upcoming: [...upcoming].sort((a, b) => a - b) }
+		return { live, upcoming: [...upcoming].sort((a, b) => a - b), assisted }
+	}
+	telemetry(): EnsembleTelemetry {
+		return this.performance.telemetry()
+	}
+	companionChannels(channel: number): number[] {
+		return this.performance.companionChannels(channel)
 	}
 	partRole(channel: number): "notes" | "groove" {
 		return this.performance.role(channel)
@@ -313,9 +347,9 @@ export class EnsembleSession {
 	}
 
 	/** Holding or tapping keeps a player's parts playing at the shared song position. */
-	press(player: number, now: number): IAudioCommand[] {
+	press(player: number, now: number, velocity?: number): IAudioCommand[] {
 		if (this.settings.mode === "perform")
-			return [...this.advance(now), ...this.performance.press(player, now)]
+			return [...this.advance(now), ...this.performance.press(player, now, velocity)]
 		const output = this.advance(now)
 		const assigned = this.settings.players[player]
 		if (!this.song || this.ended || !assigned) {

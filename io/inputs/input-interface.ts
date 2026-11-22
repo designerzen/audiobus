@@ -11,6 +11,10 @@ export interface IAudioInput extends EventTarget, ComponentUi {
 	updateTime?(now: number): void
 	startClock?(): void
 	stopClock?(): void
+	/** Transport position in quarter-note beats, on every clock tick. */
+	setMusicalBeat?(beat: number): void
+	/** Key, chords, instruments and drum pads of the chain, for generative inputs. */
+	setMusicalContext?(context: import("../ai-fugue").MusicalContext): void
 	connect?(): Promise<void | Function> | Function
 	disconnect?(): Promise<void> | Function
 	createGui?(): Promise<HTMLElement>

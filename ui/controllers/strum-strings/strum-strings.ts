@@ -21,6 +21,15 @@ import {
 import styles from "./strum-strings.css?inline"
 import { PatchController } from "../../shared/patch-controller.ts"
 import {
+	createModalString,
+	modalStringAmplitude,
+	nudgeModalString,
+	sampleModalString,
+	shapeModalString,
+	stepModalString,
+	type ModalString
+} from "../../shared/modal-string.ts"
+import {
 	dispatchInstrumentEvent,
 	instrumentNote,
 	noteDetail,
@@ -60,17 +69,8 @@ const SILENT = 0.015
 /** A finger that has not moved for this long is resting, and mutes the string under it. */
 const REST_MS = 70
 
-interface Strand {
-	note: number
+interface Strand extends ModalString {
 	hue: number
-	/** Modal displacement in CSS pixels. */
-	a: Float32Array
-	/** Modal velocity divided by its angular frequency, in CSS pixels. */
-	b: Float32Array
-	/** Visible fundamental in radians per second; lower strings swing slower. */
-	omega: number
-	/** Envelope of the sounding note, 0–1. */
-	level: number
 	held?: NoteDetail
 	caught?: number
 	muted: boolean
@@ -435,12 +435,8 @@ export class StrumStrings extends PatchController {
 		const capo = this.capo
 		const notes = this.tuning.map((note) => clamp(note + capo, 0, 127))
 		this.strands = notes.map((note) => ({
-			note,
+			...createModalString(note, MODES),
 			hue: (note % 12) * 30,
-			a: new Float32Array(MODES),
-			b: new Float32Array(MODES),
-			omega: 2 * Math.PI * clamp(3.5 * 2 ** ((note - 40) / 24), 2, 9),
-			level: 0,
 			muted: false
 		}))
 		this.focused = Math.min(this.focused, notes.length - 1)
@@ -535,29 +531,17 @@ export class StrumStrings extends PatchController {
 
 	/** Set a string to the triangle a finger makes holding it at position, displaced by offset. */
 	private shape(strand: Strand, position: number, offset: number) {
-		const scale = (2 * offset) / (Math.PI * Math.PI * position * (1 - position))
-		for (let m = 0; m < MODES; m++) {
-			const n = m + 1
-			strand.a[m] = (scale * Math.sin(n * Math.PI * position)) / (n * n)
-			strand.b[m] = 0
-		}
+		shapeModalString(strand, position, offset)
 	}
 
 	/** A light touch: an impulse that sets the string swinging without sounding it. */
 	private nudge(strand: Strand, position: number, impulse: number) {
-		for (let m = 0; m < MODES; m++) {
-			const n = m + 1
-			strand.b[m] += (impulse * Math.sin(n * Math.PI * position)) / n
-		}
+		nudgeModalString(strand, position, impulse)
 		this.wake()
 	}
 
 	private amplitude(strand: Strand) {
-		let sum = 0
-		for (let m = 0; m < MODES; m++) {
-			sum += Math.abs(strand.a[m]) + Math.abs(strand.b[m])
-		}
-		return sum
+		return modalStringAmplitude(strand)
 	}
 
 	private velocity(contact: Contact, speed: number, push = 0) {
@@ -827,16 +811,7 @@ export class StrumStrings extends PatchController {
 			)
 			const damping = rate * (strand.muted ? 14 : 1)
 			if (strand.caught === undefined) {
-				for (let m = 0; m < MODES; m++) {
-					const angle = strand.omega * (m + 1) * seconds,
-						decay = Math.exp(-damping * (0.5 + 0.5 * (m + 1)) * seconds),
-						cos = Math.cos(angle),
-						sin = Math.sin(angle),
-						a = strand.a[m],
-						b = strand.b[m]
-					strand.a[m] = (a * cos + b * sin) * decay
-					strand.b[m] = (b * cos - a * sin) * decay
-				}
+				stepModalString(strand, seconds, damping)
 			}
 			if (strand.held) {
 				strand.level *= Math.exp(-damping * seconds)
@@ -897,10 +872,7 @@ export class StrumStrings extends PatchController {
 			context.beginPath()
 			for (let k = 0; k <= SEGMENTS; k++) {
 				const u = k / SEGMENTS
-				let offset = 0
-				for (let m = 0; m < MODES; m++) {
-					offset += strand.a[m] * Math.sin((m + 1) * Math.PI * u)
-				}
+				const offset = sampleModalString(strand, u)
 				const along = start + u * span,
 					across = rest + clamp(offset, -limit, limit)
 				if (horizontal) {

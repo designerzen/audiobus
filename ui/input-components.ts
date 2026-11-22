@@ -1,4 +1,5 @@
 import * as INPUT_TYPES from "../io/inputs/input-types.ts"
+import { CHROME_MUSIC_LAB_ATTRIBUTION } from "./shared/chrome-music-lab.ts"
 
 /** Lazy modules keep custom-element registration out of headless consumers. */
 export const UI_INPUT_COMPONENTS = {
@@ -94,6 +95,69 @@ export const UI_INPUT_COMPONENTS = {
 			"Strum, pluck and mute colourful physically simulated strings; resizes to fit control surfaces",
 		subtype: "pointer",
 		load: () => import("./controllers/strum-strings/strum-strings.ts")
+	},
+	[INPUT_TYPES.CHROME_MUSIC_LAB_ARPEGGIOS]: {
+		tag: "chrome-music-lab-arpeggios",
+		name: "Chrome Music Lab Arpeggios",
+		description:
+			"Circle-of-fifths major and minor chord wheel with looping arpeggio patterns inspired by Chrome Music Lab",
+		subtype: "pointer",
+		attribution: CHROME_MUSIC_LAB_ATTRIBUTION,
+		load: () => import("./controllers/arpeggios/arpeggios.ts")
+	},
+	[INPUT_TYPES.CHROME_MUSIC_LAB_CHORDS]: {
+		tag: "chrome-music-lab-chords",
+		name: "Chrome Music Lab Chords",
+		description:
+			"Play major or minor triads from any key on a two-octave keyboard inspired by Chrome Music Lab",
+		subtype: "keyboard",
+		attribution: CHROME_MUSIC_LAB_ATTRIBUTION,
+		load: () => import("./controllers/chords/chords.ts")
+	},
+	[INPUT_TYPES.CHROME_MUSIC_LAB_HARMONICS]: {
+		tag: "chrome-music-lab-harmonics",
+		name: "Chrome Music Lab Harmonics",
+		description:
+			"Explore standing-wave overtones of the harmonic series with physically wobbling modal waves inspired by Chrome Music Lab",
+		subtype: "pointer",
+		attribution: CHROME_MUSIC_LAB_ATTRIBUTION,
+		load: () => import("./controllers/harmonics/harmonics.ts")
+	},
+	[INPUT_TYPES.CHROME_MUSIC_LAB_STRINGS]: {
+		tag: "chrome-music-lab-strings",
+		name: "Chrome Music Lab Strings",
+		description:
+			"Pluck and strum divided string lengths (1/1 through 1/6) simulated with modal string physics inspired by Chrome Music Lab",
+		subtype: "pointer",
+		attribution: CHROME_MUSIC_LAB_ATTRIBUTION,
+		load: () => import("./controllers/harmonic-strings/harmonic-strings.ts")
+	},
+	[INPUT_TYPES.CHROME_MUSIC_LAB_MELODY_MAKER]: {
+		tag: "chrome-music-lab-melody-maker",
+		name: "Chrome Music Lab Melody Maker",
+		description:
+			"Eight-step diatonic grid sequencer with ghost harmony shadows inspired by Chrome Music Lab",
+		subtype: "pads",
+		attribution: CHROME_MUSIC_LAB_ATTRIBUTION,
+		load: () => import("./controllers/melody-maker/melody-maker.ts")
+	},
+	[INPUT_TYPES.CHROME_MUSIC_LAB_PIANO_ROLL]: {
+		tag: "chrome-music-lab-piano-roll",
+		name: "Chrome Music Lab Piano Roll",
+		description:
+			"Play and scrub classical piano roll scores forward or backward across a live trigger line inspired by Chrome Music Lab",
+		subtype: "pointer",
+		attribution: CHROME_MUSIC_LAB_ATTRIBUTION,
+		load: () => import("./controllers/scrolling-piano-roll/scrolling-piano-roll.ts")
+	},
+	[INPUT_TYPES.CHROME_MUSIC_LAB_SOUND_WAVES]: {
+		tag: "chrome-music-lab-sound-waves",
+		name: "Chrome Music Lab Sound Waves",
+		description:
+			"Play a keyboard while watching longitudinal air-particle waves and zoomed sine traces inspired by Chrome Music Lab",
+		subtype: "keyboard",
+		attribution: CHROME_MUSIC_LAB_ATTRIBUTION,
+		load: () => import("./controllers/sound-waves/sound-waves.ts")
 	}
 } as const
 

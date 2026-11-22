@@ -210,11 +210,16 @@ export class SiONPlayer extends HTMLElement {
 		window.addEventListener(EVENT_PAGE_HIDE, () => this.dispose(), options)
 		this.poll = setInterval(() => {
 			if (this.driver?.isPlaying && this.get("#play").hasAttribute("data-playing")) {
-				this.status(
-					this.context?.state === "running"
-						? `Playing score. ${Math.max(0, this.driver.position / 1000).toFixed(1)} s`
-						: "Audio paused. Press Play to resume."
-				)
+				const statusEl = this.get("#status")
+				if (statusEl) {
+					if (this.context?.state === "running") {
+						statusEl.setAttribute("aria-live", "off")
+						statusEl.textContent = `Playing score. ${Math.max(0, this.driver.position / 1000).toFixed(1)} s`
+					} else {
+						statusEl.setAttribute("aria-live", "polite")
+						this.status("Audio paused. Press Play to resume.")
+					}
+				}
 			}
 			if (
 				this.driver &&
@@ -222,6 +227,8 @@ export class SiONPlayer extends HTMLElement {
 				this.get("#play").hasAttribute("data-playing")
 			) {
 				this.get("#play").removeAttribute("data-playing")
+				const statusEl = this.get("#status")
+				statusEl?.setAttribute("aria-live", "polite")
 				this.status("Playback finished.")
 			}
 		}, 250)
@@ -240,8 +247,8 @@ export class SiONPlayer extends HTMLElement {
 	private render() {
 		if (this.hasAttribute("transport-only")) {
 			this.root.innerHTML = `<style>${styles}</style><div class="panel"><div class="toolbar">
-                <button id="play" class="primary" type="button">▶ Play song</button>
-                <button id="stop" type="button">■ Stop</button>
+                <button id="play" class="primary" type="button"><span aria-hidden="true">▶</span> Play song</button>
+                <button id="stop" type="button"><span aria-hidden="true">■</span> Stop</button>
                 <label for="volume">Volume</label><input id="volume" type="range" min="0" max="100" value="35" aria-describedby="volume-value">
                 <output id="volume-value" for="volume">35%</output>
                 </div><p id="status" class="status" role="status" aria-live="polite">Ready. Press Play to enable audio.</p></div>`
@@ -262,8 +269,8 @@ export class SiONPlayer extends HTMLElement {
           <textarea id="mml" spellcheck="false" aria-describedby="mml-help"></textarea>
           <p id="mml-help" class="hint">The score sets its own tempo and instruments. The voice selector below applies to the keyboard.</p>
           <div class="toolbar">
-            <button id="play" class="primary" type="button">▶ Play score</button>
-            <button id="stop" type="button">■ Stop all sound</button>
+            <button id="play" class="primary" type="button"><span aria-hidden="true">▶</span> Play score</button>
+            <button id="stop" type="button"><span aria-hidden="true">■</span> Stop all sound</button>
           </div>
           <p id="status" class="status" role="status" aria-live="polite">Ready. Play a score or press a piano key to enable audio.</p>
         </section>
@@ -447,7 +454,8 @@ export class SiONPlayer extends HTMLElement {
 	private keyEvent(event: KeyboardEvent, down: boolean) {
 		const target = event.target as HTMLElement
 		if (
-			target.matches("textarea, input, select") ||
+			document.documentElement.dataset.shortcuts === "off" ||
+			target.matches("textarea, input, select, button:not([data-note]), a, summary") ||
 			event.ctrlKey ||
 			event.altKey ||
 			event.metaKey

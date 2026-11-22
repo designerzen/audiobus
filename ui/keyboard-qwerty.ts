@@ -279,6 +279,8 @@ export default class QwertyKeyboard extends AbstractInteractive {
 		const svg = `<svg 
 					xmlns="http://www.w3.org/2000/svg" 
 					class="qwerty-keys" 
+					role="img"
+					aria-label="QWERTY keyboard layout"
 					viewBox="0 0 ${totalWidth} ${totalHeight}" 
 					draggable="false">
 					${keyElements.join("")}

@@ -66,6 +66,9 @@ export default class OutputDrumKit extends EventTarget implements IAudioOutput {
 	get name(): string {
 		return "Drum Kit"
 	}
+	get drumPads() {
+		return PADS.map(([name, note]) => ({ name, note }))
+	}
 	get description(): string {
 		return "Play a synthesized General MIDI drum kit from notes or touch pads"
 	}

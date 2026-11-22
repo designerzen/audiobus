@@ -80,6 +80,8 @@ export default class OutputNotation implements IAudioOutput {
 
 		// Create canvas
 		this.#canvas = document.createElement("canvas")
+		this.#canvas.setAttribute("role", "img")
+		this.#canvas.setAttribute("aria-label", "Musical staff notation")
 		this.#canvas.width = this.#containerWidth
 		this.#canvas.height = this.#containerHeight
 		this.#canvas.style.display = "block"

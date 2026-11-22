@@ -17,6 +17,21 @@ export { ENSEMBLE_KEYS }
 export function installEnsembleControls(chain: IOChain, signal: AbortSignal): void {
 	const subscriptions = new Map<TransformerEnsemble, () => void>()
 	let syncing = false
+	const syncFeedback = (ensemble: TransformerEnsemble) => {
+		for (const input of chain.inputs) {
+			if (
+				input instanceof InputChannelTrigger &&
+				input.options.ensembleId === ensemble.midiControlId
+			) {
+				const channel = Number(input.options.songChannel) || 1
+				const feedback = ensemble.partFeedback(channel)
+				input.setEnsembleFeedback({
+					...feedback,
+					stateText: ensemble.partState(channel)
+				})
+			}
+		}
+	}
 	const remove = (ensembleId: string) => {
 		for (const input of chain.inputs) {
 			if (input instanceof InputChannelTrigger && input.options.ensembleId === ensembleId) {
@@ -139,6 +154,7 @@ export function installEnsembleControls(chain: IOChain, signal: AbortSignal): vo
 					mainSurfaceId: chain.options.mainSurfaceId ?? id
 				})
 			}
+			syncFeedback(ensemble)
 		} finally {
 			syncing = false
 		}
@@ -160,13 +176,15 @@ export function installEnsembleControls(chain: IOChain, signal: AbortSignal): vo
 				void ensemble.loadSongLibrary()
 			}
 			if (!subscriptions.has(ensemble)) {
-				subscriptions.set(
-					ensemble,
-					ensemble.subscribeControls(() => {
-						sync(ensemble)
-						chain.dispatchEvent(configurationUpdate(EVENT_CONFIGURATION_CHANGED))
-					})
-				)
+				const unsubControls = ensemble.subscribeControls(() => {
+					sync(ensemble)
+					chain.dispatchEvent(configurationUpdate(EVENT_CONFIGURATION_CHANGED))
+				})
+				const unsubFeedback = ensemble.subscribeFeedback(() => syncFeedback(ensemble))
+				subscriptions.set(ensemble, () => {
+					unsubControls()
+					unsubFeedback()
+				})
 			}
 			sync(ensemble)
 		}

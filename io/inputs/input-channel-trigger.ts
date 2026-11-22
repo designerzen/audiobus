@@ -18,12 +18,23 @@ import type { ControlValue, UiDescriptor } from "control-surface/types"
 let gamepads: GamePadManager | undefined
 let gamepadUsers = 0
 
+export interface ChannelTriggerFeedback {
+	phase: string
+	message: string
+	stateText?: string
+	beat?: number
+	approach?: number
+}
+
 /** One persistent player control, shared by its key, gamepad and surface pad. */
 export default class InputChannelTrigger extends AbstractInput {
 	private events = new AbortController()
 	private held = new Set<string>()
 	private releaseGamepad?: () => void
 	private gui?: HTMLElement
+	private cueNode?: HTMLElement
+	private statusNode?: HTMLElement
+	feedback?: ChannelTriggerFeedback
 	get name() {
 		return this.options.label || `Song channel ${this.options.songChannel}`
 	}
@@ -191,6 +202,54 @@ export default class InputChannelTrigger extends AbstractInput {
 			this.trigger(Number(value) > 0)
 		}
 	}
+	setEnsembleFeedback(feedback?: ChannelTriggerFeedback): void {
+		this.feedback = feedback
+		const cueText = feedback
+			? [feedback.message, feedback.stateText].filter(Boolean).join(" · ")
+			: ""
+		const approach = Math.max(0, Math.min(1, feedback?.approach ?? 0))
+		const approachPercent = String(Math.round(approach * 100))
+		if (this.cueNode) {
+			if (this.cueNode.textContent !== (feedback?.message ?? "")) {
+				this.cueNode.textContent = feedback?.message ?? ""
+			}
+			if (feedback?.phase) {
+				this.cueNode.dataset.phase = feedback.phase
+				this.cueNode.dataset.approach = approachPercent
+				this.cueNode.style.setProperty("--ensemble-approach", approach.toFixed(2))
+			} else {
+				delete this.cueNode.dataset.phase
+				delete this.cueNode.dataset.approach
+				this.cueNode.style.removeProperty("--ensemble-approach")
+			}
+		}
+		if (this.statusNode && this.statusNode.textContent !== (feedback?.stateText ?? "")) {
+			this.statusNode.textContent = feedback?.stateText ?? ""
+		}
+		if (typeof document !== "undefined" && this.uuid) {
+			for (const widget of document.querySelectorAll<HTMLElement>(
+				`.cs-widget[data-source-id="${this.uuid}"]`
+			)) {
+				if (feedback) {
+					if (widget.dataset.ensemblePhase !== feedback.phase) {
+						widget.dataset.ensemblePhase = feedback.phase
+					}
+					if (widget.dataset.ensembleCue !== cueText) {
+						widget.dataset.ensembleCue = cueText
+					}
+					if (widget.dataset.ensembleApproach !== approachPercent) {
+						widget.dataset.ensembleApproach = approachPercent
+						widget.style.setProperty("--ensemble-approach", approach.toFixed(2))
+					}
+				} else {
+					delete widget.dataset.ensemblePhase
+					delete widget.dataset.ensembleCue
+					delete widget.dataset.ensembleApproach
+					widget.style.removeProperty("--ensemble-approach")
+				}
+			}
+		}
+	}
 	async createGui(): Promise<HTMLElement> {
 		if (this.gui) {
 			return this.gui
@@ -223,13 +282,22 @@ export default class InputChannelTrigger extends AbstractInput {
 		button.addEventListener(EVENT_BLUR, () => this.releaseAll())
 		const info = document.createElement("p")
 		info.textContent = this.getUiDescriptor().controls[0].help ?? ""
-		root.append(button, info)
+		const cue = document.createElement("small")
+		cue.className = "ensemble-part-cue"
+		const status = document.createElement("small")
+		status.className = "ensemble-part-status"
+		this.cueNode = cue
+		this.statusNode = status
+		if (this.feedback) {
+			this.setEnsembleFeedback(this.feedback)
+		}
+		root.append(button, cue, status, info)
 		this.gui = root
 		return root
 	}
 	async destroyGui(): Promise<void> {
 		this.releaseAll()
-		this.gui = undefined
+		this.gui = this.cueNode = this.statusNode = undefined
 	}
 	destroy(): void {
 		this.releaseAll()
