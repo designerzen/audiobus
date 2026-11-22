@@ -111,7 +111,7 @@ export default class InputOnScreenKeyboard extends AbstractInput implements IAud
 		const command: AudioCommand = new AudioCommand()
 		command.type = NOTE_ON
 		// The keyboard reports pointer pressure (0–1); commands use MIDI velocity.
-		command.velocity = Math.round(Math.max(0, Math.min(1, pressure)) * 127)
+		command.velocity = Math.max(1, Math.round(Math.max(0, Math.min(1, pressure)) * 127))
 		command.number = noteNumber
 		command.from = ONSCREEN_KEYBOARD_INPUT_ID
 		command.startAt = this.now

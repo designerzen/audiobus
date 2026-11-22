@@ -696,10 +696,8 @@ export default class IOChain extends EventTarget {
 	 * Cancel any playing notes and let them settle
 	 */
 	allNotesOff(): void {
-		// Clear the audio command queue of pending note commands
+		// Clear the audio command queue of pending note commands and stop playing notes
 		this.clearNoteCommands()
-		// Cancel any currently playing notes
-		this.outputManager.allNotesOff()
 	}
 
 	/**

@@ -17,6 +17,7 @@ import { insertCLAPEffect } from "./clap-mixer"
 export default class CLAPInstrument extends EventTarget implements IAudioOutput {
 	readonly uuid = `CLAP-Instrument-${crypto.randomUUID()}`
 	readonly requiresConnectionControl = false
+	readonly configurationAffectsNoteRouting = false
 	readonly output: GainNode
 	readonly options: {
 		defaultPatchId?: string
@@ -34,6 +35,7 @@ export default class CLAPInstrument extends EventTarget implements IAudioOutput 
 	private closeInterface?: () => void
 	private removeEffect?: () => void
 	private notes = new Map<string, number[]>()
+	private usedChannels = new Set<number>()
 
 	constructor(
 		private context: AudioContext,
@@ -195,7 +197,9 @@ export default class CLAPInstrument extends EventTarget implements IAudioOutput 
 		await this.node.sendMidi(bytes)
 		const key = this.getNoteKey(command)
 		if ((bytes[0] & 0xf0) === 0x90 && bytes[2]) {
-			this.notes.set(key, [0x80 | (bytes[0] & 15), bytes[1], 0])
+			const channel = bytes[0] & 15
+			this.usedChannels.add(channel)
+			this.notes.set(key, [0x80 | channel, bytes[1], 0])
 		} else if ((bytes[0] & 0xf0) === 0x80 || ((bytes[0] & 0xf0) === 0x90 && !bytes[2])) {
 			this.notes.delete(key)
 		}
@@ -212,25 +216,31 @@ export default class CLAPInstrument extends EventTarget implements IAudioOutput 
 		} as IAudioCommand).catch(console.error)
 	}
 	allNotesOff(): void {
-		void this.releaseNotes().catch(console.error)
+		void this.releaseNotes(true).catch(console.error)
 	}
-	private async releaseNotes(): Promise<void> {
+	private async releaseNotes(releaseAll = false): Promise<void> {
 		const node = this.node
 		if (!node) {
 			return
 		}
-		const notes = [...this.notes.values()]
+		const messages: number[][] = [...this.notes.values()]
 		this.notes.clear()
-		for (const bytes of notes) {
-			await node.sendMidi(bytes)
-		}
 		for (let channel = 0; channel < 16; channel++) {
-			await node.sendMidi([0xb0 | channel, 64, 0])
-			await node.sendMidi([0xb0 | channel, 123, 0])
+			messages.push([0xb0 | channel, 64, 0], [0xb0 | channel, 123, 0])
 		}
+		if (releaseAll) {
+			const channels = this.usedChannels.size ? [...this.usedChannels] : [0]
+			for (const channel of channels) {
+				for (let note = 0; note < 128; note++) {
+					messages.push([0x80 | channel, note, 0])
+				}
+			}
+		}
+		await Promise.all(messages.map((bytes) => node.sendMidi(bytes)))
 	}
 	private async releaseNode(): Promise<void> {
-		await this.releaseNotes()
+		await this.releaseNotes(false)
+		this.usedChannels.clear()
 		this.closeInterface?.()
 		this.closeInterface = undefined
 		this.removeEffect?.()

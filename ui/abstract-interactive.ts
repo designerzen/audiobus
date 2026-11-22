@@ -147,7 +147,11 @@ export default class AbstractInteractive {
 				if (event.pointerType === "mouse") {
 					this.#mouseDown = true
 				}
-				root.setPointerCapture?.(event.pointerId)
+				try {
+					root.setPointerCapture?.(event.pointerId)
+				} catch {
+					// Synthetic or already-ended pointers cannot be captured.
+				}
 				press(event.pointerId, key, event.pressure)
 			}) as EventListener,
 			options

@@ -7,8 +7,13 @@ import {
 	EVENT_CHANGE,
 	EVENT_CLICK,
 	EVENT_INPUT,
+	EVENT_KEY_DOWN,
+	EVENT_KEY_UP,
 	EVENT_LOAD,
-	EVENT_ERROR
+	EVENT_ERROR,
+	EVENT_POINTER_CANCEL,
+	EVENT_POINTER_DOWN,
+	EVENT_POINTER_UP
 } from "../../events/event-constants"
 import { EnsembleSession, type EnsembleMode, type EnsembleSettings } from "../ensemble-session"
 import type {
@@ -98,12 +103,14 @@ export class TransformerEnsemble extends Transformer<Config> {
 	private error = ""
 	private root?: HTMLElement
 	private status?: HTMLElement
+	private meter?: HTMLElement
 	private playersRoot?: HTMLElement
 	private addPlayerButton?: HTMLButtonElement
 	private timingControls = new Map<string, { control: HTMLElement; output: HTMLOutputElement }>()
 	private unsubscribe?: () => void
 	private learning?: number
 	private destroyed = false
+	private pendingCommands: IAudioCommand[] = []
 	private feedbackListeners = new Set<() => void>()
 	private library: { name: string; url: string }[] = []
 	private libraryLoading?: Promise<void>
@@ -578,9 +585,10 @@ export class TransformerEnsemble extends Transformer<Config> {
 			return []
 		}
 		if (!this.config.enabled) {
+			this.pendingCommands.length = 0
 			return [...this.session.advance(now), ...commands]
 		}
-		const output: IAudioCommand[] = []
+		const output: IAudioCommand[] = this.pendingCommands.splice(0)
 		for (const command of commands) {
 			const pressed = command.type === NOTE_ON && command.velocity > 0
 			const released =
@@ -636,15 +644,19 @@ export class TransformerEnsemble extends Transformer<Config> {
 		return output
 	}
 	tick(now: number, _timer: Timer): IAudioCommand[] {
-		const output = this.destroyed ? [] : this.session.advance(now)
+		const output = this.destroyed
+			? []
+			: [...this.pendingCommands.splice(0), ...this.session.advance(now)]
 		this.updateStatus()
 		return output
 	}
 	reset(): void {
+		this.pendingCommands.length = 0
 		this.session?.reset()
 		this.updateStatus()
 	}
 	stop(now: number): IAudioCommand[] {
+		this.pendingCommands.length = 0
 		this.session.reset()
 		return this.session.advance(now)
 	}
@@ -689,6 +701,22 @@ export class TransformerEnsemble extends Transformer<Config> {
 			.filter(Boolean)
 			.join(" · ")
 	}
+	private triggerChannel(channel: number, pressed: boolean): void {
+		if (!this.song || this.loading || this.destroyed || !this.config.enabled) {
+			return
+		}
+		const player = this.config.players.findIndex((p) => p.channels.includes(channel))
+		if (player < 0) {
+			return
+		}
+		const now = this.session.state.lastNow ?? 0
+		if (pressed) {
+			this.pendingCommands.push(...this.session.press(player, now, 110))
+		} else {
+			this.pendingCommands.push(...this.session.releasePress(player, now))
+		}
+		this.updateStatus()
+	}
 	private partStatuses = new Map<number, HTMLElement[]>()
 	private partCues = new Map<number, HTMLElement[]>()
 	private updateStatus(): void {
@@ -698,8 +726,10 @@ export class TransformerEnsemble extends Transformer<Config> {
 				if (node.textContent !== feedback.message) node.textContent = feedback.message
 				if (node.dataset.phase !== feedback.phase) node.dataset.phase = feedback.phase
 				const tile = node.closest<HTMLElement>(".ensemble-part")
-				if (tile && tile.dataset.phase !== feedback.phase) {
-					tile.dataset.phase = feedback.phase
+				if (tile) {
+					if (tile.dataset.phase !== feedback.phase) tile.dataset.phase = feedback.phase
+					const role = this.session.partRole(channel)
+					if (tile.dataset.role !== role) tile.dataset.role = role
 				}
 				if (node.dataset.accepted !== String(feedback.accepted)) {
 					node.dataset.accepted = String(feedback.accepted)
@@ -716,7 +746,10 @@ export class TransformerEnsemble extends Transformer<Config> {
 				}
 				// Quantize the visual pulse to eight steps per beat, avoiding full-rate DOM writes.
 				const pulse = this.session.state.running ? Math.floor((feedback.beat % 1) * 8) : -1
-				if (node.dataset.pulse !== String(pulse)) node.dataset.pulse = String(pulse)
+				if (node.dataset.pulse !== String(pulse)) {
+					node.dataset.pulse = String(pulse)
+					if (tile) tile.dataset.pulse = String(pulse)
+				}
 				const approachPercent = String(Math.round((feedback.approach ?? 0) * 100))
 				if (node.dataset.approach !== approachPercent) {
 					node.dataset.approach = approachPercent
@@ -737,6 +770,23 @@ export class TransformerEnsemble extends Transformer<Config> {
 		}
 		for (const listener of this.feedbackListeners) {
 			listener()
+		}
+		if (this.meter) {
+			const state = this.session.state
+			const progress =
+				this.song && this.song.duration > 0
+					? Math.max(0, Math.min(1, state.position / this.song.duration))
+					: 0
+			const beatInBar =
+				state.running && this.song
+					? ((Math.floor(this.session.partFeedback(this.song.channels[0] ?? 1).beat) %
+							4) +
+							4) %
+						4
+					: -1
+			this.meter.dataset.running = String(state.running)
+			this.meter.dataset.beat = String(beatInBar)
+			this.meter.style.setProperty("--ensemble-progress", progress.toFixed(3))
 		}
 		if (!this.status) {
 			return
@@ -848,9 +898,38 @@ export class TransformerEnsemble extends Transformer<Config> {
 					this.config.autoInputs === "keyboard"
 						? (ENSEMBLE_KEYS[index]?.toUpperCase() ?? "–")
 						: `Pad ${index + 1}`
+				trigger.tabIndex = 0
+				trigger.setAttribute("role", "button")
+				trigger.setAttribute(
+					"aria-label",
+					`Play ${this.partNames([part.channel])} (Channel ${part.channel})`
+				)
+				trigger.title = "Click or press to play this part"
+				trigger.addEventListener(EVENT_POINTER_DOWN, (event) => {
+					event.preventDefault()
+					trigger.setPointerCapture?.(event.pointerId)
+					this.triggerChannel(part.channel, true)
+				})
+				for (const type of [EVENT_POINTER_UP, EVENT_POINTER_CANCEL]) {
+					trigger.addEventListener(type, () => this.triggerChannel(part.channel, false))
+				}
+				trigger.addEventListener(EVENT_KEY_DOWN, (event) => {
+					if (!event.repeat && (event.key === " " || event.key === "Enter")) {
+						event.preventDefault()
+						this.triggerChannel(part.channel, true)
+					}
+				})
+				trigger.addEventListener(EVENT_KEY_UP, (event) => {
+					if (event.key === " " || event.key === "Enter") {
+						event.preventDefault()
+						this.triggerChannel(part.channel, false)
+					}
+				})
 				const name = document.createElement("span")
+				name.className = "ensemble-part-name"
 				name.textContent = this.partNames([part.channel])
 				const channel = document.createElement("small")
+				channel.className = "ensemble-part-channel"
 				channel.textContent = `Ch ${part.channel}`
 				this.playersRoot!.append(
 					item("ensemble-part", trigger, name, channel, this.partControls(part.channel))
@@ -927,7 +1006,9 @@ export class TransformerEnsemble extends Transformer<Config> {
 				const label = document.createElement("label")
 				label.title = `Channel ${channel}`
 				label.append(box, `${channel} · ${this.partNames([channel])}`)
-				parts.append(label, this.partControls(channel))
+				const controls = this.partControls(channel)
+				controls.hidden = this.config.mode !== "perform" || !box.checked
+				parts.append(label, controls)
 			}
 			if (!channels.length) {
 				parts.textContent = "Load a song to choose parts."
@@ -960,7 +1041,14 @@ export class TransformerEnsemble extends Transformer<Config> {
 		const restart = element("button", "", "Restart")
 		restart.type = "button"
 		restart.addEventListener(EVENT_CLICK, () => this.reset())
-		header.append(this.status, restart)
+		this.meter = element("div", "ensemble-meter")
+		this.meter.setAttribute("aria-hidden", "true")
+		for (let beat = 0; beat < 4; beat++) {
+			const dot = element("span", "ensemble-beat-dot")
+			dot.dataset.slot = String(beat)
+			this.meter.append(dot)
+		}
+		header.append(this.status, restart, this.meter)
 
 		// Generated settings keep their MIDI-learn bindings; the players list joins their group.
 		const controls = await super.createGui()
@@ -1026,7 +1114,7 @@ export class TransformerEnsemble extends Transformer<Config> {
 	override destroyGui(): void {
 		this.unsubscribe?.()
 		this.unsubscribe = undefined
-		this.root = this.playersRoot = this.status = this.addPlayerButton = undefined
+		this.root = this.playersRoot = this.status = this.meter = this.addPlayerButton = undefined
 		this.timingControls.clear()
 		this.partStatuses.clear()
 		this.partCues.clear()

@@ -2,7 +2,7 @@
 
 AudioBus is the browser audio and musical-event toolkit behind HarmonEasy. It connects accessible controllers, MIDI devices, sequencers and generated music to ordered transformations, instruments, effects, recording and visual feedback.
 
-The current [package manifest](package.json) names the package **`audiobus`**, version **3.2.1**. Its entry points are TypeScript source. Use it through the HarmonEasy pnpm workspace and a browser bundler that handles TypeScript, workers, worklets and asset URLs.
+The [package manifest](package.json) names the package **`audiobus`** and declares its current version, dependencies and exports. Its entry points are TypeScript source. Use it through the HarmonEasy pnpm workspace and a browser bundler that handles TypeScript, workers, worklets and asset URLs.
 
 ## Contents
 
@@ -35,7 +35,7 @@ pnpm --filter audiobus lint
 
 The filtered install includes AudioBus and its workspace dependencies and skips lifecycle scripts. Submodules are already initialised by the clone command. For the complete HarmonEasy application, use `pnpm install --frozen-lockfile` and follow the host application's native/Electron setup separately.
 
-For an existing checkout, initialise missing submodules with `git submodule update --init --recursive` before installing. Installation uses the submodule commits recorded by the parent repository; its install hook does not advance to remote branch tips. `pnpm run upgrade:git` is a separate, explicit upstream update operation. Commit and review dependency updates and the lockfile together before using them in another checkout.
+For an existing checkout, initialise missing submodules with `git submodule update --init --recursive` before installing. The parent repository's current `postinstall` runs `git submodule update --init --remote --recursive` and targeted dependency updates: an ordinary install can advance submodules to remote branch tips. To keep recorded revisions during an audit or reproducible install, initialise them explicitly and use `pnpm install --frozen-lockfile --ignore-scripts`. `pnpm run upgrade:git` is another explicit upstream-update path. Review dependency commits and the lockfile together; consult the parent manifest for the current lifecycle commands.
 
 The [workspace configuration](../../pnpm-workspace.yaml) links AudioBus dependencies to these Git repository checkouts:
 
@@ -45,6 +45,7 @@ The [workspace configuration](../../pnpm-workspace.yaml) links AudioBus dependen
 | `netronome` | [netronome](https://github.com/designerzen/netronome) | `packages/netronome` |
 | `pitfalls` | [pitfalls](https://github.com/designerzen/pitfalls) | `packages/pitfalls` |
 | `sion` | [SiON](https://github.com/designerzen/SiON) | `packages/sion` |
+| `midi-devices` | [midi-devices](https://github.com/designerzen/midi-devices) | `packages/midi-devices` |
 
 The AudioBus manifest also names these dependencies using full `git+https` repository URLs pinned to commit IDs for consumers outside this workspace. The workspace overrides use local submodules instead. Other third-party packages remain package-registry dependencies resolved by the committed lockfile. GitHub file-view (`/blob/`) links, raw source files and copied browser Blob URLs are not installation sources. Browser-generated Blob URLs used internally for workers or recordings are runtime objects, not package dependencies.
 
@@ -215,11 +216,11 @@ Transformers operate on musical commands before output delivery. Configure their
 | Area | Processors and behaviour |
 | --- | --- |
 | Pitch and tuning | **Transposer** shifts semitones; **Constrictor** constrains pitch; **Microtonality** subdivides intervals; **Pitch Mirror** inverts around a centre; **Register Orbit** moves through registers; **Scale Explorer** explores scale material. |
-| Chords and voices | **Harmoniser** adds harmony; **Chordifier** expands notes into chords; **Interval Stack** adds custom offsets; **Voice Leader** minimises movement; **Chord Bloom** gradually grows held harmony. |
+| Chords and voices | **Harmoniser** maps notes to a selected key/scale; **Chordifier** expands notes into chords; **Interval Stack** adds custom offsets; **Voice Leader** minimises movement; **Chord Bloom** gradually grows held harmony. |
 | Harmonic development | **Progression Stepper** advances chord sequences; **Harmonic Bridge** connects destinations; **Cadence Weaver** prepares cadences; **Key Traveller** connects tonal centres; **Tension Arc** shapes harmonic preparation; **Melodic Mediator** connects notes with passing and ornamental material. |
 | Shared musical context | **Shared Chord Track** follows workspace harmony as melody, bass or chords; **Ensemble** coordinates players and song material; **Improvisation Partner** answers remembered motifs in gaps. |
 | Played patterns | **Arpeggiator** plays chord tones once or repeatedly; **Strummer** spreads chord attacks; **Harp** sweeps chords across octaves; **Chord Pattern** replays held chords in fixed rhythms. |
-| Timing and feel | **Quantise** aligns a grid; **Groove** reshapes swing/shuffle timing; **Timing Humaniser** varies timing; **Slop** delays each press independently; **Legato** changes overlap and note connections. |
+| Timing and feel | **Quantise** aligns a grid; **Groove** reshapes swing/shuffle timing; **Slop** delays each press independently; **Legato** changes overlap and note connections. **Timing Humaniser** currently offsets `command.number` by `config.distance` and has no timing-jitter controls; its display name does not establish implemented humanisation. |
 | Echoes and durations | **Note Delay**, **Note Repeater**, **Note Reverb**, **Note Bouncer**, **Note Shortener** and **Release Trigger** delay, repeat, decay, shorten or retrigger notes. These produce musical events rather than audio delay/reverb. |
 | Gates and held notes | **Filter** selects commands; **Probability Gate** thins notes; **Euclidean Gate** pulses held notes; **Latch / Hold** sustains them; **Polyphony Limiter** limits voices. |
 | Phrase and expression | **Randomiser**, **Velocity Shaper**, **Contour Dynamics**, **Melody Shadow**, **Rhythm Weave**, **Ornamenter**, **Phrase Recombiner**, **Emoji** and **Vibrato** reshape pitch, dynamics, rhythm, remembered material or expressive motion. |
@@ -310,7 +311,7 @@ Implemented import paths include [MIDI](importers/import-midi-file.ts), [MusicXM
 
 Export adapters cover [MIDI](exporters/adapter-midi-file.ts), [MusicXML](exporters/adapter-musicxml.ts), [VexFlow notation](exporters/adapter-vexflow.ts), [MIDI Markdown](exporters/adapter-midi-markdown.ts), [DAWproject](exporters/adapter-dawproject.ts) and [MED](exporters/adapter-med-file.ts). Format support is adapter-specific; do not assume lossless round trips or a universal project/audio exporter.
 
-The older [chain serialization guide](io/EXPORT_IMPORT.md) and [import options guide](io/IMPORT_OPTIONS.md) give background, but some examples predate the current implementation. In particular, the current chain snapshot is Base64 and does not itself include device definitions; use the workspace/bundle APIs when those are required.
+The [chain serialization guide](io/EXPORT_IMPORT.md) and [import options guide](io/IMPORT_OPTIONS.md) describe the current snapshot and override contracts. A chain snapshot is compressed Base64 and does not itself include device definitions; use the workspace/bundle APIs when those are required.
 
 ## Controls, notation and visualisation
 
@@ -394,6 +395,6 @@ Historical licensing metadata varies: the archive manifest declares MIT and the 
 | `storage/`, `formats/`, `importers/`, `exporters/` | OPFS command storage, format implementations and adapters. |
 | `ui/`, `visualisation/` | Playable controls, notation, timelines and audio visualisers. |
 
-Tests live alongside the implementations, including transformer behaviour, chain serialization, percussion, gamepads, chord/interval helpers and MED export. The updated checkout passes the AudioBus package suite (382 tests) and the MIDI integration suite in HarmonEasy (365 tests). The filtered frozen-lockfile install above was also run successfully; this is not a claim that all optional engines, physical MIDI devices or Electron packaging have been tested. Package-wide lint currently reports existing brace-style violations in AI inputs, theory helpers and other source files; treat it as a separate cleanup task rather than a passing check. Run `pnpm --filter audiobus test --run` for a finite Vitest run; `pnpm --filter audiobus test` starts the configured interactive test mode. Run `pnpm --filter audiobus lint` for package linting.
+Tests live alongside implementations, including transformer behaviour, chain serialization, percussion, gamepads, chord/interval helpers and MED export. Run `pnpm --filter audiobus test --run` for a finite Vitest run; `pnpm --filter audiobus test` starts interactive mode. Run `pnpm --filter audiobus lint` for linting. Test totals and historical local results are not release guarantees; optional engines, physical MIDI hardware and Electron packaging need their corresponding runtime checks.
 
 For application integration, see [HarmonEasy](../../readme.md), [Netronome](../netronome/readme.md) and [Pitfalls](../pitfalls/README.md). In the standalone AudioBus repository those parent-workspace links require a HarmonEasy checkout. Read the host repository's coding standards before changing application code.

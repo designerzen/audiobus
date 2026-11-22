@@ -209,7 +209,7 @@ export default class OutputManager extends EventTarget implements IAudioOutput {
 		this.dispatchEvent(
 			new CustomEvent(EVENT_CONTROL_SURFACE_NOTES, { detail: { reset: true } })
 		)
-		this.#outputs.forEach((output) => this.release(output))
+		this.#outputs.forEach((output) => this.release(output, true))
 	}
 
 	/**
@@ -301,7 +301,7 @@ export default class OutputManager extends EventTarget implements IAudioOutput {
 		return commands
 	}
 
-	private release(output: IAudioOutput): void {
+	private release(output: IAudioOutput, forceAllNotesOff = false): void {
 		const notes = owners.get(output)
 		notes?.forEach((held, pitch) => {
 			if (held.delete(this) && held.size === 0) {
@@ -315,6 +315,9 @@ export default class OutputManager extends EventTarget implements IAudioOutput {
 				}
 			}
 		})
+		if (forceAllNotesOff && (!notes || notes.size === 0)) {
+			void enqueue(output, () => output.allNotesOff())
+		}
 	}
 
 	static async settled(output: IAudioOutput): Promise<void> {

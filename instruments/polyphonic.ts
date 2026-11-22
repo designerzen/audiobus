@@ -176,10 +176,19 @@ export default class PolySynth extends EventTarget implements IAudioOutput {
 		} else {
 			for (const instrument of this.instruments) {
 				if (!instrument.isNoteDown) {
-					await instrument.noteOn(noteNumber, velocity, arp, delay)
 					this.instrumentActivity.set(noteNumber, instrument)
 					this.#activeVoices++
 					this.updateMasterGain()
+					try {
+						await instrument.noteOn(noteNumber, velocity, arp, delay)
+					} catch (error) {
+						if (this.instrumentActivity.get(noteNumber) === instrument) {
+							this.instrumentActivity.delete(noteNumber)
+							this.#activeVoices = Math.max(0, this.#activeVoices - 1)
+							this.updateMasterGain()
+						}
+						throw error
+					}
 					break
 				}
 			}
@@ -212,7 +221,7 @@ export default class PolySynth extends EventTarget implements IAudioOutput {
 	 * Stop all notes on all instruments
 	 */
 	allNotesOff() {
-		this.instrumentActivity.forEach((instrument) => instrument.allNotesOff())
+		this.instruments.forEach((instrument) => instrument.allNotesOff())
 		this.instrumentActivity.clear()
 		this.#activeVoices = 0
 		this.updateMasterGain()
