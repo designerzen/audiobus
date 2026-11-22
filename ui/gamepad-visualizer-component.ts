@@ -1,390 +1,332 @@
-/**
- * Shared Gamepad Visualizer Component
- * Creates and manages an SVG visualization of a gamepad
- * Can be used by any input that needs to display gamepad state
- */
-
 import { COMMANDS } from "../hardware/gamepad/gamepad.ts"
+import {
+	EVENT_BLUR,
+	EVENT_CONTEXT_MENU,
+	EVENT_FOCUS_OUT,
+	EVENT_KEY_DOWN,
+	EVENT_KEY_UP,
+	EVENT_LOST_POINTER_CAPTURE,
+	EVENT_POINTER_CANCEL,
+	EVENT_POINTER_DOWN,
+	EVENT_POINTER_MOVE,
+	EVENT_POINTER_UP,
+	EVENT_VISIBILITY_CHANGE
+} from "../events/event-constants.ts"
 import "./gamepad-visualizer.css"
 
-export class GamepadVisualizerComponent {
-	#containerElement: HTMLElement | null = null
-	#buttonElements: Map<string, SVGElement> = new Map()
-	#isVisible: boolean = false
+type Side = "left" | "right"
+type Control = { element: SVGElement; button?: string; side?: Side }
+const STICKS = {
+	left: { x: 225, y: 255, commands: [COMMANDS.LEFT_STICK_X, COMMANDS.LEFT_STICK_Y] },
+	right: { x: 405, y: 255, commands: [COMMANDS.RIGHT_STICK_X, COMMANDS.RIGHT_STICK_Y] }
+}
+const SVG_NS = "http://www.w3.org/2000/svg"
+const svgElement = <K extends keyof SVGElementTagNameMap>(
+	tag: K,
+	attributes: Record<string, string | number>
+) => {
+	const element = document.createElementNS(SVG_NS, tag)
+	for (const [name, value] of Object.entries(attributes))
+		{element.setAttribute(name, String(value))}
+	return element
+}
 
-	constructor() {}
+/** An always playable gamepad. Hardware feedback never emits virtual input. */
+export class GamepadVisualizerComponent {
+	#container: HTMLElement | null = null
+	#svg: SVGSVGElement | null = null
+	#abort = new AbortController()
+	#buttons = new Map<string, SVGElement>()
+	#sticks = new Map<Side, SVGElement>()
+	#hardwareButtons = new Set<string>()
+	#hardwareSticks = { left: [0, 0], right: [0, 0] }
+	#virtualSticks = { left: [0, 0], right: [0, 0] }
+	#pressed = new Map<string, Set<string>>()
+	#pointers = new Map<number, Control>()
+	#keys = new Map<string, Control>()
+
+	constructor(private onInput: (command: string, value: number) => void = () => {}) {}
 
 	public createContainer(): HTMLElement {
+		if (this.#container) {return this.#container}
 		const container = document.createElement("div")
-		container.className = "gamepad-visualizer-container"
-		this.#containerElement = container
-		this.showPlaceholder()
+		container.className = "gamepad-visualizer-container nodrag nopan nowheel"
+		this.#container = container
+		this.createGamepadSVG()
+		const hint = container.appendChild(document.createElement("p"))
+		hint.className = "gamepad-hint"
+		hint.textContent = "Touch or click buttons. Drag either stick."
 		return container
 	}
 
-	public showPlaceholder(): void {
-		if (!this.#containerElement) {
-			return
-		}
-
-		const placeholder = document.createElement("div")
-		placeholder.className = "gamepad-placeholder"
-
-		const icon = document.createElement("div")
-		icon.className = "placeholder-icon"
-		icon.textContent = "🕹️"
-
-		const text = document.createElement("div")
-		text.className = "placeholder-text"
-		text.textContent = "Connect your controller"
-
-		const hint = document.createElement("div")
-		hint.className = "placeholder-hint"
-		hint.textContent = "Plug in a gamepad or controller to get started"
-
-		placeholder.appendChild(icon)
-		placeholder.appendChild(text)
-		placeholder.appendChild(hint)
-
-		this.#containerElement.innerHTML = ""
-		this.#containerElement.appendChild(placeholder)
-		this.#isVisible = false
-		this.#buttonElements.clear()
-	}
-
 	public createGamepadSVG(): void {
-		if (!this.#containerElement) {
-			return
+		if (!this.#container || this.#svg) {return}
+		const svg = svgElement("svg", {
+			viewBox: "0 0 600 360",
+			class: "gamepad-visualizer",
+			role: "group",
+			"aria-label": "Interactive gamepad"
+		})
+		this.#svg = svg
+		svg.appendChild(
+			svgElement("path", {
+				class: "gamepad-body",
+				d: "M150 75 Q100 66 78 112 L32 278 Q20 333 60 338 Q87 340 125 279 L170 245 Q300 278 430 245 L475 279 Q513 340 540 338 Q580 333 568 278 L522 112 Q500 66 450 75 Q300 104 150 75Z"
+			})
+		)
+		const button = (
+			command: string,
+			label: string,
+			x: number,
+			y: number,
+			width = 38,
+			height = width,
+			round = false
+		) => {
+			const group = svgElement("g", {
+				class: `gamepad-button gamepad-button-${command}`,
+				"data-command": command,
+				transform: `translate(${x} ${y})`,
+				role: "button",
+				tabindex: 0,
+				"aria-label": label,
+				"aria-pressed": "false"
+			})
+			group.appendChild(
+				round
+					? svgElement("circle", { r: width / 2 })
+					: svgElement("rect", { x: -width / 2, y: -height / 2, width, height, rx: 7 })
+			)
+			const text = group.appendChild(
+				svgElement("text", { "text-anchor": "middle", "dominant-baseline": "central" })
+			)
+			text.textContent = label
+			svg.appendChild(group)
+			this.#buttons.set(command, group)
 		}
-
-		const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-		svg.setAttribute("viewBox", "0 0 800 500")
-		svg.setAttribute("class", "gamepad-visualizer")
-		svg.setAttribute("xmlns", "http://www.w3.org/2000/svg")
-
-		// Gamepad body
-		const bodyGroup = document.createElementNS("http://www.w3.org/2000/svg", "g")
-		bodyGroup.setAttribute("class", "gamepad-body")
-
-		// Left grip
-		const leftGrip = document.createElementNS("http://www.w3.org/2000/svg", "path")
-		leftGrip.setAttribute("d", "M 80 180 Q 40 250 80 320 L 120 320 Q 100 250 120 180 Z")
-		leftGrip.setAttribute("fill", "#2a2a2a")
-		leftGrip.setAttribute("stroke", "#444")
-		leftGrip.setAttribute("stroke-width", "2")
-		bodyGroup.appendChild(leftGrip)
-
-		// Center body
-		const centerBody = document.createElementNS("http://www.w3.org/2000/svg", "rect")
-		centerBody.setAttribute("x", "120")
-		centerBody.setAttribute("y", "100")
-		centerBody.setAttribute("width", "560")
-		centerBody.setAttribute("height", "300")
-		centerBody.setAttribute("rx", "80")
-		centerBody.setAttribute("fill", "#1a1a1a")
-		centerBody.setAttribute("stroke", "#333")
-		centerBody.setAttribute("stroke-width", "2")
-		bodyGroup.appendChild(centerBody)
-
-		// Right grip
-		const rightGrip = document.createElementNS("http://www.w3.org/2000/svg", "path")
-		rightGrip.setAttribute("d", "M 680 180 Q 720 250 680 320 L 640 320 Q 660 250 640 180 Z")
-		rightGrip.setAttribute("fill", "#2a2a2a")
-		rightGrip.setAttribute("stroke", "#444")
-		rightGrip.setAttribute("stroke-width", "2")
-		bodyGroup.appendChild(rightGrip)
-
-		// Center details
-		const centerDetail = document.createElementNS("http://www.w3.org/2000/svg", "rect")
-		centerDetail.setAttribute("x", "140")
-		centerDetail.setAttribute("y", "120")
-		centerDetail.setAttribute("width", "520")
-		centerDetail.setAttribute("height", "260")
-		centerDetail.setAttribute("rx", "70")
-		centerDetail.setAttribute("fill", "#222")
-		centerDetail.setAttribute("stroke", "none")
-		bodyGroup.appendChild(centerDetail)
-
-		svg.appendChild(bodyGroup)
-
-		// D-Pad
-		this.createDPad(svg)
-
-		// Left Stick
-		this.createStick(svg, "left", 280, 310)
-
-		// Action Buttons (ABXY)
-		this.createActionButtons(svg)
-
-		// Right Stick
-		this.createStick(svg, "right", 670, 310)
-
-		// Shoulder Buttons
-		this.createShoulderButtons(svg)
-
-		// Trigger Buttons
-		this.createTriggerButtons(svg)
-
-		// Menu Buttons
-		this.createMenuButtons(svg)
-
-		// Stick Click Buttons
-		this.createStickClickButtons(svg)
-
-		this.#containerElement.innerHTML = ""
-		this.#containerElement.appendChild(svg)
-		this.#isVisible = true
-	}
-
-	private createDPad(svg: SVGSVGElement): void {
-		const group = document.createElementNS("http://www.w3.org/2000/svg", "g")
-		group.setAttribute("class", "dpad-group")
-		group.setAttribute("transform", "translate(200, 200)")
-
-		const buttons = [
-			{ id: "up", x: "-15", y: "-35", class: "dpad-up", cmd: COMMANDS.UP },
-			{ id: "down", x: "-15", y: "10", class: "dpad-down", cmd: COMMANDS.DOWN },
-			{ id: "left", x: "-35", y: "-12.5", class: "dpad-left", cmd: COMMANDS.LEFT },
-			{ id: "right", x: "10", y: "-12.5", class: "dpad-right", cmd: COMMANDS.RIGHT }
-		]
-
-		buttons.forEach((btn) => {
-			const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect")
-			rect.setAttribute("class", `dpad-button ${btn.class}`)
-			rect.setAttribute("x", btn.x)
-			rect.setAttribute("y", btn.y)
-			rect.setAttribute("width", btn.id === "left" || btn.id === "right" ? "25" : "30")
-			rect.setAttribute("height", btn.id === "left" || btn.id === "right" ? "30" : "25")
-			rect.setAttribute("rx", "3")
-			rect.id = `button-${btn.cmd}`
-			group.appendChild(rect)
-			this.#buttonElements.set(btn.cmd, rect)
-		})
-
-		svg.appendChild(group)
-	}
-
-	private createStick(svg: SVGSVGElement, side: "left" | "right", x: number, y: number): void {
-		const group = document.createElementNS("http://www.w3.org/2000/svg", "g")
-		group.setAttribute("class", `${side}-stick-group`)
-		group.setAttribute("transform", `translate(${x}, ${y})`)
-
-		const outer = document.createElementNS("http://www.w3.org/2000/svg", "circle")
-		outer.setAttribute("cx", "0")
-		outer.setAttribute("cy", "0")
-		outer.setAttribute("r", "30")
-		outer.setAttribute("fill", "#1a1a1a")
-		outer.setAttribute("stroke", "#555")
-		outer.setAttribute("stroke-width", "2")
-		group.appendChild(outer)
-
-		const mid = document.createElementNS("http://www.w3.org/2000/svg", "circle")
-		mid.setAttribute("cx", "0")
-		mid.setAttribute("cy", "0")
-		mid.setAttribute("r", "26")
-		mid.setAttribute("fill", "#2a2a2a")
-		mid.setAttribute("stroke", "none")
-		group.appendChild(mid)
-
-		const innerGroup = document.createElementNS("http://www.w3.org/2000/svg", "g")
-		innerGroup.setAttribute("class", "stick-inner")
-		innerGroup.id = `stick-${side}`
-
-		const inner = document.createElementNS("http://www.w3.org/2000/svg", "circle")
-		inner.setAttribute("cx", "0")
-		inner.setAttribute("cy", "0")
-		inner.setAttribute("r", "20")
-		inner.setAttribute("fill", "#444")
-		inner.setAttribute("stroke", "#666")
-		inner.setAttribute("stroke-width", "1")
-		innerGroup.appendChild(inner)
-
-		group.appendChild(innerGroup)
-		svg.appendChild(group)
-	}
-
-	private createActionButtons(svg: SVGSVGElement): void {
-		const group = document.createElementNS("http://www.w3.org/2000/svg", "g")
-		group.setAttribute("class", "buttons-group")
-		group.setAttribute("transform", "translate(600, 200)")
-
-		const buttons = [
-			{ cmd: COMMANDS.Y, cx: "0", cy: "-40", class: "button-y", label: "Y" },
-			{ cmd: COMMANDS.B, cx: "40", cy: "0", class: "button-b", label: "B" },
-			{ cmd: COMMANDS.A, cx: "0", cy: "40", class: "button-a", label: "A" },
-			{ cmd: COMMANDS.X, cx: "-40", cy: "0", class: "button-x", label: "X" }
-		]
-
-		buttons.forEach((btn) => {
-			const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle")
-			circle.setAttribute("class", `action-button ${btn.class}`)
-			circle.setAttribute("cx", btn.cx)
-			circle.setAttribute("cy", btn.cy)
-			circle.setAttribute("r", "18")
-			circle.id = `button-${btn.cmd}`
-			group.appendChild(circle)
-			this.#buttonElements.set(btn.cmd, circle)
-
-			const text = document.createElementNS("http://www.w3.org/2000/svg", "text")
-			text.setAttribute("x", btn.cx)
-			text.setAttribute("y", btn.cy)
-			text.setAttribute("text-anchor", "middle")
-			text.setAttribute("dominant-baseline", "middle")
-			text.setAttribute("class", "button-label")
-			text.textContent = btn.label
-			group.appendChild(text)
-		})
-
-		svg.appendChild(group)
-	}
-
-	private createShoulderButtons(svg: SVGSVGElement): void {
-		const buttons = [
-			{ cmd: COMMANDS.LB, x: "160", label: "LB" },
-			{ cmd: COMMANDS.RB, x: "580", label: "RB" }
-		]
-
-		buttons.forEach((btn) => {
-			const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect")
-			rect.setAttribute("class", `shoulder-button ${btn.cmd}-button`)
-			rect.setAttribute("x", btn.x)
-			rect.setAttribute("y", "95")
-			rect.setAttribute("width", "60")
-			rect.setAttribute("height", "35")
-			rect.setAttribute("rx", "8")
-			rect.id = `button-${btn.cmd}`
-			svg.appendChild(rect)
-			this.#buttonElements.set(btn.cmd, rect)
-
-			const text = document.createElementNS("http://www.w3.org/2000/svg", "text")
-			text.setAttribute("x", btn.x === "160" ? "190" : "610")
-			text.setAttribute("y", "117")
-			text.setAttribute("text-anchor", "middle")
-			text.setAttribute("dominant-baseline", "middle")
-			text.setAttribute("class", "shoulder-label")
-			text.textContent = btn.label
-			svg.appendChild(text)
-		})
-	}
-
-	private createTriggerButtons(svg: SVGSVGElement): void {
-		const buttons = [
-			{ cmd: COMMANDS.LT, x: "160", label: "LT" },
-			{ cmd: COMMANDS.RT, x: "580", label: "RT" }
-		]
-
-		buttons.forEach((btn) => {
-			const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect")
-			rect.setAttribute("class", `trigger-button ${btn.cmd}-button`)
-			rect.setAttribute("x", btn.x)
-			rect.setAttribute("y", "50")
-			rect.setAttribute("width", "60")
-			rect.setAttribute("height", "30")
-			rect.setAttribute("rx", "6")
-			rect.id = `button-${btn.cmd}`
-			svg.appendChild(rect)
-			this.#buttonElements.set(btn.cmd, rect)
-
-			const text = document.createElementNS("http://www.w3.org/2000/svg", "text")
-			text.setAttribute("x", btn.x === "160" ? "190" : "610")
-			text.setAttribute("y", "70")
-			text.setAttribute("text-anchor", "middle")
-			text.setAttribute("dominant-baseline", "middle")
-			text.setAttribute("class", "trigger-label")
-			text.textContent = btn.label
-			svg.appendChild(text)
-		})
-	}
-
-	private createMenuButtons(svg: SVGSVGElement): void {
-		const buttons = [
-			{ cmd: COMMANDS.SELECT, x: "310", label: "SELECT" },
-			{ cmd: COMMANDS.START, x: "410", label: "START" }
-		]
-
-		buttons.forEach((btn) => {
-			const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect")
-			rect.setAttribute("class", `menu-button ${btn.cmd}-button`)
-			rect.setAttribute("x", btn.x)
-			rect.setAttribute("y", "230")
-			rect.setAttribute("width", "80")
-			rect.setAttribute("height", "25")
-			rect.setAttribute("rx", "5")
-			rect.id = `button-${btn.cmd}`
-			svg.appendChild(rect)
-			this.#buttonElements.set(btn.cmd, rect)
-
-			const text = document.createElementNS("http://www.w3.org/2000/svg", "text")
-			text.setAttribute("x", btn.x === "310" ? "350" : "450")
-			text.setAttribute("y", "247")
-			text.setAttribute("text-anchor", "middle")
-			text.setAttribute("dominant-baseline", "middle")
-			text.setAttribute("class", "menu-label text-small")
-			text.textContent = btn.label
-			svg.appendChild(text)
-		})
-	}
-
-	private createStickClickButtons(svg: SVGSVGElement): void {
-		const buttons = [
-			{ cmd: COMMANDS.LEFT_SHOULDER, cx: "280" },
-			{ cmd: COMMANDS.RIGHT_SHOULDER, cx: "670" }
-		]
-
-		buttons.forEach((btn) => {
-			const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle")
-			circle.setAttribute("class", `stick-button ${btn.cmd}-button`)
-			circle.setAttribute("cx", btn.cx)
-			circle.setAttribute("cy", "310")
-			circle.setAttribute("r", "8")
-			circle.id = `button-${btn.cmd}`
-			svg.appendChild(circle)
-			this.#buttonElements.set(btn.cmd, circle)
-		})
-	}
-
-	public updateButtonVisual(buttonName: string, isActive: boolean): void {
-		if (!this.#isVisible) {
-			return
+		button(COMMANDS.LT, "LT", 145, 36, 70, 30)
+		button(COMMANDS.RT, "RT", 455, 36, 70, 30)
+		button(COMMANDS.LB, "LB", 145, 77, 82, 30)
+		button(COMMANDS.RB, "RB", 455, 77, 82, 30)
+		button(COMMANDS.UP, "↑", 145, 126, 34)
+		button(COMMANDS.DOWN, "↓", 145, 198, 34)
+		button(COMMANDS.LEFT, "←", 109, 162, 34)
+		button(COMMANDS.RIGHT, "→", 181, 162, 34)
+		button(COMMANDS.Y, "Y", 455, 120, 38, 38, true)
+		button(COMMANDS.X, "X", 415, 160, 38, 38, true)
+		button(COMMANDS.B, "B", 495, 160, 38, 38, true)
+		button(COMMANDS.A, "A", 455, 200, 38, 38, true)
+		button(COMMANDS.SELECT, "Select", 265, 147, 58, 30)
+		button(COMMANDS.START, "Start", 335, 147, 58, 30)
+		button(COMMANDS.P1, "P1", 275, 191, 34, 28)
+		button(COMMANDS.P2, "P2", 325, 191, 34, 28)
+		for (const side of ["left", "right"] as const) {
+			const { x, y } = STICKS[side]
+			const group = svgElement("g", {
+				class: "gamepad-stick",
+				"data-stick": side,
+				transform: `translate(${x} ${y})`,
+				role: "group",
+				"aria-label": `${side} joystick: drag to move`
+			})
+			group.appendChild(svgElement("circle", { class: "gamepad-stick-well", r: 43 }))
+			const knob = group.appendChild(
+				svgElement("circle", { class: "gamepad-stick-knob", r: 26 })
+			)
+			this.#sticks.set(side, knob)
+			svg.appendChild(group)
+			button(
+				side === "left" ? COMMANDS.LEFT_SHOULDER : COMMANDS.RIGHT_SHOULDER,
+				side === "left" ? "L3" : "R3",
+				x,
+				319,
+				44,
+				26
+			)
 		}
+		this.#container.appendChild(svg)
+		this.addInteraction(svg)
+	}
 
-		const element = this.#buttonElements.get(buttonName)
-		if (!element) {
-			return
-		}
-
-		if (isActive) {
-			element.classList.add("active")
-		} else {
-			element.classList.remove("active")
+	private control(target: EventTarget | null): Control | undefined {
+		if (!(target instanceof Element)) {return}
+		const element = target.closest<SVGElement>("[data-command], [data-stick]")
+		if (!element || !this.#svg?.contains(element)) {return}
+		return {
+			element,
+			button: element.dataset.command,
+			side: element.dataset.stick as Side | undefined
 		}
 	}
 
-	public updateStickPosition(side: "left" | "right", x: number, y: number): void {
-		if (!this.#isVisible) {
-			return
+	private addInteraction(svg: SVGSVGElement): void {
+		const options = { signal: this.#abort.signal }
+		svg.addEventListener(
+			EVENT_POINTER_DOWN,
+			(event) => {
+				const control = this.control(event.target)
+				if (event.button !== 0 || !control) {return}
+				event.preventDefault()
+				event.stopPropagation()
+				if (
+					control.side &&
+					[...this.#pointers.values()].some(({ side }) => side === control.side)
+				)
+					{return}
+				this.#pointers.set(event.pointerId, control)
+				svg.setPointerCapture?.(event.pointerId)
+				if (control.button) {this.press(control.button, `pointer:${event.pointerId}`, true)}
+				if (control.side) {this.moveStick(control.side, event)}
+			},
+			options
+		)
+		document.addEventListener(
+			EVENT_POINTER_MOVE,
+			(event) => {
+				const control = this.#pointers.get(event.pointerId)
+				if (!control) {return}
+				event.preventDefault()
+				if (control.side) {this.moveStick(control.side, event)}
+			},
+			{ ...options, passive: false }
+		)
+		const release = (event: PointerEvent) => this.releasePointer(event.pointerId)
+		document.addEventListener(EVENT_POINTER_UP, release, options)
+		document.addEventListener(EVENT_POINTER_CANCEL, release, options)
+		svg.addEventListener(EVENT_LOST_POINTER_CAPTURE, release, options)
+		svg.addEventListener(
+			EVENT_KEY_DOWN,
+			(event) => {
+				const control = this.control(event.target)
+				if (!control?.button || ![" ", "Enter"].includes(event.key)) {return}
+				event.preventDefault()
+				event.stopPropagation()
+				if (event.repeat) {return}
+				this.#keys.set(event.key, control)
+				this.press(control.button, `key:${event.key}`, true)
+			},
+			options
+		)
+		document.addEventListener(
+			EVENT_KEY_UP,
+			(event) => {
+				const control = this.#keys.get(event.key)
+				if (!control?.button) {return}
+				this.#keys.delete(event.key)
+				this.press(control.button, `key:${event.key}`, false)
+			},
+			options
+		)
+		svg.addEventListener(
+			EVENT_FOCUS_OUT,
+			(event) => {
+				for (const [key, control] of this.#keys) {
+					if (control.element === event.target && control.button) {
+						this.#keys.delete(key)
+						this.press(control.button, `key:${key}`, false)
+					}
+				}
+			},
+			options
+		)
+		svg.addEventListener(EVENT_CONTEXT_MENU, (event) => event.preventDefault(), options)
+		window.addEventListener(EVENT_BLUR, () => this.releaseAll(), options)
+		document.addEventListener(
+			EVENT_VISIBILITY_CHANGE,
+			() => {
+				if (document.hidden) {this.releaseAll()}
+			},
+			options
+		)
+	}
+
+	private press(button: string, owner: string, active: boolean): void {
+		const owners = this.#pressed.get(button) ?? new Set<string>()
+		const wasActive = owners.size > 0
+		if (active) {owners.add(owner)}
+		else {owners.delete(owner)}
+		if (owners.size) {this.#pressed.set(button, owners)}
+		else {this.#pressed.delete(button)}
+		this.renderButton(button)
+		if (wasActive !== owners.size > 0) {this.onInput(button, owners.size ? 1 : 0)}
+	}
+
+	private releasePointer(id: number): void {
+		const control = this.#pointers.get(id)
+		if (!control) {return}
+		this.#pointers.delete(id)
+		if (control.button) {this.press(control.button, `pointer:${id}`, false)}
+		if (control.side) {this.setVirtualStick(control.side, 0, 0)}
+		if (this.#svg?.hasPointerCapture?.(id)) {this.#svg.releasePointerCapture(id)}
+	}
+
+	private moveStick(side: Side, event: PointerEvent): void {
+		const bounds = this.#svg!.getBoundingClientRect()
+		const scale = Math.min(bounds.width / 600, bounds.height / 360)
+		if (!scale) {return}
+		const x =
+			((event.clientX - bounds.left - (bounds.width - 600 * scale) / 2) / scale -
+				STICKS[side].x) /
+			30
+		const y =
+			((event.clientY - bounds.top - (bounds.height - 360 * scale) / 2) / scale -
+				STICKS[side].y) /
+			30
+		const length = Math.max(1, Math.hypot(x, y))
+		this.setVirtualStick(side, x / length, y / length)
+	}
+
+	private setVirtualStick(side: Side, x: number, y: number): void {
+		const previous = this.#virtualSticks[side]
+		this.#virtualSticks[side] = [x, y]
+		this.renderStick(side)
+		;[x, y].forEach((value, axis) => {
+			if (previous[axis] !== value) {this.onInput(STICKS[side].commands[axis], value)}
+		})
+	}
+
+	public releaseAll(): void {
+		for (const id of this.#pointers.keys()) {this.releasePointer(id)}
+		this.#keys.clear()
+		for (const [button, owners] of this.#pressed) {
+			for (const owner of owners) {this.press(button, owner, false)}
 		}
+	}
 
-		const stickElement = document.getElementById(`stick-${side}`)
-		if (!stickElement) {
-			return
-		}
+	private renderButton(button: string): void {
+		const active = this.#hardwareButtons.has(button) || this.#pressed.has(button)
+		const element = this.#buttons.get(button)
+		element?.classList.toggle("active", active)
+		element?.setAttribute("aria-pressed", String(active))
+	}
 
-		const deadzone = 0.1
-		const absX = Math.abs(x) > deadzone ? x : 0
-		const absY = Math.abs(y) > deadzone ? y : 0
+	public updateButtonVisual(button: string, active: boolean): void {
+		if (active) {this.#hardwareButtons.add(button)}
+		else {this.#hardwareButtons.delete(button)}
+		this.renderButton(button)
+	}
 
-		const moveX = absX * 20
-		const moveY = absY * 20
+	private renderStick(side: Side): void {
+		const dragging = [...this.#pointers.values()].some((control) => control.side === side)
+		const [x, y] = dragging ? this.#virtualSticks[side] : this.#hardwareSticks[side]
+		const knob = this.#sticks.get(side)
+		knob?.setAttribute("transform", `translate(${x * 22} ${y * 22})`)
+		knob?.classList.toggle("active", Math.hypot(x, y) > 0.1)
+	}
 
-		stickElement.style.transform = `translate(${moveX}, ${moveY})`
+	public updateStickPosition(side: Side, x: number, y: number): void {
+		this.#hardwareSticks[side] = [x, y].map((value) =>
+			Number.isFinite(value) ? Math.max(-1, Math.min(1, value)) : 0
+		)
+		this.renderStick(side)
 	}
 
 	public destroy(): void {
-		this.#buttonElements.clear()
-		if (this.#containerElement) {
-			this.#containerElement.innerHTML = ""
-		}
+		this.releaseAll()
+		this.#abort.abort()
+		this.#container?.remove()
+		this.#buttons.clear()
+		this.#sticks.clear()
 	}
 }
 

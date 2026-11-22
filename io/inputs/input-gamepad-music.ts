@@ -34,6 +34,7 @@ import { COMMANDS, GAME_PAD_DISCONNECTED, GamePadManager } from "../../hardware/
 import AudioCommand from "../../commands/audio-command"
 import AbstractInput from "./abstract-input"
 import type { IAudioInput } from "./input-interface"
+import GamepadInputView from "../../ui/gamepad-input-view.ts"
 
 export const GAMEPAD_MUSIC_INPUT_ID = "GamePadMusic"
 
@@ -58,6 +59,7 @@ const PENTATONIC_SCALE = [0, 2, 4, 7, 9]
 type ArpeggioPattern = "up" | "down" | "updown" | "random" | "updown_repeat"
 
 interface GamePadMusicState {
+	source: string
 	currentMode: "chord" | "melodic" | "drum" | "arpeggiator"
 	currentRootNote: number // MIDI note number
 	currentOctave: number
@@ -72,6 +74,7 @@ interface GamePadMusicState {
 
 function createGamePadMusicState(): GamePadMusicState {
 	return {
+		source: GAMEPAD_MUSIC_INPUT_ID,
 		currentMode: "chord",
 		currentRootNote: 60, // Middle C
 		currentOctave: BASE_OCTAVE,
@@ -89,8 +92,8 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 	gamePadManager: GamePadManager
 	state: GamePadMusicState
 	private playerStates = new Map<number, GamePadMusicState>()
-	private currentSource = GAMEPAD_MUSIC_INPUT_ID
 	stickDeadzone: number = 0.15
+	private view: GamepadInputView | null = null
 
 	constructor(options: Record<string, any> = {}) {
 		super(options)
@@ -111,9 +114,28 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 		return "Gamepad Music Input - Multiple intuitive modes for music creation"
 	}
 
+	async createGui(): Promise<HTMLElement> {
+		this.view ??= new GamepadInputView(
+			this.gamePadManager,
+			this.onGamePadEvent,
+			this.options.gamepadIndex
+		)
+		return this.view.element
+	}
+
+	async destroyGui(): Promise<void> {
+		this.view?.destroy()
+		this.view = null
+	}
+
 	override destroy(): void {
+		void this.destroyGui()
 		this.gamePadManager.removeEventListener(this.onGamePadEvent)
 		this.gamePadManager.destroy()
+		for (const state of this.playerStates.values()) {
+			this.state = state
+			this.releaseHeldNotes()
+		}
 		this.playerStates.clear()
 		this.state.heldNotes.clear()
 		this.setAsDisconnected()
@@ -128,35 +150,25 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 	 */
 	protected onGamePadEvent(button: string, value: number, gamePad: GamePad, heldFor: number) {
 		if (
+			gamePad.index >= 0 &&
 			this.options.gamepadIndex != null &&
 			Number(this.options.gamepadIndex) !== gamePad.index
 		) {
 			return
 		}
-		this.currentSource = `${GAMEPAD_MUSIC_INPUT_ID}:${gamePad.index}:${gamePad.id}`
 		let state = this.playerStates.get(gamePad.index)
 		if (!state) {
 			state = createGamePadMusicState()
 			this.playerStates.set(gamePad.index, state)
 		}
 		this.state = state
+		state.source = `${GAMEPAD_MUSIC_INPUT_ID}:${gamePad.index}:${gamePad.id}`
 		if (button === GAME_PAD_DISCONNECTED) {
-			for (const number of state.heldNotes.values()) {
-				this.dispatch(
-					Object.assign(new AudioCommand(), {
-						type: NOTE_OFF,
-						number,
-						velocity: 0,
-						from: this.currentSource,
-						startAt: this.now,
-						time: this.now
-					})
-				)
-			}
+			this.releaseHeldNotes()
 			this.playerStates.delete(gamePad.index)
 			return
 		}
-		const isHeld = this.gamePadManager.isHeld(button, gamePad.index)
+		const isHeld = value > 0
 
 		// Mode switching
 		if (button === COMMANDS.SELECT && value) {
@@ -190,7 +202,7 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 	 */
 	private handleChordMode(button: string, value: number, _isHeld: boolean, _heldFor: number) {
 		// D-Pad: Select root note
-		if (button.startsWith("d")) {
+		if (button.startsWith("d") && value) {
 			this.handleDPadRootSelection(button)
 			return
 		}
@@ -248,7 +260,7 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 
 		// Right stick Y: Octave selection
 		if (button === COMMANDS.RIGHT_STICK_Y) {
-			const octave = Math.round(3 + (value / 32768) * 4) // Maps to octaves 1-7
+			const octave = Math.round(4 + value * 3) // Normalized axes map to octaves 1-7.
 			if (octave !== this.state.currentOctave) {
 				this.state.currentOctave = Math.max(1, Math.min(7, octave))
 			}
@@ -258,10 +270,12 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 		// D-Pad: Quick note stepping
 		if (button === COMMANDS.UP && value) {
 			this.state.currentRootNote = Math.min(127, this.state.currentRootNote + 1)
-			this.playMelodicNote(this.state.currentRootNote, 100)
+			this.playMelodicNote(this.state.currentRootNote, 100, button)
 		} else if (button === COMMANDS.DOWN && value) {
 			this.state.currentRootNote = Math.max(0, this.state.currentRootNote - 1)
-			this.playMelodicNote(this.state.currentRootNote, 100)
+			this.playMelodicNote(this.state.currentRootNote, 100, button)
+		} else if ((button === COMMANDS.UP || button === COMMANDS.DOWN) && !value) {
+			this.stopMelodicNote(button)
 		}
 
 		// Buttons: Scale-based note selection (pentatonic)
@@ -283,7 +297,7 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 
 		if (scaleStep !== null && value) {
 			const noteInScale = this.state.currentRootNote + PENTATONIC_SCALE[scaleStep]
-			this.playMelodicNote(noteInScale, 100)
+			this.playMelodicNote(noteInScale, 100, scaleStep)
 		} else if (scaleStep !== null && !value) {
 			this.stopMelodicNote(scaleStep)
 		}
@@ -416,8 +430,8 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 	}
 
 	private handleStickInput(button: string, value: number) {
-		// Normalize stick values (-32768 to 32767)
-		const normalized = Math.abs(value) > this.stickDeadzone * 32767 ? value / 32767 : 0
+		// Both the Gamepad API and onscreen sticks use axes between -1 and 1.
+		const normalized = Math.abs(value) > this.stickDeadzone ? value : 0
 
 		if (button === COMMANDS.LEFT_STICK_X) {
 			this.state.lastStickX = normalized
@@ -428,7 +442,7 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 
 	private getStickBasedNote(stickX: number): number {
 		// 8-note chromatic scale based on stick position
-		const normalized = (stickX / 32767 + 1) / 2 // 0 to 1
+		const normalized = (stickX + 1) / 2 // 0 to 1
 		return Math.round(normalized * 11) % 12
 	}
 
@@ -440,7 +454,7 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 
 	private playChord(chordType: keyof typeof CHORD_SHAPES, rootNote: number) {
 		const intervals = CHORD_SHAPES[chordType]
-		const chordKey = `${chordType}_${rootNote}`
+		const chordKey = chordType
 
 		intervals.forEach((interval, index) => {
 			const noteNumber = rootNote + interval
@@ -448,55 +462,61 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 			command.number = noteNumber
 			command.type = NOTE_ON
 			command.velocity = 100
-			command.from = this.currentSource
+			command.from = this.state.source
 			command.text = `${chordType}[${index}]`
 			command.time = this.now
 			command.startAt = this.now
 
+			const alreadyHeld = [...this.state.heldNotes.values()].includes(noteNumber)
 			this.state.heldNotes.set(`${chordKey}_${index}`, noteNumber)
-			this.dispatch(command)
+			if (!alreadyHeld) {this.dispatch(command)}
 		})
 	}
 
 	private stopChord(chordType: keyof typeof CHORD_SHAPES) {
 		const intervals = CHORD_SHAPES[chordType]
-		const chordKey = `${chordType}_${this.state.currentRootNote}`
 
 		intervals.forEach((_, index) => {
-			const command = new AudioCommand()
-			command.type = NOTE_OFF
-			command.from = this.currentSource
-			command.time = this.now
-			command.startAt = this.now
-
-			this.state.heldNotes.delete(`${chordKey}_${index}`)
-			this.dispatch(command)
+			this.releaseNote(`${chordType}_${index}`)
 		})
 	}
 
-	private playMelodicNote(noteNumber: number, velocity: number) {
+	private playMelodicNote(noteNumber: number, velocity: number, owner: number | string) {
 		const command = new AudioCommand()
 		command.number = noteNumber
 		command.type = NOTE_ON
 		command.velocity = velocity
-		command.from = this.currentSource
+		command.from = this.state.source
 		command.text = `${NOTE_NAMES[noteNumber % 12]}${Math.floor(noteNumber / 12)}`
 		command.time = this.now
 		command.startAt = this.now
 
-		this.state.heldNotes.set(`melodic_${noteNumber}`, noteNumber)
+		const alreadyHeld = [...this.state.heldNotes.values()].includes(noteNumber)
+		this.state.heldNotes.set(`melodic_${owner}`, noteNumber)
+		if (!alreadyHeld) {this.dispatch(command)}
+	}
+
+	private stopMelodicNote(owner: number | string) {
+		this.releaseNote(`melodic_${owner}`)
+	}
+
+	private releaseNote(key: string) {
+		const number = this.state.heldNotes.get(key)
+		if (number === undefined) {return}
+		this.state.heldNotes.delete(key)
+		if ([...this.state.heldNotes.values()].includes(number)) {return}
+		const command = new AudioCommand()
+		command.number = number
+		command.type = NOTE_OFF
+		command.velocity = 0
+		command.from = this.state.source
+		command.time = this.now
+		command.startAt = this.now
 		this.dispatch(command)
 	}
 
-	private stopMelodicNote(scaleStep: number) {
-		const command = new AudioCommand()
-		command.type = NOTE_OFF
-		command.from = this.currentSource
-		command.time = this.now
-		command.startAt = this.now
-
-		this.state.heldNotes.delete(`melodic_${scaleStep}`)
-		this.dispatch(command)
+	private releaseHeldNotes() {
+		for (const key of this.state.heldNotes.keys()) {this.releaseNote(key)}
 	}
 
 	private playDrumPad(noteNumber: number, name: string | null, velocity: number) {
@@ -505,7 +525,7 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 		command.type = NOTE_ON
 		command.velocity = velocity
 		command.channel = 9 // MIDI drum channel
-		command.from = this.currentSource
+		command.from = this.state.source
 		command.text = name || `Drum ${noteNumber}`
 		command.time = this.now
 		command.startAt = this.now
@@ -513,12 +533,13 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 		this.dispatch(command)
 
 		// Auto-release for drum pads (short percussion)
+		const source = this.state.source
 		setTimeout(() => {
 			const releaseCommand = new AudioCommand()
 			releaseCommand.number = noteNumber
 			releaseCommand.type = NOTE_OFF
 			releaseCommand.channel = 9
-			releaseCommand.from = GAMEPAD_MUSIC_INPUT_ID
+			releaseCommand.from = source
 			releaseCommand.time = this.now
 			releaseCommand.startAt = this.now
 			this.dispatch(releaseCommand)
@@ -554,6 +575,7 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 	}
 
 	private switchMode() {
+		this.releaseHeldNotes()
 		const modes: Array<"chord" | "melodic" | "drum" | "arpeggiator"> = [
 			"chord",
 			"melodic",
@@ -569,7 +591,7 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 	private dispatchInfoCommand(text: string) {
 		const command = new AudioCommand()
 		command.text = text
-		command.from = this.currentSource
+		command.from = this.state.source
 		command.time = this.now
 		command.type = "INFO"
 		this.dispatch(command)
@@ -580,7 +602,7 @@ export default class InputGamePadMusic extends AbstractInput implements IAudioIn
 		command.type = CONTROL_CHANGE
 		command.number = controller
 		command.value = value
-		command.from = this.currentSource
+		command.from = this.state.source
 		command.time = this.now
 		command.startAt = this.now
 		this.dispatch(command)
