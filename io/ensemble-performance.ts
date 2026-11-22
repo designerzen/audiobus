@@ -1154,7 +1154,6 @@ export class EnsemblePerformance {
 		const horizon = this.beat(
 			Math.min(duration, this.position + (this.settings().lookahead ?? 0) * this.speed)
 		)
-		const assigned = new Set(this.settings().players.flatMap((p) => p.channels))
 		// Channel setup follows the shared arrangement. Assigned note attacks belong exclusively to gestures.
 		while (
 			this.cursor < this.song.events.length &&
