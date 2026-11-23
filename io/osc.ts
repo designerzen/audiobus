@@ -1,5 +1,14 @@
 import type { IAudioCommand } from "../commands/audio-command-interface"
-import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON, PITCH_BEND } from "../commands/commands"
+import {
+	CONTROL_CHANGE,
+	MIDI_CLOCK,
+	MIDI_CONTINUE,
+	MIDI_START,
+	MIDI_STOP,
+	NOTE_OFF,
+	NOTE_ON,
+	PITCH_BEND
+} from "../commands/commands"
 import { musicalCommand } from "./event-clip"
 
 export interface OscMessage {
@@ -166,6 +175,14 @@ export function commandToOSC(command: IAudioCommand, prefix: string): OscMessage
 	}
 }
 
+/** MIDI-clock semantics over OSC: 24 argument-free clock messages per quarter note. */
+const OSC_TRANSPORT: Record<string, string> = {
+	clock: MIDI_CLOCK,
+	start: MIDI_START,
+	stop: MIDI_STOP,
+	continue: MIDI_CONTINUE
+}
+
 export function oscToCommand(
 	message: OscMessage,
 	prefix: string,
@@ -173,6 +190,12 @@ export function oscToCommand(
 	from: string
 ): IAudioCommand | undefined {
 	const { args, address } = message
+	const transport = address.startsWith(`${prefix}/`)
+		? OSC_TRANSPORT[address.slice(prefix.length + 1)]
+		: undefined
+	if (transport && !args.length) {
+		return musicalCommand({ type: transport, from, startAt: now, time: now })
+	}
 	let fields: Partial<IAudioCommand>
 	if (address === `${prefix}/note/on` && args.length === 3) {
 		fields = {

@@ -149,6 +149,16 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		category: "Audio",
 		icon: "/icons/output-recorder.svg"
 	},
+	[OUTPUT_TYPES.LYRIA]: {
+		id: OUTPUT_TYPES.LYRIA,
+		name: "Lyria Backing Track",
+		description:
+			"Generate music with Google Lyria using your Gemini API key, or load a backing track to play with the transport",
+		type: "engine",
+		subtype: "instrument",
+		category: "Audio",
+		icon: "/icons/output-recorder.svg"
+	},
 	[OUTPUT_TYPES.LOOP_PLAYER]: {
 		id: OUTPUT_TYPES.LOOP_PLAYER,
 		name: "Loop Player",
@@ -224,6 +234,15 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		description: "Photosynth MoogFF ladder synthesizer with MIDI and WAM2 controls",
 		icon: "/icons/output-wam2.svg",
 		category: "Synthesis"
+	},
+	[OUTPUT_TYPES.ZETA]: {
+		id: OUTPUT_TYPES.ZETA,
+		name: "Zeta",
+		description: "Play zeta-zero logarithmic integrals, cumulative sums and the cycle approximation",
+		type: "engine",
+		subtype: "instrument",
+		category: "Synthesis",
+		icon: "/icons/device-instrument.svg"
 	},
 	[OUTPUT_TYPES.FM]: {
 		id: OUTPUT_TYPES.FM,

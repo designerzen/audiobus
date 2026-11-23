@@ -283,6 +283,8 @@ export class RomplerGui {
 	}
 
 	private dropTarget(): void {
+		// Tells the app's page-wide drop handler to leave soundfonts dropped here to this panel
+		this.element.dataset.fileDrop = SOUNDFONT_EXTENSIONS
 		const dragging = (event: DragEvent) => !!event.dataTransfer?.types.includes("Files")
 		this.element.addEventListener(EVENT_DRAG_OVER, (event) => {
 			if (dragging(event)) {

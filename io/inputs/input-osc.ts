@@ -1,9 +1,19 @@
 import NoteInput from "./note-input"
-import { CONTROL_CHANGE, NOTE_OFF, NOTE_ON } from "../../commands/commands"
+import {
+	CONTROL_CHANGE,
+	MIDI_CLOCK,
+	MIDI_CONTINUE,
+	MIDI_START,
+	MIDI_STOP,
+	NOTE_OFF,
+	NOTE_ON
+} from "../../commands/commands"
 import { changed, devicePanel } from "../device-controls"
 import { decodeOSC, oscPrefix, oscToCommand } from "../osc"
 import { OscConnection, oscControls } from "../osc-connection"
 import { musicalCommand } from "../event-clip"
+
+const TRANSPORT = [MIDI_CLOCK, MIDI_START, MIDI_STOP, MIDI_CONTINUE]
 
 export default class InputOSC extends NoteInput {
 	readonly requiresConnectionControl = true
@@ -20,6 +30,10 @@ export default class InputOSC extends NoteInput {
 	hasOscInput() {
 		return true
 	}
+	/** Offered as a MIDI clock source, so a DAW plugin's transport can drive the app. */
+	get clockPorts() {
+		return [{ id: this.uuid, name: this.name }]
+	}
 	constructor(options: Record<string, any> = {}) {
 		super(options)
 		this.options.url = options.url ?? "ws://127.0.0.1:8080"
@@ -35,6 +49,8 @@ export default class InputOSC extends NoteInput {
 						this.noteOn(command.number, command.velocity, command.channel)
 					} else if (command.type === NOTE_OFF || command.type === NOTE_ON) {
 						this.noteOff(command.number, command.channel)
+					} else if (TRANSPORT.includes(command.type)) {
+						this.dispatch(command)
 					} else {
 						this.channels.add(command.channel)
 						this.dispatch(command)

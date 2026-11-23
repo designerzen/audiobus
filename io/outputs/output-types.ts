@@ -10,6 +10,7 @@ export const SONG_TREE = "song-tree" as const
 export const SION = "sion" as const
 export const SAMPLE_PLAYER = "sample-player" as const
 export const LOOP_PLAYER = "loop-player" as const
+export const LYRIA = "lyria" as const
 export const CHROMATIC_SAMPLER = "chromatic-sampler" as const
 export const ROMPLER = "rompler" as const
 export const HARMONY_SAMPLER = "harmony-sampler" as const
@@ -26,6 +27,7 @@ export const VIBRATOR = "vibrator" as const
 export const WAM2 = "wam2" as const
 export const MOOG = "moog" as const
 export const FM = "fm" as const
+export const ZETA = "zeta" as const
 export const MONOTRON = "monotron" as const
 export const WAVEGUIDE = "waveguide" as const
 export const MULTI_OSCILLATOR = "multi-oscillator" as const
@@ -59,6 +61,7 @@ export type OutputId =
 	| typeof SONG_TREE
 	| typeof SAMPLE_PLAYER
 	| typeof LOOP_PLAYER
+	| typeof LYRIA
 	| typeof CHROMATIC_SAMPLER
 	| typeof ROMPLER
 	| typeof HARMONY_SAMPLER
@@ -78,6 +81,7 @@ export type OutputId =
 	| typeof WAM2
 	| typeof MOOG
 	| typeof FM
+	| typeof ZETA
 	| typeof MONOTRON
 	| typeof WAVEGUIDE
 	| typeof MULTI_OSCILLATOR

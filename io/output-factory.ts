@@ -53,6 +53,8 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./outputs/output-sample-player")
 		case OUTPUT_TYPES.LOOP_PLAYER:
 			return await import("./outputs/output-loop-player")
+		case OUTPUT_TYPES.LYRIA:
+			return await import("./outputs/output-lyria")
 		case OUTPUT_TYPES.HARMONY_SAMPLER:
 			return await import("./outputs/output-harmony-sampler")
 		case OUTPUT_TYPES.EVENT_RECORDER:
@@ -83,6 +85,8 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./outputs/output-moog.ts")
 		case OUTPUT_TYPES.FM:
 			return await import("./outputs/output-fm.ts")
+		case OUTPUT_TYPES.ZETA:
+			return await import("./outputs/output-zeta.ts")
 		case OUTPUT_TYPES.MONOTRON:
 			return await import("./outputs/output-monotron.ts")
 		case OUTPUT_TYPES.WAVEGUIDE:
@@ -259,6 +263,11 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		create: (options) => createOutput(OUTPUT_TYPES.SAMPLE_PLAYER, options)
 	},
 	{
+		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.LYRIA],
+		...requiring("webAudio"),
+		create: (options) => createOutput(OUTPUT_TYPES.LYRIA, options)
+	},
+	{
 		...OUTPUT_DEFINITIONS[OUTPUT_TYPES.LOOP_PLAYER],
 		...requiring("webAudio"),
 		create: (options) => createOutput(OUTPUT_TYPES.LOOP_PLAYER, options)
@@ -308,7 +317,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		...requiring("audioWorklet"),
 		create: (options) => createOutput(OUTPUT_TYPES.FM, options)
 	},
-	...[OUTPUT_TYPES.MONOTRON, OUTPUT_TYPES.WAVEGUIDE, OUTPUT_TYPES.MULTI_OSCILLATOR].map((id) => ({
+	...[OUTPUT_TYPES.ZETA, OUTPUT_TYPES.MONOTRON, OUTPUT_TYPES.WAVEGUIDE, OUTPUT_TYPES.MULTI_OSCILLATOR].map((id) => ({
 		...OUTPUT_DEFINITIONS[id],
 		...requiring("webAudio"),
 		create: (options?: Record<string, any>) => createOutput(id, options)
