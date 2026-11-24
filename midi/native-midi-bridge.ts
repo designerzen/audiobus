@@ -127,17 +127,16 @@ const endpointBridges = new WeakMap<EndpointMidiBridge, NativeMidiBridge>()
 
 function findNativeMidiBridge(): NativeMidiBridge | undefined {
 	const scope = (globalThis as any).window ?? globalThis
+	const endpoints: EndpointMidiBridge | undefined = scope.electron?.midi
+	if (endpoints?.available) {
+		if (!endpointBridges.has(endpoints)) {
+			endpointBridges.set(endpoints, createEndpointMidiBridge(endpoints))
+		}
+		return endpointBridges.get(endpoints)
+	}
 	if (scope.electronAPI?.midi2) {
 		return scope.electronAPI.midi2
 	}
-	const endpoints: EndpointMidiBridge | undefined = scope.electron?.midi
-	if (!endpoints?.available) {
-		return
-	}
-	if (!endpointBridges.has(endpoints)) {
-		endpointBridges.set(endpoints, createEndpointMidiBridge(endpoints))
-	}
-	return endpointBridges.get(endpoints)
 }
 
 export function hasNativeMidiBridge(): boolean {

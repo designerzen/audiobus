@@ -4,14 +4,50 @@ import { chordAt, DEFAULT_CHORDS, parseProgression, type ChordStep } from "../mu
 import { pitchClasses, quantisePitchSet, mod12 } from "../../tuning/pitch-class-set"
 import { DEFAULT_HARMONY, parseHarmony, type HarmonicState } from "../harmony"
 
+const WHITE_KEY_INDEX: Record<number, number> = {
+	0: 0, // C
+	2: 1, // D
+	4: 2, // E
+	5: 3, // F
+	7: 4, // G
+	9: 5, // A
+	11: 6 // B
+}
+
+function closestFifthPitchClass(tones: readonly number[], root: number): number {
+	let best = mod12(root + 7)
+	let bestDistance = 12
+	for (const pc of tones) {
+		const interval = mod12(pc - root)
+		const distance = Math.min(Math.abs(interval - 7), 12 - Math.abs(interval - 7))
+		if (distance < bestDistance) {
+			bestDistance = distance
+			best = pc
+		}
+	}
+	return best
+}
+
+function whiteKeyStep(midiNote: number): number | undefined {
+	const index = WHITE_KEY_INDEX[mod12(midiNote)]
+	if (index === undefined) {
+		return
+	}
+	const octave = Math.floor(midiNote / 12) - 5 // Middle C (60) -> step 0
+	return octave * 7 + index
+}
+
 export const ID_CHORD_TRACK = "Shared-Chord-Track"
 export class TransformerChordTrack extends PerformanceTransformer {
 	type = ID_CHORD_TRACK
 	category = "Harmony"
 	beat = 0
-	private harmony = { ...DEFAULT_HARMONY }
+	private harmony: HarmonicState = { ...DEFAULT_HARMONY }
 	setHarmony(state: HarmonicState): void {
 		this.harmony = parseHarmony(state)
+		if (Number(this.options.repitch) === 1 && this.voices.size > 0) {
+			this.schedule(this.now, () => this.repitchHeldVoices())
+		}
 	}
 	private gui?: HTMLElement
 	private editor?: { refresh(): void; destroy(): void }
@@ -56,6 +92,8 @@ export class TransformerChordTrack extends PerformanceTransformer {
 				role: "melody",
 				follow: "chord",
 				source: "track",
+				mapping: "nearest",
+				repitch: 0,
 				transpose: 0,
 				progression: JSON.stringify(DEFAULT_CHORDS)
 			},
@@ -68,6 +106,24 @@ export class TransformerChordTrack extends PerformanceTransformer {
 				},
 				{ name: "follow", label: "Melody follows", values: ["chord", "scale"] },
 				{ name: "role", label: "Follow as", values: ["melody", "bass", "chords"] },
+				{
+					name: "mapping",
+					label: "Key mapping",
+					values: [
+						{ name: "Nearest tone", value: "nearest" },
+						{ name: "White keys (chord palette)", value: "white-keys" },
+						{ name: "White keys (root & fifth)", value: "root-fifth" }
+					],
+					help: "White-key modes ignore black keys and map white keys into fixed-octave chord tones or root/fifth bass groups."
+				},
+				{
+					name: "repitch",
+					label: "Held notes on change",
+					values: [
+						{ name: "Keep sounding", value: 0 },
+						{ name: "Re-pitch into new chord", value: 1 }
+					]
+				},
 				{
 					name: "transpose",
 					label: "Transpose (semitones)",
@@ -87,30 +143,93 @@ export class TransformerChordTrack extends PerformanceTransformer {
 	setMusicalBeat(beat: number): void {
 		this.beat = beat
 	}
-	protected noteOn(voice: Voice) {
+	private targetPitches(input: number): number[] {
 		const step = chordAt(this.progression, this.beat)
 		const live = this.options.source === "live"
 		const chord = live
-			? { mask: this.harmony.chord, root: this.harmony.root, scale: this.harmony.scale }
-			: step
+			? {
+					mask: this.harmony.chord,
+					root: this.harmony.root,
+					scale: this.harmony.scale,
+					bass: this.harmony.bass
+				}
+			: { ...step, bass: undefined }
 		const transpose = Math.round(Number(this.options.transpose))
-		const input = voice.input.number
+		const mapping = String(this.options.mapping ?? "nearest")
 		const mask =
 			this.options.role === "melody" && this.options.follow === "scale"
 				? (chord.scale ?? this.harmony.scale)
 				: chord.mask
-		const nearest = quantisePitchSet(input, mask, 0)
-		if (nearest === undefined) {
-			return []
+
+		let notes: number[]
+		if (mapping === "white-keys" || mapping === "root-fifth") {
+			const stepIndex = whiteKeyStep(input)
+			if (stepIndex === undefined) {
+				return []
+			}
+			const tones = pitchClasses(mask)
+			if (!tones.length) {
+				return []
+			}
+			if (mapping === "root-fifth") {
+				const bassPc = chord.bass ?? chord.root
+				const fifthPc = closestFifthPitchClass(tones, chord.root)
+				const group = Math.floor(stepIndex / 3)
+				const octaveShift = Math.floor(group / 2)
+				const isFifth = ((group % 2) + 2) % 2 === 1
+				const pc = isFifth ? fifthPc : bassPc
+				const octaveOffset = isFifth && fifthPc < bassPc ? 1 : 0
+				notes = [60 + (octaveShift + octaveOffset) * 12 + pc]
+			} else {
+				// Fixed-octave chord tones sorted upward from C so shared tones stay under the same fingers.
+				const len = tones.length
+				const octaveShift = Math.floor(stepIndex / len)
+				const index = ((stepIndex % len) + len) % len
+				notes = [60 + octaveShift * 12 + tones[index]]
+			}
+		} else {
+			const nearest = quantisePitchSet(input, mask, 0)
+			if (nearest === undefined) {
+				return []
+			}
+			const bassRoot = chord.bass ?? chord.root
+			notes =
+				this.options.role === "chords"
+					? pitchClasses(chord.mask).map((pitch) => Math.floor(input / 12) * 12 + pitch)
+					: [this.options.role === "bass" ? input - mod12(input - bassRoot) : nearest]
 		}
-		const notes =
-			this.options.role === "chords"
-				? pitchClasses(chord.mask).map((pitch) => Math.floor(input / 12) * 12 + pitch)
-				: [this.options.role === "bass" ? input - mod12(input - chord.root) : nearest]
 		return notes
 			.map((pitch) => pitch + transpose)
 			.filter((pitch) => pitch >= 0 && pitch <= 127)
-			.map((pitch) => this.start(voice, pitch))
+	}
+	private repitchHeldVoices() {
+		const noteOffs = []
+		const noteOns = []
+		for (const voice of this.voices) {
+			if (voice.released) {
+				continue
+			}
+			const desired = new Set(this.targetPitches(voice.input.number))
+			const currentTargets = [...voice.targets]
+			const kept = new Set<number>()
+			for (const target of currentTargets) {
+				if (desired.has(target.number)) {
+					kept.add(target.number)
+				} else {
+					noteOffs.push(this.end(voice, target, this.now))
+				}
+			}
+			for (const pitch of desired) {
+				if (!kept.has(pitch)) {
+					noteOns.push(this.start(voice, pitch, this.now, voice.input.velocity))
+				}
+			}
+		}
+		// Send all note-offs before note-ons so mono/poly synths never stick or overlap.
+		return [...noteOffs, ...noteOns]
+	}
+	protected noteOn(voice: Voice) {
+		return this.targetPitches(voice.input.number).map((pitch) => this.start(voice, pitch))
 	}
 	protected clearState() {
 		this.beat = 0

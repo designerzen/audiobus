@@ -23,3 +23,6 @@ export * from "./midi-echo-guard.ts"
 
 // Electron native MIDI, from either preload shape
 export * from "./native-midi-bridge.ts"
+
+// MIDI 2.0 Flex Data (Set Chord Name, Set Key Signature, Set Tempo)
+export * from "./flex-data.ts"

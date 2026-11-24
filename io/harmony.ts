@@ -17,6 +17,8 @@ export interface HarmonicState {
 	root: number
 	scale: number
 	chord: number
+	/** Optional slash-chord bass pitch class (0-11), e.g. from MIDI 2.0 Flex Data Set Chord Name. */
+	bass?: number
 }
 export interface HarmonicSection extends HarmonicState {
 	id: string
@@ -43,7 +45,18 @@ export function parseHarmony(value: unknown): HarmonicState {
 	if (!state || !Number.isInteger(state.root) || state.root < 0 || state.root > 11) {
 		throw new Error("Harmony needs a tonic from 0 to 11")
 	}
-	return { root: state.root, scale: pitchSetMask(state.scale), chord: pitchSetMask(state.chord) }
+	const parsed: HarmonicState = {
+		root: state.root,
+		scale: pitchSetMask(state.scale),
+		chord: pitchSetMask(state.chord)
+	}
+	if (state.bass !== undefined) {
+		if (!Number.isInteger(state.bass) || state.bass < 0 || state.bass > 11) {
+			throw new Error("Harmony bass must be a pitch class from 0 to 11")
+		}
+		parsed.bass = state.bass
+	}
+	return parsed
 }
 export function parseSections(value: unknown): HarmonicSection[] {
 	if (!Array.isArray(value) || value.length > 128) {
@@ -91,7 +104,7 @@ export function sectionAt(sections: HarmonicSection[], beat: number): HarmonicSe
 	}
 }
 export function sameHarmony(a: HarmonicState, b: HarmonicState): boolean {
-	return a.root === b.root && a.scale === b.scale && a.chord === b.chord
+	return a.root === b.root && a.scale === b.scale && a.chord === b.chord && a.bass === b.bass
 }
 export function scaleNeighbours(state: HarmonicState) {
 	return SCALE_FAMILIES.flatMap((family) =>
