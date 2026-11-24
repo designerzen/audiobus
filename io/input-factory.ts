@@ -49,6 +49,8 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./inputs/input-protocol")
 		case INPUT_TYPES.CHANNEL_TRIGGER:
 			return await import("./inputs/input-channel-trigger")
+		case INPUT_TYPES.COMPOSER:
+			return await import("./inputs/input-composer")
 		case INPUT_TYPES.SCALE_EXPLORER:
 			return await import("./inputs/input-scale-explorer")
 		case INPUT_TYPES.STEP_SEQUENCER:
@@ -93,6 +95,12 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./inputs/input-midi-transport-clock.ts")
 		case INPUT_TYPES.MUSIC_MOUSE:
 			return await import("./inputs/input-music-mouse.ts")
+		case INPUT_TYPES.MICROPHONE_MELODY:
+			return await import("./inputs/input-microphone-melody.ts")
+		case INPUT_TYPES.MICROPHONE_CHORDS:
+			return await import("./inputs/input-microphone-chords.ts")
+		case INPUT_TYPES.MICROPHONE_TIMBRE:
+			return await import("./inputs/input-microphone-timbre.ts")
 		case INPUT_TYPES.MICROPHONE_PITCH:
 			return await import("./inputs/input-microphone-pitch.ts")
 		case INPUT_TYPES.DVS_CONTROL_VINYL:
@@ -159,6 +167,7 @@ export const INPUT_FACTORIES: InputFactory[] = [
 	})),
 	...[
 		INPUT_TYPES.SCALE_EXPLORER,
+		INPUT_TYPES.COMPOSER,
 		INPUT_TYPES.STEP_SEQUENCER,
 		INPUT_TYPES.PADS,
 		INPUT_TYPES.CHANNEL_TRIGGER,
@@ -330,6 +339,21 @@ export const INPUT_FACTORIES: InputFactory[] = [
 			"Cursor-controlled musical instrument inspired by Laurie Spiegel's classic Music Mouse",
 		...requiring(),
 		create: (options) => createInput(INPUT_TYPES.MUSIC_MOUSE, options)
+	},
+	{
+		...INPUT_DEFINITIONS[INPUT_TYPES.MICROPHONE_MELODY],
+		...requiring("mediaDevices", "webAudio", "audioWorklet", "workers", "webAssembly"),
+		create: (options) => createInput(INPUT_TYPES.MICROPHONE_MELODY, options)
+	},
+	{
+		...INPUT_DEFINITIONS[INPUT_TYPES.MICROPHONE_CHORDS],
+		...requiring("mediaDevices", "webAudio", "audioWorklet", "workers", "webAssembly"),
+		create: (options) => createInput(INPUT_TYPES.MICROPHONE_CHORDS, options)
+	},
+	{
+		...INPUT_DEFINITIONS[INPUT_TYPES.MICROPHONE_TIMBRE],
+		...requiring("mediaDevices", "webAudio", "audioWorklet", "workers", "webAssembly"),
+		create: (options) => createInput(INPUT_TYPES.MICROPHONE_TIMBRE, options)
 	},
 	{
 		id: INPUT_TYPES.MICROPHONE_PITCH,

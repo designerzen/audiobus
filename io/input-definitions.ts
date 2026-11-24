@@ -56,6 +56,16 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		category: "Device",
 		icon: "/icons/input-cosmo-dots.svg"
 	},
+	[INPUT_TYPES.COMPOSER]: {
+		id: INPUT_TYPES.COMPOSER,
+		name: "Composer",
+		description:
+			"An autonomous composer that develops themes from emotion and energy on the shared transport",
+		type: "generator",
+		subtype: "sequencer",
+		category: "Sequencing",
+		icon: "/icons/preset-melodic-sequencer.svg"
+	},
 	[INPUT_TYPES.SCALE_EXPLORER]: {
 		id: INPUT_TYPES.SCALE_EXPLORER,
 		name: "Scale Explorer",
@@ -323,6 +333,51 @@ export const INPUT_DEFINITIONS: Record<string, InputDefinition> = {
 		category: "UI"
 	},
 
+	[INPUT_TYPES.MICROPHONE_MELODY]: {
+		id: INPUT_TYPES.MICROPHONE_MELODY,
+		type: "audio",
+		subtype: "pitch",
+		name: "Microphone Melody (Essentia)",
+		description: "Hum or play one note with low-latency pitch tracking using Essentia.js (AGPL-3.0)",
+		attribution: {
+			author: "Music Technology Group, Universitat Pompeu Fabra",
+			sourceUrl: "https://github.com/MTG/essentia.js",
+			license: "AGPL-3.0",
+			licenseUrls: ["https://www.gnu.org/licenses/agpl-3.0.html"]
+		},
+		icon: "/icons/input-microphone-pitch.svg",
+		category: "Audio"
+	},
+	[INPUT_TYPES.MICROPHONE_CHORDS]: {
+		id: INPUT_TYPES.MICROPHONE_CHORDS,
+		type: "audio",
+		subtype: "pitch",
+		name: "Microphone Chords (Essentia)",
+		description: "Follow microphone chords and estimate the current key using Essentia.js (AGPL-3.0)",
+		attribution: {
+			author: "Music Technology Group, Universitat Pompeu Fabra",
+			sourceUrl: "https://github.com/MTG/essentia.js",
+			license: "AGPL-3.0",
+			licenseUrls: ["https://www.gnu.org/licenses/agpl-3.0.html"]
+		},
+		icon: "/icons/input-microphone-pitch.svg",
+		category: "Audio"
+	},
+	[INPUT_TYPES.MICROPHONE_TIMBRE]: {
+		id: INPUT_TYPES.MICROPHONE_TIMBRE,
+		type: "audio",
+		subtype: "modulation",
+		name: "Microphone Timbre (Essentia)",
+		description: "Map microphone tone and dynamics to MIDI controllers using Essentia.js (AGPL-3.0)",
+		attribution: {
+			author: "Music Technology Group, Universitat Pompeu Fabra",
+			sourceUrl: "https://github.com/MTG/essentia.js",
+			license: "AGPL-3.0",
+			licenseUrls: ["https://www.gnu.org/licenses/agpl-3.0.html"]
+		},
+		icon: "/icons/input-microphone-pitch.svg",
+		category: "Audio"
+	},
 	[INPUT_TYPES.MICROPHONE_PITCH]: {
 		id: INPUT_TYPES.MICROPHONE_PITCH,
 		type: "audio",

@@ -6,6 +6,7 @@
 export const KEYBOARD = "keyboard" as const
 export const CHANNEL_TRIGGER = "channel-trigger" as const
 export const SCALE_EXPLORER = "scale-explorer" as const
+export const COMPOSER = "composer" as const
 export const MIDI_FILE = "midi-file" as const
 export const STEP_SEQUENCER = "step-sequencer" as const
 export const PADS = "pads" as const
@@ -33,12 +34,16 @@ export const AI_TRIO = "ai-trio" as const
 export const PROMPT_AI_SPEECH = "prompt-ai-speech" as const
 export const MIDI_TRANSPORT_CLOCK = "midi-transport-clock" as const
 export const MUSIC_MOUSE = "music-mouse" as const
+export const MICROPHONE_MELODY = "microphone-melody" as const
+export const MICROPHONE_CHORDS = "microphone-chords" as const
+export const MICROPHONE_TIMBRE = "microphone-timbre" as const
 export const MICROPHONE_PITCH = "microphone-pitch" as const
 export const DVS_CONTROL_VINYL = "dvs-control-vinyl" as const
 export const DEVICE_MOTION = "device-motion" as const
 
 export type InputId =
 	| typeof SCALE_EXPLORER
+	| typeof COMPOSER
 	| (string & {})
 	| typeof AI_IMPROV
 	| typeof AI_MELODY
@@ -66,6 +71,9 @@ export type InputId =
 	| typeof PROMPT_AI_SPEECH
 	| typeof MIDI_TRANSPORT_CLOCK
 	| typeof MUSIC_MOUSE
+	| typeof MICROPHONE_MELODY
+	| typeof MICROPHONE_CHORDS
+	| typeof MICROPHONE_TIMBRE
 	| typeof MICROPHONE_PITCH
 	| typeof DVS_CONTROL_VINYL
 	| typeof DEVICE_MOTION

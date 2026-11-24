@@ -7,6 +7,7 @@ import { getAudioDestination } from "../audio-destination"
 import { musicalCommand } from "../event-clip"
 import { DEFAULT_HARMONY, type HarmonicState } from "../harmony"
 import { quantisePitchSet } from "../../tuning/pitch-class-set"
+import { AUDIO_MEDIA_ACCEPT, decodeAudioMedia } from "../media/audio-media"
 
 const MAX_SAMPLE_BYTES = 4 * 1024 * 1024
 interface SampleVoice {
@@ -108,8 +109,7 @@ export default class OutputSamplePlayer extends EventTarget implements IAudioOut
 				character.charCodeAt(0)
 			)
 			const revision = this.sampleRevision
-			this.loading = this.context
-				.decodeAudioData(bytes.buffer)
+			this.loading = decodeAudioMedia(this.context, bytes.buffer)
 				.then((buffer) => {
 					if (revision === this.sampleRevision && !this.destroyed) {
 						this.buffer = buffer
@@ -128,7 +128,7 @@ export default class OutputSamplePlayer extends EventTarget implements IAudioOut
 		}
 		const generation = ++this.generation
 		++this.sampleRevision
-		const buffer = await this.context.decodeAudioData(bytes.slice(0))
+		const buffer = await decodeAudioMedia(this.context, bytes)
 		if (generation !== this.generation || this.destroyed) {
 			return
 		}
@@ -278,7 +278,7 @@ export default class OutputSamplePlayer extends EventTarget implements IAudioOut
 			this.options.fileName ??
 			"Load an audio sample, up to 4 MB. The sample is saved with your workspace."
 		file.type = "file"
-		file.accept = "audio/*"
+		file.accept = AUDIO_MEDIA_ACCEPT
 		file.addEventListener(EVENT_CHANGE, async () => {
 			const selected = file.files?.[0]
 			if (!selected) {
@@ -297,7 +297,7 @@ export default class OutputSamplePlayer extends EventTarget implements IAudioOut
 			}
 			file.value = ""
 		})
-		label.append("Audio sample ", file)
+		label.append("Audio or video sample ", file)
 		panel.append(label, this.status)
 		numberControl(panel, "Original pitch (MIDI note)", this.options.root, 0, 127, (value) => {
 			this.options.root = value

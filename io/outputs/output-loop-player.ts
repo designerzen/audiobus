@@ -7,7 +7,15 @@ import { changed, devicePanel, numberControl } from "../device-controls"
 import { getAudioDestination } from "../audio-destination"
 import { loadCaptureWorklet } from "../inputs/load-capture-worklet"
 import { loopPlayerSettings, loopSourceBpm, type LoopPlayerSettings } from "./loop-player-settings"
+import {
+	alignLoopToBeats,
+	describeDetectedLoop,
+	detectedLoop,
+	type DetectedLoop,
+	type LoopAlignmentSource
+} from "./loop-alignment"
 import { LOOP_PLAYER_PROCESSOR, LOOP_PLAYER_WORKLET_CODE } from "./loop-player-worklet"
+import { AUDIO_MEDIA_ACCEPT, decodeAudioMedia } from "../media/audio-media"
 
 const MAX_SAMPLE_BYTES = 4 * 1024 * 1024
 const FADE_SECONDS = 0.005
@@ -70,7 +78,8 @@ export default class OutputLoopPlayer extends EventTarget implements IAudioOutpu
 			end:
 				typeof options.end === "number" && Number.isFinite(options.end)
 					? options.end
-					: undefined
+					: undefined,
+			analysis: detectedLoop(options.analysis)
 		}
 		this.output = this.context.createGain()
 		this.output.connect(this.destination)
@@ -84,8 +93,42 @@ export default class OutputLoopPlayer extends EventTarget implements IAudioOutpu
 	get sourceBpm(): number | undefined {
 		return this.buffer ? loopSourceBpm(this.settings) : undefined
 	}
+	/** The decoded audio, once loaded; it changes when another file is loaded. */
+	get audioBuffer(): AudioBuffer | undefined {
+		return this.buffer
+	}
+	/** Tempo and key found by analysis, kept with the saved sample. */
+	get detected(): DetectedLoop | undefined {
+		return this.options.analysis
+	}
 	private get settings(): LoopPlayerSettings {
 		return loopPlayerSettings(this.options, this.buffer!.duration)
+	}
+	/**
+	 * Keep what analysis found and, unless align is false, start the loop on the first detected beat
+	 * with a whole number of beats, so the source BPM matches the detected tempo.
+	 * Returns whether the loop was realigned.
+	 */
+	applyAnalysis(
+		analysis: LoopAlignmentSource & Omit<DetectedLoop, "bpm">,
+		{ align = true }: { align?: boolean } = {}
+	): boolean {
+		if (!this.buffer) {
+			return false
+		}
+		const detected = detectedLoop(analysis)
+		if (!detected) {
+			return false
+		}
+		this.options.analysis = detected
+		const region = align ? alignLoopToBeats(analysis, this.buffer.duration) : undefined
+		if (region) {
+			this.configure(region)
+		} else {
+			this.refreshGui()
+			changed(this)
+		}
+		return region !== undefined
 	}
 	hasAudioOutput(): boolean {
 		return true
@@ -132,6 +175,9 @@ export default class OutputLoopPlayer extends EventTarget implements IAudioOutpu
 				this.sourceBpm === undefined
 					? "Source BPM: load audio first"
 					: `Source BPM: ${this.sourceBpm.toFixed(2)}`
+			if (this.options.analysis) {
+				this.bpmLabel.textContent += ` · ${describeDetectedLoop(this.options.analysis)}`
+			}
 		}
 		for (const [control, key] of [
 			[this.startControl, "start"],
@@ -165,7 +211,7 @@ export default class OutputLoopPlayer extends EventTarget implements IAudioOutpu
 					if (bytes.byteLength > MAX_SAMPLE_BYTES) {
 						throw new Error("Saved sample exceeds 4 MB")
 					}
-					const buffer = await this.context.decodeAudioData(bytes.buffer)
+					const buffer = await decodeAudioMedia(this.context, bytes.buffer)
 					if (generation === this.generation && !this.destroyed) {
 						this.acceptBuffer(buffer)
 					}
@@ -182,7 +228,7 @@ export default class OutputLoopPlayer extends EventTarget implements IAudioOutpu
 			throw new Error("Sample exceeds 4 MB")
 		}
 		const generation = ++this.generation
-		const buffer = await this.context.decodeAudioData(bytes.slice(0))
+		const buffer = await decodeAudioMedia(this.context, bytes)
 		if (generation !== this.generation || this.destroyed) {
 			return
 		}
@@ -195,6 +241,8 @@ export default class OutputLoopPlayer extends EventTarget implements IAudioOutpu
 		this.options.fileName = fileName
 		this.options.start = 0
 		this.options.end = buffer.duration
+		// Tempo and key belong to the previous audio
+		this.options.analysis = undefined
 		this.acceptBuffer(buffer)
 		changed(this)
 	}
@@ -411,7 +459,7 @@ export default class OutputLoopPlayer extends EventTarget implements IAudioOutpu
 		this.status.setAttribute("role", "status")
 		this.bpmLabel = document.createElement("p")
 		file.type = "file"
-		file.accept = "audio/*"
+		file.accept = AUDIO_MEDIA_ACCEPT
 		file.addEventListener(EVENT_CHANGE, async () => {
 			const selected = file.files?.[0]
 			if (!selected) {

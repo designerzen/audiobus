@@ -17,6 +17,7 @@ import {
 	type SamplerLayer
 } from "./sampler/sampler-state.js"
 import { setupSamplerEditor } from "./sampler/sampler-editor.js"
+import { decodeAudioMedia } from "../media/audio-media"
 import "./sampler/sampler-editor.css"
 
 interface SavedLayer extends Omit<SamplerLayer, "channels" | "sampleRate"> {
@@ -210,7 +211,8 @@ export default class ChromaticSampler extends EventTarget implements IAudioOutpu
 						}
 						const slot = `${key}:${index}`,
 							revision = this.revisions.get(slot)
-						const audio = await this.context.decodeAudioData(
+						const audio = await decodeAudioMedia(
+							this.context,
 							Uint8Array.from(atob(saved.sample), (c) => c.charCodeAt(0)).buffer
 						)
 						if (this.destroyed || this.revisions.get(slot) !== revision) {
@@ -268,7 +270,7 @@ export default class ChromaticSampler extends EventTarget implements IAudioOutpu
 		if (bytes.byteLength > MAX_SAMPLE_BYTES) {
 			throw Error("Choose a sample smaller than 16 MB")
 		}
-		const audio = await this.context.decodeAudioData(bytes.slice(0))
+		const audio = await decodeAudioMedia(this.context, bytes)
 		const channels = this.channels(audio)
 		if (this.destroyed || this.revisions.get(slot) !== revision) {
 			return

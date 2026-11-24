@@ -13,6 +13,7 @@ import {
 	EVENT_POINTER_MOVE,
 	EVENT_POINTER_UP
 } from "../../../events/event-constants.ts"
+import { AUDIO_MEDIA_ACCEPT } from "../../media/audio-media.ts"
 const escape = (value) =>
 	String(value).replace(
 		/[&<>"']/g,
@@ -90,7 +91,7 @@ export const setupSamplerEditor = (root, getBackend) => {
 				.join("")}</nav>
 			<div class="sampler-toolbar"><label>Key <select data-sampler-key aria-label="Sample key">${Array.from({ length: 128 }, (_, note) => `<option value="${note}"${note === key ? " selected" : ""}>${noteName(note)}</option>`).join("")}</select></label><button type="button" data-sampler-clear>Clear layer</button></div>
 			<div class="sampler-slots">${layers.map((item, index) => `<button type="button" data-sampler-layer="${index}" aria-pressed="${index === selected}" title="${escape(item.name)}">${String(index + 1).padStart(2, "0")} ${item.channels ? escape(item.name) : "ADD"}</button>`).join("")}</div>
-			${tab === "sample" ? `<div class="sampler-drop"><label>Load sample<input type="file" accept="audio/*,.wav,.aif,.aiff,.flac,.ogg,.mp3" data-sampler-file${loading ? " disabled" : ""} /></label><span>or drop an audio file here</span></div><svg class="sampler-wave" viewBox="0 0 600 160" role="img" aria-label="Sample waveform and trim points"></svg><div class="sampler-switches"><label><input type="checkbox" data-sampler-param="loop"${l.loop ? " checked" : ""} /> Loop</label><label><input type="checkbox" data-sampler-param="oneShot"${l.oneShot ? " checked" : ""} /> One shot</label></div>` : ""}
+			${tab === "sample" ? `<div class="sampler-drop"><label>Load sample<input type="file" accept="${AUDIO_MEDIA_ACCEPT}" data-sampler-file${loading ? " disabled" : ""} /></label><span>or drop an audio or video file here</span></div><svg class="sampler-wave" viewBox="0 0 600 160" role="img" aria-label="Sample waveform and trim points"></svg><div class="sampler-switches"><label><input type="checkbox" data-sampler-param="loop"${l.loop ? " checked" : ""} /> Loop</label><label><input type="checkbox" data-sampler-param="oneShot"${l.oneShot ? " checked" : ""} /> One shot</label></div>` : ""}
 			${tab === "envelope" ? '<svg class="sampler-envelope" viewBox="0 0 600 160" role="img" aria-label="Amplitude envelope"></svg>' : ""}
 			${tab === "filter" ? `<label>Filter type<select data-sampler-param="filter">${["lowpass", "highpass", "bandpass", "off"].map((id) => `<option${id === l.filter ? " selected" : ""}>${id}</option>`).join("")}</select></label><svg class="sampler-filter" viewBox="0 0 600 160" role="img" aria-label="Filter response"></svg>` : ""}
 			${tab === "layer" ? `<div class="sampler-layer-graphs">${layers.map((item, index) => `<button type="button" data-sampler-layer="${index}" aria-pressed="${index === selected}"><span>${index + 1} · ${escape(item.name)}</span><svg viewBox="0 0 600 70" aria-hidden="true"><path d="M ${item.velocityLow * 600} 65 L ${item.fadeIn * 600} 5 L ${item.fadeOut * 600} 5 L ${item.velocityHigh * 600} 65 Z" /></svg></button>`).join("")}<small>Soft velocity → Loud velocity</small><button type="button" data-sampler-split>Split loaded layers evenly</button></div>` : ""}

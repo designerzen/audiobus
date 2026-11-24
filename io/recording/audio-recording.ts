@@ -12,6 +12,7 @@ import {
 	type RecordingBits
 } from "./recording-format"
 import { getAudioDestination } from "../audio-destination"
+import { convertAudioMedia, type AudioExportFormat } from "../media/audio-media"
 
 // A plain URL rather than a bundler-specific import, so Vite and Parcel both emit the worklet as its own file.
 const workletURL = new URL("./recording.worklet.js", import.meta.url).href
@@ -271,6 +272,23 @@ export class AudioRecording extends EventTarget {
 			this.node = undefined
 		}
 		this.stopped = undefined
+	}
+
+	/** Compressed exports read the retained float WAV incrementally and can stream directly to disk. */
+	async exportAudio(
+		format: AudioExportFormat,
+		onProgress?: (progress: number) => void,
+		destination?: FileSystemWritableFileStream
+	): Promise<Blob | undefined> {
+		if (format === "16" || format === "32") {
+			const blob = await this.wave(format === "16" ? 16 : 32)
+			if (destination) {
+				await blob.stream().pipeTo(destination)
+				return
+			}
+			return blob
+		}
+		return convertAudioMedia(await this.wave(32), format, onProgress, destination)
 	}
 
 	async wave(bits: RecordingBits): Promise<Blob> {
