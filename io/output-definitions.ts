@@ -262,6 +262,24 @@ export const OUTPUT_DEFINITIONS: Record<string, OutputDefinition> = {
 		icon: "/icons/device-instrument.svg",
 		category: "Synthesis"
 	},
+	[OUTPUT_TYPES.PDE]: {
+		id: OUTPUT_TYPES.PDE,
+		type: "engine",
+		subtype: "instrument",
+		name: "PDE",
+		description: "Heat, wave, Maxwell, Euler, Schrödinger, beam and reaction-diffusion modes",
+		icon: "/icons/device-instrument.svg",
+		category: "Synthesis"
+	},
+	[OUTPUT_TYPES.EQUATIONS]: {
+		id: OUTPUT_TYPES.EQUATIONS,
+		type: "engine",
+		subtype: "instrument",
+		name: "Equations",
+		description: "Waveforms from Fourier series, special functions, curves, chaos and number theory",
+		icon: "/icons/device-instrument.svg",
+		category: "Synthesis"
+	},
 	[OUTPUT_TYPES.WAVEGUIDE]: {
 		id: OUTPUT_TYPES.WAVEGUIDE,
 		type: "engine",

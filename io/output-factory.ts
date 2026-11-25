@@ -89,6 +89,10 @@ const loadSupportingLibrary = async (type: string) => {
 			return await import("./outputs/output-zeta.ts")
 		case OUTPUT_TYPES.MONOTRON:
 			return await import("./outputs/output-monotron.ts")
+		case OUTPUT_TYPES.PDE:
+			return await import("./outputs/output-pde.ts")
+		case OUTPUT_TYPES.EQUATIONS:
+			return await import("./outputs/output-equations.ts")
 		case OUTPUT_TYPES.WAVEGUIDE:
 			return await import("./outputs/output-waveguide.ts")
 		case OUTPUT_TYPES.MULTI_OSCILLATOR:
@@ -317,7 +321,7 @@ export const OUTPUT_FACTORIES: OutputFactory[] = [
 		...requiring("audioWorklet"),
 		create: (options) => createOutput(OUTPUT_TYPES.FM, options)
 	},
-	...[OUTPUT_TYPES.ZETA, OUTPUT_TYPES.MONOTRON, OUTPUT_TYPES.WAVEGUIDE, OUTPUT_TYPES.MULTI_OSCILLATOR].map((id) => ({
+	...[OUTPUT_TYPES.ZETA, OUTPUT_TYPES.MONOTRON, OUTPUT_TYPES.PDE, OUTPUT_TYPES.EQUATIONS, OUTPUT_TYPES.WAVEGUIDE, OUTPUT_TYPES.MULTI_OSCILLATOR].map((id) => ({
 		...OUTPUT_DEFINITIONS[id],
 		...requiring("webAudio"),
 		create: (options?: Record<string, any>) => createOutput(id, options)

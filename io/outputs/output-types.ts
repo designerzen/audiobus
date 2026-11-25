@@ -29,6 +29,8 @@ export const MOOG = "moog" as const
 export const FM = "fm" as const
 export const ZETA = "zeta" as const
 export const MONOTRON = "monotron" as const
+export const PDE = "pde" as const
+export const EQUATIONS = "equations" as const
 export const WAVEGUIDE = "waveguide" as const
 export const MULTI_OSCILLATOR = "multi-oscillator" as const
 export const TB303 = "tb303" as const
@@ -83,6 +85,8 @@ export type OutputId =
 	| typeof FM
 	| typeof ZETA
 	| typeof MONOTRON
+	| typeof PDE
+	| typeof EQUATIONS
 	| typeof WAVEGUIDE
 	| typeof MULTI_OSCILLATOR
 	| typeof TB303
