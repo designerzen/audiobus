@@ -1,11 +1,17 @@
 import {
 	Peer,
 	windowTransport,
+	midiTransport,
+	findMidiPort,
 	assertPeerOrigin,
 	generatePairingCode,
 	formatPairingCode,
 	normalizePairingCode,
-	type CommandRegistry
+	normalizeSecret,
+	isInitializeRequest,
+	type CommandRegistry,
+	type MidiAccessLike,
+	type Transport
 } from "audiobus-protocol"
 import AbstractInput from "./abstract-input"
 import { getProtocolRegistry } from "../protocol-registry"
@@ -14,15 +20,32 @@ import { joinUnpaired, unpairedPeers, unpairedSessionCount } from "../protocol-u
 import { midiToCommand } from "../../midi/midi-command-conversion"
 import { umpToCommand } from "../../midi/ump-codec"
 import { ProtocolMidiState, type ProtocolPacket } from "../protocol-midi-state"
-import { changed, devicePanel } from "../device-controls"
+import { changed, devicePanel, numberControl } from "../device-controls"
 import { EVENT_CHANGE, EVENT_CLICK } from "../../events/event-constants"
 
 export { MAX_UNPAIRED_PEERS } from "../protocol-unpaired"
+
+/** Random characters in a generated MIDI port secret: 60 bits, beyond practical guessing. */
+export const MIDI_SECRET_LENGTH = 12
+
+/** Groups of four, like pairing codes, keeping every character the transport uses. */
+const formatSecret = (secret: string) =>
+	(normalizeSecret(secret).match(/.{1,4}/gu) ?? []).join("-")
+
+const portOption = (name: string) => {
+	const option = document.createElement("option")
+	option.value = option.textContent = name
+	return option
+}
 
 /**
  * Application control, MIDI commands and WebMidiLink MIDI, listening by default. With
  * `acceptUnpaired: false`, connections require an explicitly attached application; otherwise
  * those sessions are shared by every Input that accepts them, so each command executes once.
+ *
+ * Set `midiPort` (with optional `midiRoom` and `midiSecret`) to also listen on a loopback MIDI
+ * port, for applications that cannot reach this window, such as cross-origin isolated pages that
+ * use SharedArrayBuffer. With a secret, the port is encrypted and only its holder is heard.
  */
 export default class InputProtocol extends AbstractInput {
 	readonly requiresConnectionControl = false
@@ -30,8 +53,12 @@ export default class InputProtocol extends AbstractInput {
 	private origin?: string
 	private requiredCode?: string
 	private peer?: Peer
+	private midiPortPeer?: Peer
+	private midiPortError?: string
+	private midiAccess?: Promise<MidiAccessLike>
 	private leaveUnpaired?: () => void
 	private midiState = new ProtocolMidiState()
+	private midiPortState = new ProtocolMidiState()
 	/** Notes held by each unpaired session, released when that session ends. */
 	private sessionStates = new Map<number, ProtocolMidiState>()
 	private status?: HTMLElement
@@ -53,6 +80,10 @@ export default class InputProtocol extends AbstractInput {
 	get connection(): Peer | undefined {
 		return this.peer
 	}
+	/** The connection listening on a MIDI port, when `midiPort` is set. */
+	get midiPortConnection(): Peer | undefined {
+		return this.midiPortPeer
+	}
 	/** Connections from windows that sent messages without pairing. */
 	get unpairedConnections(): Peer[] {
 		return this.leaveUnpaired ? unpairedPeers() : []
@@ -63,7 +94,7 @@ export default class InputProtocol extends AbstractInput {
 	}
 	constructor(options: Record<string, any> = {}) {
 		super({ acceptUnpaired: true, now: () => performance.now() / 1000, ...options })
-		if (this.options.acceptUnpaired && this.options.autoConnect !== false) {
+		if ((this.options.acceptUnpaired || this.options.midiPort) && this.options.autoConnect !== false) {
 			void this.connect().catch((error) => this.report(error, "connect"))
 		}
 	}
@@ -92,17 +123,29 @@ export default class InputProtocol extends AbstractInput {
 		this.origin = origin
 		this.requiredCode = code
 	}
-	private createPairedPeer(target: Window, origin: string): Peer {
+	private createPeer(
+		transport: Transport,
+		state: ProtocolMidiState,
+		options: { requirePairingCode?: string; onAuthorized?: () => void; onClosed: () => void }
+	): Peer {
 		const commands = new LayeredRegistry(this.registry)
 		registerMidiCommands(commands, (bytes) =>
-			this.receivePacket({ format: "midi", data: bytes }, this.midiState)
+			this.receivePacket({ format: "midi", data: bytes }, state)
 		)
-		const peer: Peer = new Peer(windowTransport(target, origin), {
+		return new Peer(transport, {
 			identity: this.identity,
 			registry: commands,
 			getPatch: this.options.getPatch,
 			setPatch: this.options.setPatch,
 			ump: true,
+			...options,
+			onError: (error, context) => this.report(error, context),
+			onMidi: (bytes) => this.receivePacket({ format: "midi", data: Array.from(bytes) }, state),
+			onUmp: (words) => this.receivePacket({ format: "ump", data: words }, state)
+		})
+	}
+	private createPairedPeer(target: Window, origin: string): Peer {
+		const peer: Peer = this.createPeer(windowTransport(target, origin), this.midiState, {
 			requirePairingCode: this.requiredCode,
 			onAuthorized: () => {
 				if (this.peer === peer && this.status) {
@@ -119,13 +162,82 @@ export default class InputProtocol extends AbstractInput {
 					this.status.textContent =
 						"The other application closed the connection. Press Connect to pair again."
 				}
-			},
-			onError: (error, context) => this.report(error, context),
-			onMidi: (bytes) =>
-				this.receivePacket({ format: "midi", data: Array.from(bytes) }, this.midiState),
-			onUmp: (words) => this.receivePacket({ format: "ump", data: words }, this.midiState)
+			}
 		})
 		return peer
+	}
+	private requestMidiAccess(): Promise<MidiAccessLike> {
+		const request: ((options: { sysex: boolean }) => Promise<MidiAccessLike>) | undefined =
+			this.options.requestMIDIAccess ??
+			(navigator as any).requestMIDIAccess?.bind(navigator)
+		if (!request) {
+			return Promise.reject(new Error("This browser has no Web MIDI"))
+		}
+		// Protocol messages travel as SysEx, so the port needs SysEx permission.
+		this.midiAccess ??= request({ sysex: true }).catch((error: unknown) => {
+			this.midiAccess = undefined
+			throw error
+		})
+		return this.midiAccess
+	}
+	/** Names of MIDI ports with an input and an output of the same name, such as loopback ports. */
+	async midiPortNames(): Promise<string[]> {
+		const access = await this.requestMidiAccess()
+		const names = [...access.outputs.values()].map((port) => port.name ?? "")
+		return names.filter(
+			(name, index) => name && names.indexOf(name) === index && findMidiPort(access, name)
+		)
+	}
+	/** Listens on the configured MIDI port; failures are shown in the status, not thrown. */
+	private async openMidiPort(generation: number): Promise<void> {
+		const name: string = this.options.midiPort
+		this.midiPortError = undefined
+		try {
+			const access = await this.requestMidiAccess()
+			const port = findMidiPort(access, name)
+			if (!port) {
+				throw new Error(`MIDI port "${name}" was not found`)
+			}
+			if (generation !== this.generation) {
+				return
+			}
+			const secret = this.midiSecret
+			const transport = midiTransport(port.input, port.output, {
+				room: this.options.midiRoom ?? 0,
+				secret: secret || undefined
+			})
+			const releaseNotes = () => {
+				for (const release of this.midiPortState.release()) {
+					this.dispatchPacket(release)
+				}
+			}
+			const peer: Peer = this.createPeer(
+				{
+					send: (message) => transport.send(message),
+					// A new connection, such as a reloaded application taking over without saying
+					// goodbye, releases the notes the previous one held.
+					listen: (receive) =>
+						transport.listen((message) => {
+							if (typeof message === "string" && isInitializeRequest(message)) {
+								releaseNotes()
+							}
+							receive(message)
+						})
+				},
+				this.midiPortState,
+				// Keep listening: the other application may reconnect, for example after a reload.
+				{ onClosed: releaseNotes }
+			)
+			this.midiPortPeer = peer
+		} catch (error) {
+			if (generation === this.generation) {
+				this.midiPortError = error instanceof Error ? error.message : String(error)
+				this.report(error, "MIDI port")
+			}
+		}
+	}
+	private get midiSecret(): string {
+		return normalizeSecret(String(this.options.midiSecret ?? ""))
 	}
 	private report(error: unknown, context: string): void {
 		console.warn(`audioBus Protocol input: ${context}`, error)
@@ -153,7 +265,7 @@ export default class InputProtocol extends AbstractInput {
 			return
 		}
 		const unpaired = this.options.acceptUnpaired === true
-		if ((!this.target || !this.origin) && !unpaired) {
+		if ((!this.target || !this.origin) && !unpaired && !this.options.midiPort) {
 			throw new Error(
 				"Pair an application window and exact origin using attach() first, or accept unpaired control"
 			)
@@ -172,6 +284,13 @@ export default class InputProtocol extends AbstractInput {
 				changed: () => this.updateStatus(),
 				onError: (error, context) => this.report(error, context)
 			})
+		}
+		// Only wait when there is a port, so window connections start synchronously as before.
+		if (this.options.midiPort) {
+			await this.openMidiPort(generation)
+			if (generation !== this.generation) {
+				return
+			}
 		}
 		if (!this.target || !this.origin) {
 			this.setAsConnected()
@@ -208,7 +327,14 @@ export default class InputProtocol extends AbstractInput {
 		const unpaired = this.leaveUnpaired
 			? `Listening for connections (${unpairedSessionCount()} connected).`
 			: ""
-		return [paired, unpaired].filter(Boolean).join(" ")
+		const port = this.midiPortError
+			? `MIDI port: ${this.midiPortError}.`
+			: this.midiPortPeer
+				? this.midiSecret
+					? `Listening on MIDI port ${this.options.midiPort}, encrypted with secret ${formatSecret(this.midiSecret)}.`
+					: `Listening on MIDI port ${this.options.midiPort} without a secret: anything on the port can read and send.`
+				: ""
+		return [paired, unpaired, port].filter(Boolean).join(" ")
 	}
 	private updateStatus(): void {
 		if (this.status) {
@@ -243,16 +369,120 @@ export default class InputProtocol extends AbstractInput {
 		this.generation++
 		this.peer?.close()
 		this.peer = undefined
+		this.midiPortPeer?.close()
+		this.midiPortPeer = undefined
 		this.leaveUnpaired?.()
 		this.leaveUnpaired = undefined
 		for (const session of this.sessionStates.keys()) {
 			this.endSession(session)
 		}
-		for (const release of this.midiState.release()) {
-			this.dispatchPacket(release)
+		for (const state of [this.midiState, this.midiPortState]) {
+			for (const release of state.release()) {
+				this.dispatchPacket(release)
+			}
 		}
 		this.setAsDisconnected()
 		this.updateStatus()
+	}
+	/** Applies changed settings to a running connection, or starts one when asked. */
+	private reconnect(start: boolean): void {
+		const wasConnected = this.isConnected
+		void this.disconnect()
+		// Any later disconnect, connect or destroy changes the generation and cancels this.
+		const generation = this.generation
+		const possible = Boolean(this.target || this.options.acceptUnpaired || this.options.midiPort)
+		if ((wasConnected || start) && possible) {
+			queueMicrotask(() => {
+				if (generation === this.generation && !this.destroyed) {
+					this.connect().catch((error) => {
+						if (this.status) {
+							this.status.textContent = error instanceof Error ? error.message : String(error)
+						}
+					})
+				}
+			})
+		}
+	}
+	private createMidiPortGui(): HTMLElement {
+		const fieldset = document.createElement("fieldset")
+		const legend = document.createElement("legend")
+		legend.textContent = "MIDI port connection"
+		const help = document.createElement("small")
+		help.textContent =
+			"For applications that cannot open or embed this window, such as ones isolated for SharedArrayBuffer. Both choose the same loopback port (loopMIDI, IAC Driver), room and secret."
+		const portLabel = document.createElement("label")
+		const port = document.createElement("select")
+		const current = this.options.midiPort as string | undefined
+		if (current) {
+			port.append(portOption(current))
+		}
+		portLabel.append("Port ", port)
+		const find = document.createElement("button")
+		find.type = "button"
+		find.textContent = "Find MIDI ports"
+		find.addEventListener(EVENT_CLICK, async () => {
+			try {
+				const names = await this.midiPortNames()
+				port.replaceChildren(...names.map(portOption))
+				if (current && names.includes(current)) {
+					port.value = current
+				}
+				if (!names.length && this.status) {
+					this.status.textContent =
+						"No port has an input and an output with the same name. Create a loopback port and try again."
+				}
+			} catch (error) {
+				if (this.status) {
+					this.status.textContent = error instanceof Error ? error.message : String(error)
+				}
+			}
+		})
+		fieldset.append(legend, help, portLabel, find)
+		let room = Number(this.options.midiRoom ?? 0)
+		numberControl(fieldset, "Room", room, 0, 127, (value) => (room = value))
+		const secretLabel = document.createElement("label")
+		const secret = document.createElement("input")
+		secret.autocomplete = "off"
+		secret.spellcheck = false
+		secret.value = this.options.midiSecret
+			? formatSecret(this.options.midiSecret)
+			: formatPairingCode(generatePairingCode(MIDI_SECRET_LENGTH))
+		secretLabel.append("Secret ", secret)
+		const regenerate = document.createElement("button")
+		regenerate.type = "button"
+		regenerate.textContent = "New secret"
+		regenerate.addEventListener(EVENT_CLICK, () => {
+			secret.value = formatPairingCode(generatePairingCode(MIDI_SECRET_LENGTH))
+		})
+		const use = document.createElement("button")
+		use.type = "button"
+		use.textContent = "Listen on this port"
+		use.addEventListener(EVENT_CLICK, () => {
+			if (!port.value) {
+				if (this.status) {
+					this.status.textContent = "Find MIDI ports and choose one first."
+				}
+				return
+			}
+			this.options.midiPort = port.value
+			this.options.midiRoom = room
+			this.options.midiSecret = normalizeSecret(secret.value)
+			changed(this)
+			this.reconnect(true)
+		})
+		const stop = document.createElement("button")
+		stop.type = "button"
+		stop.textContent = "Stop listening on MIDI"
+		stop.addEventListener(EVENT_CLICK, () => {
+			delete this.options.midiPort
+			changed(this)
+			this.reconnect(false)
+		})
+		const warning = document.createElement("small")
+		warning.textContent =
+			"Type the same secret into the other application. Without a secret, any software using the port can read and send."
+		fieldset.append(secretLabel, regenerate, warning, use, stop)
+		return fieldset
 	}
 	async createGui(): Promise<HTMLElement> {
 		if (this.gui) {
@@ -332,26 +562,10 @@ export default class InputProtocol extends AbstractInput {
 			pairing.hidden = unpaired.checked
 			this.options.acceptUnpaired = unpaired.checked
 			changed(this)
-			// Apply the change to a running connection. Any later disconnect, connect or destroy
-			// changes the generation and cancels this reconnect.
-			const wasConnected = this.isConnected
-			void this.disconnect()
-			const generation = this.generation
-			if ((wasConnected || unpaired.checked) && (this.target || unpaired.checked)) {
-				queueMicrotask(() => {
-					if (generation === this.generation && !this.destroyed) {
-						this.connect().catch((error) => {
-							if (this.status) {
-								this.status.textContent =
-									error instanceof Error ? error.message : String(error)
-							}
-						})
-					}
-				})
-			}
+			this.reconnect(unpaired.checked)
 		})
 		pairing.append(label, open, opener, connection)
-		advanced.append(summary, unpairedLabel, warning, pairing)
+		advanced.append(summary, unpairedLabel, warning, pairing, this.createMidiPortGui())
 		this.gui.append(this.status, advanced)
 		return this.gui
 	}

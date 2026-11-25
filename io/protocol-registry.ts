@@ -6,6 +6,8 @@ export {
 	ProtocolError,
 	Peer,
 	windowTransport,
+	midiTransport,
+	secureTransport,
 	generatePairingCode,
 	formatPairingCode,
 	normalizePairingCode,
