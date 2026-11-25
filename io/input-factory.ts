@@ -167,7 +167,6 @@ export const INPUT_FACTORIES: InputFactory[] = [
 	})),
 	...[
 		INPUT_TYPES.SCALE_EXPLORER,
-		INPUT_TYPES.COMPOSER,
 		INPUT_TYPES.STEP_SEQUENCER,
 		INPUT_TYPES.PADS,
 		INPUT_TYPES.CHANNEL_TRIGGER,
@@ -179,6 +178,11 @@ export const INPUT_FACTORIES: InputFactory[] = [
 		...requiring(),
 		create: (options?: Record<string, any>) => createInput(id, options)
 	})),
+	{
+		...INPUT_DEFINITIONS[INPUT_TYPES.COMPOSER],
+		...requiring("page", "webComponents"),
+		create: (options?: Record<string, any>) => createInput(INPUT_TYPES.COMPOSER, options)
+	},
 	{
 		...INPUT_DEFINITIONS[INPUT_TYPES.MICROPHONE_TRIGGER],
 		...requiring("mediaDevices", "webAudio"),

@@ -764,13 +764,13 @@ export class IOChainManager extends EventTarget {
 				input.stopClock?.()
 			}
 		}
-		this.#timedInputs = inputs
-		if (!this.#inputTransportRunning) {
-			for (const input of inputs) {
+		for (const input of inputs) {
+			if (!this.#inputTransportRunning || !this.#timedInputs.has(input)) {
 				input.startClock?.()
 			}
-			this.#inputTransportRunning = true
 		}
+		this.#timedInputs = inputs
+		this.#inputTransportRunning = true
 		for (const input of inputs) {
 			input.updateTime?.(now)
 		}

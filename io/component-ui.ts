@@ -45,7 +45,7 @@ export function fieldsDescriptor(fields: FieldConfig[]): UiDescriptor {
 							: field.type === "select"
 								? "select"
 								: field.type === "number"
-									? "number"
+									? "slider"
 									: "text",
 					min: field.min ?? (field.type === "number" ? -1000000 : undefined),
 					max: field.max ?? (field.type === "number" ? 1000000 : undefined),
