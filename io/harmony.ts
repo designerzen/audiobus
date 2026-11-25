@@ -12,11 +12,28 @@ import {
 	type ScaleFormula
 } from "../tuning/keys.ts"
 
+export interface HarmonyChordSymbol {
+	tonic: number
+	accidental: number
+	type: number
+	alterations: Array<{ type: 1 | 2 | 3 | 4; degree: number }>
+	bassTonic: number
+	bassAccidental: number
+	bassType: number
+	bassAlterations: Array<{ type: 1 | 2 | 3 | 4; degree: number }>
+}
+
 /** Masks are absolute pitch classes (bit 0 = C), independent of the tonic. */
 export interface HarmonicState {
+	/** Key tonic. Chord changes must not change this field. */
 	root: number
 	scale: number
 	chord: number
+	/** Defaults to the key tonic for older projects. */
+	chordRoot?: number
+	/** Original spelling; -8/0 explicitly denotes an unknown signature/tonic. */
+	keySignature?: { sharpsOrFlats: number; tonic: number }
+	chordSymbol?: HarmonyChordSymbol
 	/** Optional slash-chord bass pitch class (0-11), e.g. from MIDI 2.0 Flex Data Set Chord Name. */
 	bass?: number
 }
@@ -49,6 +66,36 @@ export function parseHarmony(value: unknown): HarmonicState {
 		root: state.root,
 		scale: pitchSetMask(state.scale),
 		chord: pitchSetMask(state.chord)
+	}
+	if (state.chordRoot !== undefined) {
+		if (!Number.isInteger(state.chordRoot) || state.chordRoot < 0 || state.chordRoot > 11) {
+			throw new Error("Chord root must be a pitch class from 0 to 11")
+		}
+		parsed.chordRoot = state.chordRoot
+	}
+	if (state.keySignature !== undefined) {
+		const { sharpsOrFlats, tonic } = state.keySignature
+		if (!Number.isInteger(sharpsOrFlats) || sharpsOrFlats < -8 || sharpsOrFlats > 7 ||
+			!Number.isInteger(tonic) || tonic < 0 || tonic > 7) {
+			throw new Error("Invalid key signature")
+		}
+		parsed.keySignature = { sharpsOrFlats, tonic }
+	}
+	if (state.chordSymbol !== undefined) {
+		const symbol = state.chordSymbol
+		const valid = (n: number, min: number, max: number) => Number.isInteger(n) && n >= min && n <= max
+		const alterations = (items: HarmonyChordSymbol["alterations"], max: number) => {
+			if (!Array.isArray(items) || items.length > max || items.some(a => !a || !valid(a.type, 1, 4) || !valid(a.degree, 1, 15))) {
+				throw new Error("Invalid chord alterations")
+			}
+			return items.map(({ type, degree }) => ({ type, degree }))
+		}
+		if (!symbol || !valid(symbol.tonic, 0, 7) || !valid(symbol.accidental, -2, 2) ||
+			!valid(symbol.type, 0, 27) || !valid(symbol.bassTonic, 0, 7) ||
+			!(valid(symbol.bassAccidental, -2, 2) || symbol.bassAccidental === -8) || !valid(symbol.bassType, 0, 27)) {
+			throw new Error("Invalid chord symbol")
+		}
+		parsed.chordSymbol = { ...symbol, alterations: alterations(symbol.alterations, 4), bassAlterations: alterations(symbol.bassAlterations, 2) }
 	}
 	if (state.bass !== undefined) {
 		if (!Number.isInteger(state.bass) || state.bass < 0 || state.bass > 11) {
@@ -104,7 +151,11 @@ export function sectionAt(sections: HarmonicSection[], beat: number): HarmonicSe
 	}
 }
 export function sameHarmony(a: HarmonicState, b: HarmonicState): boolean {
-	return a.root === b.root && a.scale === b.scale && a.chord === b.chord && a.bass === b.bass
+	return a.root === b.root && a.scale === b.scale && a.chord === b.chord && a.bass === b.bass &&
+		(a.chordRoot ?? a.root) === (b.chordRoot ?? b.root) &&
+		a.keySignature?.sharpsOrFlats === b.keySignature?.sharpsOrFlats &&
+		a.keySignature?.tonic === b.keySignature?.tonic
+		&& JSON.stringify(a.chordSymbol) === JSON.stringify(b.chordSymbol)
 }
 export function scaleNeighbours(state: HarmonicState) {
 	return SCALE_FAMILIES.flatMap((family) =>

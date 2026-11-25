@@ -17,11 +17,11 @@ export {
 	EVENT_CHAINS_UPDATED
 } from "../events/event-constants.ts"
 import { compressToBase64, decompressFromBase64 } from "lz-string"
-import { chordAt, defaultMusicTools, parseMusicTools, type MusicToolsState } from "./music-tools"
+import { chordAt, defaultMusicTools, parseMusicTools, parseMusicalTiming, type MusicalTiming, type MusicToolsState } from "./music-tools"
 import { TransformerChordTrack } from "./transformers/transformer-chord-track"
 import { TransformerImprovPartner } from "./transformers/transformer-improv-partner"
 import { EVENT_WORKSPACE_RESTORED } from "../events/event-constants"
-import { EVENT_HARMONY_CHANGED, EVENT_HARMONY_SETTINGS_CHANGED } from "../events/event-constants"
+import { EVENT_HARMONY_CHANGED, EVENT_HARMONY_SETTINGS_CHANGED, EVENT_MUSICAL_TIMING_CHANGED } from "../events/event-constants"
 import { parseHarmony, sameHarmony, sectionAt, type HarmonicState } from "./harmony"
 import { deviceId, deviceDefinition, defineDevice } from "./device-definition"
 import { restoreDevice, UnavailableDevice, type SavedDevice } from "./workspace-devices"
@@ -122,16 +122,25 @@ export class IOChainManager extends EventTarget {
 		}
 	}
 	get harmony(): HarmonicState {
-		return { ...this.#musicTools.harmony }
+		return parseHarmony(this.#musicTools.harmony)
 	}
-	setHarmony(value: HarmonicState): void {
+	get musicalTiming(): MusicalTiming {
+		return parseMusicalTiming(this.#musicTools.timing ?? {})
+	}
+	setMusicalTiming(value: MusicalTiming, source = "local"): void {
+		const next = parseMusicalTiming(value)
+		if (JSON.stringify(next) === JSON.stringify(this.musicalTiming)) return
+		this.#musicTools.timing = next
+		this.dispatchEvent(new CustomEvent(EVENT_MUSICAL_TIMING_CHANGED, { detail: { source } }))
+	}
+	setHarmony(value: HarmonicState, source = "local"): void {
 		const next = parseHarmony(value)
 		if (sameHarmony(next, this.#musicTools.harmony)) {
 			return
 		}
 		this.#musicTools.harmony = next
 		this.applyHarmony()
-		this.dispatchEvent(new Event(EVENT_HARMONY_CHANGED))
+		this.dispatchEvent(new CustomEvent(EVENT_HARMONY_CHANGED, { detail: { source } }))
 	}
 	private applyHarmony(): void {
 		for (const chain of this.chains) {

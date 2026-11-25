@@ -1,5 +1,8 @@
 import { devicePanel } from "../device-controls"
-import { PerformanceTransformer, type Settings, type Voice } from "./performance-transformer"
+import { PerformanceTransformer, copyCommand, noteKey, type Settings, type Voice } from "./performance-transformer"
+import { PER_NOTE_CONTROLLER, PER_NOTE_PITCH_BEND } from "../../commands/commands"
+import { POLYPHONIC_PRESSURE } from "../../midi/midi-command-conversion"
+import type { IAudioCommand } from "../../commands/audio-command-interface"
 import { chordAt, DEFAULT_CHORDS, parseProgression, type ChordStep } from "../music-tools"
 import { pitchClasses, quantisePitchSet, mod12 } from "../../tuning/pitch-class-set"
 import { DEFAULT_HARMONY, parseHarmony, type HarmonicState } from "../harmony"
@@ -90,7 +93,7 @@ export class TransformerChordTrack extends PerformanceTransformer {
 		super(
 			{
 				role: "melody",
-				follow: "chord",
+					follow: "chord",
 				source: "track",
 				mapping: "nearest",
 				repitch: 0,
@@ -104,7 +107,7 @@ export class TransformerChordTrack extends PerformanceTransformer {
 					values: ["track", "live"],
 					help: "Track uses the chord progression. Live follows the Harmony workspace or conductor."
 				},
-				{ name: "follow", label: "Melody follows", values: ["chord", "scale"] },
+				{ name: "follow", label: "Melody follows", values: ["chord", "scale", "free"] },
 				{ name: "role", label: "Follow as", values: ["melody", "bass", "chords"] },
 				{
 					name: "mapping",
@@ -144,12 +147,13 @@ export class TransformerChordTrack extends PerformanceTransformer {
 		this.beat = beat
 	}
 	private targetPitches(input: number): number[] {
+		if (this.options.follow === "free") return [input]
 		const step = chordAt(this.progression, this.beat)
 		const live = this.options.source === "live"
 		const chord = live
 			? {
 					mask: this.harmony.chord,
-					root: this.harmony.root,
+					root: this.harmony.chordRoot ?? this.harmony.root,
 					scale: this.harmony.scale,
 					bass: this.harmony.bass
 				}
@@ -230,6 +234,19 @@ export class TransformerChordTrack extends PerformanceTransformer {
 	}
 	protected noteOn(voice: Voice) {
 		return this.targetPitches(voice.input.number).map((pitch) => this.start(voice, pitch))
+	}
+	protected override noteOff(voice: Voice, command: IAudioCommand): IAudioCommand[] {
+		return this.release(voice, command.startAt).map(target => copyCommand(command, { number: target.number }))
+	}
+	protected override other(command: IAudioCommand): IAudioCommand[] {
+		if (![PER_NOTE_CONTROLLER, PER_NOTE_PITCH_BEND, POLYPHONIC_PRESSURE].includes(command.type)) return [command]
+		const targets = new Set<number>()
+		for (const voice of this.voices) {
+			if (!voice.released && noteKey(voice.input) === noteKey(command)) {
+				for (const target of voice.targets) targets.add(target.number)
+			}
+		}
+		return [...targets].map(number => copyCommand(command, { number }))
 	}
 	protected clearState() {
 		this.beat = 0

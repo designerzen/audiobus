@@ -32,8 +32,8 @@ export const numbers = (min: number, max: number, step = 1) =>
 export const clamp = (value: number, min: number, max: number) =>
 	Math.max(min, Math.min(max, value))
 export const noteKey = (command: IAudioCommand) =>
-	`${command.from ?? ""}:${command.channel ?? 1}:${command.number}`
-export const routeKey = (command: IAudioCommand) => `${command.from ?? ""}:${command.channel ?? 1}`
+	`${routeKey(command)}:${command.number}`
+export const routeKey = (command: IAudioCommand) => `${command.from ?? ""}:${command.midiGroup ?? 0}:${command.channel ?? 1}`
 export const isNoteOn = (command: IAudioCommand) => command.type === NOTE_ON && command.velocity > 0
 export const isNoteOff = (command: IAudioCommand) =>
 	command.type === NOTE_OFF || (command.type === NOTE_ON && command.velocity === 0)
@@ -48,10 +48,16 @@ export function copyCommand(
 	changes: Partial<IAudioCommand> = {}
 ): IAudioCommand {
 	const copy = Object.assign(cloneAudioCommand(command), changes)
-	// Generated messages must not retain a different message's native encoding.
+	// Preserve native precision only when the message remains in the same family.
+	// commandToUmp applies changed pitch, channel, velocity and note-on/off status.
 	copy.raw = new Uint8Array()
-	delete copy.ump
-	delete copy.umpOriginal
+	const type = (copy.ump?.[0] ?? 0) >>> 28
+	const status = ((copy.ump?.[0] ?? 0) >>> 20) & 15
+	const note = (status === 8 || status === 9) && (copy.type === NOTE_ON || copy.type === NOTE_OFF)
+	if (type !== 4 || (!note && copy.type !== command.type)) {
+		delete copy.ump
+		delete copy.umpOriginal
+	}
 	return copy
 }
 

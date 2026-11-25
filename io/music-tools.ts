@@ -8,6 +8,21 @@ import {
 } from "./harmony"
 import { NOTE_ON, NOTE_OFF } from "../commands/commands"
 import { clipCommand, parseEventClip, type EventClip } from "./event-clip"
+import { encodeFlexTimeSignatureUmp, encodeFlexMetronomeUmp, type FlexTimeSignature, type FlexMetronome } from "../midi/flex-data"
+
+export interface MusicalTiming {
+	timeSignature?: FlexTimeSignature
+	metronome?: FlexMetronome
+}
+export function parseMusicalTiming(value: MusicalTiming): MusicalTiming {
+	if (!value || typeof value !== "object") throw new Error("Invalid musical timing")
+	if (value.timeSignature) encodeFlexTimeSignatureUmp(value.timeSignature)
+	if (value.metronome) encodeFlexMetronomeUmp(value.metronome)
+	return {
+		...(value.timeSignature ? { timeSignature: { numerator: value.timeSignature.numerator, denominator: value.timeSignature.denominator, thirtySecondNotes: value.timeSignature.thirtySecondNotes } } : {}),
+		...(value.metronome ? { metronome: { clocksPerClick: value.metronome.clocksPerClick, barAccents: [...value.metronome.barAccents], subdivisions: [...value.metronome.subdivisions] } as FlexMetronome } : {})
+	}
+}
 
 export interface ChordStep {
 	mask: number
@@ -35,6 +50,7 @@ export interface GrooveTemplate {
 }
 export interface MusicToolsState {
 	version: 1
+	timing?: MusicalTiming
 	harmony: HarmonicState
 	sections: HarmonicSection[]
 	playSections: boolean
@@ -143,6 +159,7 @@ export function parseMusicTools(value: unknown): MusicToolsState {
 	return {
 		version: 1,
 		harmony: parseHarmony(data.harmony ?? DEFAULT_HARMONY),
+		...(data.timing ? { timing: parseMusicalTiming(data.timing) } : {}),
 		sections: parseSections(data.sections ?? []),
 		playSections: data.playSections === true,
 		progression: parseProgression(data.progression),

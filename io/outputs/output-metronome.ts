@@ -105,19 +105,22 @@ export default class OutputMetronome extends EventTarget implements IAudioOutput
 		this.#beatsPerMeasure = beatsPerMeasure
 		this.#playClick(contextTime)
 	}
+	playMusicalClick(accent: boolean, secondary: boolean, contextTime?: number): void {
+		this.#playClick(contextTime, accent, secondary)
+	}
 
 	/**
 	 * Play a click sound
 	 */
-	#playClick(contextTime?: number): void {
+	#playClick(contextTime?: number, accent?: boolean, secondary = false): void {
 		if (!this.#audioContext || !this.#gainNode) {
 			return
 		}
 
 		try {
 			// Accent the first beat of each measure.
-			const isDownbeat = this.#beatCounter % this.#beatsPerMeasure === 0
-			const frequency = isDownbeat ? this.#accentFrequency : this.#frequency
+			const isDownbeat = accent ?? this.#beatCounter % this.#beatsPerMeasure === 0
+			const frequency = isDownbeat ? this.#accentFrequency : secondary ? this.#frequency * 0.75 : this.#frequency
 			const displayColor = isDownbeat ? this.#accentColor : this.#normalColor
 
 			// Create and play oscillator

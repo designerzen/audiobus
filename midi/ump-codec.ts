@@ -95,6 +95,10 @@ export function commandToUmp(command: IAudioCommand): number[] {
 				((command.type === NOTE_OFF ? 8 : 9) << 20) |
 				(note << 8)) >>>
 			0
+		if (command.type === NOTE_ON && (words[0] & 255) === 3 && note !== original.number) {
+			const pitch = Math.max(0, Math.min(65535, (words[1] & 0xffff) + (note - original.number) * 512))
+			words[1] = ((words[1] & 0xffff0000) | pitch) >>> 0
+		}
 		if (command.velocity !== original.velocity || command.type !== original.type) {
 			const value = Math.max(0, Math.min(127, Math.round(command.velocity ?? 0)))
 			words[1] =
@@ -128,6 +132,9 @@ export function commandToUmp(command: IAudioCommand): number[] {
 				kind === 6
 					? scaleCentered(Math.max(0, Math.min(16383, Math.round(command.value))), 14)
 					: scaleCentered(Math.max(0, Math.min(127, Math.round(command.value))), 7)
+		}
+		if (kind === 0 && (words[0] & 255) === 3 && command.number !== original.number) {
+			words[1] = Math.max(0, Math.min(0xffffffff, words[1] + (command.number - original.number) * 2 ** 25)) >>> 0
 		}
 	}
 	return words
