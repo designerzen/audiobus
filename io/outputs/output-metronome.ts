@@ -120,7 +120,11 @@ export default class OutputMetronome extends EventTarget implements IAudioOutput
 		try {
 			// Accent the first beat of each measure.
 			const isDownbeat = accent ?? this.#beatCounter % this.#beatsPerMeasure === 0
-			const frequency = isDownbeat ? this.#accentFrequency : secondary ? this.#frequency * 0.75 : this.#frequency
+			const frequency = isDownbeat
+				? this.#accentFrequency
+				: secondary
+					? this.#frequency * 0.75
+					: this.#frequency
 			const displayColor = isDownbeat ? this.#accentColor : this.#normalColor
 
 			// Create and play oscillator

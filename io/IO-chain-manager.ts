@@ -17,11 +17,23 @@ export {
 	EVENT_CHAINS_UPDATED
 } from "../events/event-constants.ts"
 import { compressToBase64, decompressFromBase64 } from "lz-string"
-import { chordAt, defaultMusicTools, parseMusicTools, parseMusicalTiming, type MusicalTiming, type MusicToolsState } from "./music-tools"
+import {
+	chordAt,
+	defaultMusicTools,
+	parseMusicTools,
+	parseMusicalTiming,
+	type MusicalTiming,
+	type MusicToolsState
+} from "./music-tools"
 import { TransformerChordTrack } from "./transformers/transformer-chord-track"
 import { TransformerImprovPartner } from "./transformers/transformer-improv-partner"
 import { EVENT_WORKSPACE_RESTORED } from "../events/event-constants"
-import { EVENT_HARMONY_CHANGED, EVENT_HARMONY_SETTINGS_CHANGED, EVENT_MUSICAL_TIMING_CHANGED } from "../events/event-constants"
+import {
+	EVENT_HARMONY_CHANGED,
+	EVENT_HARMONY_SETTINGS_CHANGED,
+	EVENT_MUSICAL_TIMING_CHANGED,
+	EVENT_TEMPO_CHANGED
+} from "../events/event-constants"
 import { parseHarmony, sameHarmony, sectionAt, type HarmonicState } from "./harmony"
 import { deviceId, deviceDefinition, defineDevice } from "./device-definition"
 import { restoreDevice, UnavailableDevice, type SavedDevice } from "./workspace-devices"
@@ -103,7 +115,27 @@ export class IOChainManager extends EventTarget {
 	sessionInputHandler?: (chainId: string, command: IAudioCommand) => boolean
 	sessionOutputHandler?: (chainId: string, commands: IAudioCommand[]) => boolean
 	externallyControlledTransport = false
-	externallyControlledHarmony = false
+	#legacyHarmonyControl = false
+	#harmonyOwners = new Set<string>()
+	get externallyControlledHarmony(): boolean {
+		return this.#legacyHarmonyControl || this.#harmonyOwners.size > 0
+	}
+	set externallyControlledHarmony(value: boolean) {
+		this.#legacyHarmonyControl = value
+	}
+	claimHarmonySource(source: string): boolean {
+		if (
+			this.#legacyHarmonyControl ||
+			[...this.#harmonyOwners].some((owner) => owner !== source)
+		) {
+			return false
+		}
+		this.#harmonyOwners.add(source)
+		return true
+	}
+	releaseHarmonySource(source: string): void {
+		this.#harmonyOwners.delete(source)
+	}
 	#handledControls = new WeakMap<object, boolean>()
 	#clockOutputs = new Set<IAudioOutput>()
 	#timedInputs = new Set<IAudioInput>()
@@ -127,9 +159,14 @@ export class IOChainManager extends EventTarget {
 	get musicalTiming(): MusicalTiming {
 		return parseMusicalTiming(this.#musicTools.timing ?? {})
 	}
+	notifyTempoChanged(): void {
+		this.dispatchEvent(new Event(EVENT_TEMPO_CHANGED))
+	}
 	setMusicalTiming(value: MusicalTiming, source = "local"): void {
 		const next = parseMusicalTiming(value)
-		if (JSON.stringify(next) === JSON.stringify(this.musicalTiming)) return
+		if (JSON.stringify(next) === JSON.stringify(this.musicalTiming)) {
+			return
+		}
 		this.#musicTools.timing = next
 		this.dispatchEvent(new CustomEvent(EVENT_MUSICAL_TIMING_CHANGED, { detail: { source } }))
 	}

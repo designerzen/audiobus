@@ -31,9 +31,9 @@ export const numbers = (min: number, max: number, step = 1) =>
 	Array.from({ length: Math.floor((max - min) / step) + 1 }, (_, i) => min + i * step)
 export const clamp = (value: number, min: number, max: number) =>
 	Math.max(min, Math.min(max, value))
-export const noteKey = (command: IAudioCommand) =>
-	`${routeKey(command)}:${command.number}`
-export const routeKey = (command: IAudioCommand) => `${command.from ?? ""}:${command.midiGroup ?? 0}:${command.channel ?? 1}`
+export const noteKey = (command: IAudioCommand) => `${routeKey(command)}:${command.number}`
+export const routeKey = (command: IAudioCommand) =>
+	`${command.from ?? ""}:${command.midiGroup ?? 0}:${command.channel ?? 1}`
 export const isNoteOn = (command: IAudioCommand) => command.type === NOTE_ON && command.velocity > 0
 export const isNoteOff = (command: IAudioCommand) =>
 	command.type === NOTE_OFF || (command.type === NOTE_ON && command.velocity === 0)

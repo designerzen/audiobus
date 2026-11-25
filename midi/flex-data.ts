@@ -1,4 +1,10 @@
-import { DEFAULT_HARMONY, NOTE_NAMES, parseHarmony, type HarmonicState, type HarmonyChordSymbol } from "../io/harmony.ts"
+import {
+	DEFAULT_HARMONY,
+	NOTE_NAMES,
+	parseHarmony,
+	type HarmonicState,
+	type HarmonyChordSymbol
+} from "../io/harmony.ts"
 import { mapPitchSet, mod12 } from "../tuning/pitch-class-set.ts"
 
 /** MIDI 2.0 UMP Message Type 0xD (Flex Data, always 128-bit / 4 words). */
@@ -170,9 +176,12 @@ export interface FlexMetronome {
 	barAccents: [number, number, number]
 	subdivisions: [number, number]
 }
-export type DecodedFlexData = DecodedFlexTempo | DecodedFlexKeySignature | DecodedFlexChordName |
-	({ kind: "timeSignature"; group: number } & FlexTimeSignature) |
-	({ kind: "metronome"; group: number } & FlexMetronome)
+export type DecodedFlexData =
+	| DecodedFlexTempo
+	| DecodedFlexKeySignature
+	| DecodedFlexChordName
+	| ({ kind: "timeSignature"; group: number } & FlexTimeSignature)
+	| ({ kind: "metronome"; group: number } & FlexMetronome)
 
 function signed4(nibble: number): number {
 	const value = nibble & 0xf
@@ -184,8 +193,19 @@ function packSigned4(value: number): number {
 }
 
 function makeFlexHeader(statusBank: number, status: number, options: FlexDataAddress = {}): number {
-	if (options.group !== undefined && (!Number.isInteger(options.group) || options.group < 0 || options.group > 15)) throw new Error("Invalid UMP group")
-	if (options.channel !== undefined && !options.groupScoped && (!Number.isInteger(options.channel) || options.channel < 1 || options.channel > 16)) throw new Error("Invalid MIDI channel")
+	if (
+		options.group !== undefined &&
+		(!Number.isInteger(options.group) || options.group < 0 || options.group > 15)
+	) {
+		throw new Error("Invalid UMP group")
+	}
+	if (
+		options.channel !== undefined &&
+		!options.groupScoped &&
+		(!Number.isInteger(options.channel) || options.channel < 1 || options.channel > 16)
+	) {
+		throw new Error("Invalid MIDI channel")
+	}
 	const group = Math.max(0, Math.min(15, Math.round(options.group ?? 0))) & 0xf
 	const groupScoped = options.groupScoped ?? true
 	const addrs = groupScoped ? 1 : 0
@@ -193,13 +213,14 @@ function makeFlexHeader(statusBank: number, status: number, options: FlexDataAdd
 		? 0
 		: Math.max(0, Math.min(15, Math.round((options.channel ?? 1) - 1))) & 0xf
 	return (
-		(UMP_TYPE_FLEX_DATA << 28) |
-		(group << 24) |
-		(addrs << 20) |
-		(channel << 16) |
-		((statusBank & 0xff) << 8) |
-		(status & 0xff)
-	) >>> 0
+		((UMP_TYPE_FLEX_DATA << 28) |
+			(group << 24) |
+			(addrs << 20) |
+			(channel << 16) |
+			((statusBank & 0xff) << 8) |
+			(status & 0xff)) >>>
+		0
+	)
 }
 
 function intervalsToMask(root: number, intervals: Iterable<number>): number {
@@ -218,8 +239,9 @@ function applyAlterations(
 	for (const alt of alterations) {
 		const degree = ((alt.degree - 1) % 7) + 1
 		const natural = [0, 2, 4, 5, 7, 9, 11][degree - 1]
-		const candidates = degree === 3 ? [3, 4] : degree === 5 ? [6, 7, 8] : degree === 7 ? [10, 11] : [natural]
-		const semitone = candidates.find(n => tones.has(n)) ?? natural
+		const candidates =
+			degree === 3 ? [3, 4] : degree === 5 ? [6, 7, 8] : degree === 7 ? [10, 11] : [natural]
+		const semitone = candidates.find((n) => tones.has(n)) ?? natural
 		if (semitone === undefined) {
 			continue
 		}
@@ -239,17 +261,14 @@ function applyAlterations(
 }
 
 function decodeAlterations(word1: number, word2: number): FlexChordAlteration[] | undefined {
-	const bytes = [
-		(word1 >>> 8) & 0xff,
-		word1 & 0xff,
-		(word2 >>> 24) & 0xff,
-		(word2 >>> 16) & 0xff
-	]
+	const bytes = [(word1 >>> 8) & 0xff, word1 & 0xff, (word2 >>> 24) & 0xff, (word2 >>> 16) & 0xff]
 	const result: FlexChordAlteration[] = []
 	for (const byte of bytes) {
 		const type = (byte >>> 4) & 0xf
 		const degree = byte & 0xf
-		if (type > 4 || (type !== 0 && degree === 0)) return
+		if (type > 4 || (type !== 0 && degree === 0)) {
+			return
+		}
 		if (type >= 1 && degree > 0) {
 			result.push({ type: type as 1 | 2 | 3 | 4, degree })
 		}
@@ -284,7 +303,11 @@ function formatChordName(
 
 /** Decode a MIDI 2.0 Flex Data UMP packet (Set Tempo, Set Key Signature, Set Chord Name). */
 export function decodeFlexDataUmp(words: readonly number[]): DecodedFlexData | undefined {
-	if (!Array.isArray(words) || words.length !== 4 || words.some(w => !Number.isInteger(w) || w < 0 || w > 0xffffffff)) {
+	if (
+		!Array.isArray(words) ||
+		words.length !== 4 ||
+		words.some((w) => !Number.isInteger(w) || w < 0 || w > 0xffffffff)
+	) {
 		return
 	}
 	const w0 = words[0] >>> 0
@@ -296,9 +319,13 @@ export function decodeFlexDataUmp(words: readonly number[]): DecodedFlexData | u
 		return
 	}
 	const group = (w0 >>> 24) & 0xf
-	if (((w0 >>> 20) & 3) > 1) return
+	if (((w0 >>> 20) & 3) > 1) {
+		return
+	}
 	const groupScoped = ((w0 >>> 20) & 0x3) === 1
-	if (groupScoped && ((w0 >>> 16) & 15) !== 0) return
+	if (groupScoped && ((w0 >>> 16) & 15) !== 0) {
+		return
+	}
 	const channel = groupScoped ? 0 : ((w0 >>> 16) & 0xf) + 1
 	const statusBank = (w0 >>> 8) & 0xff
 	const status = w0 & 0xff
@@ -325,29 +352,67 @@ export function decodeFlexDataUmp(words: readonly number[]): DecodedFlexData | u
 		const numerator = w1 >>> 24
 		const exponent = (w1 >>> 16) & 255
 		const thirtySecondNotes = (w1 >>> 8) & 255
-		if (!groupScoped || !numerator || exponent > 7 || !thirtySecondNotes || (w1 & 255) || w2 || w3) return
-		return { kind: "timeSignature", group, numerator, denominator: 2 ** exponent, thirtySecondNotes }
+		if (
+			!groupScoped ||
+			!numerator ||
+			exponent > 7 ||
+			!thirtySecondNotes ||
+			w1 & 255 ||
+			w2 ||
+			w3
+		) {
+			return
+		}
+		return {
+			kind: "timeSignature",
+			group,
+			numerator,
+			denominator: 2 ** exponent,
+			thirtySecondNotes
+		}
 	}
 	if (status === FLEX_STATUS_SET_METRONOME) {
-		if (!groupScoped || !((w1 >>> 24) & 255) || (w2 & 0xffff) || w3) return
-		return { kind: "metronome", group, clocksPerClick: w1 >>> 24,
+		if (!groupScoped || !((w1 >>> 24) & 255) || w2 & 0xffff || w3) {
+			return
+		}
+		return {
+			kind: "metronome",
+			group,
+			clocksPerClick: w1 >>> 24,
 			barAccents: [(w1 >>> 16) & 255, (w1 >>> 8) & 255, w1 & 255],
-			subdivisions: [w2 >>> 24, (w2 >>> 16) & 255] }
+			subdivisions: [w2 >>> 24, (w2 >>> 16) & 255]
+		}
 	}
 
 	if (status === FLEX_STATUS_SET_KEY_SIGNATURE) {
 		const sfNibble = (w1 >>> 28) & 0xf
 		const tonicLetter = (w1 >>> 24) & 0xf
-		if (tonicLetter > 7 || (w1 & 0xffffff) || w2 || w3) return
+		if (tonicLetter > 7 || w1 & 0xffffff || w2 || w3) {
+			return
+		}
 		const sharpsOrFlats = signed4(sfNibble)
-		if (sharpsOrFlats === -8) return { kind: "keySignature", group, channel, groupScoped, sharpsOrFlats, tonic: tonicLetter }
+		if (sharpsOrFlats === -8) {
+			return {
+				kind: "keySignature",
+				group,
+				channel,
+				groupScoped,
+				sharpsOrFlats,
+				tonic: tonicLetter
+			}
+		}
 		const majorRoot = mod12(sharpsOrFlats * 7)
 		const scale = mapPitchSet(MAJOR_MASK, 1, majorRoot)
 		let root: number | undefined
 		const naturalPc = LETTER_TO_PC[tonicLetter]
 		if (naturalPc !== undefined) {
 			const order = sharpsOrFlats > 0 ? [6, 3, 7, 4, 1, 5, 2] : [2, 5, 1, 4, 7, 3, 6]
-			root = mod12(naturalPc + (order.slice(0, Math.abs(sharpsOrFlats)).includes(tonicLetter) ? Math.sign(sharpsOrFlats) : 0))
+			root = mod12(
+				naturalPc +
+					(order.slice(0, Math.abs(sharpsOrFlats)).includes(tonicLetter)
+						? Math.sign(sharpsOrFlats)
+						: 0)
+			)
 		}
 		return {
 			kind: "keySignature",
@@ -366,13 +431,21 @@ export function decodeFlexDataUmp(words: readonly number[]): DecodedFlexData | u
 		const tonicLetter = (w1 >>> 24) & 0xf
 		const chordType = (w1 >>> 16) & 0xff
 		const naturalPc = LETTER_TO_PC[tonicLetter]
-		if ((w2 & 0xffff) || chordType > 27 || (chordType !== 0 && naturalPc === undefined) || tonicAccidental < -2 || tonicAccidental > 2) {
+		if (
+			w2 & 0xffff ||
+			chordType > 27 ||
+			(chordType !== 0 && naturalPc === undefined) ||
+			tonicAccidental < -2 ||
+			tonicAccidental > 2
+		) {
 			return
 		}
 		const root = mod12((naturalPc ?? 0) + tonicAccidental)
 		const baseIntervals = CHORD_TYPE_INTERVALS[chordType] ?? []
 		const alterations = decodeAlterations(w1, w2)
-		if (!alterations) return
+		if (!alterations) {
+			return
+		}
 		const tones = applyAlterations(baseIntervals, alterations)
 		const chord = chordType === 0 ? 0 : intervalsToMask(root, tones)
 
@@ -381,8 +454,16 @@ export function decodeFlexDataUmp(words: readonly number[]): DecodedFlexData | u
 		const bassNatural = LETTER_TO_PC[bassLetter]
 		const bassType = (w3 >>> 16) & 255
 		const bassAlterations = decodeAlterations(w3, 0)
-		if (!bassAlterations || bassType > 27 || bassLetter > 7 ||
-			(bassLetter === 0 ? bassAccidental !== -8 && chordType !== 0 : bassAccidental < -2 || bassAccidental > 2)) return
+		if (
+			!bassAlterations ||
+			bassType > 27 ||
+			bassLetter > 7 ||
+			(bassLetter === 0
+				? bassAccidental !== -8 && chordType !== 0
+				: bassAccidental < -2 || bassAccidental > 2)
+		) {
+			return
+		}
 		const bass = bassNatural !== undefined ? mod12(bassNatural + bassAccidental) : undefined
 
 		return {
@@ -396,8 +477,16 @@ export function decodeFlexDataUmp(words: readonly number[]): DecodedFlexData | u
 			alterations,
 			bass,
 			name: chordType === 0 ? "N.C." : formatChordName(root, chordType, alterations, bass),
-			symbol: { tonic: tonicLetter, accidental: tonicAccidental, type: chordType, alterations,
-				bassTonic: bassLetter, bassAccidental, bassType, bassAlterations }
+			symbol: {
+				tonic: tonicLetter,
+				accidental: tonicAccidental,
+				type: chordType,
+				alterations,
+				bassTonic: bassLetter,
+				bassAccidental,
+				bassType,
+				bassAlterations
+			}
 		}
 	}
 }
@@ -405,7 +494,9 @@ export function decodeFlexDataUmp(words: readonly number[]): DecodedFlexData | u
 /** Encode a MIDI 2.0 Flex Data Set Tempo UMP packet. */
 export function encodeFlexTempoUmp(bpm: number, options: FlexDataAddress = {}): number[] {
 	const units = Math.round(6_000_000_000 / bpm)
-	if (!Number.isFinite(bpm) || bpm <= 0 || units < 1 || units > 0xffffffff) throw new Error("Tempo is outside the Flex Data range")
+	if (!Number.isFinite(bpm) || bpm <= 0 || units < 1 || units > 0xffffffff) {
+		throw new Error("Tempo is outside the Flex Data range")
+	}
 	return [
 		makeFlexHeader(FLEX_STATUS_BANK_COMMON, FLEX_STATUS_SET_TEMPO, {
 			...options,
@@ -435,23 +526,46 @@ export function encodeFlexKeySignatureUmp(
 	if (sharpsOrFlats !== -8) {
 		tonic = 0
 		for (let letter = 1; letter <= 7; letter++) {
-			const packet = [makeFlexHeader(0, 5), ((packSigned4(sharpsOrFlats) << 28) | (letter << 24)) >>> 0, 0, 0]
+			const packet = [
+				makeFlexHeader(0, 5),
+				((packSigned4(sharpsOrFlats) << 28) | (letter << 24)) >>> 0,
+				0,
+				0
+			]
 			const decoded = decodeFlexDataUmp(packet)
-			if (decoded?.kind === "keySignature" && decoded.root === state.root) { tonic = letter; break }
+			if (decoded?.kind === "keySignature" && decoded.root === state.root) {
+				tonic = letter
+				break
+			}
 		}
-	} else tonic = 0
+	} else {
+		tonic = 0
+	}
 	if (state.keySignature) {
 		const signature = state.keySignature
-		const packet = [makeFlexHeader(0, 5), ((packSigned4(signature.sharpsOrFlats) << 28) | (signature.tonic << 24)) >>> 0, 0, 0]
+		const packet = [
+			makeFlexHeader(0, 5),
+			((packSigned4(signature.sharpsOrFlats) << 28) | (signature.tonic << 24)) >>> 0,
+			0,
+			0
+		]
 		const decoded = decodeFlexDataUmp(packet)
-		if (decoded?.kind === "keySignature" && (decoded.scale === undefined || decoded.scale === state.scale) &&
-			(decoded.root === undefined || decoded.root === state.root)) {
+		if (
+			decoded?.kind === "keySignature" &&
+			(decoded.scale === undefined || decoded.scale === state.scale) &&
+			(decoded.root === undefined || decoded.root === state.root)
+		) {
 			sharpsOrFlats = signature.sharpsOrFlats
 			tonic = signature.tonic
 		}
 	}
 	const w1 = ((packSigned4(sharpsOrFlats) << 28) | ((tonic & 0xf) << 24)) >>> 0
-	return [makeFlexHeader(FLEX_STATUS_BANK_COMMON, FLEX_STATUS_SET_KEY_SIGNATURE, options), w1, 0, 0]
+	return [
+		makeFlexHeader(FLEX_STATUS_BANK_COMMON, FLEX_STATUS_SET_KEY_SIGNATURE, options),
+		w1,
+		0,
+		0
+	]
 }
 
 function matchChordType(relativeMask: number): number {
@@ -472,16 +586,36 @@ export function encodeFlexChordNameUmp(
 	const header = makeFlexHeader(FLEX_STATUS_BANK_COMMON, FLEX_STATUS_SET_CHORD_NAME, options)
 	if (state.chordSymbol) {
 		const s = state.chordSymbol
-		const alt = (a?: FlexChordAlteration) => a ? (a.type << 4) | a.degree : 0
-		const packet = [header,
-			((packSigned4(s.accidental) << 28) | (s.tonic << 24) | (s.type << 16) | (alt(s.alterations[0]) << 8) | alt(s.alterations[1])) >>> 0,
+		const alt = (a?: FlexChordAlteration) => (a ? (a.type << 4) | a.degree : 0)
+		const packet = [
+			header,
+			((packSigned4(s.accidental) << 28) |
+				(s.tonic << 24) |
+				(s.type << 16) |
+				(alt(s.alterations[0]) << 8) |
+				alt(s.alterations[1])) >>>
+				0,
 			((alt(s.alterations[2]) << 24) | (alt(s.alterations[3]) << 16)) >>> 0,
-			((packSigned4(s.bassAccidental) << 28) | (s.bassTonic << 24) | (s.bassType << 16) | (alt(s.bassAlterations[0]) << 8) | alt(s.bassAlterations[1])) >>> 0]
+			((packSigned4(s.bassAccidental) << 28) |
+				(s.bassTonic << 24) |
+				(s.bassType << 16) |
+				(alt(s.bassAlterations[0]) << 8) |
+				alt(s.bassAlterations[1])) >>>
+				0
+		]
 		const decoded = decodeFlexDataUmp(packet)
-		if (decoded?.kind === "chordName" && decoded.chord === state.chord &&
-			(!state.chord || decoded.root === (state.chordRoot ?? state.root)) && decoded.bass === state.bass) return packet
+		if (
+			decoded?.kind === "chordName" &&
+			decoded.chord === state.chord &&
+			(!state.chord || decoded.root === (state.chordRoot ?? state.root)) &&
+			decoded.bass === state.bass
+		) {
+			return packet
+		}
 	}
-	if (!state.chord) return [header, 0, 0, 0x80000000]
+	if (!state.chord) {
+		return [header, 0, 0, 0x80000000]
+	}
 	const root = mod12(state.chordRoot ?? state.root)
 	const relativeMask = mapPitchSet(state.chord, 1, -root)
 	let chordType = matchChordType(relativeMask)
@@ -494,20 +628,32 @@ export function encodeFlexChordNameUmp(
 			const baseMask = intervalsToMask(0, intervals)
 			const degreeFor = (pc: number) => [1, 2, 2, 3, 3, 4, 5, 5, 5, 6, 7, 7][pc]
 			for (const pc of intervals) {
-				if (!(relativeMask & (1 << pc))) changes.push({ type: 2, degree: degreeFor(pc) })
+				if (!(relativeMask & (1 << pc))) {
+					changes.push({ type: 2, degree: degreeFor(pc) })
+				}
 			}
 			for (let pc = 0; pc < 12; pc++) {
-				if (!(relativeMask & ~baseMask & (1 << pc))) continue
+				if (!(relativeMask & ~baseMask & (1 << pc))) {
+					continue
+				}
 				const degree = degreeFor(pc)
 				const natural = [0, 2, 4, 5, 7, 9, 11][degree - 1]
 				changes.push({ type: pc === natural ? 1 : pc > natural ? 3 : 4, degree })
 			}
-			if (changes.length <= 4 && (!best || changes.length < best.length) &&
-				intervalsToMask(0, applyAlterations(intervals, changes)) === relativeMask) {
-				best = changes; chordType = Number(type)
+			if (
+				changes.length <= 4 &&
+				(!best || changes.length < best.length) &&
+				intervalsToMask(0, applyAlterations(intervals, changes)) === relativeMask
+			) {
+				best = changes
+				chordType = Number(type)
 			}
 		}
-		if (!best) throw new Error("This pitch set cannot be represented exactly as a MIDI 2.0 chord symbol")
+		if (!best) {
+			throw new Error(
+				"This pitch set cannot be represented exactly as a MIDI 2.0 chord symbol"
+			)
+		}
 		alterations = best
 	}
 
@@ -530,25 +676,59 @@ export function encodeFlexChordNameUmp(
 		w3 = ((packSigned4(bass.accidental) << 28) | ((bass.letter & 0xf) << 24)) >>> 0
 	}
 
-	return [makeFlexHeader(FLEX_STATUS_BANK_COMMON, FLEX_STATUS_SET_CHORD_NAME, options), w1, w2, w3]
+	return [
+		makeFlexHeader(FLEX_STATUS_BANK_COMMON, FLEX_STATUS_SET_CHORD_NAME, options),
+		w1,
+		w2,
+		w3
+	]
 }
 
-export function encodeFlexTimeSignatureUmp(signature: FlexTimeSignature, options: FlexDataAddress = {}): number[] {
+export function encodeFlexTimeSignatureUmp(
+	signature: FlexTimeSignature,
+	options: FlexDataAddress = {}
+): number[] {
 	const exponent = Math.log2(signature.denominator)
-	if (!Number.isInteger(signature.numerator) || signature.numerator < 1 || signature.numerator > 255 ||
-		!Number.isInteger(exponent) || exponent < 1 || exponent > 7 ||
-		!Number.isInteger(signature.thirtySecondNotes) || signature.thirtySecondNotes < 1 || signature.thirtySecondNotes > 255) throw new Error("Invalid Flex Data time signature")
-	return [makeFlexHeader(0, FLEX_STATUS_SET_TIME_SIGNATURE, { ...options, groupScoped: true }),
-		((signature.numerator << 24) | (exponent << 16) | (signature.thirtySecondNotes << 8)) >>> 0, 0, 0]
+	if (
+		!Number.isInteger(signature.numerator) ||
+		signature.numerator < 1 ||
+		signature.numerator > 255 ||
+		!Number.isInteger(exponent) ||
+		exponent < 1 ||
+		exponent > 7 ||
+		!Number.isInteger(signature.thirtySecondNotes) ||
+		signature.thirtySecondNotes < 1 ||
+		signature.thirtySecondNotes > 255
+	) {
+		throw new Error("Invalid Flex Data time signature")
+	}
+	return [
+		makeFlexHeader(0, FLEX_STATUS_SET_TIME_SIGNATURE, { ...options, groupScoped: true }),
+		((signature.numerator << 24) | (exponent << 16) | (signature.thirtySecondNotes << 8)) >>> 0,
+		0,
+		0
+	]
 }
 
-export function encodeFlexMetronomeUmp(metronome: FlexMetronome, options: FlexDataAddress = {}): number[] {
+export function encodeFlexMetronomeUmp(
+	metronome: FlexMetronome,
+	options: FlexDataAddress = {}
+): number[] {
 	const values = [metronome.clocksPerClick, ...metronome.barAccents, ...metronome.subdivisions]
-	if (metronome.barAccents.length !== 3 || metronome.subdivisions.length !== 2 ||
-		values.some(n => !Number.isInteger(n) || n < 0 || n > 255) || !metronome.clocksPerClick) throw new Error("Invalid Flex Data metronome")
-	return [makeFlexHeader(0, FLEX_STATUS_SET_METRONOME, { ...options, groupScoped: true }),
+	if (
+		metronome.barAccents.length !== 3 ||
+		metronome.subdivisions.length !== 2 ||
+		values.some((n) => !Number.isInteger(n) || n < 0 || n > 255) ||
+		!metronome.clocksPerClick
+	) {
+		throw new Error("Invalid Flex Data metronome")
+	}
+	return [
+		makeFlexHeader(0, FLEX_STATUS_SET_METRONOME, { ...options, groupScoped: true }),
 		((values[0] << 24) | (values[1] << 16) | (values[2] << 8) | values[3]) >>> 0,
-		((values[4] << 24) | (values[5] << 16)) >>> 0, 0]
+		((values[4] << 24) | (values[5] << 16)) >>> 0,
+		0
+	]
 }
 
 export interface FlexDataHarmonyAdapterOptions {
@@ -579,6 +759,8 @@ export class FlexDataHarmonyAdapter {
 	#onTempo?: (bpm: number) => void
 	#options: FlexDataHarmonyAdapterOptions
 	#scheduled = new Set<ReturnType<typeof setTimeout>>()
+	#batches = new Map<number, DecodedFlexData[]>()
+	#batching = false
 
 	constructor(options: FlexDataHarmonyAdapterOptions = {}) {
 		this.#options = options
@@ -605,15 +787,50 @@ export class FlexDataHarmonyAdapter {
 
 	feed(words: readonly number[], effectiveAt?: number): DecodedFlexData | undefined {
 		const decoded = decodeFlexDataUmp(words)
-		if (!decoded || (this.#options.group !== undefined && decoded.group !== this.#options.group) ||
-			("groupScoped" in decoded && !decoded.groupScoped && decoded.channel !== this.#options.channel)) {
+		if (
+			!decoded ||
+			(this.#options.group !== undefined && decoded.group !== this.#options.group) ||
+			("groupScoped" in decoded &&
+				!decoded.groupScoped &&
+				decoded.channel !== this.#options.channel)
+		) {
 			return
 		}
 		if (effectiveAt !== undefined) {
 			const delay = effectiveAt - (this.#options.now?.() ?? performance.now())
-			if (!Number.isFinite(delay) || delay > 60_000 || this.#scheduled.size >= 1024) return
+			if (!Number.isFinite(delay) || delay > 60_000 || this.#scheduled.size >= 1024) {
+				return
+			}
 			if (delay > 0) {
-				const timer = setTimeout(() => { this.#scheduled.delete(timer); this.#apply(decoded, true) }, delay)
+				const pending = this.#batches.get(effectiveAt)
+				if (pending) {
+					if (pending.length < 128) {
+						pending.push(decoded)
+					}
+					return decoded
+				}
+				const batch = [decoded]
+				this.#batches.set(effectiveAt, batch)
+				const timer = setTimeout(() => {
+					this.#scheduled.delete(timer)
+					this.#batches.delete(effectiveAt)
+					this.#batching = true
+					try {
+						for (const message of batch) {
+							this.#apply(message, true)
+						}
+					} finally {
+						this.#batching = false
+					}
+					if (
+						batch.some(
+							(message) =>
+								message.kind === "keySignature" || message.kind === "chordName"
+						)
+					) {
+						this.flush()
+					}
+				}, delay)
 				this.#scheduled.add(timer)
 				return decoded
 			}
@@ -627,8 +844,14 @@ export class FlexDataHarmonyAdapter {
 			this.#onTempo?.(decoded.bpm)
 			return
 		}
-		if (decoded.kind === "timeSignature") { this.#options.onTimeSignature?.(decoded); return }
-		if (decoded.kind === "metronome") { this.#options.onMetronome?.(decoded); return }
+		if (decoded.kind === "timeSignature") {
+			this.#options.onTimeSignature?.(decoded)
+			return
+		}
+		if (decoded.kind === "metronome") {
+			this.#options.onMetronome?.(decoded)
+			return
+		}
 		if (decoded.kind === "keySignature") {
 			this.#state = {
 				...this.#state,
@@ -663,8 +886,11 @@ export class FlexDataHarmonyAdapter {
 	}
 
 	destroy(): void {
-		for (const timer of this.#scheduled) clearTimeout(timer)
+		for (const timer of this.#scheduled) {
+			clearTimeout(timer)
+		}
 		this.#scheduled.clear()
+		this.#batches.clear()
 		if (this.#timer) {
 			clearTimeout(this.#timer)
 			this.#timer = undefined
@@ -672,11 +898,16 @@ export class FlexDataHarmonyAdapter {
 	}
 
 	#scheduleEmit(timed = false): void {
+		if (this.#batching) {
+			return
+		}
 		if (timed || this.#coalesceMs === 0) {
 			this.flush()
 			return
 		}
-		if (this.#timer) return
+		if (this.#timer) {
+			return
+		}
 		this.#timer = setTimeout(() => {
 			this.#timer = undefined
 			this.#onHarmony?.(this.state, this.#chordName)

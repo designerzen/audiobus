@@ -1,5 +1,11 @@
 import { devicePanel } from "../device-controls"
-import { PerformanceTransformer, copyCommand, noteKey, type Settings, type Voice } from "./performance-transformer"
+import {
+	PerformanceTransformer,
+	copyCommand,
+	noteKey,
+	type Settings,
+	type Voice
+} from "./performance-transformer"
 import { PER_NOTE_CONTROLLER, PER_NOTE_PITCH_BEND } from "../../commands/commands"
 import { POLYPHONIC_PRESSURE } from "../../midi/midi-command-conversion"
 import type { IAudioCommand } from "../../commands/audio-command-interface"
@@ -46,6 +52,7 @@ export class TransformerChordTrack extends PerformanceTransformer {
 	category = "Harmony"
 	beat = 0
 	private harmony: HarmonicState = { ...DEFAULT_HARMONY }
+	private expression = new Map<string, Map<string, IAudioCommand>>()
 	setHarmony(state: HarmonicState): void {
 		this.harmony = parseHarmony(state)
 		if (Number(this.options.repitch) === 1 && this.voices.size > 0) {
@@ -93,7 +100,7 @@ export class TransformerChordTrack extends PerformanceTransformer {
 		super(
 			{
 				role: "melody",
-					follow: "chord",
+				follow: "chord",
 				source: "track",
 				mapping: "nearest",
 				repitch: 0,
@@ -147,7 +154,9 @@ export class TransformerChordTrack extends PerformanceTransformer {
 		this.beat = beat
 	}
 	private targetPitches(input: number): number[] {
-		if (this.options.follow === "free") return [input]
+		if (this.options.follow === "free") {
+			return [input]
+		}
 		const step = chordAt(this.progression, this.beat)
 		const live = this.options.source === "live"
 		const chord = live
@@ -202,9 +211,7 @@ export class TransformerChordTrack extends PerformanceTransformer {
 					? pitchClasses(chord.mask).map((pitch) => Math.floor(input / 12) * 12 + pitch)
 					: [this.options.role === "bass" ? input - mod12(input - bassRoot) : nearest]
 		}
-		return notes
-			.map((pitch) => pitch + transpose)
-			.filter((pitch) => pitch >= 0 && pitch <= 127)
+		return notes.map((pitch) => pitch + transpose).filter((pitch) => pitch >= 0 && pitch <= 127)
 	}
 	private repitchHeldVoices() {
 		const noteOffs = []
@@ -225,7 +232,10 @@ export class TransformerChordTrack extends PerformanceTransformer {
 			}
 			for (const pitch of desired) {
 				if (!kept.has(pitch)) {
-					noteOns.push(this.start(voice, pitch, this.now, voice.input.velocity))
+					noteOns.push(
+						...this.expressionFor(voice, pitch),
+						this.start(voice, pitch, this.now, voice.input.velocity)
+					)
 				}
 			}
 		}
@@ -233,22 +243,92 @@ export class TransformerChordTrack extends PerformanceTransformer {
 		return [...noteOffs, ...noteOns]
 	}
 	protected noteOn(voice: Voice) {
-		return this.targetPitches(voice.input.number).map((pitch) => this.start(voice, pitch))
+		return this.targetPitches(voice.input.number).flatMap((pitch) => [
+			...this.expressionFor(voice, pitch),
+			this.start(voice, pitch)
+		])
+	}
+	private expressionFor(voice: Voice, number: number): IAudioCommand[] {
+		return [...(this.expression.get(noteKey(voice.input))?.values() ?? [])].map((command) =>
+			this.mapExpression(command, number)
+		)
+	}
+	private mapExpression(command: IAudioCommand, number: number): IAudioCommand {
+		const mapped = copyCommand(command, { number, startAt: this.now })
+		// Registered per-note Pitch is absolute 7.25 pitch, not a relative bend.
+		if (mapped.ump && ((mapped.ump[0] >>> 20) & 15) === 0 && (mapped.ump[0] & 255) === 3) {
+			mapped.ump = [...mapped.ump]
+			mapped.ump[1] =
+				Math.max(
+					0,
+					Math.min(0xffffffff, mapped.ump[1] + (number - command.number) * 2 ** 25)
+				) >>> 0
+		}
+		return mapped
+	}
+	protected override clearRoute(route: string): IAudioCommand[] {
+		for (const key of this.expression.keys()) {
+			if (key.startsWith(`${route}:`)) {
+				this.expression.delete(key)
+			}
+		}
+		return []
+	}
+	protected override start(
+		voice: Voice,
+		pitch = voice.input.number,
+		at = this.now,
+		velocity = voice.input.velocity
+	): IAudioCommand {
+		const command = super.start(voice, pitch, at, velocity)
+		// Pitch attribute #3 overrides the note number: move it with the harmony
+		// while retaining the 1/512-semitone fractional tuning and native velocity.
+		if (command.ump && (command.ump[0] & 255) === 3) {
+			command.ump = [...command.ump]
+			const value = Math.max(
+				0,
+				Math.min(
+					65535,
+					(command.ump[1] & 65535) + (command.number - voice.input.number) * 512
+				)
+			)
+			command.ump[1] = ((command.ump[1] & 0xffff0000) | value) >>> 0
+		}
+		return command
 	}
 	protected override noteOff(voice: Voice, command: IAudioCommand): IAudioCommand[] {
-		return this.release(voice, command.startAt).map(target => copyCommand(command, { number: target.number }))
+		return this.release(voice, command.startAt).map((target) =>
+			copyCommand(command, { number: target.number })
+		)
 	}
 	protected override other(command: IAudioCommand): IAudioCommand[] {
-		if (![PER_NOTE_CONTROLLER, PER_NOTE_PITCH_BEND, POLYPHONIC_PRESSURE].includes(command.type)) return [command]
+		if (
+			![PER_NOTE_CONTROLLER, PER_NOTE_PITCH_BEND, POLYPHONIC_PRESSURE].includes(command.type)
+		) {
+			return [command]
+		}
+		const key = noteKey(command)
+		if (!this.expression.has(key) && this.expression.size >= 2048) {
+			this.expression.delete(this.expression.keys().next().value!)
+		}
+		const values = this.expression.get(key) ?? new Map<string, IAudioCommand>()
+		values.set(
+			`${command.type}:${command.registered ?? false}:${command.controller ?? 0}`,
+			copyCommand(command)
+		)
+		this.expression.set(key, values)
 		const targets = new Set<number>()
 		for (const voice of this.voices) {
 			if (!voice.released && noteKey(voice.input) === noteKey(command)) {
-				for (const target of voice.targets) targets.add(target.number)
+				for (const target of voice.targets) {
+					targets.add(target.number)
+				}
 			}
 		}
-		return [...targets].map(number => copyCommand(command, { number }))
+		return [...targets].map((number) => this.mapExpression(command, number))
 	}
 	protected clearState() {
 		this.beat = 0
+		this.expression?.clear()
 	}
 }

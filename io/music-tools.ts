@@ -8,19 +8,46 @@ import {
 } from "./harmony"
 import { NOTE_ON, NOTE_OFF } from "../commands/commands"
 import { clipCommand, parseEventClip, type EventClip } from "./event-clip"
-import { encodeFlexTimeSignatureUmp, encodeFlexMetronomeUmp, type FlexTimeSignature, type FlexMetronome } from "../midi/flex-data"
+import {
+	encodeFlexTimeSignatureUmp,
+	encodeFlexMetronomeUmp,
+	type FlexTimeSignature,
+	type FlexMetronome
+} from "../midi/flex-data"
 
 export interface MusicalTiming {
 	timeSignature?: FlexTimeSignature
 	metronome?: FlexMetronome
 }
 export function parseMusicalTiming(value: MusicalTiming): MusicalTiming {
-	if (!value || typeof value !== "object") throw new Error("Invalid musical timing")
-	if (value.timeSignature) encodeFlexTimeSignatureUmp(value.timeSignature)
-	if (value.metronome) encodeFlexMetronomeUmp(value.metronome)
+	if (!value || typeof value !== "object") {
+		throw new Error("Invalid musical timing")
+	}
+	if (value.timeSignature) {
+		encodeFlexTimeSignatureUmp(value.timeSignature)
+	}
+	if (value.metronome) {
+		encodeFlexMetronomeUmp(value.metronome)
+	}
 	return {
-		...(value.timeSignature ? { timeSignature: { numerator: value.timeSignature.numerator, denominator: value.timeSignature.denominator, thirtySecondNotes: value.timeSignature.thirtySecondNotes } } : {}),
-		...(value.metronome ? { metronome: { clocksPerClick: value.metronome.clocksPerClick, barAccents: [...value.metronome.barAccents], subdivisions: [...value.metronome.subdivisions] } as FlexMetronome } : {})
+		...(value.timeSignature
+			? {
+					timeSignature: {
+						numerator: value.timeSignature.numerator,
+						denominator: value.timeSignature.denominator,
+						thirtySecondNotes: value.timeSignature.thirtySecondNotes
+					}
+				}
+			: {}),
+		...(value.metronome
+			? {
+					metronome: {
+						clocksPerClick: value.metronome.clocksPerClick,
+						barAccents: [...value.metronome.barAccents],
+						subdivisions: [...value.metronome.subdivisions]
+					} as FlexMetronome
+				}
+			: {})
 	}
 }
 
