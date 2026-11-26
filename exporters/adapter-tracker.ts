@@ -7,6 +7,26 @@ import { MOD_SPEC, writeMOD } from "../formats/tracker/mod-writer"
 import { S3M_SPEC, writeS3M } from "../formats/tracker/s3m-writer"
 import { XM_SPEC, writeXM } from "../formats/tracker/xm-writer"
 import {
+	STM_SPEC,
+	AMF_SPEC,
+	PTM_SPEC,
+	writeSTM,
+	writeAMF,
+	writePTM
+} from "../formats/tracker/additional-writers"
+import {
+	MTM_SPEC,
+	DSM_SPEC,
+	ULT_SPEC,
+	C669_SPEC,
+	OKT_SPEC,
+	writeMTM,
+	writeDSM,
+	writeULT,
+	write669,
+	writeOKT
+} from "../formats/tracker/legacy-writers"
+import {
 	TRACKER_EXPORT_FORMATS,
 	type TrackerExportId,
 	type TrackerExportOptions,
@@ -31,7 +51,15 @@ const WRITERS: Record<
 	mod: { spec: MOD_SPEC, write: writeMOD },
 	xm: { spec: XM_SPEC, write: writeXM },
 	s3m: { spec: S3M_SPEC, write: writeS3M },
-	it: { spec: IT_SPEC, write: writeIT }
+	it: { spec: IT_SPEC, write: writeIT },
+	mtm: { spec: MTM_SPEC, write: writeMTM },
+	dsm: { spec: DSM_SPEC, write: writeDSM },
+	ult: { spec: ULT_SPEC, write: writeULT },
+	"669": { spec: C669_SPEC, write: write669 },
+	okt: { spec: OKT_SPEC, write: writeOKT },
+	stm: { spec: STM_SPEC, write: writeSTM },
+	amf: { spec: AMF_SPEC, write: writeAMF },
+	ptm: { spec: PTM_SPEC, write: writePTM }
 }
 
 /** Module bytes for a recording; each instrument that played gets one embedded sample.

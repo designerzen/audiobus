@@ -142,6 +142,19 @@ export async function detectImportFile(file: File): Promise<DetectedImportFile> 
 		at(0, 4) === "IMPM" ||
 		/^MMD[0-3]$/.test(at(0, 4)) ||
 		at(44, 4) === "SCRM" ||
+		at(44, 4) === "PTMF" ||
+		at(0, 25) === "ASYLUM Music Format V1.0\0" ||
+		/^MAS_UTrack_V00[1-4]$/.test(at(0, 15)) ||
+		(["if", "JN"].includes(at(0, 2)) &&
+			bytes.length >= 497 &&
+			bytes[110] <= 64 &&
+			bytes[111] >= 1 &&
+			bytes[111] <= 128 &&
+			bytes[112] < 128 &&
+			bytes.subarray(113, 241).every((order) => order < 128 || order >= 254) &&
+			bytes.subarray(241, 369).every((speed) => speed <= 15) &&
+			bytes.subarray(369, 497).every((row) => row < 64)) ||
+		(at(20, 8) === "!Scream!" && bytes[28] === 0x1a && bytes[29] === 2 && bytes[30] === 2) ||
 		/^(M\.K\.|M!K!|FLT[48]|[1-9]CHN|[0-9]{2}CH)$/.test(at(1080, 4)) ||
 		["DBM0", "DMDL", "PTMF", "PSM ", "MT20", "IM10", "XPKF"].includes(at(0, 4)) ||
 		(["PSM", "FAR", "GDM"].includes(at(0, 3)) && bytes[3] === 0xfe) ||

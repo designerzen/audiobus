@@ -45,7 +45,15 @@ export const TRACKER_EXPORT_FORMATS = [
 	{ id: "mod", label: "ProTracker module", extension: "mod" },
 	{ id: "xm", label: "FastTracker 2 module", extension: "xm" },
 	{ id: "s3m", label: "Scream Tracker 3 module", extension: "s3m" },
-	{ id: "it", label: "Impulse Tracker module", extension: "it" }
+	{ id: "it", label: "Impulse Tracker module", extension: "it" },
+	{ id: "mtm", label: "MultiTracker module", extension: "mtm" },
+	{ id: "dsm", label: "DSIK module", extension: "dsm" },
+	{ id: "ult", label: "UltraTracker module", extension: "ult" },
+	{ id: "669", label: "Composer 669 module", extension: "669" },
+	{ id: "okt", label: "Oktalyzer module (4 channels)", extension: "okt" },
+	{ id: "stm", label: "Scream Tracker 2 module", extension: "stm" },
+	{ id: "amf", label: "ASYLUM module", extension: "amf" },
+	{ id: "ptm", label: "PolyTracker module", extension: "ptm" }
 ] as const
 export type TrackerExportId = (typeof TRACKER_EXPORT_FORMATS)[number]["id"]
 
