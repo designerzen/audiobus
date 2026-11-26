@@ -11,12 +11,20 @@ const PALETTE_TOKENS = {
 	sharpRow: "--col-surface-raised",
 	grid: "--col-line",
 	label: "--col-muted",
-	playhead: "--col-fg"
+	playhead: "--col-fg",
+	cut: "--col-warning"
 }
+
+/** Absolute times in milliseconds, comparable with performance.timeOrigin + performance.now(). */
+export type TimelineCuts = { cutIn?: number; cutOut?: number }
 
 export default class NoteTimelineVisualiser extends AbstractResizeable {
 	private interactions = new AbortController()
 	private observer: ResizeObserver
+	/** The next click on the timeline places this cut. */
+	private armed?: "in" | "out"
+	/** Called whenever the cut in or end point moves or is cleared. */
+	onCuts?: (cuts: TimelineCuts) => void
 
 	constructor(canvas: HTMLCanvasElement) {
 		super(canvas, TIMELINE_WORKER)
@@ -53,27 +61,66 @@ export default class NoteTimelineVisualiser extends AbstractResizeable {
 		const pan = (x: number, y: number) => this.worker.postMessage({ type: "pan", x, y })
 		const zoom = (factor: number, anchor = 0.5) =>
 			this.worker.postMessage({ type: "zoom", factor, anchor })
-		canvas
-			.parentElement!.querySelectorAll<HTMLButtonElement>("[data-timeline-action]")
-			.forEach((button) => {
-				button.addEventListener(
-					"click",
-					() => {
-						switch (button.dataset.timelineAction) {
-							case "zoom-in":
-								zoom(1.25)
-								break
-							case "zoom-out":
-								zoom(0.8)
-								break
-							case "follow":
-								this.worker.postMessage({ type: "follow" })
-								break
-						}
-					},
-					{ signal }
-				)
+		const buttons =
+			canvas.parentElement!.querySelectorAll<HTMLButtonElement>("[data-timeline-action]")
+		const arm = (edge?: "in" | "out") => {
+			this.armed = edge
+			canvas.dataset.placing = edge ?? ""
+			buttons.forEach((button) => {
+				const action = button.dataset.timelineAction
+				if (action === "cut-in" || action === "cut-out") {
+					button.setAttribute("aria-pressed", String(action === `cut-${edge}`))
+				}
 			})
+		}
+		const cut = (edge: "in" | "out", position?: number) => {
+			arm()
+			this.worker.postMessage({ type: "cut", edge, position })
+		}
+		this.worker.addEventListener(
+			"message",
+			({ data }) => {
+				if (data?.type !== "cuts") {
+					return
+				}
+				buttons.forEach((button) => {
+					if (button.dataset.timelineAction === "clear-cuts") {
+						button.hidden = data.cutIn === undefined && data.cutOut === undefined
+					}
+				})
+				this.onCuts?.({ cutIn: data.cutIn, cutOut: data.cutOut })
+			},
+			{ signal }
+		)
+		buttons.forEach((button) => {
+			button.addEventListener(
+				"click",
+				() => {
+					switch (button.dataset.timelineAction) {
+						case "zoom-in":
+							zoom(1.25)
+							break
+						case "zoom-out":
+							zoom(0.8)
+							break
+						case "follow":
+							this.worker.postMessage({ type: "follow" })
+							break
+						case "cut-in":
+						case "cut-out": {
+							const edge = button.dataset.timelineAction === "cut-in" ? "in" : "out"
+							arm(this.armed === edge ? undefined : edge)
+							break
+						}
+						case "clear-cuts":
+							arm()
+							this.worker.postMessage({ type: "clearCuts" })
+							break
+					}
+				},
+				{ signal }
+			)
+		})
 		canvas.addEventListener(
 			"wheel",
 			(event) => {
@@ -102,6 +149,11 @@ export default class NoteTimelineVisualiser extends AbstractResizeable {
 			"pointerdown",
 			(event) => {
 				if (event.button !== 0 || pointer !== undefined) {
+					return
+				}
+				if (this.armed) {
+					const rect = canvas.getBoundingClientRect()
+					cut(this.armed, (event.clientX - rect.left) / rect.width)
 					return
 				}
 				pointer = event.pointerId
@@ -148,6 +200,10 @@ export default class NoteTimelineVisualiser extends AbstractResizeable {
 					zoom(event.key === "-" ? 0.8 : 1.25)
 				} else if (event.key === "Home") {
 					this.worker.postMessage({ type: "follow" })
+				} else if (event.key === "i" || event.key === "o") {
+					cut(event.key === "i" ? "in" : "out")
+				} else if (event.key === "Escape" && this.armed) {
+					arm()
 				} else {
 					return
 				}

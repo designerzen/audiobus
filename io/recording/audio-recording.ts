@@ -41,6 +41,9 @@ export class AudioRecording extends EventTarget {
 	private stopped?: () => void
 	private stopping?: Promise<void>
 	private cached = new Map<RecordingBits, Blob>()
+	/** When capture began, as performance.timeOrigin + performance.now(); unknown for a recovered take. */
+	private startedAt?: number
+	private cuts: { cutIn?: number; cutOut?: number } = {}
 	readonly ready: Promise<void>
 
 	constructor(
@@ -172,6 +175,7 @@ export class AudioRecording extends EventTarget {
 			this.captureFailed = false
 			this.error = ""
 			this.state = "recording"
+			this.startedAt = performance.timeOrigin + performance.now()
 			node.port.postMessage(RECORDING_START)
 		} catch (error) {
 			this.disconnect()
@@ -274,6 +278,35 @@ export class AudioRecording extends EventTarget {
 		this.stopped = undefined
 	}
 
+	/**
+	 * Trim saved audio to a cut in and end point, given as absolute times in milliseconds
+	 * on the same clock as performance.timeOrigin + performance.now(), so the take need not
+	 * start with the silence before the first note. Omitted points keep the take's own edges.
+	 */
+	setCuts(cuts: { cutIn?: number; cutOut?: number }) {
+		this.cuts = { ...cuts }
+		this.cached.clear()
+		this.changed()
+	}
+
+	/** The frames the cuts keep, or undefined when the whole take is kept. */
+	private trimmedFrames(): [number, number] | undefined {
+		if (this.startedAt === undefined) {
+			return
+		}
+		const frame = (time: number) =>
+			Math.max(
+				0,
+				Math.min(
+					this.frames,
+					Math.round(((time - this.startedAt!) / 1000) * this.sampleRate)
+				)
+			)
+		const start = this.cuts.cutIn === undefined ? 0 : frame(this.cuts.cutIn)
+		const end = this.cuts.cutOut === undefined ? this.frames : frame(this.cuts.cutOut)
+		return (start > 0 || end < this.frames) && end > start ? [start, end] : undefined
+	}
+
 	/** Compressed exports read the retained float WAV incrementally and can stream directly to disk. */
 	async exportAudio(
 		format: AudioExportFormat,
@@ -314,8 +347,23 @@ export class AudioRecording extends EventTarget {
 				],
 				{ type: "audio/wav" }
 			)
-		this.cached.set(bits, result)
-		return result
+		const range = this.trimmedFrames()
+		const frameBytes = (2 * bits) / 8
+		const headerBytes = bits === 32 ? 92 : 80
+		const kept = range
+			? new Blob(
+					[
+						waveHeader((range[1] - range[0]) * frameBytes, this.sampleRate, bits),
+						result.slice(
+							headerBytes + range[0] * frameBytes,
+							headerBytes + range[1] * frameBytes
+						)
+					],
+					{ type: "audio/wav" }
+				)
+			: result
+		this.cached.set(bits, kept)
+		return kept
 	}
 }
 

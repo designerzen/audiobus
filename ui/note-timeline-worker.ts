@@ -10,6 +10,9 @@ let offset = 0
 let scale = 100
 let topNote = 84
 let follow = true
+/** Cut in and end point, in seconds on the timeline, which trim the saved recording. */
+let cutIn: number | undefined
+let cutOut: number | undefined
 const rowHeight = 14
 const gutter = 48
 const ruler = 24
@@ -20,7 +23,8 @@ const palette = {
 	sharpRow: "#1b202c",
 	grid: "#364052",
 	label: "#c7d1e4",
-	playhead: "#f5f7ff"
+	playhead: "#f5f7ff",
+	cut: "#f2b84b"
 }
 const now = () =>
 	origin === undefined ? 0 : (performance.timeOrigin + performance.now() - origin) / 1000
@@ -74,12 +78,46 @@ function render() {
 	}
 	context.fillStyle = palette.playhead
 	context.fillRect(gutter + (time - offset) * scale, ruler, 1, canvas.height - ruler)
+	drawCuts(time)
 	context.restore()
 	if (!timeline.notes.length) {
 		context.fillStyle = palette.label
 		context.fillText("Play notes to build a timeline", gutter + 16, ruler + 30)
 	}
 	requestAnimationFrame(render)
+}
+
+/** Dims what the cuts leave out and marks each cut on the ruler. */
+function drawCuts(time: number) {
+	const x = (t: number) => gutter + (t - offset) * scale
+	const height = canvas.height - ruler
+	context.save()
+	context.globalAlpha = 0.55
+	context.fillStyle = palette.background
+	if (cutIn !== undefined) {
+		context.fillRect(gutter, ruler, Math.max(0, x(cutIn) - gutter), height)
+	}
+	if (cutOut !== undefined) {
+		context.fillRect(x(cutOut), ruler, Math.max(0, x(time) - x(cutOut)), height)
+	}
+	context.restore()
+	context.fillStyle = palette.cut
+	for (const [label, t] of [
+		["In", cutIn],
+		["End", cutOut]
+	] as const) {
+		if (t !== undefined) {
+			context.fillRect(x(t) - 1, ruler, 2, height)
+			context.fillText(label, x(t) + 4, ruler + 12)
+		}
+	}
+}
+
+/** Tells the page where the cuts sit, as absolute times in milliseconds. */
+function postCuts() {
+	const absolute = (t: number | undefined) =>
+		t === undefined || origin === undefined ? undefined : origin + t * 1000
+	globalThis.postMessage({ type: "cuts", cutIn: absolute(cutIn), cutOut: absolute(cutOut) })
 }
 
 globalThis.onmessage = ({ data }) => {
@@ -111,6 +149,8 @@ globalThis.onmessage = ({ data }) => {
 		case "clear":
 			timeline.clear()
 			origin = undefined
+			cutIn = cutOut = undefined
+			postCuts()
 			offset = 0
 			follow = true
 			break
@@ -136,6 +176,32 @@ globalThis.onmessage = ({ data }) => {
 		}
 		case "follow":
 			follow = true
+			break
+		case "cut": {
+			if (origin === undefined) {
+				break
+			}
+			// Without a position the cut lands at the centre of the view.
+			const x =
+				data.position === undefined ? width() / 2 : data.position * canvas.width - gutter
+			const at = Math.max(0, Math.min(now(), offset + x / scale))
+			if (data.edge === "in") {
+				cutIn = at
+				if (cutOut !== undefined && cutOut <= at) {
+					cutOut = undefined
+				}
+			} else {
+				cutOut = at
+				if (cutIn !== undefined && cutIn >= at) {
+					cutIn = undefined
+				}
+			}
+			postCuts()
+			break
+		}
+		case "clearCuts":
+			cutIn = cutOut = undefined
+			postCuts()
 			break
 	}
 }
